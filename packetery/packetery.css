@@ -1,0 +1,43 @@
+/* Zasilkovna */
+div.packetery-branch-list {font-size: 100%; text-align: left; }
+div.packetery-branch-list select {background: #eee; color: #000; border: 1px solid #888; width: 350px; }
+div.packetery-branch-list img {border: 0 none; }
+div.packetery-branch-list a {font-weight: bold; text-decoration: underline; text-align: left; font-style: normal; }
+div.packetery-branch-list a:hover {text-decoration: none; }
+
+.packetery-branch-list-in-city {position: absolute; z-index: 2222; border: 3px solid #888; background: white; border-collapse: collapse; text-align: left; font-size: 10pt; }
+.packetery-branch-list-in-city th {background: #888; font-weight: bold; color: white; margin: 0; padding: 3px; text-align: center; font-size: 100%; }
+.packetery-branch-list-in-city td {padding: 3px; margin: 0; cursor: pointer; }
+.packetery-branch-list-in-city td + td {border-left: 1px solid black; }
+.packetery-branch-list-in-city tr.packetery-branch-row + tr td {border-top: 1px solid black; }
+.packetery-branch-list-in-city tr:hover td {background: #ddd; }
+
+.packetery-info-dialog {font-size: 10pt; font-family: Verdana, Arial, sans-serif; line-height: 1.4em; text-align: left; } 
+.packetery-info-dialog h3 {color: black; font-size: 110%; font-weight: bold; padding: 0; margin: 1em 0 0.2em; }
+.packetery-info-dialog p {margin: 0 0 0.3em; }
+.packetery-info-dialog div.packetery-left {float: left; width: 390px; }
+.packetery-info-dialog div.packetery-right {float: right; width: 506px; }
+.packetery-info-dialog div.packetery-map {width: 506px; height: 300px; }
+.packetery-info-dialog .packetery-thumb {padding: 0; margin: 0; display: block; }
+.packetery-info-dialog .packetery-thumb a {float: left; margin: 10px 10px 0 0; border: 1px solid black; padding: 0; }
+.packetery-info-dialog .packetery-thumb a.packetery-three {margin-right: 0; }
+.packetery-info-dialog .packetery-thumb a.packetery-no-thumb {margin: 0; border: 0 none; }
+.packetery-info-dialog .packetery-thumb a img {margin: 0; border: 0 none; display: block; }
+
+div.packetery-branch-list-header {padding: .5em .5em .5em .7em; }
+table.packetery-branch-list {width: 100%; background: #fff; border-collapse: collapse; border: 1px dotted #abc; margin: 0 0 1em 0; font-size: 10pt; }
+table.packetery-branch-list tr:hover td {background: #cde; }
+table.packetery-branch-list td {border: 1px dotted #abc; padding: 4px; cursor: pointer; }
+table.packetery-branch-list td a {color: black; text-decoration: underline; }
+table.packetery-branch-list td a:hover {text-decoration: none; }
+
+div.packetery-branch-item-header {padding: .5em .5em .5em .7em; margin-bottom: 0.7em; }
+div.packetery-branch-item {clear: right; padding-bottom: 1em; font-size: 10pt; }
+div.packetery-branch-item h3 {font-size: 12pt; font-weight: bold; margin: 0; padding: 0; border: 0 none; color: black; }
+div.packetery-branch-item + div.packetery-branch-item {padding-top: 1em; border-top: 1px solid #579; }
+div.packetery-branch-item table.packetery-right {float: right; border: 0 none; border-collapse: collapse; margin: 0; padding: 0; font-size: 10pt; border-left: 1px dashed #abc; border-bottom: 1px dashed #abc; border-right: 1px dashed #abc; }
+div.packetery-branch-item table.packetery-right td {border: 0 none; margin: 0; padding: 4px; }
+div.packetery-branch-item div.packetery-main div {margin-top: 0.5em; }
+div.packetery-branch-item div.packetery-main p {margin: 0 0 0.25em; }
+div.packetery-branch-item div.packetery-main a {color: black; text-decoration: underline; }
+div.packetery-branch-item div.packetery-main a:hover {text-decoration: none; }

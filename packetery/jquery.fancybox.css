@@ -1,0 +1,415 @@
+/* Fancybox */
+/*
+ * FancyBox - jQuery Plugin
+ * Simple and fancy lightbox alternative
+ *
+ * Examples and documentation at: http://fancybox.net
+ * 
+ * Copyright (c) 2008 - 2010 Janis Skarnelis
+ *
+ * Version: 1.3.1 (05/03/2010)
+ * Requires: jQuery v1.3+
+ *
+ * Dual licensed under the MIT and GPL licenses:
+ *   http://www.opensource.org/licenses/mit-license.php
+ *   http://www.gnu.org/licenses/gpl.html
+ */
+
+#fancyzbox-loading {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	height: 40px;
+	width: 40px;
+	margin-top: -20px;
+	margin-left: -20px;
+	cursor: pointer;
+	overflow: hidden;
+	z-index: 1104;
+	display: none;
+}
+
+* html #fancyzbox-loading {	/* IE6 */
+	position: absolute;
+	margin-top: 0;
+}
+
+#fancyzbox-loading div {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 40px;
+	height: 480px;
+	background-image: url('fancybox/fancybox.png');
+}
+
+#fancyzbox-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	background: #000;
+	z-index: 1100;
+	display: none;
+}
+
+* html #fancyzbox-overlay {	/* IE6 */
+	position: absolute;
+	width: 100%;
+}
+
+#fancyzbox-tmp {
+	padding: 0;
+	margin: 0;
+	border: 0;
+	overflow: auto;
+	display: none;
+}
+
+#fancyzbox-wrap {
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin: 0;
+	padding: 20px;
+	z-index: 1101;
+	display: none;
+}
+
+/* oprava pro pilulky24.cz */
+#fancyzbox-wrap,
+#fancyzbox-wrap * {
+	-moz-box-sizing: content-box;
+	box-sizing: content-box;
+}
+
+#fancyzbox-outer {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	background: #FFF;
+}
+
+#fancyzbox-inner {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: 0;
+	outline: none;
+	overflow: hidden;
+}
+
+#fancyzbox-hide-sel-frame {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: transparent;
+}
+
+#fancyzbox-close {
+	position: absolute;
+	top: -15px;
+	right: -15px;
+	width: 30px;
+	height: 30px;
+	background: url('fancybox/fancybox.png');
+	background-position: -40px 0px;
+	cursor: pointer;
+	z-index: 1103;
+	display: none;
+}
+
+#fancyzbox_error {
+	color: #444;
+	font: normal 12px/20px Arial;
+	padding: 7px;
+	margin: 0;
+}
+
+#fancyzbox-content {
+	height: auto;
+	width: auto;
+	padding: 0;
+	margin: 0;
+}
+
+#fancyzbox-img {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	border: none;
+	outline: none;
+	line-height: 0;
+	vertical-align: top;
+	-ms-interpolation-mode: bicubic;
+}
+
+#fancyzbox-frame {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	border: none;
+	display: block;
+}
+
+#fancyzbox-title {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	font-family: Arial;
+	font-size: 12px;
+	z-index: 1102;
+}
+
+.fancyzbox-title-inside {
+	padding: 10px 0;
+	text-align: center;
+	color: #333;
+}
+
+.fancyzbox-title-outside {
+	padding-top: 5px;
+	color: #FFF;
+	text-align: center;
+	font-weight: bold;
+}
+
+.fancyzbox-title-over {
+	color: #FFF;
+	text-align: left;
+}
+
+#fancyzbox-title-over {
+	padding: 10px;
+	background-image: url('fancybox/fancy_title_over.png');
+	display: block;
+}
+
+#fancyzbox-title-wrap {
+	display: inline-block;
+}
+
+#fancyzbox-title-wrap span {
+	height: 32px;
+	float: left;
+}
+
+#fancyzbox-title-left {
+	padding-left: 15px;
+	background-image: url('fancybox/fancybox.png');
+	background-position: -40px -90px;
+	background-repeat: no-repeat;
+}
+
+#fancyzbox-title-main {
+	font-weight: bold;
+	line-height: 29px;
+	background-image: url('fancybox/fancybox-x.png');
+	background-position: 0px -40px;
+	color: #FFF;
+}
+
+#fancyzbox-title-right {
+	padding-left: 15px;
+	background-image: url('fancybox/fancybox.png');
+	background-position: -55px -90px;
+	background-repeat: no-repeat;
+}
+
+#fancyzbox-left, #fancyzbox-right {
+	position: absolute;
+	bottom: 0px;
+	height: 100%;
+	width: 35%;
+	cursor: pointer;
+	outline: none;
+	background: url('fancybox/blank.gif');
+	z-index: 1102;
+	display: none;
+}
+
+#fancyzbox-left {
+	left: 0px;
+}
+
+#fancyzbox-right {
+	right: 0px;
+}
+
+#fancyzbox-left-ico, #fancyzbox-right-ico {
+	position: absolute;
+	top: 50%;
+	left: -9999px;
+	width: 30px;
+	height: 30px;
+	margin-top: -15px;
+	cursor: pointer;
+	z-index: 1102;
+	display: block;
+}
+
+#fancyzbox-left-ico {
+	background-image: url('fancybox/fancybox.png');
+	background-position: -40px -30px;
+}
+
+#fancyzbox-right-ico {
+	background-image: url('fancybox/fancybox.png');
+	background-position: -40px -60px;
+}
+
+#fancyzbox-left:hover, #fancyzbox-right:hover {
+	visibility: visible;    /* IE6 */
+}
+
+#fancyzbox-left:hover span {
+	left: 20px;
+}
+
+#fancyzbox-right:hover span {
+	left: auto;
+	right: 20px;
+}
+
+.fancy-bg {
+	position: absolute;
+	padding: 0;
+	margin: 0;
+	border: 0;
+	width: 20px;
+	height: 20px;
+	z-index: 1001;
+}
+
+#fancyz-bg-n {
+	top: -20px;
+	left: 0;
+	width: 100%;
+	background-image: url('fancybox/fancybox-x.png');
+}
+
+#fancyz-bg-ne {
+	top: -20px;
+	right: -20px;
+	background-image: url('fancybox/fancybox.png');
+	background-position: -40px -162px;
+}
+
+#fancyz-bg-e {
+	top: 0;
+	right: -20px;
+	height: 100%;
+	background-image: url('fancybox/fancybox-y.png');
+	background-position: -20px 0px;
+}
+
+#fancyz-bg-se {
+	bottom: -20px;
+	right: -20px;
+	background-image: url('fancybox/fancybox.png');
+	background-position: -40px -182px; 
+}
+
+#fancyz-bg-s {
+	bottom: -20px;
+	left: 0;
+	width: 100%;
+	background-image: url('fancybox/fancybox-x.png');
+	background-position: 0px -20px;
+}
+
+#fancyz-bg-sw {
+	bottom: -20px;
+	left: -20px;
+	background-image: url('fancybox/fancybox.png');
+	background-position: -40px -142px;
+}
+
+#fancyz-bg-w {
+	top: 0;
+	left: -20px;
+	height: 100%;
+	background-image: url('fancybox/fancybox-y.png');
+}
+
+#fancyz-bg-nw {
+	top: -20px;
+	left: -20px;
+	background-image: url('fancybox/fancybox.png');
+	background-position: -40px -122px;
+}
+
+/* IE */
+
+#fancyzbox-loading.fancybox-ie div	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_loading.png', sizingMethod='scale'); }
+.fancybox-ie #fancyzbox-close		{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_close.png', sizingMethod='scale'); }
+
+.fancybox-ie #fancyzbox-title-over	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_title_over.png', sizingMethod='scale'); zoom: 1; }
+.fancybox-ie #fancyzbox-title-left	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_title_left.png', sizingMethod='scale'); }
+.fancybox-ie #fancyzbox-title-main	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_title_main.png', sizingMethod='scale'); }
+.fancybox-ie #fancyzbox-title-right	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_title_right.png', sizingMethod='scale'); }
+
+.fancybox-ie #fancyzbox-left-ico		{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_nav_left.png', sizingMethod='scale'); }
+.fancybox-ie #fancyzbox-right-ico	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_nav_right.png', sizingMethod='scale'); }
+
+.fancybox-ie .fancy-bg { background: transparent !important; }
+
+.fancybox-ie #fancyz-bg-n	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_n.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-ne	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_ne.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-e	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_e.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-se	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_se.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-s	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_s.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-sw	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_sw.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-w	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_w.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-nw	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_nw.png', sizingMethod='scale'); }
+
+/* Zasilkovna */
+div.packetery-branch-list {font-size: 100%; text-align: left; }
+div.packetery-branch-list select {background: #eee; color: #000; border: 1px solid #888; width: 350px; }
+div.packetery-branch-list img {border: 0 none; }
+div.packetery-branch-list a {font-weight: bold; text-decoration: underline; text-align: left; font-style: normal; }
+div.packetery-branch-list a:hover {text-decoration: none; }
+
+.packetery-branch-list-in-city {position: absolute; z-index: 2222; border: 3px solid #888; background: white; border-collapse: collapse; text-align: left; font-size: 10pt; }
+.packetery-branch-list-in-city th {background: #888; font-weight: bold; color: white; margin: 0; padding: 3px; text-align: center; font-size: 100%; }
+.packetery-branch-list-in-city td {padding: 3px; margin: 0; cursor: pointer; }
+.packetery-branch-list-in-city td + td {border-left: 1px solid black; }
+.packetery-branch-list-in-city tr.packetery-branch-row + tr td {border-top: 1px solid black; }
+.packetery-branch-list-in-city tr:hover td {background: #ddd; }
+
+.packetery-info-dialog {font-size: 10pt; font-family: Verdana, Arial, sans-serif; line-height: 1.4em; text-align: left; } 
+.packetery-info-dialog h3 {color: black; font-size: 110%; font-weight: bold; padding: 0; margin: 1em 0 0.2em; }
+.packetery-info-dialog p {margin: 0 0 0.3em; }
+.packetery-info-dialog div.packetery-left {float: left; width: 390px; }
+.packetery-info-dialog div.packetery-right {float: right; width: 506px; }
+.packetery-info-dialog div.packetery-map {width: 506px; height: 300px; }
+.packetery-info-dialog .packetery-thumb {padding: 0; margin: 0; display: block; }
+.packetery-info-dialog .packetery-thumb a {float: left; margin: 10px 10px 0 0; border: 1px solid black; padding: 0; }
+.packetery-info-dialog .packetery-thumb a.packetery-three {margin-right: 0; }
+.packetery-info-dialog .packetery-thumb a.packetery-no-thumb {margin: 0; border: 0 none; }
+.packetery-info-dialog .packetery-thumb a img {margin: 0; border: 0 none; display: block; }
+
+div.packetery-branch-list-header {padding: .5em .5em .5em .7em; }
+table.packetery-branch-list {width: 100%; background: #fff; border-collapse: collapse; border: 1px dotted #abc; margin: 0 0 1em 0; font-size: 10pt; }
+table.packetery-branch-list tr:hover td {background: #cde; }
+table.packetery-branch-list td {border: 1px dotted #abc; padding: 4px; cursor: pointer; }
+table.packetery-branch-list td a {color: black; text-decoration: underline; }
+table.packetery-branch-list td a:hover {text-decoration: none; }
+
+div.packetery-branch-item-header {padding: .5em .5em .5em .7em; margin-bottom: 0.7em; }
+div.packetery-branch-item {clear: right; padding-bottom: 1em; font-size: 10pt; }
+div.packetery-branch-item h3 {font-size: 12pt; font-weight: bold; margin: 0; padding: 0; border: 0 none; color: black; }
+div.packetery-branch-item + div.packetery-branch-item {padding-top: 1em; border-top: 1px solid #579; }
+div.packetery-branch-item table.packetery-right {float: right; border: 0 none; border-collapse: collapse; margin: 0; padding: 0; font-size: 10pt; border-left: 1px dashed #abc; border-bottom: 1px dashed #abc; border-right: 1px dashed #abc; }
+div.packetery-branch-item table.packetery-right td {border: 0 none; margin: 0; padding: 4px; }
+div.packetery-branch-item div.packetery-main div {margin-top: 0.5em; }
+div.packetery-branch-item div.packetery-main p {margin: 0 0 0.25em; }
+div.packetery-branch-item div.packetery-main a {color: black; text-decoration: underline; }
+div.packetery-branch-item div.packetery-main a:hover {text-decoration: none; }
