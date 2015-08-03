@@ -42,7 +42,7 @@
 
   [![screen2](https://raw.githubusercontent.com/Zasilkovna/prestashop/master/doc/img/3-nainstalovano-varovani.png)](https://raw.githubusercontent.com/Zasilkovna/prestashop/master/doc/img/3-nainstalovano-varovani.png)
 
-5. V nastavení je nutné zadat klíč API. Váš klíč API je cf001e6c16561393 a v případě potřeby jej najdete také ve své klientské sekci, pod Můj účet:
+5. V nastavení je nutné zadat klíč API. Váš klíč API najdete ve své klientské sekci, pod Můj účet:
 
   [![screen2](https://raw.githubusercontent.com/Zasilkovna/prestashop/master/doc/img/4-klic-api.png)](https://raw.githubusercontent.com/Zasilkovna/prestashop/master/doc/img/4-klic-api.png)
 
