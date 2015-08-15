@@ -21,6 +21,10 @@
               $id_carrier = $context->cart->id_carrier;
               $id_cart = $context->cart->id;
           }
+          else {
+              $id_carrier = null;
+              $id_cart = null;
+          }
 
           $is_packetery_carrier = ($db->getValue('select 1 from `'._DB_PREFIX_.'packetery_carrier` where id_carrier=' . ((int) $id_carrier)) == 1);
           if($is_packetery_carrier) {

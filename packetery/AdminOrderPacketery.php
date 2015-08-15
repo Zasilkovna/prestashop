@@ -31,10 +31,10 @@ class AdminOrderPacketery extends AdminTab
     }
 
     // not sure why I had to do this to make it work
-    function l($str)
+    function l($str, $class = 'AdminOrderPacketery', $addslashes = false, $htmlentities = true)
     {
         $this->ensure_initialized();
-        return $this->packetery->l($str, "AdminOrderPacketery");
+        return $this->packetery->l($str, $class, $addslashes, $htmlentities);
     }
     
     private function csv_escape($s)

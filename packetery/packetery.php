@@ -9,7 +9,7 @@ if(!defined('_PS_VERSION_')) {
 
 class Packetery extends Module
 {
-    const VERSION = '1.14';
+    const VERSION = '1.15';
     private $supported_countries = array('cz', 'sk');
     private $currency_conversion;
     const CC_PRESTASHOP = 1, CC_CNB = 2, CC_FIXED = 3;
@@ -249,14 +249,14 @@ class Packetery extends Module
 
     private function c_configuration_post()
     {
-        if($_POST['packetery_api_key']) {
+        if(isset($_POST['packetery_api_key']) && $_POST['packetery_api_key']) {
             if(trim($_POST['packetery_api_key']) != Configuration::get('PACKETERY_API_KEY')) {
                 Configuration::updateValue('PACKETERY_API_KEY', trim($_POST['packetery_api_key']));
                 @unlink(_PS_MODULE_DIR_."packetery/api.js");
                 @clearstatcache();
             }
         }
-        if($_POST['packetery_eshop_domain']) {
+        if(isset($_POST['packetery_eshop_domain']) && $_POST['packetery_eshop_domain']) {
             Configuration::updateValue('PACKETERY_ESHOP_DOMAIN', trim($_POST['packetery_eshop_domain']));
         }
     }
@@ -264,7 +264,7 @@ class Packetery extends Module
     public function c_add_carrier_post()
     {
         $db = Db::getInstance();
-        if(!$_POST['packetery_add_carrier']) return;
+        if(!isset($_POST['packetery_add_carrier']) || !$_POST['packetery_add_carrier']) return;
         
         $carrier = new Carrier();
         
@@ -317,6 +317,7 @@ class Packetery extends Module
 
     private function c_configuration()
     {
+        $html = "";
         $html .= "<fieldset><legend>" . $this->l('Module Configuration') . "</legend>";
         $html .= "<form method='post'>";
 
@@ -343,6 +344,7 @@ class Packetery extends Module
     
     private function c_add_carrier()
     {
+        $html = "";
         $html .= "<fieldset><legend>" . $this->l('Add Carrier') . "</legend>";
         
         $html .= "<form method='post'>";
@@ -434,7 +436,7 @@ class Packetery extends Module
     }
     private function c_list_carriers_post()
     {
-        if($_POST['packetery_remove_carrier']) {
+        if(isset($_POST['packetery_remove_carrier']) && $_POST['packetery_remove_carrier']) {
             $db = Db::getInstance();
             $db->execute('update `' . _DB_PREFIX_.'carrier` set deleted=1 where external_module_name="packetery" and id_carrier=' . ((int) $_POST['packetery_remove_carrier']));
         }
@@ -443,6 +445,7 @@ class Packetery extends Module
     private function c_list_carriers()
     {
         $db = Db::getInstance();
+        $html = "";
         $html .= "<fieldset><legend>" . $this->l('Carrier List') . "</legend>";
         if($list = $db->executeS('select c.id_carrier, c.name, pc.country, pc.list_type, pc.is_cod from `'._DB_PREFIX_.'carrier` c join `'._DB_PREFIX_.'packetery_carrier` pc on(pc.id_carrier=c.id_carrier) where c.deleted=0')) {
             $html .= "<table class='table' cellspacing='0'>";
@@ -463,7 +466,7 @@ class Packetery extends Module
 
     private function c_list_payments_post()
     {
-        if($_POST['packetery_payment_module']) {
+        if(isset($_POST['packetery_payment_module']) && $_POST['packetery_payment_module']) {
             $db = Db::getInstance();
             if($db->getValue('select 1 from `' . _DB_PREFIX_.'packetery_payment` where module_name="' . pSQL($_POST['packetery_payment_module']) . '"') == 1) {
                 $db->execute('update `' . _DB_PREFIX_.'packetery_payment` set is_cod=' . ((int) $_POST['packetery_payment_is_cod']) . ' where module_name="' . pSQL($_POST['packetery_payment_module']) . '"');
@@ -477,6 +480,7 @@ class Packetery extends Module
     private function c_list_payments()
     {
         $db = Db::getInstance();
+        $html = "";
         $html .= "<fieldset><legend>" . $this->l('Payment List') . "</legend>";
         $html .= "<table class='table' cellspacing='0'>";
         $html .= "<tr><th>" . $this->l('Module') . "</th><th>" . $this->l('Is COD') . "</th><th>" . $this->l('Action') . "</th></tr>";
@@ -502,7 +506,7 @@ class Packetery extends Module
 
     private function c_list_address_delivery_carriers_post()
     {
-        if(!$_POST['address_delivery_carriers']) return;
+        if(!isset($_POST['address_delivery_carriers']) || !$_POST['address_delivery_carriers']) return;
 
         $data = (is_array($_POST["data"]) ? $_POST["data"] : array());
         $db = Db::getInstance();
@@ -521,6 +525,7 @@ class Packetery extends Module
     private function c_list_address_delivery_carriers()
     {
         $db = Db::getInstance();
+        $html = "";
         $html .= "<fieldset><legend>" . $this->l('Address Delivery Carriers List') . "</legend>";
         $html .= "<form method='post'>";
         $html .= "<input type='hidden' name='address_delivery_carriers' value='1'>";
@@ -616,7 +621,7 @@ class Packetery extends Module
         $is_opc = Configuration::get('PS_ORDER_PROCESS_TYPE');
         return '<script type="text/javascript">
   window.packetery.jQuery(function() {
-      window.prestashopPacketerySelectedId = '.($selected_id ?: "null").';'./*This function might get called automagically by some OPC module and this needs to be updated.*/'
+      window.prestashopPacketerySelectedId = '.($selected_id ? $selected_id : "null").';'./*This function might get called automagically by some OPC module and this needs to be updated.*/'
   
       if(window.prestashopPacketeryInitialized) return;
       window.prestashopPacketeryInitialized = true;
@@ -957,6 +962,9 @@ class Packetery extends Module
             $url = preg_replace('/^http:/', 'https:', $url);
             $transportMethod = substr($transportMethod, 0, -1);
             $ssl = true;
+        }
+        else {
+            $ssl = false;
         }
         
         switch($transportMethod) {
