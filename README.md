@@ -1,5 +1,8 @@
 # Modul pro PrestaShop
 
+## Stažení modulu
+<a href="https://github.com/Zasilkovna/prestashop/raw/master/releases/packetery-latest.zip">Klikněte pro stažení poslední verze</a>
+
 ## Informace o modulu
 
 **Podporované jazyky:**
