@@ -1047,7 +1047,7 @@ class Packetery extends Module
     public static function address_deliveries()
     {
         $res = array();
-        $fn = _PS_MODULE_DIR_."packetery/address-delivery.xml"
+        $fn = _PS_MODULE_DIR_."packetery/address-delivery.xml";
         if(function_exists("simplexml_load_file") && file_exists($fn)) {
             $xml = simplexml_load_file($fn);
             foreach($xml->branches->branch as $branch) {
