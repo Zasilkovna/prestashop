@@ -9,7 +9,7 @@ if(!defined('_PS_VERSION_')) {
 
 class Packetery extends Module
 {
-    const VERSION = '1.15';
+    const VERSION = '1.16';
     private $supported_countries = array('cz', 'sk');
     private $currency_conversion;
     const CC_PRESTASHOP = 1, CC_CNB = 2, CC_FIXED = 3;
@@ -41,16 +41,16 @@ class Packetery extends Module
         }
     }
 
-	public static function _isInstalled($module_name)
-	{
-	    if(method_exists("Packetery", "isInstalled")) {
-	        return self::isInstalled($module_name);
-	    }
-	    else {
-	        return true;
-	    }
-	}
-	    
+    public static function _isInstalled($module_name)
+    {
+        if(method_exists("Packetery", "isInstalled")) {
+            return self::isInstalled($module_name);
+        }
+        else {
+            return true;
+        }
+    }
+        
     private static function transportMethod()
     {
         if(extension_loaded('curl')) {
@@ -279,7 +279,7 @@ class Packetery extends Module
         $carrier->need_range = true;
 
         foreach(Language::getLanguages(true) as $language) {
-            if($_POST['delay_'.$language['id_lang']]) {
+            if(isset($_POST['delay_'.$language['id_lang']]) && $_POST['delay_'.$language['id_lang']]) {
                 $carrier->delay[$language['id_lang']] = $_POST['delay_'.$language['id_lang']];
             }
         }
@@ -288,8 +288,8 @@ class Packetery extends Module
             return false;
         }
 
-        $country = implode(',', $_POST['packetery_carrier_country']);
-        $db->execute('insert into `'._DB_PREFIX_.'packetery_carrier` set id_carrier='. ((int) $carrier->id) . ', country="' . pSQL($country ? $country : 'cz,sk') . '", list_type=' . ((int) $_POST['packetery_carrier_list_type']) . ', is_cod=' . ((int) $_POST['packetery_carrier_is_cod']));
+        $country = (isset($_POST['packetery_carrier_country']) ? implode(',', $_POST['packetery_carrier_country']) : "");
+        $db->execute('insert into `'._DB_PREFIX_.'packetery_carrier` set id_carrier='. ((int) $carrier->id) . ', country="' . pSQL($country ? $country : 'cz,sk') . '", list_type=' . ((int) $_POST['packetery_carrier_list_type']) . ', is_cod=' . (isset($_POST['packetery_carrier_is_cod']) ? (int) $_POST['packetery_carrier_is_cod'] : 0));
         
         foreach(Group::getGroups(true) as $group) {
             $db->autoExecute(_DB_PREFIX_.'carrier_group', array('id_carrier' => (int) $carrier->id, 'id_group' => (int) $group['id_group']), 'INSERT');
@@ -301,6 +301,12 @@ class Packetery extends Module
         $rangeWeight->delimiter2 = '5';
         $rangeWeight->add();
 
+        $rangePrice = new RangePrice();
+        $rangePrice->id_carrier = $carrier->id;
+        $rangePrice->delimiter1 = '0';
+        $rangePrice->delimiter2 = '1000000';
+        $rangePrice->add();
+
         $zones = Zone::getZones(true);
         foreach($zones as $zone) {
             $db->autoExecute(_DB_PREFIX_.'carrier_zone', array('id_carrier' => (int) $carrier->id, 'id_zone' => (int) $zone['id_zone']), 'INSERT');
@@ -308,7 +314,7 @@ class Packetery extends Module
             $db->autoExecuteWithNullValues(_DB_PREFIX_.'delivery', array('id_carrier' => (int) $carrier->id, 'id_range_price' => NULL, 'id_range_weight' => (int) $rangeWeight->id, 'id_zone' => (int) $zone['id_zone'], 'price' => '0'), 'INSERT');
         }
 
-        if(strlen($_POST['packetery_carrier_logo']) == 2) {
+        if(isset($_POST['packetery_carrier_logo']) && strlen($_POST['packetery_carrier_logo']) == 2) {
             copy(dirname(__FILE__).'/logo-' . $_POST['packetery_carrier_logo'] . '.jpg', _PS_SHIP_IMG_DIR_.'/'.((int) $carrier->id).'.jpg');
         }
         
@@ -508,7 +514,7 @@ class Packetery extends Module
     {
         if(!isset($_POST['address_delivery_carriers']) || !$_POST['address_delivery_carriers']) return;
 
-        $data = (is_array($_POST["data"]) ? $_POST["data"] : array());
+        $data = (isset($_POST["data"]) && is_array($_POST["data"]) ? $_POST["data"] : array());
         $db = Db::getInstance();
         $address_deliveries = self::address_deliveries();
         foreach($data as $id_carrier => $attr) {
@@ -1021,12 +1027,12 @@ class Packetery extends Module
                     // else keep trying with each load
                     if(file_exists($local)) {
                         $error_count = @file_get_contents($local.".error");
-	                    if($error_count > 5) {
-	                        unlink($local);
-	                    }
-	                    else {
-	                        touch($local);
-	                    }
+                        if($error_count > 5) {
+                            unlink($local);
+                        }
+                        else {
+                            touch($local);
+                        }
                         @file_put_contents($local.".error", $error_count + 1);
                     }
                     return;
@@ -1041,8 +1047,9 @@ class Packetery extends Module
     public static function address_deliveries()
     {
         $res = array();
-        if(function_exists("simplexml_load_file")) {
-            $xml = simplexml_load_file(_PS_MODULE_DIR_."packetery/address-delivery.xml");
+        $fn = _PS_MODULE_DIR_."packetery/address-delivery.xml"
+        if(function_exists("simplexml_load_file") && file_exists($fn)) {
+            $xml = simplexml_load_file($fn);
             foreach($xml->branches->branch as $branch) {
                 $res[(string) $branch->id] = (object) array(
                     'name' => (string) $branch->name,

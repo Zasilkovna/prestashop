@@ -17,7 +17,7 @@
               $id_carrier = $order['id_carrier'];
               $id_cart = $order['id_cart'];
           }
-          elseif(!in_array($controller, array("orderopc", "order"))) {
+          elseif(!in_array($controller, array("orderopc", "order")) && $context && $context->cart) {
               $id_carrier = $context->cart->id_carrier;
               $id_cart = $context->cart->id;
           }
