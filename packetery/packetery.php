@@ -10,7 +10,7 @@ if(!defined('_PS_VERSION_')) {
 class Packetery extends Module
 {
     const VERSION = '1.16';
-    private $supported_countries = array('cz', 'sk');
+    private $supported_countries = array('cz', 'sk', 'pl', 'hu', 'de');
     private $currency_conversion;
     const CC_PRESTASHOP = 1, CC_CNB = 2, CC_FIXED = 3;
     
@@ -19,7 +19,7 @@ class Packetery extends Module
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
         $this->version = self::VERSION;
-        $this->limited_countries = array('cz', 'sk');
+        $this->limited_countries = array('cz', 'sk', 'pl', 'hu', 'de');
         parent::__construct();
 
         $this->author = $this->l('Packetery, Ltd.');
@@ -379,7 +379,7 @@ class Packetery extends Module
 
         $html .= "<label>" . $this->l('Countries') . ": </label>";
         $html .= "<div class='margin-form'><select name='packetery_carrier_country[]' multiple style='width: 180px; ' size='3'>";
-        foreach(array('cz' => $this->l('Czech Republic'), 'sk' => $this->l('Slovakia')) as $code => $country) {
+        foreach(array('cz' => $this->l('Czech Republic'), 'sk' => $this->l('Slovakia'), 'hu' => $this->l('Hungary'), 'pl' => $this->l('Poland'), 'de' => $this->l('Germany')) as $code => $country) {
             $html .= "<option value='$code'>$country</option>\n";
         }
         $html .= "</select>";
