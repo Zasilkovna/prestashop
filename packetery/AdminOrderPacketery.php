@@ -145,7 +145,7 @@ class AdminOrderPacketery extends AdminTab
             $paging .= "<p>" . $this->l('Pages') . ": ";
             for($i = 1; $i <= ceil($items / $per_page); $i++) {
                 if($i == $page) $paging .= '<strong>&nbsp;'.$i.'&nbsp;</strong> ';
-                else $paging .= '<a href="'.$_SERVER[REQUEST_URI].'&packetery_page='.$i.'">&nbsp;'.$i.'&nbsp;</a> ';
+                else $paging .= '<a href="'.$_SERVER['REQUEST_URI'].'&packetery_page='.$i.'">&nbsp;'.$i.'&nbsp;</a> ';
             }
             $paging .= "</p>";
         }
