@@ -9,7 +9,7 @@ if(!defined('_PS_VERSION_')) {
 
 class Packetery extends Module
 {
-    const VERSION = '1.16';
+    const VERSION = '1.17';
     private $supported_countries = array('cz', 'sk', 'pl', 'hu', 'de');
     private $currency_conversion;
     const CC_PRESTASHOP = 1, CC_CNB = 2, CC_FIXED = 3;
@@ -982,7 +982,7 @@ class Packetery extends Module
                 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
                 curl_setopt($ch, CURLOPT_AUTOREFERER, false);
                 curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 7);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 10);
                 if($ssl) {
                     curl_setopt($ch, CURLOPT_CAINFO, __DIR__."/godaddy.crt");
                 }
@@ -994,7 +994,8 @@ class Packetery extends Module
                 
             case 'fopen':
                 if(function_exists('stream_context_create')) {
-                    $ctx = stream_context_create(array('http' => array('timeout' => 7), 'ssl' => array('cafile' => __DIR__."/godaddy.crt", 'verify_peer' => true)));
+                    // set longer timeout here, because we cannot detect timeout errors
+                    $ctx = stream_context_create(array('http' => array('timeout' => 60), 'ssl' => array('cafile' => __DIR__."/godaddy.crt", 'verify_peer' => true)));
                     return file_get_contents($url, false, $ctx);
                 }
                 else {
