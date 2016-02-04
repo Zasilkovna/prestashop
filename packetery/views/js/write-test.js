@@ -1,4 +1,3 @@
-<?php
 /**
  * NOTICE OF LICENSE
  *
@@ -13,9 +12,4 @@
  *  @license   LICENSE.txt
  */
 
-  @header("Content-Type: application/javascript; charset=utf-8");
-  @header("Cache-Control: ");
-  @header("Expires: ");
-  @header("Pragma: ");
-  echo $_GET['call'];
-?>();
+alert('test');

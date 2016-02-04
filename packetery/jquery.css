@@ -56,33 +56,33 @@
 .uiz-widget { font-family: Verdana,Arial,sans-serif; font-size: 1.1em; }
 .uiz-widget .uiz-widget { font-size: 1em; }
 .uiz-widget input, .uiz-widget select, .uiz-widget textarea, .uiz-widget button { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
-.uiz-widget-content { border: 1px solid #a6c9e2; background: #fcfdfd url(zasilkovna/ui-bg_inset-hard_100_fcfdfd_1x100.png) 50% bottom repeat-x; color: #222222; }
+.uiz-widget-content { border: 1px solid #a6c9e2; background: #fcfdfd url(views/img/ui-bg_inset-hard_100_fcfdfd_1x100.png) 50% bottom repeat-x; color: #222222; }
 .uiz-widget-content a { color: #222222; }
-.uiz-widget-header { border: 1px solid #4297d7; background: #2191c0 url(zasilkovna/ui-bg_gloss-wave_75_2191c0_500x100.png) 50% 50% repeat-x; color: #eaf5f7; font-weight: bold; }
+.uiz-widget-header { border: 1px solid #4297d7; background: #2191c0 url(views/img/ui-bg_gloss-wave_75_2191c0_500x100.png) 50% 50% repeat-x; color: #eaf5f7; font-weight: bold; }
 .uiz-widget-header a { color: #eaf5f7; }
 
 /* Interaction states
 ----------------------------------*/
 .uiz-state-default, .uiz-widget-content .uiz-state-default, .uiz-widget-header .uiz-state-default {
   border: 1px solid #448dae;
-  background: #79c9ec url(zasilkovna/ui-bg_glass_75_79c9ec_1x400.png) 50% 50% repeat-x;
+  background: #79c9ec url(views/img/ui-bg_glass_75_79c9ec_1x400.png) 50% 50% repeat-x;
   font-weight: normal; color: #026890; }
 .uiz-state-default a, .uiz-state-default a:link, .uiz-state-default a:visited { color: #026890; text-decoration: none; }
 .uiz-state-hover, .uiz-widget-content .uiz-state-hover, .uiz-widget-header .uiz-state-hover, .uiz-state-focus, .uiz-widget-content .uiz-state-focus, .uiz-widget-header .uiz-state-focus {
   border: 1px solid #77d5f7; 
-  background: #0078ae url(zasilkovna/ui-bg_glass_45_0078ae_1x400.png) 50% 50% repeat-x;
+  background: #0078ae url(views/img/ui-bg_glass_45_0078ae_1x400.png) 50% 50% repeat-x;
   font-weight: normal; color: #ffffff; }
 .uiz-state-hover a, .uiz-state-hover a:hover { color: #ffffff; text-decoration: none; }
 .uiz-state-active, .uiz-widget-content .uiz-state-active, .uiz-widget-header .uiz-state-active {
-  border: 1px solid #DC5C5C; background: #D3413E url(zasilkovna/ui-bg_gloss-wave_50_6eac2c_500x100.png) 50% 50% repeat-x; font-weight: normal; color: #ffffff; }
+  border: 1px solid #DC5C5C; background: #D3413E url(views/img/ui-bg_gloss-wave_50_6eac2c_500x100.png) 50% 50% repeat-x; font-weight: normal; color: #ffffff; }
 .uiz-state-active a, .uiz-state-active a:link, .uiz-state-active a:visited { color: #ffffff; text-decoration: none; }
 .uiz-widget :active { outline: none; }
 
 /* Interaction Cues
 ----------------------------------*/
-.uiz-state-highlight, .uiz-widget-content .uiz-state-highlight, .uiz-widget-header .uiz-state-highlight  {border: 1px solid #fcd113; background: #f8da4e url(zasilkovna/ui-bg_glass_55_f8da4e_1x400.png) 50% 50% repeat-x; color: #915608; }
+.uiz-state-highlight, .uiz-widget-content .uiz-state-highlight, .uiz-widget-header .uiz-state-highlight  {border: 1px solid #fcd113; background: #f8da4e url(views/img/ui-bg_glass_55_f8da4e_1x400.png) 50% 50% repeat-x; color: #915608; }
 .uiz-state-highlight a, .uiz-widget-content .uiz-state-highlight a,.uiz-widget-header .uiz-state-highlight a { color: #915608; }
-.uiz-state-error, .uiz-widget-content .uiz-state-error, .uiz-widget-header .uiz-state-error {border: 1px solid #cd0a0a; background: #e14f1c url(zasilkovna/ui-bg_gloss-wave_45_e14f1c_500x100.png) 50% top repeat-x; color: #ffffff; }
+.uiz-state-error, .uiz-widget-content .uiz-state-error, .uiz-widget-header .uiz-state-error {border: 1px solid #cd0a0a; background: #e14f1c url(views/img/ui-bg_gloss-wave_45_e14f1c_500x100.png) 50% top repeat-x; color: #ffffff; }
 .uiz-state-error a, .uiz-widget-content .uiz-state-error a, .uiz-widget-header .uiz-state-error a { color: #ffffff; }
 .uiz-state-error-text, .uiz-widget-content .uiz-state-error-text, .uiz-widget-header .uiz-state-error-text { color: #ffffff; }
 .uiz-priority-primary, .uiz-widget-content .uiz-priority-primary, .uiz-widget-header .uiz-priority-primary { font-weight: bold; }
@@ -93,14 +93,14 @@
 ----------------------------------*/
 
 /* states and images */
-.uiz-icon { width: 16px; height: 16px; background-image: url(zasilkovna/ui-icons_0078ae_256x240.png); }
-.uiz-widget-content .uiz-icon {background-image: url(zasilkovna/ui-icons_0078ae_256x240.png); }
-.uiz-widget-header .uiz-icon {background-image: url(zasilkovna/ui-icons_d8e7f3_256x240.png); }
-.uiz-state-default .uiz-icon { background-image: url(zasilkovna/ui-icons_056b93_256x240.png); }
-.uiz-state-hover .uiz-icon, .uiz-state-focus .uiz-icon {background-image: url(zasilkovna/ui-icons_e0fdff_256x240.png); }
-.uiz-state-active .uiz-icon {background-image: url(zasilkovna/ui-icons_f5e175_256x240.png); }
-.uiz-state-highlight .uiz-icon {background-image: url(zasilkovna/ui-icons_f7a50d_256x240.png); }
-.uiz-state-error .uiz-icon, .uiz-state-error-text .uiz-icon {background-image: url(zasilkovna/ui-icons_fcd113_256x240.png); }
+.uiz-icon { width: 16px; height: 16px; background-image: url(views/img/ui-icons_0078ae_256x240.png); }
+.uiz-widget-content .uiz-icon {background-image: url(views/img/ui-icons_0078ae_256x240.png); }
+.uiz-widget-header .uiz-icon {background-image: url(views/img/ui-icons_d8e7f3_256x240.png); }
+.uiz-state-default .uiz-icon { background-image: url(views/img/ui-icons_056b93_256x240.png); }
+.uiz-state-hover .uiz-icon, .uiz-state-focus .uiz-icon {background-image: url(views/img/ui-icons_e0fdff_256x240.png); }
+.uiz-state-active .uiz-icon {background-image: url(views/img/ui-icons_f5e175_256x240.png); }
+.uiz-state-highlight .uiz-icon {background-image: url(views/img/ui-icons_f7a50d_256x240.png); }
+.uiz-state-error .uiz-icon, .uiz-state-error-text .uiz-icon {background-image: url(views/img/ui-icons_fcd113_256x240.png); }
 
 /* positioning */
 .uiz-icon-carat-1-n { background-position: 0 0; }
@@ -290,8 +290,8 @@
 .uiz-corner-all, .uiz-corner-bottom, .uiz-corner-right, .uiz-corner-br { -moz-border-radius-bottomright: 5px; -webkit-border-bottom-right-radius: 5px; -khtml-border-bottom-right-radius: 5px; border-bottom-right-radius: 5px; }
 
 /* Overlays */
-.uiz-widget-overlay { background: #aaaaaa url(zasilkovna/ui-bg_flat_75_aaaaaa_40x100.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); }
-.uiz-widget-shadow { margin: 5px 0 0 5px; padding: 0px; background: #999999 url(zasilkovna/ui-bg_flat_55_999999_40x100.png) 50% 50% repeat-x; opacity: .45;filter:Alpha(Opacity=45); -moz-border-radius: 5px; -khtml-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; }/*
+.uiz-widget-overlay { background: #aaaaaa url(views/img/ui-bg_flat_75_aaaaaa_40x100.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); }
+.uiz-widget-shadow { margin: 5px 0 0 5px; padding: 0px; background: #999999 url(views/img/ui-bg_flat_55_999999_40x100.png) 50% 50% repeat-x; opacity: .45;filter:Alpha(Opacity=45); -moz-border-radius: 5px; -khtml-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; }/*
  * jQuery UI Resizable 1.8.17
  *
  * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
@@ -398,7 +398,7 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
  * http://docs.jquery.com/UI/Dialog#theming
  */
 .uiz-dialog { position: absolute; padding: .2em; width: 300px; overflow: hidden; }
-.uiz-dialog .uiz-dialog-titlebar { padding: .4em 1em; position: relative; background-color: #D3413E; background-image: url(zasilkovna/ui-bg_gloss-wave_50_6eac2c_500x100.png); border: 1px solid #DC5C5C; }
+.uiz-dialog .uiz-dialog-titlebar { padding: .4em 1em; position: relative; background-color: #D3413E; background-image: url(views/img/ui-bg_gloss-wave_50_6eac2c_500x100.png); border: 1px solid #DC5C5C; }
 .uiz-dialog .uiz-dialog-title { float: left; margin: .1em 16px .1em 0; } 
 .uiz-dialog .uiz-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
 .uiz-dialog .uiz-dialog-titlebar-close span { display: block; margin: 1px; }
@@ -452,7 +452,7 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
 	left: 0;
 	width: 40px;
 	height: 480px;
-	background-image: url('fancybox/fancybox.png');
+	background-image: url('views/img/fancybox.png');
 }
 
 #fancyzbox-overlay {
@@ -530,7 +530,7 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
 	right: -15px;
 	width: 30px;
 	height: 30px;
-	background: url('fancybox/fancybox.png');
+	background: url('views/img/fancybox.png');
 	background-position: -40px 0px;
 	cursor: pointer;
 	z-index: 1103;
@@ -600,7 +600,7 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
 
 #fancyzbox-title-over {
 	padding: 10px;
-	background-image: url('fancybox/fancy_title_over.png');
+	background-image: url('views/img/fancy_title_over.png');
 	display: block;
 }
 
@@ -615,7 +615,7 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
 
 #fancyzbox-title-left {
 	padding-left: 15px;
-	background-image: url('fancybox/fancybox.png');
+	background-image: url('views/img/fancybox.png');
 	background-position: -40px -90px;
 	background-repeat: no-repeat;
 }
@@ -623,14 +623,14 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
 #fancyzbox-title-main {
 	font-weight: bold;
 	line-height: 29px;
-	background-image: url('fancybox/fancybox-x.png');
+	background-image: url('views/img/fancybox-x.png');
 	background-position: 0px -40px;
 	color: #FFF;
 }
 
 #fancyzbox-title-right {
 	padding-left: 15px;
-	background-image: url('fancybox/fancybox.png');
+	background-image: url('views/img/fancybox.png');
 	background-position: -55px -90px;
 	background-repeat: no-repeat;
 }
@@ -642,7 +642,7 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
 	width: 35%;
 	cursor: pointer;
 	outline: none;
-	background: url('fancybox/blank.gif');
+	background: url('views/img/blank.gif');
 	z-index: 1102;
 	display: none;
 }
@@ -668,12 +668,12 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
 }
 
 #fancyzbox-left-ico {
-	background-image: url('fancybox/fancybox.png');
+	background-image: url('views/img/fancybox.png');
 	background-position: -40px -30px;
 }
 
 #fancyzbox-right-ico {
-	background-image: url('fancybox/fancybox.png');
+	background-image: url('views/img/fancybox.png');
 	background-position: -40px -60px;
 }
 
@@ -704,13 +704,13 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
 	top: -20px;
 	left: 0;
 	width: 100%;
-	background-image: url('fancybox/fancybox-x.png');
+	background-image: url('views/img/fancybox-x.png');
 }
 
 #fancyz-bg-ne {
 	top: -20px;
 	right: -20px;
-	background-image: url('fancybox/fancybox.png');
+	background-image: url('views/img/fancybox.png');
 	background-position: -40px -162px;
 }
 
@@ -718,14 +718,14 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
 	top: 0;
 	right: -20px;
 	height: 100%;
-	background-image: url('fancybox/fancybox-y.png');
+	background-image: url('views/img/fancybox-y.png');
 	background-position: -20px 0px;
 }
 
 #fancyz-bg-se {
 	bottom: -20px;
 	right: -20px;
-	background-image: url('fancybox/fancybox.png');
+	background-image: url('views/img/fancybox.png');
 	background-position: -40px -182px; 
 }
 
@@ -733,14 +733,14 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
 	bottom: -20px;
 	left: 0;
 	width: 100%;
-	background-image: url('fancybox/fancybox-x.png');
+	background-image: url('views/img/fancybox-x.png');
 	background-position: 0px -20px;
 }
 
 #fancyz-bg-sw {
 	bottom: -20px;
 	left: -20px;
-	background-image: url('fancybox/fancybox.png');
+	background-image: url('views/img/fancybox.png');
 	background-position: -40px -142px;
 }
 
@@ -748,39 +748,39 @@ button.uiz-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pa
 	top: 0;
 	left: -20px;
 	height: 100%;
-	background-image: url('fancybox/fancybox-y.png');
+	background-image: url('views/img/fancybox-y.png');
 }
 
 #fancyz-bg-nw {
 	top: -20px;
 	left: -20px;
-	background-image: url('fancybox/fancybox.png');
+	background-image: url('views/img/fancybox.png');
 	background-position: -40px -122px;
 }
 
 /* IE */
 
-#fancyzbox-loading.fancybox-ie div	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_loading.png', sizingMethod='scale'); }
-.fancybox-ie #fancyzbox-close		{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_close.png', sizingMethod='scale'); }
+#fancyzbox-loading.fancybox-ie div	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_loading.png', sizingMethod='scale'); }
+.fancybox-ie #fancyzbox-close		{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_close.png', sizingMethod='scale'); }
 
-.fancybox-ie #fancyzbox-title-over	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_title_over.png', sizingMethod='scale'); zoom: 1; }
-.fancybox-ie #fancyzbox-title-left	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_title_left.png', sizingMethod='scale'); }
-.fancybox-ie #fancyzbox-title-main	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_title_main.png', sizingMethod='scale'); }
-.fancybox-ie #fancyzbox-title-right	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_title_right.png', sizingMethod='scale'); }
+.fancybox-ie #fancyzbox-title-over	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_title_over.png', sizingMethod='scale'); zoom: 1; }
+.fancybox-ie #fancyzbox-title-left	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_title_left.png', sizingMethod='scale'); }
+.fancybox-ie #fancyzbox-title-main	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_title_main.png', sizingMethod='scale'); }
+.fancybox-ie #fancyzbox-title-right	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_title_right.png', sizingMethod='scale'); }
 
-.fancybox-ie #fancyzbox-left-ico		{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_nav_left.png', sizingMethod='scale'); }
-.fancybox-ie #fancyzbox-right-ico	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_nav_right.png', sizingMethod='scale'); }
+.fancybox-ie #fancyzbox-left-ico		{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_nav_left.png', sizingMethod='scale'); }
+.fancybox-ie #fancyzbox-right-ico	{ background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_nav_right.png', sizingMethod='scale'); }
 
 .fancybox-ie .fancy-bg { background: transparent !important; }
 
-.fancybox-ie #fancyz-bg-n	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_n.png', sizingMethod='scale'); }
-.fancybox-ie #fancyz-bg-ne	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_ne.png', sizingMethod='scale'); }
-.fancybox-ie #fancyz-bg-e	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_e.png', sizingMethod='scale'); }
-.fancybox-ie #fancyz-bg-se	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_se.png', sizingMethod='scale'); }
-.fancybox-ie #fancyz-bg-s	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_s.png', sizingMethod='scale'); }
-.fancybox-ie #fancyz-bg-sw	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_sw.png', sizingMethod='scale'); }
-.fancybox-ie #fancyz-bg-w	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_w.png', sizingMethod='scale'); }
-.fancybox-ie #fancyz-bg-nw	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/fancybox/fancy_shadow_nw.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-n	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_shadow_n.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-ne	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_shadow_ne.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-e	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_shadow_e.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-se	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_shadow_se.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-s	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_shadow_s.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-sw	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_shadow_sw.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-w	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_shadow_w.png', sizingMethod='scale'); }
+.fancybox-ie #fancyz-bg-nw	{ filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/modules/packetery/views/img/fancy_shadow_nw.png', sizingMethod='scale'); }
 
 /* Zasilkovna */
 div.packetery-branch-list {font-size: 100%; text-align: left; }
