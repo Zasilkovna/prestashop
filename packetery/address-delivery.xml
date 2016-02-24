@@ -1,0 +1,889 @@
+<?xml version="1.0" encoding="UTF-8" ?><export
+    xmlns="http://www.zasilkovna.cz/api/v3/branch"
+    xmlns:ns="http://www.zasilkovna.cz/api/v3/branch"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zasilkovna.cz/api/v3/branch http://www.zasilkovna.cz/api/v3/branch.xsd">
+  <contacts>
+    <contact>
+      <country>cz</country>
+      <phone>+420 216 216 516</phone>
+      <email>praha@zasilkovna.cz</email>
+      <businessHours>Po-Pá 08:00 – 20:00 hod.</businessHours>
+    </contact>
+    <contact>
+      <country>sk</country>
+      <phone>+421 221 201 135</phone>
+      <email>bratislava@zasielkovna.sk</email>
+      <businessHours>Po-Pi 9:00 – 19:00 hod.</businessHours>
+    </contact>
+  </contacts>  
+  <branches>
+    <branch>
+      <id>80</id>
+      <name>Rakouská pošta</name>
+      <nameStreet>Rakouská pošta</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>at</country>
+      <currency>EUR</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasielkovna.sk/point/rakouska-posta</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>A-***-080</labelRouting>
+      <labelName>Rakouská pošta</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasielkovna.sk/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasielkovna.sk/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Di&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Mi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Do&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>13</id>
+      <name>Česká pošta</name>
+      <nameStreet>Česká pošta</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip></zip>
+      <country>cz</country>
+      <currency>CZK</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasilkovna.cz/point/ceska-posta</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>A-***-013</labelRouting>
+      <labelName>Česká pošta</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasilkovna.cz/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasilkovna.cz/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Čt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pá&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>633</id>
+      <name>Česká republika DPD</name>
+      <nameStreet>Česká republika DPD</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>cz</country>
+      <currency>CZK</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasilkovna.cz/point/ceska-republika-dpd</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>A-***-633</labelRouting>
+      <labelName>Česká republika DPD</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasilkovna.cz/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasilkovna.cz/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Čt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pá&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>153</id>
+      <name>Česká republika InTime</name>
+      <nameStreet>Česká republika InTime</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>cz</country>
+      <currency>CZK</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasilkovna.cz/point/ceska-republika-in-time</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>@-***-153</labelRouting>
+      <labelName>Česká republika InTime</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasilkovna.cz/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasilkovna.cz/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Čt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pá&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>106</id>
+      <name>Doručení na adresu ČR</name>
+      <nameStreet>Doručení na adresu ČR</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>cz</country>
+      <currency>CZK</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasilkovna.cz/point/doruceni-na-adresu-cr</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>A-***-106</labelRouting>
+      <labelName>Doručení na adresu ČR</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasilkovna.cz/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasilkovna.cz/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Čt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pá&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>136</id>
+      <name>Expresní doručení Brno</name>
+      <nameStreet>Expresní doručení Brno</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>cz</country>
+      <currency>CZK</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasilkovna.cz/point/expresni-doruceni-brno</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>B-***-136</labelRouting>
+      <labelName>Expresní doručení Brno</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasilkovna.cz/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasilkovna.cz/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Čt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pá&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>134</id>
+      <name>Expresní doručení Ostrava</name>
+      <nameStreet>Expresní doručení Ostrava</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>cz</country>
+      <currency>CZK</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasilkovna.cz/point/expresni-doruceni-ostrava</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>T-***-134</labelRouting>
+      <labelName>Expresní doručení Ostrava</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasilkovna.cz/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasilkovna.cz/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Čt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pá&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>257</id>
+      <name>Expresní doručení Praha</name>
+      <nameStreet>Expresní doručení Praha</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>100 00</zip>
+      <country>cz</country>
+      <currency>CZK</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasilkovna.cz/point/expresni-doruceni-praha</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>A-***-257</labelRouting>
+      <labelName>Expresní doručení Praha</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasilkovna.cz/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasilkovna.cz/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Čt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pá&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>260</id>
+      <name>ZkusToDoma Praha</name>
+      <nameStreet>ZkusToDoma Praha</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>100 00</zip>
+      <country>cz</country>
+      <currency>CZK</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasilkovna.cz/point/zkusto-doma-praha</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>A-***-260</labelRouting>
+      <labelName>ZkusToDoma Praha</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasilkovna.cz/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasilkovna.cz/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Čt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pá&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>111</id>
+      <name>Německá pošta</name>
+      <nameStreet>Německá pošta</nameStreet>
+      <place>Německá pošta (EUR)</place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>de</country>
+      <currency>EUR</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasielkovna.sk/point/nemecka-posta</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>A-***-111</labelRouting>
+      <labelName>Německá pošta</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasielkovna.sk/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasielkovna.sk/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Di&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Mi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Do&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>151</id>
+      <name>Maďarsko kurýr</name>
+      <nameStreet>Maďarsko kurýr</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>hu</country>
+      <currency>HUF</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasielkovna.sk/point/madarsko-kuryr</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>X-***-151</labelRouting>
+      <labelName>Maďarsko kurýr</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasielkovna.sk/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasielkovna.sk/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Tu&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;We&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Th&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Su&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>272</id>
+      <name>Polská pošta</name>
+      <nameStreet>Polská pošta</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>pl</country>
+      <currency>PLN</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasielkovna.sk/point/polska-posta</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>T-***-272</labelRouting>
+      <labelName>Polská pošta</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasielkovna.sk/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasielkovna.sk/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Tu&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;We&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Th&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Su&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>590</id>
+      <name>Rumunský kurýr</name>
+      <nameStreet>Rumunský kurýr</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>ro</country>
+      <currency>RON</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasielkovna.sk/point/rumunsky-kuryr</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>L-***-590</labelRouting>
+      <labelName>Rumunský kurýr</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasielkovna.sk/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasielkovna.sk/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Tu&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;We&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Th&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Su&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>131</id>
+      <name>Doručenie na adresu SR</name>
+      <nameStreet>Doručenie na adresu SR</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>sk</country>
+      <currency>EUR</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasielkovna.sk/point/dorucenie-na-adresu-sr</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>X-***-131</labelRouting>
+      <labelName>Doručenie na adresu SR</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasielkovna.sk/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasielkovna.sk/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Št&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>132</id>
+      <name>Expresné doručenie Bratislava</name>
+      <nameStreet>Expresné doručenie Bratislava</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>sk</country>
+      <currency>EUR</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasielkovna.sk/point/expresne-dorucenie-bratislava</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>X-***-132</labelRouting>
+      <labelName>Expresné doručenie Bratislava</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasielkovna.sk/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasielkovna.sk/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Št&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>16</id>
+      <name>Slovenská pošta</name>
+      <nameStreet>Slovenská pošta</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip></zip>
+      <country>sk</country>
+      <currency>EUR</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasielkovna.sk/point/slovenska-posta</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>X-***-016</labelRouting>
+      <labelName>Slovenská pošta</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasielkovna.sk/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasielkovna.sk/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Št&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>149</id>
+      <name>Slovensko kurýr</name>
+      <nameStreet>Slovensko kurýr</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>sk</country>
+      <currency>EUR</currency>
+      <exportedUntil>2016-02-02</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url>http://www.zasielkovna.sk/point/slovensko-kuryr</url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region></region>
+      <district></district>
+      <labelRouting>X-***-149</labelRouting>
+      <labelName>Slovensko kurýr</labelName>
+      <photos>
+        <photo>
+          <thumbnail>http://www.zasielkovna.sk/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>http://www.zasielkovna.sk/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Út&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Št&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Pi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+  </branches>
+</export>
