@@ -38,6 +38,7 @@ class Packetery extends Module
             and export orders to Packetery system.'
         );
 
+        $this->module_key = 'aa9b6f2b47192e6caae86b500177a861';
         $this->currency_conversion = array(
             self::CC_PRESTASHOP => $this->l('Use PrestaShop\'s currency conversion'),
             self::CC_CNB => $this->l('Use CNB rates with optional margin'),
