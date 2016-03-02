@@ -8,9 +8,9 @@
  *
  * You must not modify, adapt or create derivative works of this source code
  *
- *  @author    Zásilkovna, s.r.o.
- *  @copyright 2012-2016 Zásilkovna, s.r.o.
- *  @license   LICENSE.txt
+ * @author    Zásilkovna, s.r.o.
+ * @copyright 2012-2016 Zásilkovna, s.r.o.
+ * @license   LICENSE.txt
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -326,12 +326,16 @@ class Packetery extends Module
         if (!$carrier->add()) {
             return false;
         }
-        $issetString = (
-            Tools::getValue('packetery_carrier_country') ?
-            implode(',', Tools::getValue('packetery_carrier_country')) : ""
-        );
 
-        $country = Tools::getIsset($issetString);
+        $country = "";
+        $countries = Tools::getValue('packetery_carrier_country');
+        foreach ($countries as $key => $countryCode) {
+            $country .= $countryCode;
+            if ($key != count($countries) - 1) {
+                $country .= ',';
+            }
+        }
+
         $db->execute(
             'insert into `' . _DB_PREFIX_ . 'packetery_carrier` set id_carrier=' . ((int)$carrier->id) .
             ', country="' . pSQL($country ? $country : 'cz,sk') . '", list_type=' .
@@ -1389,3 +1393,4 @@ class Packetery extends Module
         }
     }
 }
+
