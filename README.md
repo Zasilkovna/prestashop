@@ -3,6 +3,8 @@
 ## Stažení modulu
 <a href="https://github.com/Zasilkovna/prestashop/raw/master/releases/packetery-latest.zip">Stažení instalačního balíčku</a>
 
+Upozornění! Výše uvedená poslední verze modulu nefunguje na všech instalacích a verzích PrestaShopu. Doporučujeme aktuálně použít <a href="https://github.com/Zasilkovna/prestashop/raw/master/releases/packetery-1.17.zip">verzi 1.17 (stáhnout »)</a>.
+
 ## Informace o modulu
 
 **Podporované jazyky:**
