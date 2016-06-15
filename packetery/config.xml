@@ -2,7 +2,7 @@
         <module>
             <name>packetery</name>
             <displayName><![CDATA[Packetery]]></displayName>
-            <version><![CDATA[1.17]]></version>
+            <version><![CDATA[1.18]]></version>
             <description><![CDATA[Offers your customers the option to choose pick-up point in Packetery network,
             and export orders to Packetery system.]]></description>
             <author><![CDATA[Packetery, Ltd.]]></author>
