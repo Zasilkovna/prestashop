@@ -852,8 +852,10 @@ class Packetery extends Module
             ((int)$params['cart']->id)
         );
 
+        $this->ensureUpdatedAPI();
+
         $is_opc = Configuration::get('PS_ORDER_PROCESS_TYPE');
-        return '<script type="text/javascript">
+        return '<script type="text/javascript" src="' . _MODULE_DIR_ . 'packetery/views/js/api.js"></script>' . '<script type="text/javascript">
             window.packetery.jQuery(function() {
             /*This function might get called automagically by some OPC module and this needs to be updated.*/
             window.prestashopPacketerySelectedId = ' . ($selected_id ? $selected_id : "null") . ';' . '
@@ -863,7 +865,7 @@ class Packetery extends Module
 
             var $ = window.packetery.jQuery;
             var add_padding = true;
-            var id_carriers_selector = "input[name^=\"delivery_option[\"]:radio";
+            var id_carriers_selector = "input[name^=\'delivery_option[\']:radio";
             if ($(id_carriers_selector).size() == 0) {
                 id_carriers_selector = "input[name=id_carrier]:radio"
                 add_padding = false; // magic
@@ -922,7 +924,7 @@ class Packetery extends Module
 
                 var reinit_required = false;
                 els.each(function() {
-                    var e = id_carriers.filter("[value=\"" + $(this).data("delivery_option_value") + "\"]")[0];
+                    var e = id_carriers.filter(\'[value=\' + $(this).data("delivery_option_value") + \']\')[0];
                     if (e) { find_select_place.call(e).after(this); }
                     else { reinit_required = true; }
                 });
@@ -940,7 +942,7 @@ class Packetery extends Module
             update_id_carriers(true);
             els.each(function() {
                 find_select_place.call(
-                    id_carriers.filter("[value=\"" + $(this).data("delivery_option_value") + "\"]")[0]
+                    id_carriers.filter(\'[value=\' + $(this).data("delivery_option_value") + \']\')[0]
                 ).after(this);
             });
             }
@@ -950,7 +952,7 @@ class Packetery extends Module
                 if (!submit_now_allowed) {
                     arguments[0].HOOK_PAYMENT = ' .
                         Tools::jsonEncode(
-                            '<p class="warning">'.Tools::displayError('Error: please choose a carrier').'</p>'
+                            '<p class=\'warning\'>'.Tools::displayError('Error: please choose a carrier').'</p>'
                         ).
                 ';
                 }
@@ -1094,7 +1096,7 @@ class Packetery extends Module
 
             list[0].packetery.on("branch-change", function() {
             update_id_carriers();
-            var id_carrier = id_carriers.filter("[value=\"" + id_carrier_value + "\"]");
+            var id_carrier = id_carriers.filter(\'[value=\' + id_carrier_value + \']\');
 
             if (id_carrier.is(":checked")) {
             update_delayed();
@@ -1393,4 +1395,3 @@ class Packetery extends Module
         }
     }
 }
-
