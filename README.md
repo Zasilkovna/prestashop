@@ -1,7 +1,7 @@
 # Modul pro PrestaShop s Easypay
 
 ## Stažení modulu
-<a href="https://github.com/Zasilkovna/prestashop/blob/easypay/releases/packetery-latest-easypay.zip">Stažení instalačního balíčku</a>
+<a href="https://github.com/Zasilkovna/prestashop/raw/easypay/releases/packetery-latest-easypay.zip">Stažení instalačního balíčku</a>
 
 Upozornění! Tato modifikace funguje pouze pro Prestashop verze 1.6.x.
 
