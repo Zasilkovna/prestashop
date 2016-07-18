@@ -5,6 +5,8 @@
 
 Upozornění! Výše uvedená poslední verze modulu nefunguje na všech instalacích a verzích PrestaShopu. Doporučujeme aktuálně použít <a href="https://github.com/Zasilkovna/prestashop/raw/master/releases/packetery-1.17.zip">verzi 1.17 (stáhnout »)</a>.
 
+Modul s úpravou pro kompatibilitu s Easypay (Prestashop 1.6.x) naleznete zde: https://github.com/Zasilkovna/prestashop/tree/easypay
+
 ## Informace o modulu
 
 **Podporované jazyky:**
