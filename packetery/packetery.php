@@ -854,85 +854,85 @@ class Packetery extends Module
 
         $is_opc = Configuration::get('PS_ORDER_PROCESS_TYPE');
         return '<script type="text/javascript">
-            window.packetery.jQuery(function() {
-            /*This function might get called automagically by some OPC module and this needs to be updated.*/
-            window.prestashopPacketerySelectedId = ' . ($selected_id ? $selected_id : "null") . ';' . '
-  
-            if (window.prestashopPacketeryInitialized) return;
-            window.prestashopPacketeryInitialized = true;
+window.packetery.jQuery(function() {
+    /*This function might get called automagically by some OPC module and this needs to be updated.*/
+    window.prestashopPacketerySelectedId = ' . ($selected_id ? $selected_id : "null") . ';' . '
 
-            var $ = window.packetery.jQuery;
-            var add_padding = true;
-            var id_carriers_selector = "input[name^=\"delivery_option[\"]:radio";
-            if ($(id_carriers_selector).size() == 0) {
-                id_carriers_selector = "input[name=id_carrier]:radio"
-                add_padding = false; // magic
+    if (window.prestashopPacketeryInitialized) return;
+    window.prestashopPacketeryInitialized = true;
+
+    var $ = window.packetery.jQuery;
+    var add_padding = true;
+    var id_carriers_selector = "input[name^=\"delivery_option[\"]:radio";
+    if ($(id_carriers_selector).size() == 0) {
+        id_carriers_selector = "input[name=id_carrier]:radio"
+        add_padding = false; // magic
+    }
+    var id_carriers = $(id_carriers_selector);
+    var carrier_data = ' . Tools::jsonEncode($carrier_data) . ';
+    var last_ajax = null;
+    var original_updateCarrierSelectionAndGift = window.updateCarrierSelectionAndGift;
+    var original_updateCarrierList = window.updateCarrierList;
+    var original_updatePaymentMethods = window.updatePaymentMethods;
+    var original_paymentModuleConfirm = window.paymentModuleConfirm;
+    var original_updateAddressSelection = window.updateAddressSelection;
+    var submit_now_allowed = true;
+
+    // PrestaShop 1.5.2+ compatibility
+    var on_updated_id_carriers = function() {};
+    var update_id_carriers = function(reinitialize) {
+        id_carriers = $(id_carriers_selector); on_updated_id_carriers(reinitialize);
+    };
+    function str_repeat(s, count) { var ret = ""; while(count--) { ret += s; }; return ret; };
+    function to_number(s) { var ret = parseFloat(s); return (isNaN(ret) ? 0 : ret); };
+    function to_carrier_id(s) {
+        s = (s.toString ? s.toString() : "").replace(/,.*$/, "");
+        if (carrier_data[s]) return s;
+
+        var delim = str_repeat("0", parseInt(s.substr(0, 1)) + 1);
+        if (s.length < 4 || s.indexOf(delim) == -1) return "x";
+
+        s = s.substr(1);
+        var p;
+        while((p = s.lastIndexOf(delim)) != -1) {
+            s = s.substr(0, p);
+        }
+        return s;
+    };
+    function find_select_place() {
+        var carrier_selector = [".item,.alternate_item", ".delivery_option", "td,div", "*"];
+        var carrier = $();
+        for(var i = 0; carrier.size() == 0 && i < carrier_selector.length; i++) {
+            carrier = $(this).parent().closest(carrier_selector[i]);
+        }
+        var tmp = carrier.find("td.delivery_option_logo");
+        if (tmp.size() == 1 && tmp.closest("label").size() == 0) {
+            carrier = $("<span />").appendTo(tmp.next());
+        }
+        return carrier;
+    }
+
+    if (original_updateCarrierList) {
+        window.updateCarrierList = function() {
+            var els = $(".packetery_prestashop_branch_list").detach();
+
+            original_updateCarrierList.apply(this, arguments);
+
+            update_id_carriers();
+
+            var reinit_required = false;
+            els.each(function() {
+                var e = id_carriers.filter("[value=\"" + $(this).data("delivery_option_value") + "\"]")[0];
+                if (e) { find_select_place.call(e).after(this); }
+                else { reinit_required = true; }
+            });
+            if (reinit_required) {
+                update_id_carriers(true);
             }
-            var id_carriers = $(id_carriers_selector);
-            var carrier_data = ' . Tools::jsonEncode($carrier_data) . ';
-            var last_ajax = null;
-            var original_updateCarrierSelectionAndGift = window.updateCarrierSelectionAndGift;
-            var original_updateCarrierList = window.updateCarrierList;
-            var original_updatePaymentMethods = window.updatePaymentMethods;
-            var original_paymentModuleConfirm = window.paymentModuleConfirm;
-            var original_updateAddressSelection = window.updateAddressSelection;
-            var submit_now_allowed = true;
-
-            // PrestaShop 1.5.2+ compatibility
-            var on_updated_id_carriers = function() {};
-            var update_id_carriers = function(reinitialize) {
-                id_carriers = $(id_carriers_selector); on_updated_id_carriers(reinitialize);
-            };
-            function str_repeat(s, count) { var ret = ""; while(count--) { ret += s; }; return ret; };
-            function to_number(s) { var ret = parseFloat(s); return (isNaN(ret) ? 0 : ret); };
-            function to_carrier_id(s) {
-                s = (s.toString ? s.toString() : "").replace(/,.*$/, "");
-                if (carrier_data[s]) return s;
-
-                var delim = str_repeat("0", parseInt(s.substr(0, 1)) + 1);
-                if (s.length < 4 || s.indexOf(delim) == -1) return "x";
-
-                s = s.substr(1);
-                var p;
-                while((p = s.lastIndexOf(delim)) != -1) {
-                    s = s.substr(0, p);
-                }
-                return s;
-            };
-            function find_select_place() {
-                var carrier_selector = [".item,.alternate_item", ".delivery_option", "td,div", "*"];
-                var carrier = $();
-                for(var i = 0; carrier.size() == 0 && i < carrier_selector.length; i++) {
-                    carrier = $(this).parent().closest(carrier_selector[i]);
-                }
-                var tmp = carrier.find("td.delivery_option_logo");
-                if (tmp.size() == 1 && tmp.closest("label").size() == 0) {
-                    carrier = $("<span />").appendTo(tmp.next());
-                }
-                return carrier;
-            }
-
-            if (original_updateCarrierList) {
-                window.updateCarrierList = function() {
-                var els = $(".packetery_prestashop_branch_list").detach();
-
-                original_updateCarrierList.apply(this, arguments);
-
-                update_id_carriers();
-
-                var reinit_required = false;
-                els.each(function() {
-                    var e = id_carriers.filter("[value=\"" + $(this).data("delivery_option_value") + "\"]")[0];
-                    if (e) { find_select_place.call(e).after(this); }
-                    else { reinit_required = true; }
-                });
-                if (reinit_required) {
-                    update_id_carriers(true);
-                }
-            }
-            }
-            if (original_updateAddressSelection) {
-            window.updateAddressSelection = function() {
+        }
+    }
+    if (original_updateAddressSelection) {
+        window.updateAddressSelection = function() {
             var els = $(".packetery_prestashop_branch_list").detach();
 
             original_updateAddressSelection.apply(this, arguments);
@@ -943,136 +943,129 @@ class Packetery extends Module
                     id_carriers.filter("[value=\"" + $(this).data("delivery_option_value") + "\"]")[0]
                 ).after(this);
             });
+        }
+    }
+    if (original_updatePaymentMethods) {
+        window.updatePaymentMethods = function() {
+            if (!submit_now_allowed) {
+                arguments[0].HOOK_PAYMENT = ' .
+                    Tools::jsonEncode(
+                        '<p class="warning">'.Tools::displayError('Error: please choose a carrier').'</p>'
+                    ).
+            ';
             }
+            try {
+                original_updatePaymentMethods.apply(this, arguments);
             }
-            if (original_updatePaymentMethods) {
-                window.updatePaymentMethods = function() {
-                if (!submit_now_allowed) {
-                    arguments[0].HOOK_PAYMENT = ' .
-                        Tools::jsonEncode(
-                            '<p class="warning">'.Tools::displayError('Error: please choose a carrier').'</p>'
-                        ).
-                ';
-                }
-                try {
-                    original_updatePaymentMethods.apply(this, arguments);
-                }
-                catch(e) {}
-                }
-            }
-            // End PrestaShop 1.5.2+ compatibility
+            catch(e) {}
+        }
+    }
+    // End PrestaShop 1.5.2+ compatibility
 
-            // Compatibility with OnePageCheckout by Peter Sliacky
-            var is_custom_opc_1 = false;
-            if (original_paymentModuleConfirm) {
-                is_custom_opc_1 = true;
-                window.paymentModuleConfirm = function() {
-                    if (!submit_now_allowed) {
-                        alert(' . Tools::jsonEncode($this->l('Please select pick-up point.')) . ');
-                        return false;
-                    }
-
-                    original_paymentModuleConfirm.apply(this, arguments);
-                };
-            }
-            // End Compatibility with OnePageCheckout by Peter Sliacky
-
-            function save_selected_branch(e, callback) {
-                if (last_ajax) last_ajax.abort();
-                if (!carrier_data[to_carrier_id(e.value)]) {
-                if (callback) callback();
+    // Compatibility with OnePageCheckout by Peter Sliacky
+    var is_custom_opc_1 = false;
+    if (original_paymentModuleConfirm) {
+        is_custom_opc_1 = true;
+        window.paymentModuleConfirm = function() {
+            if (!submit_now_allowed) {
+                alert(' . Tools::jsonEncode($this->l('Please select pick-up point.')) . ');
                 return false;
             }
 
-            var p_select = $("#packetery_prestashop_branch_list_" + to_carrier_id(e.value)).find("div")[0].packetery;
-            var id_branch = p_select.option("selected-id");
-            var branch_data = (id_branch > 0 ? p_select.option("branches")[id_branch] : null);
-            var name_branch = (branch_data ? branch_data.name_street : "");
-            var currency_branch = (branch_data ? branch_data.currency : "");
-            last_ajax = $.ajax({
-                url: "' . _MODULE_DIR_ . 'packetery/ajax.php",
-                data: {id_branch: id_branch, name_branch: name_branch, currency_branch: currency_branch},
-                type: "POST",
-                complete: function() {
-                last_ajax = null;
-                if (callback) callback();
-                }
-            });
-            };
-            var u_timeout = null;
-            function update_delayed(flags) {
-            if (u_timeout) clearTimeout(u_timeout);
-            u_timeout = setTimeout(function() {
+            original_paymentModuleConfirm.apply(this, arguments);
+        };
+    }
+    // End Compatibility with OnePageCheckout by Peter Sliacky
+
+    function save_selected_branch(e, callback) {
+        if (last_ajax) last_ajax.abort();
+        if (!carrier_data[to_carrier_id(e.value)]) {
+            if (callback) callback();
+            return false;
+        }
+
+        var p_select = $("#packetery_prestashop_branch_list_" + to_carrier_id(e.value)).find("div")[0].packetery;
+        var id_branch = p_select.option("selected-id");
+        var branch_data = (id_branch > 0 ? p_select.option("branches")[id_branch] : null);
+        var name_branch = (branch_data ? branch_data.name_street : "");
+        var currency_branch = (branch_data ? branch_data.currency : "");
+        last_ajax = $.ajax({
+            url: "' . _MODULE_DIR_ . 'packetery/ajax.php",
+            data: {id_branch: id_branch, name_branch: name_branch, currency_branch: currency_branch},
+            type: "POST",
+            complete: function() {
+            last_ajax = null;
+            if (callback) callback();
+            }
+        });
+    };
+    var u_timeout = null;
+    function update_delayed(flags) {
+        if (u_timeout) clearTimeout(u_timeout);
+        u_timeout = setTimeout(function() {
             u_timeout = null;
 
             updateCarrierSelectionAndGift();
-            }, 25);
-            };
-            var reset_branch_required = function () {
-            // no update_id_carriers() - that is caller\'s duty
-            var sel = id_carriers.filter(":checked")[0];
+        }, 25);
+    };
+    var reset_branch_required = function () {
+        // no update_id_carriers() - that is caller\'s duty
+        var sel = id_carriers.filter(":checked")[0];
 
-            $(".packetery_prestashop_branch_list")
-            .find("div:first").each(function() {
+        $(".packetery_prestashop_branch_list").find("div:first").each(function() {
             this.packetery.option("required", false);
-            })
-            .prev("p").hide();
-            submit_now_allowed = true;
+        }).prev("p").hide();
+        submit_now_allowed = true;
 
-            if (!sel) return;
+        if (!sel) return;
 
-            // if selected carrier is packetery type, set branch required on it
-            var sel_pktr = $("#packetery_prestashop_branch_list_" + to_carrier_id(sel.value));
-            if (sel_pktr.size() > 0) {
+        // if selected carrier is packetery type, set branch required on it
+        var sel_pktr = $("#packetery_prestashop_branch_list_" + to_carrier_id(sel.value));
+        if (sel_pktr.size() > 0) {
             sel_pktr.find("div")[0].packetery.option("required", true);
             if (!sel_pktr.find("div")[0].packetery.option("selected-id")) {
-            sel_pktr.find("div:first").prev("p").show();
-            submit_now_allowed = false;
+                sel_pktr.find("div:first").prev("p").show();
+                submit_now_allowed = false;
             }
-            }
-            };
-            window.updateCarrierSelectionAndGift = function() {
-            update_id_carriers();
-            var sel = id_carriers.filter(":checked")[0];
-            reset_branch_required();
+        }
+    };
+    window.updateCarrierSelectionAndGift = function() {
+        update_id_carriers();
+        var sel = id_carriers.filter(":checked")[0];
+        reset_branch_required();
 
-            save_selected_branch(sel'
-            . ($is_opc
-            ? ', original_updateCarrierSelectionAndGift'
-            : '')
-            . ');
-            };
-            var id_carrier_init = function() {
-            if (!carrier_data[to_carrier_id(this.value)]) return;
-            if (this.getAttribute("packetery-initialized")) return;
-            this.setAttribute("packetery-initialized", true);
+        save_selected_branch(sel' . ($is_opc ? ', original_updateCarrierSelectionAndGift' : '') . ');
+    };
+    var id_carrier_init = function() {
+        if (!carrier_data[to_carrier_id(this.value)]) return;
+        if (this.getAttribute("packetery-initialized")) return;
+        this.setAttribute("packetery-initialized", true);
 
-            // if reinitializing, some stray elements may have prevailed, so remove them now
-            $("#packetery_prestashop_branch_list_" + to_carrier_id(this.value)).remove();
+        // if reinitializing, some stray elements may have prevailed, so remove them now
+        $("#packetery_prestashop_branch_list_" + to_carrier_id(this.value)).remove();
 
-            var id_carrier_value = this.value;
+        var id_carrier_value = this.value;
 
-            var carrier = find_select_place.call(this);
-            var e, please_select = "<p style=\'float: none; color: red; font-weight: bold; \'>' .
-            addslashes($this->l('Please select pick-up point.')) . '</p>";
-            if (carrier.is("tr")) e = $("<tr><td colspan=\'"
-            + carrier.closest("table").find("tr:first").find("th,td").size() + "\'>" +
-            please_select + "<div></div></td></tr>");
-            else e = $("<div>" + please_select + "<div></div></div>");
-            carrier.after(e);
+        var carrier = find_select_place.call(this);
+        var e, please_select = "<p style=\'float: none; color: red; font-weight: bold; \'>' . addslashes($this->l('Please select pick-up point.')) . '</p>";
+        if (carrier.is("tr")){
+            e = $("<tr><td colspan=\'" + carrier.closest("table").find("tr:first").find("th,td").size() + "\'>" + please_select + "<div></div></td></tr>");
+        }
+        else {
+            e = $("<div>" + please_select + "<div></div></div>");
+        }
+        carrier.after(e);
 
-            e.attr("id", "packetery_prestashop_branch_list_" + to_carrier_id(this.value))
-            .data("delivery_option_value", this.value)
-            .addClass("packetery_prestashop_branch_list");
-            if (add_padding) {
+        e.attr("id", "packetery_prestashop_branch_list_" + to_carrier_id(this.value)).data("delivery_option_value", this.value).addClass("packetery_prestashop_branch_list");
+        if (add_padding) {
             e.css({padding: "10px"});
-            }
+        }
 
-            if (e.children("td").size() > 0) {
+        if (e.children("td").size() > 0) {
             e.children("td").css({borderTop: "0 none"});
             carrier.children("td").css({borderBottom: "0 none"});
-            }
-            else {
+        }
+        else {
             e.css({borderTop: "0 none"});
             e.css("background-color", carrier.css("background-color"));
             e.css("border-bottom-color", carrier.css("border-bottom-color"));
@@ -1080,54 +1073,59 @@ class Packetery extends Module
             e.css("border-bottom-width", carrier.css("border-bottom-width"));
             e.css({"margin-top": "-2px", "position": "relative", "z-index": 30});
             carrier.add(carrier.children("td")).css({borderBottom: "0 none"});
-            }
-            if (carrier.is(".item")) e.addClass("item");
-            else e.addClass("alternate_item");
+        }
+        if (carrier.is(".item")) {
+            e.addClass("item");
+        }
+        else { 
+            e.addClass("alternate_item");
+        }
 
-            var list = e.find("div");
-            list.attr("data-list-type", carrier_data[to_carrier_id(this.value)].list_type);
-            list.attr("data-country", carrier_data[to_carrier_id(this.value)].country);
-            if (window.prestashopPacketerySelectedId) {
+        var list = e.find("div");
+        list.attr("data-list-type", carrier_data[to_carrier_id(this.value)].list_type);
+        list.attr("data-country", carrier_data[to_carrier_id(this.value)].country);
+        if (window.prestashopPacketerySelectedId) {
             list.attr("data-selected-id", window.prestashopPacketerySelectedId);
-            }
-            window.packetery.initialize(list);
+        }
+        window.packetery.initialize(list);
 
-            list[0].packetery.on("branch-change", function() {
+        list[0].packetery.on("branch-change", function() {
             update_id_carriers();
             var id_carrier = id_carriers.filter("[value=\"" + id_carrier_value + "\"]");
 
             if (id_carrier.is(":checked")) {
-            update_delayed();
+                update_delayed();
             }
 
             if (!this.packetery.option("selected-id")) return;
 
             if (!id_carrier.is(":checked")) {
-            id_carrier[0].checked = true;
-            update_delayed();
+                id_carrier[0].checked = true;
+                update_delayed();
             }
-            });
-            };
+        });
+    };
 
-            ' . ($is_opc
-            ? 'on_updated_id_carriers = function(reinitialize) {
-            if (!is_custom_opc_1 && (reinitialize === undefined || !reinitialize)) return;
+    ' . ($is_opc ?
+    'on_updated_id_carriers = function(reinitialize) {
+        if (!is_custom_opc_1 && (reinitialize === undefined || !reinitialize)) return;
 
-            setTimeout(function() {
+        setTimeout(function() {
             $(id_carriers_selector).each(id_carrier_init);
             reset_branch_required();
-            }, 1);
-            };'
-            : 'on_updated_id_carriers = function() {
-            id_carriers.off(".packetery").on("change.packetery", window.updateCarrierSelectionAndGift);
-            };
-            on_updated_id_carriers();'
-            ) . '
+        }, 1);
+    };'
+    : 
+    'on_updated_id_carriers = function() {
+        id_carriers.off(".packetery").on("change.packetery", window.updateCarrierSelectionAndGift);
+    };
+    on_updated_id_carriers();'
+    ) . '
 
-            id_carriers.each(id_carrier_init);
-            updateCarrierSelectionAndGift();
-            });
-            </script>';
+    id_carriers.each(id_carrier_init);
+    updateCarrierSelectionAndGift();
+});
+</script>';
     }
 
     public function hookNewOrder($params)
