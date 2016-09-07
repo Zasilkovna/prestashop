@@ -871,12 +871,14 @@ window.packetery.jQuery(function() {
     var id_carriers = $(id_carriers_selector);
     var carrier_data = ' . Tools::jsonEncode($carrier_data) . ';
     var last_ajax = null;
+    var last_branch = null;
     var original_updateCarrierSelectionAndGift = window.updateCarrierSelectionAndGift;
     var original_updateCarrierList = window.updateCarrierList;
     var original_updatePaymentMethods = window.updatePaymentMethods;
     var original_paymentModuleConfirm = window.paymentModuleConfirm;
     var original_updateAddressSelection = window.updateAddressSelection;
     var submit_now_allowed = true;
+    var is_advanced_checkout_module = false;
 
     // PrestaShop 1.5.2+ compatibility
     var on_updated_id_carriers = function() {};
@@ -977,6 +979,18 @@ window.packetery.jQuery(function() {
     }
     // End Compatibility with OnePageCheckout by Peter Sliacky
 
+    // Compatibility with Advanced Checkout module
+    if(typeof updcarrieraddress == "function"){
+        is_advanced_checkout_module = true;
+        var defaultUpdcarrieraddress = updcarrieraddress;
+        updcarrieraddress = function (carr) {
+            defaultUpdcarrieraddress(carr);
+            setTimeout(function () { update_id_carriers(true); }, 1000);
+        }
+    }
+    // End Compatibility with Advanced Checkout module
+
+
     function save_selected_branch(e, callback) {
         if (last_ajax) last_ajax.abort();
         if (!carrier_data[to_carrier_id(e.value)]) {
@@ -989,15 +1003,19 @@ window.packetery.jQuery(function() {
         var branch_data = (id_branch > 0 ? p_select.option("branches")[id_branch] : null);
         var name_branch = (branch_data ? branch_data.name_street : "");
         var currency_branch = (branch_data ? branch_data.currency : "");
+        if(is_advanced_checkout_module && id_branch === last_branch){ // AdvancedCheckout seems to do infinite loop of reloads if we don\'t kill it
+            return false;
+        }
         last_ajax = $.ajax({
             url: "' . _MODULE_DIR_ . 'packetery/ajax.php",
             data: {id_branch: id_branch, name_branch: name_branch, currency_branch: currency_branch},
             type: "POST",
             complete: function() {
-            last_ajax = null;
-            if (callback) callback();
+                last_ajax = null;
+                if (callback) callback();
             }
         });
+        last_branch = id_branch;
     };
     var u_timeout = null;
     function update_delayed(flags) {
@@ -1115,7 +1133,7 @@ window.packetery.jQuery(function() {
             reset_branch_required();
         }, 1);
     };'
-    : 
+    :
     'on_updated_id_carriers = function() {
         id_carriers.off(".packetery").on("change.packetery", window.updateCarrierSelectionAndGift);
     };
