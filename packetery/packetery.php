@@ -924,7 +924,7 @@ class Packetery extends Module
 
                 var reinit_required = false;
                 els.each(function() {
-                    var e = id_carriers.filter(\'[value=\' + $(this).data("delivery_option_value") + \']\')[0];
+                    var e = id_carriers.filter(\'[value="\' + $(this).data("delivery_option_value") + \'"]\')[0];
                     if (e) { find_select_place.call(e).after(this); }
                     else { reinit_required = true; }
                 });
@@ -942,7 +942,7 @@ class Packetery extends Module
             update_id_carriers(true);
             els.each(function() {
                 find_select_place.call(
-                    id_carriers.filter(\'[value=\' + $(this).data("delivery_option_value") + \']\')[0]
+                    id_carriers.filter(\'[value="\' + $(this).data("delivery_option_value") + \'"]\')[0]
                 ).after(this);
             });
             }
@@ -1096,7 +1096,7 @@ class Packetery extends Module
 
             list[0].packetery.on("branch-change", function() {
             update_id_carriers();
-            var id_carrier = id_carriers.filter(\'[value=\' + id_carrier_value + \']\');
+            var id_carrier = id_carriers.filter(\'[value="\' + id_carrier_value + \'"]\');
 
             if (id_carrier.is(":checked")) {
             update_delayed();
