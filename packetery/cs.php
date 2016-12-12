@@ -43,6 +43,7 @@ $_MODULE['<{packetery}prestashop>packetery_88a392b5a8d8f73986d83a2deefb0472'] = 
 $_MODULE['<{packetery}prestashop>packetery_fa79c3005daec47ecff84a116a0927a1'] = 'Maďarsko';
 $_MODULE['<{packetery}prestashop>packetery_94880bda83bda77c5692876700711f15'] = 'Polsko';
 $_MODULE['<{packetery}prestashop>packetery_d8b00929dec65d422303256336ada04f'] = 'Německo';
+$_MODULE['<{packetery}prestashop>packetery_0c7d5ae44b2a0be9ebd7d6b9f7d60f20'] = 'Rumunsko';
 $_MODULE['<{packetery}prestashop>packetery_1d81449fde0bb1c18bbfff94b55cd7dc'] = 'Můžete vybrat jednu nebo více zemí držením klávesy Ctrl a myší. Pouze pobočky ve vybraných zemích budou zobrazeny u tohoto způsobu dopravy - tudíž můžete např. nastavit různé ceny dle země.';
 $_MODULE['<{packetery}prestashop>packetery_3ad1ee08c97055658430f0292ed5883e'] = 'Typ zobrazení';
 $_MODULE['<{packetery}prestashop>packetery_3b14cd54dd2b1a356c5ec0b55c80632d'] = 'Zobrazit náhled';
