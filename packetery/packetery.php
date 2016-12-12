@@ -979,6 +979,16 @@ class Packetery extends Module
             }
             // End Compatibility with OnePageCheckout by Peter Sliacky
 
+            if(typeof ConfirmCheckout == "function") {
+                var oldConfirmCheckout = ConfirmCheckout;
+                ConfirmCheckout = function () {
+                    if (!submit_now_allowed) {
+                        alert(' . Tools::jsonEncode($this->l('Please select pick-up point.')) . ');
+                        return;
+                    }
+                    oldConfirmCheckout();
+                }
+            }
             function save_selected_branch(e, callback) {
                 if (last_ajax) last_ajax.abort();
                 if (!carrier_data[to_carrier_id(e.value)]) {
