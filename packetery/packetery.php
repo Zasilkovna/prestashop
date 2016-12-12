@@ -19,7 +19,7 @@ if (!defined('_PS_VERSION_')) {
 
 class Packetery extends Module
 {
-    private $supported_countries = array('cz', 'sk', 'pl', 'hu', 'de');
+    private $supported_countries = array('cz', 'sk', 'pl', 'hu', 'de', 'ro');
     private $currency_conversion;
     const CC_PRESTASHOP = 1, CC_CNB = 2, CC_FIXED = 3;
 
@@ -28,7 +28,7 @@ class Packetery extends Module
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
         $this->version = '1.18';
-        $this->limited_countries = array('cz', 'sk', 'pl', 'hu', 'de');
+        $this->limited_countries = array('cz', 'sk', 'pl', 'hu', 'de', 'ro');
         parent::__construct();
 
         $this->author = $this->l('Packetery, Ltd.');
@@ -502,7 +502,8 @@ class Packetery extends Module
                      'sk' => $this->l('Slovakia'),
                      'hu' => $this->l('Hungary'),
                      'pl' => $this->l('Poland'),
-                     'de' => $this->l('Germany')
+                     'de' => $this->l('Germany'),
+                     'ro' => $this->l('Romania'),
                  ) as $code => $country) {
             $html .= "<option value='$code'>$country</option>\n";
         }
@@ -1313,7 +1314,7 @@ class Packetery extends Module
         $key = Configuration::get('PACKETERY_API_KEY');
         $files = array(
             _PS_MODULE_DIR_ . "packetery/views/js/api.js" =>
-                "http://www.zasilkovna.cz/api/$key/branch.js?lib_path=" . _MODULE_DIR_ .
+                "http://www.zasilkovna.cz/api/v3/$key/branch.js?lib_path=" . _MODULE_DIR_ .
                 "packetery&sync_load=1&prestashop=1",
             _PS_MODULE_DIR_ . "packetery/address-delivery.xml" =>
                 "http://www.zasilkovna.cz/api/v3/$key/branch.xml?type=address-delivery"
