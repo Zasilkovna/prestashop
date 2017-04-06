@@ -33,6 +33,8 @@ Upozornění! Tato modifikace funguje pouze pro Prestashop verze 1.6.x.
   * automatické a manuální označení dobírek
   * konverze měn pomocí interních kurzů PrestaShopu při zasílání za hranice (i pokud nepoužíváte dobírky do zahraničí, vypočte se z objednávky alespoň hodnota zásilky pro účely pojištění)
 
+* Modul nepodporuje multistore
+
 ## Instalace
 1. Stáhnout soubor modulu
 2. Přihlašte se do administrace PrestaShopu, otevřete kartu Moduly (Modules) zde v horní části dejte přidat nový modul – tento stažený soubor:
