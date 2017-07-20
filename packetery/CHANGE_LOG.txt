@@ -1,0 +1,8 @@
+1.7.2 Release version for prestashop 1.7
+1.8.2 Easypay opc support, popup widget
+1.8.5 Fixed bugs frontend:
+	1. Continue logic opc
+	2. Closing popup
+1.8.6 - realese ok
+1.8.7 - PSR-2 check
+2.0.0rc2 - update notifications, add branches tab, add update branch button, 

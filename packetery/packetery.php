@@ -1,84 +1,138 @@
 <?php
 /**
- * NOTICE OF LICENSE
- *
- * This file is licenced under the Software License Agreement.
- * With the purchase or the installation of the software in your application
- * you accept the licence agreement.
- *
- * You must not modify, adapt or create derivative works of this source code
- *
- * @author    Zásilkovna, s.r.o.
- * @copyright 2012-2016 Zásilkovna, s.r.o.
- * @license   LICENSE.txt
- */
+* 2017 Zlab Solutions
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author    Eugene Zubkov <magrabota@gmail.com>
+*  @copyright 2017 Zlab Solutions
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*/
 
 if (!defined('_PS_VERSION_')) {
-    exit();
+    exit;
 }
 
-class Packetery extends Module
-{
-    private $supported_countries = array('cz', 'sk', 'pl', 'hu', 'de', 'ro');
-    private $currency_conversion;
-    const CC_PRESTASHOP = 1, CC_CNB = 2, CC_FIXED = 3;
+include_once(dirname(__file__).'/packetery.class.php');
+include_once(dirname(__file__).'/packetery.api.php');
 
+class Packetery extends CarrierModule
+{
+    protected $config_form = false;
+    public $widget_type = 1;
     public function __construct()
     {
+        $this->widget_type = Packeteryclass::getConfigValueByOption('WIDGET_TYPE');
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '1.18';
-        $this->limited_countries = array('cz', 'sk', 'pl', 'hu', 'de', 'ro');
+        $this->version = '2.0.0rc2';
+        $this->author = 'ZLab Solutions';
+        $this->need_instance = 0;
+
+        /**
+         * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
+         */
+        $this->bootstrap = true;
+        $this->limited_countries = array('cz', 'sk', 'pl', 'hu', 'de', 'ro', 'ua');
         parent::__construct();
 
-        $this->author = $this->l('Packetery, Ltd.');
         $this->displayName = $this->l('Packetery');
-        $this->description = $this->l(
-            'Offers your customers the option to choose pick-up point in Packetery network,
-            and export orders to Packetery system.'
-        );
-
-        $this->module_key = 'aa9b6f2b47192e6caae86b500177a861';
-        $this->currency_conversion = array(
-            self::CC_PRESTASHOP => $this->l('Use PrestaShop\'s currency conversion'),
-            self::CC_CNB => $this->l('Use CNB rates with optional margin'),
-            self::CC_FIXED => $this->l('Use fixed conversion rate'),
-        );
-
+        $this->description = $this->l('Get your customers access to pick-up point in Packetery delivery network. 
+            Export orders to Packetery system. Presatshop 1.7.0 or higher.');
+        $this->ps_versions_compliancy = array('min' => '1.7.0.0', 'max' => _PS_VERSION_);
+        
         // This is only used in admin of modules, and we're accessing Packetery API here, so don't do that elsewhere.
-        if (self::_isInstalled($this->name) && strpos($_SERVER['REQUEST_URI'], 'tab=AdminModules') !== false) {
-            $errors = array();
-            $this->configuration_errors($errors);
-            foreach ($errors as $error) {
-                $this->warning .= $error;
-            }
+        $errors = array();
+        $this->configurationErrors($errors);
+        foreach ($errors as $error) {
+            $this->warning .= $error;
         }
     }
 
-    public static function _isInstalled($module_name)
+    /**
+     * Don't forget to create update methods if needed:
+     * http://doc.prestashop.com/display/PS16/Enabling+the+Auto-Update
+     */
+    public function install()
     {
-        if (method_exists("Packetery", "isInstalled")) {
-            return self::isInstalled($module_name);
-        } else {
-            return true;
+        $db = Db::getInstance();
+        if (extension_loaded('curl') == false) {
+            $this->_errors[] = $this->l('You have to enable the cURL extension on your server to install this module');
+            return false;
         }
+        Configuration::updateValue('PACKETERY_LIVE_MODE', false);
+
+        // backup possible old order table
+        if (count($db->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'packetery_order"')) > 0) {
+            $db->execute('RENAME TABLE `' . _DB_PREFIX_ . 'packetery_order` TO `'. _DB_PREFIX_ .'packetery_order_old`');
+            $have_old_table = true;
+        } else {
+            $have_old_table = false;
+        }
+        
+        include(dirname(__FILE__).'/sql/install.php');
+
+        // copy data from old order table
+        if ($have_old_table) {
+            $fields = array();
+            foreach ($db->executeS('SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'packetery_order_old`') as $field) {
+                $fields[] = $field['Field'];
+            }
+            $db->execute(
+                'INSERT INTO `' . _DB_PREFIX_ . 'packetery_order`(`' . implode('`, `', $fields) . '`)
+                SELECT * FROM `' . _DB_PREFIX_ . 'packetery_order_old`'
+            );
+            $db->execute('DROP TABLE `' . _DB_PREFIX_ . 'packetery_order_old`');
+        }
+
+        return parent::install() &&
+            $this->registerHook('actionOrderHistoryAddAfter') &&
+            $this->registerHook('backOfficeHeader') &&
+            $this->registerHook('displayCarrierExtraContent') &&
+            $this->registerHook('displayBeforeCarrier') &&
+            $this->registerHook('displayHeader') &&
+            $this->registerHook('displayFooter') &&
+            $this->registerHook('actionCarrierUpdate') &&
+            Packeteryclass::insertTab();
+    }
+
+    public function uninstall()
+    {
+        Packeteryclass::deleteTab();
+
+        include(dirname(__FILE__).'/sql/uninstall.php');
+
+        return parent::uninstall();
+    }
+
+    public function hookActionCarrierUpdate($params)
+    {
+        Packeteryclass::actionCarrierUpdate($params);
     }
 
     private static function transportMethod()
     {
         if (extension_loaded('curl')) {
             $have_curl = true;
-            //$curl_version = curl_version();
-            //$have_curl_ssl = ($curl_version['features'] & CURL_VERSION_SSL);
         }
         if (ini_get('allow_url_fopen')) {
             $have_url_fopen = true;
-            //$have_https_fopen = ($have_url_fopen && extension_loaded('openssl') &&
-            // function_exists('stream_context_create'));
         }
         // Disabled - more trouble than it's worth
-        //if ($have_curl_ssl) return 'curls';
-        //if ($have_https_fopen) return 'fopens';
         if ($have_curl) {
             return 'curl';
         }
@@ -88,7 +142,7 @@ class Packetery extends Module
         return false;
     }
 
-    public function configuration_errors(&$error = null)
+    public function configurationErrors(&$error = null)
     {
         $error = array();
         $have_error = false;
@@ -136,1278 +190,492 @@ class Packetery extends Module
         return $have_error;
     }
 
-    public function compareVersions($v1, $v2)
-    {
-        return array_reduce(
-            array_map(
-                create_function('$a,$b', 'return $a - $b;'),
-                explode('.', $v1),
-                explode('.', $v2)
-            ),
-            create_function('$a,$b', 'return ($a ? $a : $b);')
-        );
-    }
-
-    public function install()
-    {
-        $sql = array();
-        $db = Db::getInstance();
-
-        // backup possible old order table
-        if (count($db->executeS('show tables like "' . _DB_PREFIX_ . 'packetery_order"')) > 0) {
-            $db->execute('rename table `' . _DB_PREFIX_ . 'packetery_order` to `'. _DB_PREFIX_ .'packetery_order_old`');
-            $have_old_table = true;
-        } else {
-            $have_old_table = false;
-        }
-
-        // create tables
-        if (!defined('_MYSQL_ENGINE_')) {
-            define('_MYSQL_ENGINE_', 'MyISAM');
-        }
-        include(dirname(__FILE__) . '/sql-install.php');
-        foreach ($sql as $s) {
-            if (!$db->execute($s)) {
-                return false;
-            }
-        }
-
-        // copy data from old order table
-        if ($have_old_table) {
-            $fields = array();
-            foreach ($db->executeS('show columns from `' . _DB_PREFIX_ . 'packetery_order_old`') as $field) {
-                $fields[] = $field['Field'];
-            }
-            $db->execute(
-                'insert into `' . _DB_PREFIX_ . 'packetery_order`(`' . implode('`, `', $fields) . '`)
-                select * from `' . _DB_PREFIX_ . 'packetery_order_old`'
-            );
-            $db->execute('drop table `' . _DB_PREFIX_ . 'packetery_order_old`');
-        }
-
-        // module itself and hooks
-        if (!parent::install()
-            || !$this->registerHook('extraCarrier')
-            || !$this->registerHook('updateCarrier')
-            || !$this->registerHook('newOrder')
-            || !$this->registerHook('header')
-            || !$this->registerHook('adminOrder')
-        ) {
-            return false;
-        }
-
-        // for PrestaShop >= 1.4.0.2 there is one-page-checkout, more hooks are required
-        $v = explode('.', _PS_VERSION_);
-        if (_PS_VERSION_ > '1.4.0' || (array_slice($v, 0, 3) == array(1, 4, 0) && $v[3] >= 2)) {
-            if (!$this->registerHook('processCarrier')
-                || !$this->registerHook('paymentTop')
-            ) {
-                return false;
-            }
-        }
-
-        // optional hooks (allow fail for older versions of PrestaShop)
-        $this->registerHook('orderDetailDisplayed');
-        $this->registerHook('backOfficeTop');
-        $this->registerHook('beforeCarrier');
-        $this->registerHook('displayMobileHeader');
-
-        // create admin tab under Orders
-        $db->execute(
-            'insert into `' . _DB_PREFIX_ . 'tab` (id_parent, class_name, module, position)
-            select id_parent, "AdminOrderPacketery", "packetery", coalesce(max(position) + 1, 0)
-            from `' . _DB_PREFIX_ . 'tab` pt where id_parent=(select if (id_parent>0, id_parent, id_tab) from `' .
-            _DB_PREFIX_ . 'tab` as tp where tp.class_name="AdminOrders") group by id_parent'
-        );
-        $tab_id = $db->insert_id();
-
-        $tab_name = array('en' => 'Packetery', 'cs' => 'Zásilkovna', 'sk' => 'Zásielkovňa');
-        foreach (Language::getLanguages(false) as $language) {
-            $db->execute(
-                'insert into `' . _DB_PREFIX_ . 'tab_lang` (id_tab, id_lang, name)
-                values(' . $tab_id . ', ' . $language['id_lang'] . ', "' .
-                pSQL($tab_name[$language['iso_code']] ? $tab_name[$language['iso_code']] : $tab_name['en']) . '")'
-            );
-        }
-
-        if (!Tab::initAccess($tab_id)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function uninstall()
-    {
-        foreach (array('PACKETERY_API_KEY', 'PACKETERY_ESHOP_DOMAIN') as $key) {
-            Configuration::deleteByName($key);
-        }
-
-        // remove admin tab
-        $db = Db::getInstance();
-        if ($tab_id = $db->getValue(
-            'select id_tab from `' . _DB_PREFIX_ . 'tab` where class_name="AdminOrderPacketery"'
-        )
-        ) {
-            $db->execute('delete from `' . _DB_PREFIX_ . 'tab` WHERE id_tab=' . $tab_id);
-            $db->execute('delete from `' . _DB_PREFIX_ . 'tab_lang` WHERE id_tab=' . $tab_id);
-            $db->execute('delete from `' . _DB_PREFIX_ . 'access` WHERE id_tab=' . $tab_id);
-        }
-
-        // mark carriers deleted
-        $db->execute(
-            'update `' . _DB_PREFIX_ . 'carrier` set deleted=1 where external_module_name="packetery"
-            or id_carrier in (select id_carrier from `' . _DB_PREFIX_ . 'packetery_carrier`)'
-        );
-
-        // remove our carrier and payment table, keep order table for reinstall
-        $db->execute('drop table if exists `' . _DB_PREFIX_ . 'packetery_carrier`');
-        $db->execute('drop table if exists `' . _DB_PREFIX_ . 'packetery_payment`');
-        $db->execute('drop table if exists `' . _DB_PREFIX_ . 'packetery_address_delivery`');
-
-        // module itself and hooks
-        if (!parent::uninstall()
-            || !$this->unregisterHook('beforeCarrier')
-            || !$this->unregisterHook('extraCarrier')
-            || !$this->unregisterHook('updateCarrier')
-            || !$this->unregisterHook('newOrder')
-            || !$this->unregisterHook('header')
-            || !$this->unregisterHook('processCarrier')
-            || !$this->unregisterHook('orderDetailDisplayed')
-            || !$this->unregisterHook('adminOrder')
-            || !$this->unregisterHook('paymentTop')
-            || !$this->unregisterHook('backOfficeTop')
-        ) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function cConfigurationPost()
-    {
-        if (Tools::getIsset('packetery_api_key') && Tools::getValue('packetery_api_key')) {
-            if (trim(Tools::getValue('packetery_api_key')) != Configuration::get('PACKETERY_API_KEY')) {
-                Configuration::updateValue('PACKETERY_API_KEY', trim(Tools::getValue('packetery_api_key')));
-                @unlink(_PS_MODULE_DIR_ . "packetery/views/js/api.js");
-                @clearstatcache();
-            }
-        }
-        if (Tools::getIsset('packetery_eshop_domain') && Tools::getValue('packetery_eshop_domain')) {
-            Configuration::updateValue('PACKETERY_ESHOP_DOMAIN', trim(Tools::getValue('packetery_eshop_domain')));
-        }
-    }
-
-    public function cAddCarrierPost()
-    {
-        $db = Db::getInstance();
-        if (!Tools::getIsset('packetery_add_carrier') || !Tools::getValue('packetery_add_carrier')) {
-            return;
-        }
-
-        $carrier = new Carrier();
-
-        $carrier->name = Tools::getValue('packetery_carrier_name');
-        $carrier->active = true;
-        $carrier->shipping_method = defined('Carrier::SHIPPING_METHOD_WEIGHT') ? Carrier::SHIPPING_METHOD_WEIGHT : 1;
-        $carrier->deleted = 0;
-
-        $carrier->range_behavior = true; // true disables this carrier if outside weight range
-        $carrier->is_module = false;
-        $carrier->external_module_name = "packetery";
-        $carrier->need_range = true;
-
-        foreach (Language::getLanguages(true) as $language) {
-            if (Tools::getIsset('delay_' . $language['id_lang']) && Tools::getValue('delay_' . $language['id_lang'])) {
-                $carrier->delay[$language['id_lang']] = Tools::getValue('delay_' . $language['id_lang']);
-            }
-        }
-
-        if (!$carrier->add()) {
-            return false;
-        }
-
-        $country = "";
-        $countries = Tools::getValue('packetery_carrier_country');
-        foreach ($countries as $key => $countryCode) {
-            $country .= $countryCode;
-            if ($key != count($countries) - 1) {
-                $country .= ',';
-            }
-        }
-
-        $db->execute(
-            'insert into `' . _DB_PREFIX_ . 'packetery_carrier` set id_carrier=' . ((int)$carrier->id) .
-            ', country="' . pSQL($country ? $country : 'cz,sk') . '", list_type=' .
-            ((int)Tools::getValue('packetery_carrier_list_type')) . ', is_cod=' .
-            (Tools::getIsset('packetery_carrier_is_cod') ? (int)Tools::getValue('packetery_carrier_is_cod') : 0)
-        );
-
-        foreach (Group::getGroups(true) as $group) {
-            $db->autoExecute(
-                _DB_PREFIX_ . 'carrier_group',
-                array(
-                    'id_carrier' => (int)$carrier->id,
-                    'id_group' => (int)$group['id_group']
-                ),
-                'INSERT'
-            );
-        }
-
-        $rangeWeight = new RangeWeight();
-        $rangeWeight->id_carrier = $carrier->id;
-        $rangeWeight->delimiter1 = '0';
-        $rangeWeight->delimiter2 = '5';
-        $rangeWeight->add();
-
-        $rangePrice = new RangePrice();
-        $rangePrice->id_carrier = $carrier->id;
-        $rangePrice->delimiter1 = '0';
-        $rangePrice->delimiter2 = '1000000';
-        $rangePrice->add();
-
-        $zones = Zone::getZones(true);
-        foreach ($zones as $zone) {
-            $db->autoExecute(
-                _DB_PREFIX_ . 'carrier_zone',
-                array(
-                    'id_carrier' => (int)$carrier->id,
-                    'id_zone' => (int)$zone['id_zone']
-                ),
-                'INSERT'
-            );
-            $db->autoExecuteWithNullValues(
-                _DB_PREFIX_ . 'delivery',
-                array(
-                    'id_carrier' => (int)$carrier->id,
-                    'id_range_price' => (int)$rangePrice->id,
-                    'id_range_weight' => null,
-                    'id_zone' => (int)$zone['id_zone'],
-                    'price' => '0'
-                ),
-                'INSERT'
-            );
-            $db->autoExecuteWithNullValues(
-                _DB_PREFIX_ . 'delivery',
-                array(
-                    'id_carrier' => (int)$carrier->id,
-                    'id_range_price' => null,
-                    'id_range_weight' => (int)$rangeWeight->id,
-                    'id_zone' => (int)$zone['id_zone'],
-                    'price' => '0'
-                ),
-                'INSERT'
-            );
-        }
-
-        if (Tools::getIsset('packetery_carrier_logo') && Tools::strlen(Tools::getValue('packetery_carrier_logo')) == 2) {
-            copy(
-                dirname(__FILE__) . '/logo-' . Tools::getValue('packetery_carrier_logo') . '.jpg',
-                _PS_SHIP_IMG_DIR_ . '/' . ((int)$carrier->id) . '.jpg'
-            );
-        }
-    }
-
-    private function cConfiguration()
-    {
-        $html = "";
-        $html .= "<fieldset><legend>" . $this->l('Module Configuration') . "</legend>";
-        $html .= "<form method='post'>";
-
-        $html .= "<label>" . $this->l('API key') . ": </label>";
-        $html .= "<div class='margin-form'><input type='text' name='packetery_api_key' value='" .
-            htmlspecialchars(Configuration::get('PACKETERY_API_KEY'), ENT_QUOTES) . "' /></div>";
-        $html .= "<div class='clear'></div>";
-
-        $html .= "<label>" . $this->l('E-shop domain') . ": </label>";
-        $html .= "<div class='margin-form'><input type='text' name='packetery_eshop_domain' value='" .
-            htmlspecialchars(Configuration::get('PACKETERY_ESHOP_DOMAIN'), ENT_QUOTES) . "' /><p>" .
-            $this->l(
-                'If you\'re using one Packetery account for multiple e-shops,
-                enter the domain of current one here, so that your customers
-                are properly informed about what package they are receiving.'
-            ) . "</p></div>";
-        $html .= "<div class='clear'></div>";
-
-        $html .= "<div class='margin-form'><input class='button' type='submit' value='" .
-            htmlspecialchars($this->l('Save'), ENT_QUOTES) . "'  /></div>";
-
-        $html .= "</form>";
-        $html .= "</fieldset>";
-
-        return $html;
-    }
-
-    private function listTypes()
-    {
-        return array(
-            1 => $this->l('Selection box only'),
-            $this->l('Selection box with map'),
-            $this->l('Selection box with direct details display')
-        );
-    }
-
-    private function cAddCarrier()
-    {
-        $html = "";
-        $html .= "<fieldset><legend>" . $this->l('Add Carrier') . "</legend>";
-
-        $html .= "<form method='post'>";
-        $html .= "<input type='hidden' name='packetery_add_carrier' value='1' />";
-
-        $html .= "<label>" . $this->l('Carrier Name') . ": </label>";
-        $html .= "<div class='margin-form'><input type='text' name='packetery_carrier_name' size='41' value='" .
-            htmlspecialchars($this->l('Personal pick-up – Packetery'), ENT_QUOTES) . "' /></div>";
-        $html .= "<div class='clear'></div>";
-
-        $html .= "<label>" . $this->l('Delay') . ": </label>";
-        $html .= '<div class="margin-form">';
-
-        $cookie = Context::getContext()->cookie;
-        $def_lang = (int)($cookie->id_lang ? $cookie->id_lang : Configuration::get('PS_LANG_DEFAULT'));
-        $delay = array(
-            'en' => '1-3 days when in stock',
-            'cs' => "Do 1-3 dní je-li skladem",
-            'sk' => "Do 1-3 dní ak je skladom"
-        );
-        foreach (Language::getLanguages(false) as $language) {
-            if ($def_lang == $language['id_lang']) {
-                $def_lang_code = $language['iso_code'];
-            }
-            $html .= '<div id="delay_' . $language['id_lang'] . '" style="display: ' .
-                ($language['id_lang'] == 1 ? 'block' : 'none') .
-                '; float: left;"><input type="text" size="41" maxlength="128" name="delay_' .
-                $language['id_lang'] . '" value="' .
-                htmlspecialchars(
-                    $delay[$language['iso_code']] ? $delay[$language['iso_code']] : $delay['en'],
-                    ENT_QUOTES
-                ) . '" /></div>';
-        }
-        $html .= $this->displayFlags(Language::getLanguages(false), $def_lang, 'delay', 'delay', true);
-        $html .= '<p class="clear"></p></div>';
-        $html .= "<div class='clear'></div>";
-        $html .= "<script type='text/javascript'> changeLanguage(
-            'delay',
-            'delay',
-            $def_lang,
-            '$def_lang_code'
-        ); </script>";
-
-        $html .= "<label>" . $this->l('Countries') . ": </label>";
-        $html .= "<div class='margin-form'>
-            <select name='packetery_carrier_country[]' multiple style='width: 180px; ' size='3'>";
-
-        foreach (array(
-                     'cz' => $this->l('Czech Republic'),
-                     'sk' => $this->l('Slovakia'),
-                     'hu' => $this->l('Hungary'),
-                     'pl' => $this->l('Poland'),
-                     'de' => $this->l('Germany'),
-                     'ro' => $this->l('Romania'),
-                 ) as $code => $country) {
-            $html .= "<option value='$code'>$country</option>\n";
-        }
-        $html .= "</select>";
-        $html .= "<p class='clear'>" . $this->l(
-            'You can select one or more countries by using the Ctrl key.
-        Only branches in selected countries will be shown in this shipping method
-        – you can e.g. set different price based on country.'
-        ) . "</p>";
-        $html .= "</div>";
-        $html .= "<div class='clear'></div>";
-
-        $html .= "<label>" . $this->l('Selection Type') . ": </label>";
-        $html .= "<div class='margin-form'><select name='packetery_carrier_list_type'>";
-        foreach ($this->listTypes() as $code => $country) {
-            $html .= "<option value='$code'>$country</option>\n";
-        }
-        $html .= "</select>";
-        $html .= "<input id='packetery-preview-button' type='button' class='button' value='" .
-            htmlspecialchars($this->l('Show preview'), ENT_QUOTES) . "' />";
-        $html .= "<p class='clear'>" . $this->l(
-            'Here you can change the display of branch list in shopping cart.
-            Preview will only work if you have correct API key entered.'
-        ) . "</p>";
-        $html .= "</div>";
-        $html .= "<div class='clear'></div>";
-
-        $html .= "<label for='packetery_carrier_is_cod'>" . $this->l('Is COD') . ": </label>";
-        $html .= "<div class='margin-form'>
-            <input type='checkbox' id='packetery_carrier_is_cod' name='packetery_carrier_is_cod' value='1'><p>" .
-            $this->l('When exporting order with this carrier, the order total will be put as COD.') . "</div>";
-        $html .= "<div class='clear'></div>";
-
-        $html .= "<label>" . $this->l('Install Logo') . ": </label>";
-        $html .= "<div class='margin-form'>";
-        foreach (array(
-                     "" => $this->l('No'),
-                     "cz" => "<img style='vertical-align: top; ' src='" . _MODULE_DIR_ . "packetery/views/img/logo-cz.jpg'>",
-                     "sk" => "<img style='vertical-align: top; ' src='" . _MODULE_DIR_ . "packetery/views/img/logo-sk.jpg'>"
-                 ) as $k => $v) {
-            $html .= "<input type='radio' name='packetery_carrier_logo' value='$k' id='packetery_carrier_logo_$k'>
-                <label for='packetery_carrier_logo_$k' style='width: auto; height: auto; float: none; display: inline;'>
-                $v</label> &nbsp; &nbsp; ";
-        }
-        $html .= "</div>";
-        $html .= "<div class='clear'></div>";
-
-        if (!$this->configuration_errors()) {
-            $html .= "<script type='text/javascript' src='//www.zasilkovna.cz/api/" .
-                Configuration::get('PACKETERY_API_KEY') . "/branch.js?sync_load=1&amp;prestashop=1'></script>";
-            $html .= '
-<script type="text/javascript">
-  window.packetery.jQuery(function() {
-      var $ = window.packetery.jQuery;
-      $("#packetery-preview-button").click(function() {
-          $("<div><div data-list-type=\'" + $(this).prev("select").val() + "\'></div></div>")
-              .dialog({
-                  modal: true,
-                  width: 600,
-                  height: 400,
-                  title: "' . htmlspecialchars($this->l('Selection Type Preview'), ENT_QUOTES) . '",
-                  open: function() {
-                      window.packetery.initialize($(this).find("div"));
-                  }
-              });
-      });
-  });
-</script>';
-        }
-
-        $html .= "<div class='margin-form'><input class='button' type='submit' value='" .
-            htmlspecialchars($this->l('Add'), ENT_QUOTES) . "' /></div>";
-
-        $html .= "</form>";
-
-        $html .= "</fieldset>";
-
-        return $html;
-    }
-
-    private function cListCarriersPost()
-    {
-        if (Tools::getIsset('packetery_remove_carrier') && Tools::getValue('packetery_remove_carrier')) {
-            $db = Db::getInstance();
-            $db->execute(
-                'update `' . _DB_PREFIX_ .
-                'carrier` set deleted=1 where external_module_name="packetery"
-                and id_carrier=' . ((int)Tools::getValue('packetery_remove_carrier'))
-            );
-        }
-    }
-
-    private function cListCarriers()
-    {
-        $db = Db::getInstance();
-        $html = "";
-        $html .= "<fieldset><legend>" . $this->l('Carrier List') . "</legend>";
-        if ($list = $db->executeS(
-            'select c.id_carrier, c.name, pc.country, pc.list_type, pc.is_cod
-            from `' . _DB_PREFIX_ . 'carrier` c join `' . _DB_PREFIX_ . 'packetery_carrier` pc
-            on(pc.id_carrier=c.id_carrier) where c.deleted=0'
-        )
-        ) {
-            $html .= "<table class='table' cellspacing='0'>";
-            $html .= "<tr><th>" . $this->l('Carrier Name') . "</th><th>" . $this->l('Countries') . "</th><th>" .
-                $this->l('Selection Type') . "</th><th>" . $this->l('Is COD') . "</th><th>" . $this->l('Action') .
-                "</th></tr>";
-            $list_types = $this->listTypes();
-            foreach ($list as $carrier) {
-                $html .= "<tr><td>$carrier[name]</td><td>$carrier[country]</td><td>" .
-                    $list_types[$carrier['list_type']] . "</td><td>" .
-                    ($carrier['is_cod'] == 1 ? $this->l('Yes') : $this->l('No')) . "</td><td><form method='post'>
-                    <input type='hidden' name='packetery_remove_carrier' value='$carrier[id_carrier]'>
-                    <input type='submit' class='button' value='" . htmlspecialchars($this->l('Remove'), ENT_QUOTES) .
-                    "'></form></td></tr>";
-            }
-            $html .= "</table>";
-            $html .= "<p>" . $this->l(
-                'If you want to set price, use standard PrestaShop functions (see Shipping in top menu).'
-            ) . "</p>";
-        } else {
-            $html .= "<p>" . $this->l('There are no carriers created yet. Please create some below.') . "</p>";
-        }
-        $html .= "</fieldset>";
-        return $html;
-    }
-
-    private function cListPaymentsPost()
-    {
-        if (Tools::getIsset('packetery_payment_module') && Tools::getValue('packetery_payment_module')) {
-            $db = Db::getInstance();
-            if ($db->getValue(
-                'select 1 from `' . _DB_PREFIX_ . 'packetery_payment` where module_name="' .
-                pSQL(Tools::getValue('packetery_payment_module')) . '"'
-            ) == 1
-            ) {
-                $db->execute(
-                    'update `' . _DB_PREFIX_ . 'packetery_payment` set is_cod=' .
-                    ((int)Tools::getValue('packetery_payment_is_cod')) . ' where module_name="' .
-                    pSQL(Tools::getValue('packetery_payment_module')) . '"'
-                );
-            } else {
-                $db->execute(
-                    'insert into `' . _DB_PREFIX_ . 'packetery_payment` set is_cod=' .
-                    ((int)Tools::getValue('packetery_payment_is_cod')) . ', module_name="' .
-                    pSQL(Tools::getValue('packetery_payment_module')) . '"'
-                );
-            }
-        }
-    }
-
-    private function cListPayments()
-    {
-        $db = Db::getInstance();
-        $html = "";
-        $html .= "<fieldset><legend>" . $this->l('Payment List') . "</legend>";
-        $html .= "<table class='table' cellspacing='0'>";
-        $html .= "<tr><th>" . $this->l('Module') . "</th><th>" . $this->l('Is COD') .
-            "</th><th>" . $this->l('Action') . "</th></tr>";
-        $modules = $db->executeS(
-            'select distinct m.name
-            from `' . _DB_PREFIX_ . 'module` m
-            left join `' . _DB_PREFIX_ . 'hook_module` hm on(hm.id_module=m.id_module)
-            left join `' . _DB_PREFIX_ . 'hook` h on(hm.id_hook=h.id_hook)
-            WHERE h.name in ("payment", "displayPayment", "displayPaymentReturn")
-            AND m.active=1
-        '
-        );
-        foreach ($modules as $module) {
-            $instance = Module::getInstanceByName($module['name']);
-            $is_cod = ($db->getValue(
-                'select is_cod from `' . _DB_PREFIX_ . 'packetery_payment`
-                where module_name="' . pSQL($module['name']) . '"'
-            ) == 1);
-            $html .= "<tr><td>$instance->displayName</td><td>" . ($is_cod == 1 ? $this->l('Yes') : $this->l('No')) .
-                "</td><td><form method='post'><input type='hidden' name='packetery_payment_module' value='" .
-                htmlspecialchars($module['name'], ENT_QUOTES) . "' />
-                <input type='hidden' name='packetery_payment_is_cod' value='" . (1 - $is_cod) . "' />
-                <input type='submit' class='button' value='" .
-                htmlspecialchars(
-                    $is_cod ? $this->l('Clear COD setting') : $this->l('Set COD setting'),
-                    ENT_QUOTES
-                ) . "'></form></td></tr>";
-        }
-        $html .= "</table>";
-        $html .= "<p>" . $this->l(
-            'When exporting order paid using module which has COD setting, the order total will be put as COD.'
-        ) . "</p>";
-        $html .= "<p>" . $this->l(
-            'Changes will not affect existing orders, only those created after your changes.'
-        ) . "</p>";
-        $html .= "</fieldset>";
-        return $html;
-    }
-
-    private function cListAddressDeliveryCarriersPost()
-    {
-        if (!Tools::getIsset('address_delivery_carriers') || !Tools::getValue('address_delivery_carriers')) {
-            return;
-        }
-
-        $data = (Tools::getIsset("data") && is_array(Tools::getValue("data")) ? Tools::getValue("data") : array());
-        $db = Db::getInstance();
-        $address_deliveries = self::addressDeliveries();
-        foreach ($data as $id_carrier => $attr) {
-            if ($attr['id_branch']) {
-                $a = $address_deliveries[$attr['id_branch']];
-                $db->execute(
-                    'insert into `' . _DB_PREFIX_ . 'packetery_address_delivery`(id_carrier, id_branch, name_branch,
-                     currency_branch, is_cod) values(' . ((int)$id_carrier) . ', ' . ((int)$attr['id_branch']) .
-                    ', "' . pSQL($a->name) . '", "' . pSQL($a->currency) . '", ' . ((int)$attr['is_cod']) . ')
-                    on duplicate key update id_branch=' . ((int)$attr['id_branch']) . ',
-                    is_cod=' . ((int)$attr['is_cod']) . ', name_branch="' . pSQL($a->name) . '",
-                    currency_branch="' . pSQL($a->currency) . '"'
-                );
-            } else {
-                $db->execute(
-                    'delete from `' . _DB_PREFIX_ . 'packetery_address_delivery` where id_carrier=' . ((int)$id_carrier)
-                );
-            }
-        }
-    }
-
-    private function cListAddressDeliveryCarriers()
-    {
-        $db = Db::getInstance();
-        $html = "";
-        $html .= "<fieldset><legend>" . $this->l('Address Delivery Carriers List') . "</legend>";
-        $html .= "<form method='post'>";
-        $html .= "<input type='hidden' name='address_delivery_carriers' value='1'>";
-        $html .= "<table class='table' cellspacing='0'>";
-        $html .= "<tr><th>" . $this->l('Carrier') . "</th><th>" . $this->l('Is Address Delivery via Packetery') .
-            "</th><th>" . $this->l('Is COD') . "</th></tr>";
-        $carriers = $db->executeS(
-            'select pad.*, c.name, c.id_carrier
-            from `' . _DB_PREFIX_ . 'carrier` c
-            LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` pad using(id_carrier)
-            WHERE 
-              c.external_module_name<>"packetery"
-              and c.id_carrier not in (select id_carrier from `' . _DB_PREFIX_ . 'packetery_carrier`)
-              and c.deleted=0
-              and c.active=1
-        '
-        );
-        foreach ($carriers as $carrier) {
-            $html .= "<tr><td>" . ($carrier['name'] != "0" ? $carrier['name'] : Configuration::get('PS_SHOP_NAME')) .
-                "</td><td><select name='data[$carrier[id_carrier]][id_branch]'>";
-            foreach ((
-                array(
-                    '' => (object)array(
-                        'name' => '–– ' . Tools::strtolower($this->l('No')) . ' ––')
-                ) + self::addressDeliveries()
-            ) as $k => $v) {
-                $html .= "<option value='$k'" .
-                    ($carrier['id_branch'] == $k ? " selected" : "") . ">$v->name</option>\n";
-            }
-            $html .= "</select></td><td><select name='data[$carrier[id_carrier]][is_cod]'>";
-            foreach (array(
-                         $this->l('No'),
-                         $this->l('Yes')
-                     ) as $k => $v) {
-                $html .= "<option value='$k'" . ($carrier['is_cod'] == $k ? " selected" : "") . ">$v</option>\n";
-            }
-            $html .= "</select></td></tr>";
-        }
-        $html .= "</table>";
-        $html .= "<input type='submit' class='button' value='" .
-            htmlspecialchars($this->l('Save settings'), ENT_QUOTES) . "'>";
-        $html .= "<p>" . $this->l(
-            'Changes will not affect existing orders, only those created after your changes.'
-        ) . "</p>";
-        $html .= "</fieldset>";
-        return $html;
-    }
-
+    /**
+     * Load the configuration form
+     */
     public function getContent()
     {
-        $this->ensureUpdatedAPI();
+        $labels_format = Packeteryclass::getConfigValueByOption('LABEL_FORMAT');
+        $this->context->smarty->assign('labels_format', $labels_format);
+        $this->context->smarty->assign('widget_type', $this->widget_type);
 
-        $this->cConfigurationPost();
-        $this->cAddCarrierPost();
-        $this->cListCarriersPost();
-        $this->cListPaymentsPost();
-        $this->cListAddressDeliveryCarriersPost();
+        $langs = Language::getLanguages();
+        $this->context->smarty->assign('langs', $langs);
 
-        $html = '';
-        $html .= '<h2>' . $this->l('Packetery Shipping Module Settings') . '</h2>';
-        $errors = array();
-        $this->configuration_errors($errors);
-        if ($errors) {
-            $html .= "<fieldset><legend>" . $this->l('Configuration Errors') . "</legend>";
-            foreach ($errors as $error) {
-                $html .= "<p style='font-weight: bold; color: red'>" . $error . "</p>";
-            }
-            $html .= "</fieldset>";
+        $this->context->smarty->assign('module_dir', $this->_path);
+        $id_employee = $this->context->employee->id;
+        $settings = Packeteryclass::getConfig();
+        if ($settings[3][1] == '') {
+            $shop = new Shop(Context::getContext()->shop->id);
+            Packeteryclass::updateSetting(3, $shop->domain);
+            $settings[3][1] = $shop->domain;
         }
+        $this->context->smarty->assign(array('ps_version'=> _PS_VERSION_));
+        $this->context->smarty->assign(array('check_e'=> $id_employee));
 
-        $html .= "<br>";
-        $html .= $this->cConfiguration();
-        $html .= "<br>";
-        $html .= $this->cListCarriers();
-        $html .= "<br>";
-        $html .= $this->cAddCarrier();
-        $html .= "<br>";
-        $html .= $this->cListAddressDeliveryCarriers();
-        $html .= "<br>";
-        $html .= $this->cListPayments();
+        $this->context->smarty->assign(array('settings'=> $settings));
+        $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+        $this->context->smarty->assign('module_dir', $this->_path);
+        $this->context->smarty->assign('baseuri', $base_uri);
 
-        return $html;
-    }
+        /*ORDERS*/
+        $packetery_orders_array = Packeteryclass::getListOrders();
+        $packetery_orders = $packetery_orders_array[0];
+        $packetery_orders_pages = $packetery_orders_array[1];
+        $this->context->smarty->assign('po_pages', $packetery_orders_pages);
+        $this->context->smarty->assign(array(
+            'packetery_orders' => Tools::jsonEncode(array(
+                'columns' => array(
+                    array('content' => $this->l('Ord.nr.'), 'key' => 'id_order', 'center' => true),
+                    array('content' => $this->l('Customer'), 'key' => 'customer', 'center' => true),
+                    array('content' => $this->l('Total Price'), 'key' => 'total', 'center' => true),
+                    array('content' => $this->l('Order Date'), 'key' => 'date', 'center' => true),
+                    array('content' => $this->l('Is COD'), 'bool' => true, 'key' => 'is_cod'),
+                    array('content' => $this->l('Destination branch'), 'key' => 'name_branch', 'center' => true),
+                    array('content' => $this->l('Address delivery'), 'key' => 'is_ad', 'bool' => true,'center' => true),
+                    array('content' => $this->l('Exported'), 'key' => 'exported', 'bool' => true, 'center' => true),
+                    array('content' => $this->l('Tracking number'), 'key' => 'tracking_number', 'center' => true)
+                ),
+                'rows' => $packetery_orders,
+                'url_params' => array('configure' => $this->name),
+                'identifier' => 'id_order',
+            ))
+        ));
+        /*END ORDERS*/
 
-    public static $is_before_carrier = false;
+        /*CARRIERS*/
+        $ad_array = PacketeryApi::getAdBranchesList();
+        $json_ad_array = json_encode($ad_array);
+        $raw_ad_array = rawurlencode($json_ad_array);
+        $this->context->smarty->assign('ad_array', $raw_ad_array);
+        
+        /*AD CARRIER LIST*/
+        $packetery_list_ad_carriers = array();
+        $packetery_list_ad_carriers = Packeteryclass::getListAddressDeliveryCarriers();
+        $this->context->smarty->assign(array(
+            'packetery_list_ad_carriers' => Tools::jsonEncode(array(
+                'columns' => array(
+                    array('content' => $this->l('ID'), 'key' => 'id_carrier', 'center' => true),
+                    array('content' => $this->l('Carrier'), 'key' => 'name', 'center' => true),
+                    array(
+                        'content' => $this->l('Is Address Delivery via Packetery'),
+                        'key' => 'id_branch',
+                        'center' => true
+                    ),
+                    array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
+                ),
+                'rows' => $packetery_list_ad_carriers,
+                'url_params' => array('configure' => $this->name),
+                'identifier' => 'id_carrier',
+            ))
+        ));
+        /*END AD CARRIER LIST*/
 
-    public function hookBeforeCarrier($params)
-    {
-        self::$is_before_carrier = true;
-        $res = $this->hookExtraCarrier($params);
-        self::$is_before_carrier = false;
-        return $res;
-    }
+        /*CARRIER LIST*/
+        $packetery_carriers_list = array();
+        $packetery_carriers_list = Packeteryclass::getCarriersList();
+        $this->context->smarty->assign(array(
+            'packetery_carriers_list' => Tools::jsonEncode(array(
+                'columns' => array(
+                    array('content' => $this->l('ID'), 'key' => 'id_carrier', 'center' => true),
+                    array('content' => $this->l('Carrier Name'), 'key' => 'name', 'center' => true),
+                    array('content' => $this->l('Countries'), 'key' => 'country', 'center' => true),
+                    array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
+                ),
+                'rows' => $packetery_carriers_list,
+                'rows_actions' => array(
+                    array(
+                        'title' => 'remove',
+                        'action' => 'remove_carrier',
+                        'icon' => 'delete',
+                    ),
+                ),
+                'top_actions' => array(
+                    array(
+                        'title' => $this->l('Add Carrier'),
+                        'action' => 'add_carrier',
+                        'icon' => 'add',
+                        'img' => 'themes/default/img/process-icon-new.png',
+                        'fa' => 'plus'
+                    ),
+                ),
+                'url_params' => array('configure' => $this->name),
+                'identifier' => 'id_carrier'
+            ))
+        ));
+        /*END CARRIER LIST*/
 
-    public function hookExtraCarrier($params)
-    {
-        $db = Db::getInstance();
+        /*PAYMENT LIST*/
+        $payment_list = array();
+        $payment_list = Packeteryclass::getListPayments();
+        $this->context->smarty->assign(array(
+            'payment_list' => Tools::jsonEncode(array(
+                'columns' => array(
+                    array('content' => $this->l('Module'), 'key' => 'name', 'center' => true),
+                    array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
+                    array('content' => $this->l('module_name'), 'key' => 'module_name', 'center' => true),
+                ),
+                'rows' => $payment_list,
+                'url_params' => array('configure' => $this->name),
+                'identifier' => 'id_branch'
+            ))
+        ));
+        /*END PAYMENT LIST*/
 
-        if ($db->getValue(
-            'select 1 from `' . _DB_PREFIX_ . 'hook` where name in ("beforeCarrier", "displayBeforeCarrier")'
-        ) == 1 && !self::$is_before_carrier
-        ) {
-            return "";
+        /*BRANCHES*/
+        $total_branches = PacketeryApi::countBranches();
+        $last_branches_update = '';
+        if ($settings[5][1] != '') {
+            $date = new DateTime();
+            $date->setTimestamp($settings[5][1]);
+            $last_branches_update = $date->format('Y-m-d H:i:s');
         }
-
-        $carrier_data = array();
-        foreach ($db->executeS(
-            'select pc.id_carrier, pc.country, pc.list_type from `' .
-            _DB_PREFIX_ . 'packetery_carrier` pc join `' .
-            _DB_PREFIX_ . 'carrier` c using(id_carrier) where c.deleted=0'
-        ) as $carrier) {
-            $carrier_data[$carrier['id_carrier']] = array(
-                'country' => $carrier['country'],
-                'list_type' => $carrier['list_type']
-            );
-        }
-
-        $selected_id = $db->getValue(
-            'select id_branch from `' . _DB_PREFIX_ . 'packetery_order` where id_cart=' .
-            ((int)$params['cart']->id)
+        $this->context->smarty->assign(
+            array('total_branches' => $total_branches, 'last_branches_update' => $last_branches_update)
         );
+        $packetery_branches = array();
+        $this->context->smarty->assign(array(
+            'packetery_branches' => Tools::jsonEncode(array(
+                'columns' => array(
+                    array('content' => $this->l('ID'), 'key' => 'id_branch', 'center' => true),
+                    array('content' => $this->l('Name'), 'key' => 'name', 'center' => true),
+                    array('content' => $this->l('Country'), 'key' => 'country', 'center' => true),
+                    array('content' => $this->l('City'), 'key' => 'city', 'center' => true),
+                    array('content' => $this->l('Street'), 'key' => 'street', 'center' => true),
+                    array('content' => $this->l('Zip'), 'key' => 'zip', 'center' => true),
+                    array('content' => $this->l('Url'), 'key' => 'url', 'center' => true),
+                    array('content' => $this->l('Max weight'), 'key' => 'max_weight', 'center' => true),
+                ),
+                'rows' => $packetery_branches,
+                'rows_actions' => array(
+                    array('title' => 'Change', 'action' => 'remove'),
+                ),
+                'url_params' => array('configure' => $this->name),
+                'identifier' => 'id_branch'
+            ))
+        ));
+        /*END CARRIERS*/
+        $this->hookDisplayWidget();
 
-        $is_opc = Configuration::get('PS_ORDER_PROCESS_TYPE');
-        return '<script type="text/javascript">
-window.packetery.jQuery(function() {
-    /*This function might get called automagically by some OPC module and this needs to be updated.*/
-    window.prestashopPacketerySelectedId = ' . ($selected_id ? $selected_id : "null") . ';' . '
-
-    if (window.prestashopPacketeryInitialized) return;
-    window.prestashopPacketeryInitialized = true;
-
-    var $ = window.packetery.jQuery;
-    var add_padding = true;
-    var id_carriers_selector = "input[name^=\"delivery_option[\"]:radio";
-    if ($(id_carriers_selector).size() == 0) {
-        id_carriers_selector = "input[name=id_carrier]:radio"
-        add_padding = false; // magic
-    }
-    var id_carriers = $(id_carriers_selector);
-    var carrier_data = ' . Tools::jsonEncode($carrier_data) . ';
-    var last_ajax = null;
-    var last_branch = null;
-    var original_updateCarrierSelectionAndGift = window.updateCarrierSelectionAndGift;
-    var original_updateCarrierList = window.updateCarrierList;
-    var original_updatePaymentMethods = window.updatePaymentMethods;
-    var original_paymentModuleConfirm = window.paymentModuleConfirm;
-    var original_updateAddressSelection = window.updateAddressSelection;
-    var submit_now_allowed = true;
-    var is_advanced_checkout_module = false;
-
-    // PrestaShop 1.5.2+ compatibility
-    var on_updated_id_carriers = function() {};
-    var update_id_carriers = function(reinitialize) {
-        id_carriers = $(id_carriers_selector); on_updated_id_carriers(reinitialize);
-    };
-    function str_repeat(s, count) { var ret = ""; while(count--) { ret += s; }; return ret; };
-    function to_number(s) { var ret = parseFloat(s); return (isNaN(ret) ? 0 : ret); };
-    function to_carrier_id(s) {
-        s = (s.toString ? s.toString() : "").replace(/,.*$/, "");
-        if (carrier_data[s]) return s;
-
-        var delim = str_repeat("0", parseInt(s.substr(0, 1)) + 1);
-        if (s.length < 4 || s.indexOf(delim) == -1) return "x";
-
-        s = s.substr(1);
-        var p;
-        while((p = s.lastIndexOf(delim)) != -1) {
-            s = s.substr(0, p);
-        }
-        return s;
-    };
-    function find_select_place() {
-        var carrier_selector = [".item,.alternate_item", ".delivery_option", "td,div", "*"];
-        var carrier = $();
-        for(var i = 0; carrier.size() == 0 && i < carrier_selector.length; i++) {
-            carrier = $(this).parent().closest(carrier_selector[i]);
-        }
-        var tmp = carrier.find("td.delivery_option_logo");
-        if (tmp.size() == 1 && tmp.closest("label").size() == 0) {
-            carrier = $("<span />").appendTo(tmp.next());
-        }
-        return carrier;
+        $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
+        $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/prestui/ps-tags.tpl');
+        return $output;
     }
 
-    if (original_updateCarrierList) {
-        window.updateCarrierList = function() {
-            var els = $(".packetery_prestashop_branch_list").detach();
-
-            original_updateCarrierList.apply(this, arguments);
-
-            update_id_carriers();
-
-            var reinit_required = false;
-            els.each(function() {
-                var e = id_carriers.filter("[value=\"" + $(this).data("delivery_option_value") + "\"]")[0];
-                if (e) { find_select_place.call(e).after(this); }
-                else { reinit_required = true; }
-            });
-            if (reinit_required) {
-                update_id_carriers(true);
-            }
-        }
-    }
-    if (original_updateAddressSelection) {
-        window.updateAddressSelection = function() {
-            var els = $(".packetery_prestashop_branch_list").detach();
-
-            original_updateAddressSelection.apply(this, arguments);
-
-            update_id_carriers(true);
-            els.each(function() {
-                find_select_place.call(
-                    id_carriers.filter("[value=\"" + $(this).data("delivery_option_value") + "\"]")[0]
-                ).after(this);
-            });
-        }
-    }
-    if (original_updatePaymentMethods) {
-        window.updatePaymentMethods = function() {
-            if (!submit_now_allowed) {
-                arguments[0].HOOK_PAYMENT = ' .
-                    Tools::jsonEncode(
-                        '<p class="warning">'.Tools::displayError('Error: please choose a carrier').'</p>'
-                    ).
-            ';
-            }
-            try {
-                original_updatePaymentMethods.apply(this, arguments);
-            }
-            catch(e) {}
-        }
-    }
-    // End PrestaShop 1.5.2+ compatibility
-
-    // Compatibility with OnePageCheckout by Peter Sliacky
-    var is_custom_opc_1 = false;
-    if (original_paymentModuleConfirm) {
-        is_custom_opc_1 = true;
-        window.paymentModuleConfirm = function() {
-            if (!submit_now_allowed) {
-                alert(' . Tools::jsonEncode($this->l('Please select pick-up point.')) . ');
-                return false;
-            }
-
-            original_paymentModuleConfirm.apply(this, arguments);
-        };
-    }
-    // End Compatibility with OnePageCheckout by Peter Sliacky
-
-    // Compatibility with Advanced Checkout module
-    if(typeof updcarrieraddress == "function"){
-        is_advanced_checkout_module = true;
-        var defaultUpdcarrieraddress = updcarrieraddress;
-        updcarrieraddress = function (carr) {
-            defaultUpdcarrieraddress(carr);
-            setTimeout(function () { update_id_carriers(true); }, 1000);
-        }
-    }
-    // End Compatibility with Advanced Checkout module
-
-
-    function save_selected_branch(e, callback) {
-        if (last_ajax) last_ajax.abort();
-        if (!carrier_data[to_carrier_id(e.value)]) {
-            if (callback) callback();
-            return false;
-        }
-
-        var p_select = $("#packetery_prestashop_branch_list_" + to_carrier_id(e.value)).find("div")[0].packetery;
-        var id_branch = p_select.option("selected-id");
-        var branch_data = (id_branch > 0 ? p_select.option("branches")[id_branch] : null);
-        var name_branch = (branch_data ? branch_data.name_street : "");
-        var currency_branch = (branch_data ? branch_data.currency : "");
-        if(is_advanced_checkout_module && id_branch === last_branch){ // AdvancedCheckout seems to do infinite loop of reloads if we don\'t kill it
-            return false;
-        }
-        last_ajax = $.ajax({
-            url: "' . _MODULE_DIR_ . 'packetery/ajax.php",
-            data: {id_branch: id_branch, name_branch: name_branch, currency_branch: currency_branch},
-            type: "POST",
-            complete: function() {
-                last_ajax = null;
-                if (callback) callback();
-            }
-        });
-        last_branch = id_branch;
-    };
-    var u_timeout = null;
-    function update_delayed(flags) {
-        if (u_timeout) clearTimeout(u_timeout);
-        u_timeout = setTimeout(function() {
-            u_timeout = null;
-
-            updateCarrierSelectionAndGift();
-        }, 25);
-    };
-    var reset_branch_required = function () {
-        // no update_id_carriers() - that is caller\'s duty
-        var sel = id_carriers.filter(":checked")[0];
-
-        $(".packetery_prestashop_branch_list").find("div:first").each(function() {
-            this.packetery.option("required", false);
-        }).prev("p").hide();
-        submit_now_allowed = true;
-
-        if (!sel) return;
-
-        // if selected carrier is packetery type, set branch required on it
-        var sel_pktr = $("#packetery_prestashop_branch_list_" + to_carrier_id(sel.value));
-        if (sel_pktr.size() > 0) {
-            sel_pktr.find("div")[0].packetery.option("required", true);
-            if (!sel_pktr.find("div")[0].packetery.option("selected-id")) {
-                sel_pktr.find("div:first").prev("p").show();
-                submit_now_allowed = false;
-            }
-        }
-    };
-    window.updateCarrierSelectionAndGift = function() {
-        update_id_carriers();
-        var sel = id_carriers.filter(":checked")[0];
-        reset_branch_required();
-
-        save_selected_branch(sel' . ($is_opc ? ', original_updateCarrierSelectionAndGift' : '') . ');
-    };
-    var id_carrier_init = function() {
-        if (!carrier_data[to_carrier_id(this.value)]) return;
-        if (this.getAttribute("packetery-initialized")) return;
-        this.setAttribute("packetery-initialized", true);
-
-        // if reinitializing, some stray elements may have prevailed, so remove them now
-        $("#packetery_prestashop_branch_list_" + to_carrier_id(this.value)).remove();
-
-        var id_carrier_value = this.value;
-
-        var carrier = find_select_place.call(this);
-        var e, please_select = "<p style=\'float: none; color: red; font-weight: bold; \'>' . addslashes($this->l('Please select pick-up point.')) . '</p>";
-        if (carrier.is("tr")){
-            e = $("<tr><td colspan=\'" + carrier.closest("table").find("tr:first").find("th,td").size() + "\'>" + please_select + "<div></div></td></tr>");
-        }
-        else {
-            e = $("<div>" + please_select + "<div></div></div>");
-        }
-        carrier.after(e);
-
-        e.attr("id", "packetery_prestashop_branch_list_" + to_carrier_id(this.value)).data("delivery_option_value", this.value).addClass("packetery_prestashop_branch_list");
-        if (add_padding) {
-            e.css({padding: "10px"});
-        }
-
-        if (e.children("td").size() > 0) {
-            e.children("td").css({borderTop: "0 none"});
-            carrier.children("td").css({borderBottom: "0 none"});
-        }
-        else {
-            e.css({borderTop: "0 none"});
-            e.css("background-color", carrier.css("background-color"));
-            e.css("border-bottom-color", carrier.css("border-bottom-color"));
-            e.css("border-bottom-style", carrier.css("border-bottom-style"));
-            e.css("border-bottom-width", carrier.css("border-bottom-width"));
-            e.css({"margin-top": "-2px", "position": "relative", "z-index": 30});
-            carrier.add(carrier.children("td")).css({borderBottom: "0 none"});
-        }
-        if (carrier.is(".item")) {
-            e.addClass("item");
-        }
-        else { 
-            e.addClass("alternate_item");
-        }
-
-        var list = e.find("div");
-        list.attr("data-list-type", carrier_data[to_carrier_id(this.value)].list_type);
-        list.attr("data-country", carrier_data[to_carrier_id(this.value)].country);
-        if (window.prestashopPacketerySelectedId) {
-            list.attr("data-selected-id", window.prestashopPacketerySelectedId);
-        }
-        window.packetery.initialize(list);
-
-        list[0].packetery.on("branch-change", function() {
-            update_id_carriers();
-            var id_carrier = id_carriers.filter("[value=\"" + id_carrier_value + "\"]");
-
-            if (id_carrier.is(":checked")) {
-                update_delayed();
-            }
-
-            if (!this.packetery.option("selected-id")) return;
-
-            if (!id_carrier.is(":checked")) {
-                id_carrier[0].checked = true;
-                update_delayed();
-            }
-        });
-    };
-
-    ' . ($is_opc ?
-    'on_updated_id_carriers = function(reinitialize) {
-        if (!is_custom_opc_1 && (reinitialize === undefined || !reinitialize)) return;
-
-        setTimeout(function() {
-            $(id_carriers_selector).each(id_carrier_init);
-            reset_branch_required();
-        }, 1);
-    };'
-    :
-    'on_updated_id_carriers = function() {
-        id_carriers.off(".packetery").on("change.packetery", window.updateCarrierSelectionAndGift);
-    };
-    on_updated_id_carriers();'
-    ) . '
-
-    id_carriers.each(id_carrier_init);
-    updateCarrierSelectionAndGift();
-});
-</script>';
-    }
-
-    public function hookNewOrder($params)
-    {
-        $db = DB::getInstance();
-        if ($packetery_carrier = $db->getRow(
-            'select is_cod from `' . _DB_PREFIX_ . 'packetery_carrier`
-            where id_carrier=' . ((int)$params['order']->id_carrier)
-        )
-        ) {
-            // branch
-        } elseif ($packetery_carrier = $db->getRow(
-            'select is_cod, id_branch, name_branch, currency_branch
-            from `' . _DB_PREFIX_ . 'packetery_address_delivery`
-            where id_carrier=' . ((int)$params['order']->id_carrier)
-        )
-        ) {
-            // address
-            $db->execute(
-                'insert ignore into `' . _DB_PREFIX_ . 'packetery_order` set id_cart=' . ((int)$params['cart']->id)
-            );
-            $db->execute(
-                'update `' . _DB_PREFIX_ . 'packetery_order` set id_branch=' . ((int)$packetery_carrier['id_branch']) .
-                ', name_branch="' . pSQL($packetery_carrier['name_branch']) . '", currency_branch="' .
-                pSQL($packetery_carrier['currency_branch']) . '" where id_cart=' . ((int)$params['cart']->id)
-            );
-        } else {
-            return;
-        }
-        $db->execute(
-            'update `' . _DB_PREFIX_ . 'packetery_order` set id_order=' . ((int)$params['order']->id) .
-            ' where id_cart=' . ((int)$params['cart']->id)
-        );
-
-        $carrier_is_cod = ($packetery_carrier['is_cod'] == 1);
-        $payment_is_cod = ($db->getValue(
-            'select is_cod from `' . _DB_PREFIX_ . 'packetery_payment` where module_name="' .
-            pSQL($params['order']->module) . '"'
-        ) == 1);
-        if ($carrier_is_cod || $payment_is_cod) {
-            $db->execute(
-                'update `' . _DB_PREFIX_ . 'packetery_order` set is_cod=1 where id_order=' . ((int)$params['order']->id)
-            );
-        }
-    }
-
-    public function hookAdminOrder($params)
-    {
-        if (!($res = Db::getInstance()->getRow(
-            'SELECT o.name_branch FROM `' . _DB_PREFIX_ . 'packetery_order` o
-            WHERE o.id_order = ' . ((int)$params['id_order'])
-        ))
-        ) {
-            return "";
-        }
-
-        return "<p>" . sprintf(
-            $this->l(
-                'Selected packetery branch: %s'
-            ),
-            "<strong>" . $res['name_branch'] . "</strong>"
-        ) . "</p>";
-    }
-
-    public function hookOrderDetailDisplayed($params)
-    {
-        if (!($res = Db::getInstance()->getRow(
-            'SELECT o.name_branch FROM `' . _DB_PREFIX_ . 'packetery_order` o WHERE o.id_order = ' .
-            ((int)$params['order']->id)
-        ))
-        ) {
-            return;
-        }
-
-        return "<p>" . sprintf(
-            $this->l(
-                'Selected packetery branch: %s'
-            ),
-            "<strong>" . $res['name_branch'] . "</strong>"
-        ) . "</p>";
-    }
-
-    public function hookUpdateCarrier($params)
-    {
-        if ($params['id_carrier'] != $params['carrier']->id) {
-            Db::getInstance()->execute(
-                'update `' . _DB_PREFIX_ . 'packetery_carrier`
-                set id_carrier=' . ((int)$params['carrier']->id) . '
-                where id_carrier=' . ((int)$params['id_carrier'])
-            );
-        }
-    }
-
-    public function hookDisplayMobileHeader($params)
-    {
-        return $this->hookHeader($params);
-    }
-
-    public function hookHeader($params)
-    {
-        if (!($file = basename(Tools::getValue('controller')))) {
-            $file = str_replace('.php', '', basename($_SERVER['SCRIPT_NAME']));
-        }
-
-        if (!in_array($file, array('order-opc', 'order', 'orderopc'))) {
-            return '';
-        }
-
-        $this->ensureUpdatedAPI();
-        return '<script type="text/javascript" src="' . _MODULE_DIR_ . 'packetery/views/js/api.js"></script>';
-    }
-
-    private function fetch($url)
-    {
-        $transportMethod = self::transportMethod();
-        if (Tools::substr($transportMethod, -1) == 's') {
-            $url = preg_replace('/^http:/', 'https:', $url);
-            $transportMethod = Tools::substr($transportMethod, 0, -1);
-            $ssl = true;
-        } else {
-            $ssl = false;
-        }
-
-        switch($transportMethod) {
-            case 'curl':
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-                curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-                curl_setopt($ch, CURLOPT_AUTOREFERER, false);
-                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-                if ($ssl) {
-                    curl_setopt($ch, CURLOPT_CAINFO, _MODULE_DIR_ . "packetery/godaddy.crt");
-                }
-                $body = curl_exec($ch);
-                if (curl_errno($ch) > 0) {
-                    return false;
-                }
-                return $body;
-            case 'fopen':
-                if (function_exists('stream_context_create')) {
-                    // set longer timeout here, because we cannot detect timeout errors
-                    $ctx = stream_context_create(
-                        array(
-                            'http' => array(
-                                'timeout' => 60
-                            ),
-                            'ssl' => array(
-                                'cafile' => _MODULE_DIR_ . "packetery/godaddy.crt",
-                                'verify_peer' => true
-                            )
-                        )
-                    );
-                    return Tools::file_get_contents($url, false, $ctx);
-                }
-                return Tools::file_get_contents($url);
-
-            default:
-                return false;
-        }
-    }
-
-    /*
-      Try to update API JS file once a day. If it's older than five days and still
-      can't update, then remove it - the e-shop owner must solve it.
+    /**
+    * Add the CSS & JavaScript files you want to be loaded in the BO.
     */
-    private function ensureUpdatedAPI()
+    public function hookBackOfficeHeader()
     {
-        $key = Configuration::get('PACKETERY_API_KEY');
-        $files = array(
-            _PS_MODULE_DIR_ . "packetery/views/js/api.js" =>
-                "http://www.zasilkovna.cz/api/v3/$key/branch.js?lib_path=" . _MODULE_DIR_ .
-                "packetery&sync_load=1&prestashop=1",
-            _PS_MODULE_DIR_ . "packetery/address-delivery.xml" =>
-                "http://www.zasilkovna.cz/api/v3/$key/branch.xml?type=address-delivery"
-        );
-
-        foreach ($files as $local => $remote) {
-            if (date("d.m.Y", @filemtime($local)) != date("d.m.Y") && (!file_exists($local) || date("H") >= 1)) {
-                if ($this->configuration_errors() || Tools::strlen($data = $this->fetch($remote)) <= 1024) {
-                    // if we have older data, then try again tomorrow and delete after 5 days
-                    // else keep trying with each load
-                    if (file_exists($local)) {
-                        $error_count = @Tools::file_get_contents($local . ".error");
-                        if ($error_count > 5) {
-                            unlink($local);
-                        } else {
-                            touch($local);
-                        }
-                        @file_put_contents($local . ".error", $error_count + 1);
-                    }
-                    return;
-                }
-
-                file_put_contents($local, $data);
-                @unlink($local . ".error");
-            }
+        if ((Tools::getValue('module_name') == $this->name) || (Tools::getValue('configure') == $this->name)) {
+            $this->context->controller->addjquery();
+            $this->context->controller->addJS('https://cdn.jsdelivr.net/riot/2.4.1/riot+compiler.min.js');
+            $this->context->controller->addJS($this->_path.'views/js/back.js');
+            $this->context->controller->addJS($this->_path.'views/js/widget.js');
+            $this->context->controller->addCSS($this->_path.'views/css/back.css');
+            $this->context->controller->addJS($this->_path.'views/js/notify.js');
+            $this->context->controller->addJS($this->_path.'views/js/jquery.popupoverlay.js');
         }
     }
 
-    public static function addressDeliveries()
+    /**
+     * Set values for the inputs.
+     */
+    protected function getConfigFormValues()
     {
-        $res = array();
-        $fn = _PS_MODULE_DIR_ . "packetery/address-delivery.xml";
-        if (function_exists("simplexml_load_file") && file_exists($fn)) {
-            $xml = simplexml_load_file($fn);
-            foreach ($xml->branches->branch as $branch) {
-                $res[(string)$branch->id] = (object)array(
-                    'name' => (string)$branch->name,
-                    'currency' => (string)$branch->currency,
-                );
+        return array(
+            'PACKETERY_LIVE_MODE' => Configuration::get('PACKETERY_LIVE_MODE', true),
+            'PACKETERY_ACCOUNT_EMAIL' => Configuration::get('PACKETERY_ACCOUNT_EMAIL', 'contact@prestashop.com'),
+            'PACKETERY_ACCOUNT_PASSWORD' => Configuration::get('PACKETERY_ACCOUNT_PASSWORD', null),
+        );
+    }
+
+
+    public function getOrderShippingCost($params, $shipping_cost)
+    {
+        if (Context::getContext()->customer->logged == true) {
+            $id_address_delivery = Context::getContext()->cart->id_address_delivery;
+            $address = new Address($id_address_delivery);
+            return 10;
+        }
+
+        return $shipping_cost;
+    }
+
+    public function getOrderShippingCostExternal($params)
+    {
+        return true;
+    }
+
+    protected function addCarrier()
+    {
+        $carrier = new Carrier();
+        $carrier->name = $this->l('Zasilkovna');
+        $carrier->is_module = true;
+        $carrier->active = 1;
+        $carrier->range_behavior = 1;
+        $carrier->need_range = 1;
+        $carrier->shipping_external = false;
+        $carrier->range_behavior = 0;
+        $carrier->external_module_name = $this->name;
+        $carrier->shipping_method = 2;
+
+        foreach (Language::getLanguages() as $lang) {
+            $carrier->delay[$lang['id_lang']] = $this->l('Packetery super fast delivery');
+        }
+
+        if ($carrier->add() == true) {
+            @copy(dirname(__FILE__).'/views/img/carrier_image.png', _PS_SHIP_IMG_DIR_.'/'.(int)$carrier->id.'.png');
+            Configuration::updateValue('PACKETERY_CARRIER_ID', (int)$carrier->id);
+            return $carrier;
+        }
+
+        return false;
+    }
+
+    protected function addGroups($carrier)
+    {
+        $groups_ids = array();
+        $groups = Group::getGroups(Context::getContext()->language->id);
+        foreach ($groups as $group) {
+            $groups_ids[] = $group['id_group'];
+        }
+
+        $carrier->setGroups($groups_ids);
+    }
+
+    protected function addRanges($carrier)
+    {
+        $range_price = new RangePrice();
+        $range_price->id_carrier = $carrier->id;
+        $range_price->delimiter1 = '0';
+        $range_price->delimiter2 = '10000';
+        $range_price->add();
+
+        $range_weight = new RangeWeight();
+        $range_weight->id_carrier = $carrier->id;
+        $range_weight->delimiter1 = '0';
+        $range_weight->delimiter2 = '10000';
+        $range_weight->add();
+    }
+
+    protected function addZones($carrier)
+    {
+        $zones = Zone::getZones();
+
+        foreach ($zones as $zone) {
+            $carrier->addZone($zone['id_zone']);
+        }
+    }
+
+    public function displayCarrierExtraContentPrototypeOPC($id_carrier, $id_cart)
+    {
+        //  $cart_carrier = $params['cart']->id_carrier;
+        $this->context->smarty->assign('id_carrier', $id_carrier);
+        $countries = PacketeryApi::getCountriesList($id_carrier);
+        $this->context->smarty->assign('countries', $countries);
+        $p_order_row = Packeteryclass::getPacketeryOrderRowByCart($id_cart);
+        if ($p_order_row) {
+            if (!isset($p_order_row['name_branch']) || ($p_order_row['id_carrier'] != $id_carrier)) {
+                $name_branch = '0';
+            } else {
+                $name_branch = $p_order_row['name_branch'];
             }
-            if (function_exists('mb_convert_encoding')) {
-                $fn = create_function(
-                    '$a,$b',
-                    'return strcmp(mb_convert_encoding($a->name, "ascii", "utf-8"),
-                    mb_convert_encoding($b->name, "ascii", "utf-8"));'
+        } else {
+            $name_branch = '0';
+        }
+        $this->context->smarty->assign('choosed_branch', $name_branch);
+
+        $output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget_popup.tpl');
+        return $output;
+    }
+    /*WIDGET FO*/
+
+    /*WIDGET FO for OPC*/
+    public function hookDisplayFooter()
+    {
+        if (($this->widget_type == 0) && (Module::isEnabled('easypay') == true)) {
+            $packetery_carriers_list = array();
+            $packetery_carriers_list = Packeteryclass::getCarriersList();
+            if (count($packetery_carriers_list) > 0) {
+                $output = '';
+                $carriers = array();
+                foreach ($packetery_carriers_list as $carrier) {
+                    $id_carrier = $carrier['id_carrier'];
+                    $id_cart = Context::getContext()->cart->id;
+                    $output .= $this->displayCarrierExtraContentPrototypeOPC($id_carrier, $id_cart);
+                    $carriers[] = $id_carrier;
+                }
+                $this->context->smarty->assign('js_packetery_carriers', implode(',', $carriers));
+                if (__PS_BASE_URI__ == '/') {
+                    $base_uri = '';
+                } else {
+                    $base_uri = Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+                }
+                $this->context->smarty->assign('baseuri', $base_uri);
+                /*FIELDS FOR AJAX*/
+                $ajaxfields = array(
+                    'zip' => $this->l('ZIP'),
+                    'moredetails' => $this->l('More details'),
+                    'max_weight' => $this->l('Max weight'),
+                    'dressing_room' => $this->l('Dressing room'),
+                    'packet_consignment' => $this->l('Packet consignment'),
+                    'claim_assistant' => $this->l('Claim assistant'),
+                    'yes' => $this->l('Yes'),
+                    'no' => $this->l('No')
+                    );
+                $ajaxfields_json = json_encode($ajaxfields);
+                $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
+                /*END FIELDS FOR AJAX*/
+                $this->context->smarty->assign('choosed_carrier', 100);
+                $this->context->smarty->assign('widget_type', 0);
+
+                $output_vars = $this->context->smarty->fetch(
+                    $this->local_path.'views/templates/front/widget_popup_vars.tpl'
                 );
             } else {
-                $fn = create_function(
-                    '$a,$b',
-                    'return strcmp($a->name, $b->name);'
+                return '';
+            }
+            return $output_vars.$output;
+        }
+    }
+
+    public function hookDisplayBeforeCarrier($params)
+    {
+        if (!Module::isEnabled('easypay')) {
+            if ($this->widget_type == 0) {
+                $packetery_carriers_list = array();
+                $packetery_carriers_list = Packeteryclass::getCarriersList();
+                if (count($packetery_carriers_list) > 0) {
+                    $output = '';
+                    $carriers = array();
+                    foreach ($packetery_carriers_list as $carrier) {
+                        $id_carrier = $carrier['id_carrier'];
+                        $id_cart = $params['cart']->id;
+                        $output .= $this->displayCarrierExtraContentPrototypeOPC($id_carrier, $id_cart, $params);
+                        $carriers[] = $id_carrier;
+                    }
+                    $this->context->smarty->assign('js_packetery_carriers', implode(',', $carriers));
+                    if (__PS_BASE_URI__ == '/') {
+                        $base_uri = '';
+                    } else {
+                        $base_uri = Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+                    }
+                    $this->context->smarty->assign('baseuri', $base_uri);
+                    /*FIELDS FOR AJAX*/
+                    $ajaxfields = array(
+                        'zip' => $this->l('ZIP'),
+                        'moredetails' => $this->l('More details'),
+                        'max_weight' => $this->l('Max weight'),
+                        'dressing_room' => $this->l('Dressing room'),
+                        'packet_consignment' => $this->l('Packet consignment'),
+                        'claim_assistant' => $this->l('Claim assistant'),
+                        'yes' => $this->l('Yes'),
+                        'no' => $this->l('No')
+                        );
+                    $ajaxfields_json = json_encode($ajaxfields);
+                    $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
+                    /*END FIELDS FOR AJAX*/
+                    $this->context->smarty->assign('choosed_carrier', $params['cart']->id_carrier);
+                    $this->context->smarty->assign('widget_type', 0);
+
+                    $output_vars = $this->context->smarty->fetch(
+                        $this->local_path.'views/templates/front/widget_popup_vars.tpl'
+                    );
+                } else {
+                    return '';
+                }
+                return $output_vars.$output;
+            }
+        }
+    }
+    /*END WIDGET FO for OPC*/
+
+    public function hookDisplayCarrierExtraContent($params)
+    {
+        $this->context->smarty->assign('widget_type', $this->widget_type);
+
+        if ($this->widget_type == 1) {
+            $id_carrier = $params['carrier']['id'];
+            $this->context->smarty->assign('widget_carrier', $id_carrier);
+            /*FIELDS FOR AJAX*/
+            $ajaxfields = array(
+                'zip' => $this->l('ZIP'),
+                'moredetails' => $this->l('More details'),
+                'max_weight' => $this->l('Max weight'),
+                'dressing_room' => $this->l('Dressing room'),
+                'packet_consignment' => $this->l('Packet consignment'),
+                'claim_assistant' => $this->l('Claim assistant'),
+                'yes' => $this->l('Yes'),
+                'no' => $this->l('No')
                 );
-            }
-            uasort($res, $fn);
-        }
-        return $res;
-    }
+            $ajaxfields_json = json_encode($ajaxfields);
+            $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
+            /*END FIELDS FOR AJAX*/
 
-    public function hookPaymentTop($params)
-    {
-        $db = Db::getInstance();
-        $is_packetery_carrier = ($db->getValue(
-            'select 1 from `' . _DB_PREFIX_ . 'packetery_carrier`
-            where id_carrier=' . ((int)$params['cart']->id_carrier)
-        ) == 1);
-        $has_selected_branch = ($db->getValue(
-            'select id_branch from `' . _DB_PREFIX_ . 'packetery_order` where id_cart=' . ((int)$params['cart']->id)
-        ) > 0);
-
-        if ($is_packetery_carrier && !$has_selected_branch) {
-            $params['cart']->id_carrier = 0;
+            $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+            $this->context->smarty->assign('baseuri', $base_uri);
+            $countries = PacketeryApi::getCountriesList($id_carrier);
+            $this->context->smarty->assign('countries', $countries);
+            $output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget.tpl');
+            return $output;
+        } else {
+            return '';
         }
     }
+    /*END WIDGET FO*/
 
-    public function hookProcessCarrier($params)
+    /*WIDGET BO*/
+    public function hookDisplayWidget()
     {
-        $this->hookPaymentTop($params);
+        /*FIELDS FOR AJAX*/
+        $ajaxfields = array(
+            'zip' => $this->l('ZIP'),
+            'moredetails' => $this->l('More details'),
+            'max_weight' => $this->l('Max weight'),
+            'dressing_room' => $this->l('Dressing room'),
+            'packet_consignment' => $this->l('Packet consignment'),
+            'claim_assistant' => $this->l('Claim assistant'),
+            'yes' => $this->l('Yes'),
+            'no' => $this->l('No'),
+            'error' => $this->l('Error'),
+            'success' => $this->l('Success'),
+            'success_export' => $this->l('Successfuly exported'),
+            'success_download_branches' => $this->l('Branches successfuly updated.'),
+            'reload5sec' => $this->l('Page will be reloaded in 5 seconds...'),
+            'try_download_branches' => $this->l('Trying to download branches. Please wait for download process end...'),
+            'err_no_branch' => $this->l('Please select destination branch for order(s) - '),
+            'error_export' => $this->l('not exported. Error: '),
+            'err_country' => $this->l('Please select country')
+            );
+        $ajaxfields_json = json_encode($ajaxfields);
+        $ajaxfields_json = rawurlencode($ajaxfields_json);
+        $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
+        /*END FIELDS FOR AJAX*/
+
+        $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+        $this->context->smarty->assign('baseuri', $base_uri);
+
+        $countries = PacketeryApi::getCountriesList();
+        $this->context->smarty->assign('countries', $countries);
     }
+    /*END WIDGET BO*/
 
-    public function hookBackOfficeTop($params)
+    public function hookDisplayHeader()
     {
-        $cookie = Context::getContext()->cookie;
-        if ($cookie->packetery_seen_warning < 3) {
-            $cookie->packetery_seen_warning++;
-            $errors = array();
-            if (!$this->configuration_errors($errors) && count($errors) > 0) {
-                return "<div style='float: right; width: 400px; font-weight: bold; color: red'>" . $errors[0] .
-                "</div>";
-            }
+        PacketeryApi::updateBranchCron();
+        $this->context->controller->addJS($this->_path.'views/js/jquery.popupoverlay.js');
+        $this->context->controller->addJS($this->_path.'/views/js/front.js');
+        if ($this->widget_type != 1) {
+            $this->context->controller->addJS($this->_path.'views/js/widget_popup.js');
         }
+        $this->context->controller->addCSS($this->_path.'/views/css/front.css');
     }
+
+    /*ORDERS*/
+    public function hookActionOrderHistoryAddAfter($params)
+    {
+        Packeteryclass::hookNewOrder($params);
+    }
+    /*END ORDERS*/
 }
-

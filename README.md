@@ -1,9 +1,10 @@
 # Modul pro PrestaShop
 
-## Stažení modulu
+## Stažení modulu pro Prestashop 1.7
 <a href="https://github.com/Zasilkovna/prestashop/raw/master/releases/packetery-latest.zip">Stažení instalačního balíčku</a>
 
-Upozornění! Výše uvedená poslední verze modulu nefunguje na všech instalacích a verzích PrestaShopu. Doporučujeme aktuálně použít <a href="https://github.com/Zasilkovna/prestashop/raw/master/releases/packetery-1.17.zip">verzi 1.17 (stáhnout »)</a>.
+## Modul pro starší Prestashop
+<a href="https://github.com/Zasilkovna/prestashop/raw/master/releases/packetery-1.18.zip">Verzi 1.18 (stáhnout »)</a>.
 
 Modul s úpravou pro kompatibilitu s Easypay (Prestashop 1.6.x) naleznete zde: https://github.com/Zasilkovna/prestashop/tree/easypay
 
@@ -12,13 +13,7 @@ Modul s úpravou pro kompatibilitu s Easypay (Prestashop 1.6.x) naleznete zde: h
 **Podporované jazyky:**
 
 * čeština
-* slovenština
 * angličtina.
-
-**Podporované verze PrestaShopu:**
-
-* 1.2.x, 1.3.x, 1.4.x, 1.5.x, 1.6.x (testováno 1.2.4.0 – 1.6.0.6)
-* Při problému s použitím v jiné verzi nás kontaktujte na adrese technicka.podpora@zasilkovna.cz.
 
 **Poskytované funkce:**
 
