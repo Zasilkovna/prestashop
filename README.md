@@ -1,22 +1,19 @@
 # Modul pro PrestaShop s Easypay
 
-## Stažení modulu
-<a href="https://github.com/Zasilkovna/prestashop/raw/easypay/releases/packetery-latest-easypay.zip">Stažení instalačního balíčku</a>
+## Prestashop 1.6.x
 
-Upozornění! Tato modifikace funguje pouze pro Prestashop verze 1.6.x.
+### Obsah:
+*   [Informace o modulu](https://github.com/Zasilkovna/prestashop/tree/easypay#informace-o-modulu)
+*   [Stažení modulu](https://github.com/Zasilkovna/prestashop/tree/easypay#sta%C5%BEen%C3%AD-modulu)
+*   [Instalace modulu](https://github.com/Zasilkovna/prestashop/tree/easypay#instalace-modulu)
 
-## Informace o modulu
+### Informace o modulu
 
 **Podporované jazyky:**
 
 * čeština
 * slovenština
-* angličtina.
-
-**Podporované verze PrestaShopu:**
-
-* 1.6.x
-* Při problému s použitím v jiné verzi nás kontaktujte na adrese technicka.podpora@zasilkovna.cz.
+* angličtina
 
 **Poskytované funkce:**
 
@@ -35,7 +32,15 @@ Upozornění! Tato modifikace funguje pouze pro Prestashop verze 1.6.x.
 
 * Modul nepodporuje multistore
 
-## Instalace
+**Kompatibilita:**
+
+Při problému s použitím v jiné verzi nás kontaktujte na adrese <technicka.podpora@zasilkovna.cz>.
+
+
+### Stažení modulu
+[Aktuální verze (Stáhnout »)](https://github.com/Zasilkovna/prestashop/raw/easypay/releases/packetery-latest-easypay.zip)
+
+### Instalace modulu
 1. Stáhnout soubor modulu
 2. Přihlašte se do administrace PrestaShopu, otevřete kartu Moduly (Modules) zde v horní části dejte přidat nový modul – tento stažený soubor:
 
