@@ -31,7 +31,7 @@ $(document).ready(function(){
 	tools.fixextracontent();
 
 	$('#packetery-widget .js-country').unbind();
-	$('#packetery-widget .js-country').on('change', function(){
+	$(document).on('change', '#packetery-widget .js-country', function(){
 		if (widget_type == 0) {
 			if ($('.confirmPacketeryDeliveryOption').hasClass('disabled') == false) {
 				$('.confirmPacketeryDeliveryOption').addClass('disabled');
@@ -48,7 +48,7 @@ $(document).ready(function(){
 		return false;
 	});
 	$('#packetery-widget .js-city').unbind();
-	$('#packetery-widget .js-city').on('change', function(){
+	$(document).on('change', '#packetery-widget .js-city', function(){
 		if (widget_type == 0) {
 			if ($('.confirmPacketeryDeliveryOption').hasClass('disabled') == false) {
 				$('.confirmPacketeryDeliveryOption').addClass('disabled');
@@ -64,7 +64,7 @@ $(document).ready(function(){
 		packetery.widgetGetNames(extra);
 	});
 	$('#packetery-widget .js-name').unbind();
-	$('#packetery-widget .js-name').on('change', function(){
+	$(document).on('change', '#packetery-widget .js-name', function(){
 
 		var extra = $(this).parentsUntil('.carrier-extra-content').parent();
 		var id_branch = $(this).find('option:selected').val();
