@@ -5,4 +5,5 @@
 	2. Closing popup
 1.8.6 - realese ok
 1.8.7 - PSR-2 check
-2.0.0rc2 - update notifications, add branches tab, add update branch button, 
+2.0.0rc2 - update notifications, add branches tab, add update branch button,
+2.0.1 - also delegate change events to future widget elements
