@@ -39,7 +39,7 @@ class Packetery extends CarrierModule
         $this->widget_type = Packeteryclass::getConfigValueByOption('WIDGET_TYPE');
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.0.1';
+        $this->version = '2.0.2';
         $this->author = 'ZLab Solutions';
         $this->need_instance = 0;
 
@@ -49,10 +49,13 @@ class Packetery extends CarrierModule
         $this->bootstrap = true;
         $this->limited_countries = array('cz', 'sk', 'pl', 'hu', 'de', 'ro', 'ua');
         parent::__construct();
+        $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
+        $desc = $this->l('Get your customers access to pick-up point in Packetery delivery network.');
+        $desc .= $this->l('Export orders to Packetery system.');
 
         $this->displayName = $this->l('Packetery');
-        $this->description = $this->l('Get your customers access to pick-up point in Packetery delivery network. 
-            Export orders to Packetery system. Presatshop 1.7.0 or higher.');
+        $this->description = $this->l('Packetery pick-up points, orders export, and print shipping labels');
+            
         $this->ps_versions_compliancy = array('min' => '1.7.0.0', 'max' => _PS_VERSION_);
         
         // This is only used in admin of modules, and we're accessing Packetery API here, so don't do that elsewhere.
@@ -147,7 +150,7 @@ class Packetery extends CarrierModule
         $error = array();
         $have_error = false;
 
-        $fn = _PS_MODULE_DIR_ . "packetery/views/js/write-test.js";
+        $fn = _PS_MODULE_DIR_."packetery/views/js/write-test.js";
         @touch($fn);
         if (!is_writable($fn)) {
             $error[] = $this->l(
@@ -164,26 +167,18 @@ class Packetery extends CarrierModule
             $have_error = true;
         }
 
-        $key = Configuration::get('PACKETERY_API_KEY');
+        $key = PacketeryApi::getApiKey();
+        if (Tools::strlen($key) < 5) {
+            $key = false;
+        }
         $test = "http://www.zasilkovna.cz/api/$key/test";
         if (!$key) {
-            $error[] = $this->l('Packetery API key is not set.');
+            $error[] = $this->l('Packetery API pass is not set.');
             $have_error = true;
         } elseif (!$error) {
-            if ($this->fetch($test) != 1) {
+            if (Tools::file_get_contents($test) != 1) {
                 $error[] = $this->l('Cannot access Packetery API with specified key. Possibly the API key is wrong.');
                 $have_error = true;
-            } else {
-                $data = Tools::jsonDecode(
-                    $this->fetch("http://www.zasilkovna.cz/api/$key/version-check-prestashop?my=" . $this->version)
-                );
-                if (self::compareVersions($data->version, $this->version) > 0) {
-                    $cookie = Context::getContext()->cookie;
-                    $def_lang = (int)($cookie->id_lang ? $cookie->id_lang : Configuration::get('PS_LANG_DEFAULT'));
-                    $def_lang_iso = Language::getIsoById($def_lang);
-                    $error[] = $this->l('New version of Prestashop Packetery module is available.') . ' '
-                        . $data->message->$def_lang_iso;
-                }
             }
         }
 
@@ -195,6 +190,12 @@ class Packetery extends CarrierModule
      */
     public function getContent()
     {
+        $soap_disabled = 0;
+        if (!extension_loaded("soap")) {
+            $soap_disabled = 1;
+        }
+        $this->context->smarty->assign(array('soap_disabled'=> $soap_disabled));
+
         $labels_format = Packeteryclass::getConfigValueByOption('LABEL_FORMAT');
         $this->context->smarty->assign('labels_format', $labels_format);
         $this->context->smarty->assign('widget_type', $this->widget_type);
@@ -219,6 +220,12 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('baseuri', $base_uri);
 
         /*ORDERS*/
+        $active_tab = Tools::getValue('active_tab');
+        if ($active_tab == 'settings') {
+            $this->context->smarty->assign('active_tab_settings', 1);
+        } else {
+            $this->context->smarty->assign('active_tab_settings', 0);
+        }
         $packetery_orders_array = Packeteryclass::getListOrders();
         $packetery_orders = $packetery_orders_array[0];
         $packetery_orders_pages = $packetery_orders_array[1];
@@ -285,7 +292,7 @@ class Packetery extends CarrierModule
                 'rows' => $packetery_carriers_list,
                 'rows_actions' => array(
                     array(
-                        'title' => 'remove',
+                        'title' => $this->l('remove'),
                         'action' => 'remove_carrier',
                         'icon' => 'delete',
                     ),
@@ -394,11 +401,8 @@ class Packetery extends CarrierModule
     public function getOrderShippingCost($params, $shipping_cost)
     {
         if (Context::getContext()->customer->logged == true) {
-            $id_address_delivery = Context::getContext()->cart->id_address_delivery;
-            $address = new Address($id_address_delivery);
             return 10;
         }
-
         return $shipping_cost;
     }
 
@@ -470,10 +474,11 @@ class Packetery extends CarrierModule
 
     public function displayCarrierExtraContentPrototypeOPC($id_carrier, $id_cart)
     {
-        //  $cart_carrier = $params['cart']->id_carrier;
         $this->context->smarty->assign('id_carrier', $id_carrier);
         $countries = PacketeryApi::getCountriesList($id_carrier);
         $this->context->smarty->assign('countries', $countries);
+        $countries_count = count($countries);
+        $this->context->smarty->assign('countries_count', $countries_count);
         $p_order_row = Packeteryclass::getPacketeryOrderRowByCart($id_cart);
         if ($p_order_row) {
             if (!isset($p_order_row['name_branch']) || ($p_order_row['id_carrier'] != $id_carrier)) {
@@ -522,7 +527,10 @@ class Packetery extends CarrierModule
                     'packet_consignment' => $this->l('Packet consignment'),
                     'claim_assistant' => $this->l('Claim assistant'),
                     'yes' => $this->l('Yes'),
-                    'no' => $this->l('No')
+                    'no' => $this->l('No'),
+                    'all' => $this->l('All'),
+                    'please_choose' => $this->l('please choose'),
+                    'please_choose_branch' => $this->l('Please choose delivery branch')
                     );
                 $ajaxfields_json = json_encode($ajaxfields);
                 $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
@@ -571,7 +579,9 @@ class Packetery extends CarrierModule
                         'packet_consignment' => $this->l('Packet consignment'),
                         'claim_assistant' => $this->l('Claim assistant'),
                         'yes' => $this->l('Yes'),
-                        'no' => $this->l('No')
+                        'no' => $this->l('No'),
+                        'please_choose' => $this->l('please choose'),
+                        'please_choose_branch' => $this->l('Please choose delivery branch')
                         );
                     $ajaxfields_json = json_encode($ajaxfields);
                     $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
@@ -607,7 +617,9 @@ class Packetery extends CarrierModule
                 'packet_consignment' => $this->l('Packet consignment'),
                 'claim_assistant' => $this->l('Claim assistant'),
                 'yes' => $this->l('Yes'),
-                'no' => $this->l('No')
+                'no' => $this->l('No'),
+                'please_choose' => $this->l('please choose'),
+                'please_choose_branch' => $this->l('Please choose delivery branch')
                 );
             $ajaxfields_json = json_encode($ajaxfields);
             $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
@@ -617,6 +629,8 @@ class Packetery extends CarrierModule
             $this->context->smarty->assign('baseuri', $base_uri);
             $countries = PacketeryApi::getCountriesList($id_carrier);
             $this->context->smarty->assign('countries', $countries);
+            $countries_count = count($countries);
+            $this->context->smarty->assign('countries_count', $countries_count);
             $output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget.tpl');
             return $output;
         } else {
@@ -638,6 +652,7 @@ class Packetery extends CarrierModule
             'claim_assistant' => $this->l('Claim assistant'),
             'yes' => $this->l('Yes'),
             'no' => $this->l('No'),
+            'all' => $this->l('All'),
             'error' => $this->l('Error'),
             'success' => $this->l('Success'),
             'success_export' => $this->l('Successfuly exported'),
@@ -646,7 +661,10 @@ class Packetery extends CarrierModule
             'try_download_branches' => $this->l('Trying to download branches. Please wait for download process end...'),
             'err_no_branch' => $this->l('Please select destination branch for order(s) - '),
             'error_export' => $this->l('not exported. Error: '),
-            'err_country' => $this->l('Please select country')
+            'err_country' => $this->l('Please select country'),
+            'api_wrong' => $this->l('Api password is wrong. Branches will not be updated.'),
+            'please_choose' => $this->l('please choose'),
+            'please_choose_branch' => $this->l('Please choose delivery branch')
             );
         $ajaxfields_json = json_encode($ajaxfields);
         $ajaxfields_json = rawurlencode($ajaxfields_json);
@@ -657,7 +675,9 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('baseuri', $base_uri);
 
         $countries = PacketeryApi::getCountriesList();
+        $countries_count = count($countries);
         $this->context->smarty->assign('countries', $countries);
+        $this->context->smarty->assign('countries_count', $countries_count);
     }
     /*END WIDGET BO*/
 

@@ -236,7 +236,13 @@ class PacketeryApi
 
         $is_cod = $packetery_order['is_cod'];
         if ($is_cod) {
-            $cod = round($total);
+            if ($branch_currency_iso == 'CZK') {
+                $cod = ceil($total);
+            } elseif ($branch_currency_iso == 'HUF') {
+                $cod = Packeteryclass::roundUpMultiples($total);
+            } else {
+                $cod = round($total, 2);
+            }
         } else {
             $cod = 0;
         }
@@ -692,7 +698,8 @@ class PacketeryApi
         $name_branch = $branch['name'];
         $currency_branch = $branch['currency'];
         $is_ad = $branch['is_ad'];
-        $is_cod = Tools::getValue('is_cod');
+        $packetery_carrier_row = Packeteryclass::getPacketeryCarrierRow($id_carrier);
+        $is_cod = $packetery_carrier_row['is_cod'];
 
         if (!isset($id_cart) ||
             !isset($id_branch) ||
@@ -747,13 +754,13 @@ class PacketeryApi
 
     public static function widgetGetDetailsAjax()
     {
-        $details = self::widgetGetDetails();
+        $id_branch = Tools::getValue('id_branch');
+        $details = self::widgetGetDetails($id_branch);
         echo Tools::jsonEncode($details);
     }
 
-    public static function widgetGetDetails()
+    public static function widgetGetDetails($id_branch)
     {
-        $id_branch = Tools::getValue('id_branch');
         $sql = 'SELECT *
                 FROM '._DB_PREFIX_.'packetery_branch
                 WHERE id_branch='.(int)$id_branch.';';

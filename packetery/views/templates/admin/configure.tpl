@@ -21,6 +21,9 @@
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
+{if soap_disabled eq 1}
+	<ps-alert-error>{l s='Soap is disabled. You have to enable Soap on your server' mod='packetery'}</ps-alert-error>
+{/if}
 
 <input type="hidden" name="check_e" id="check_e" value="{$check_e|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
@@ -32,10 +35,10 @@
 		</div>
 	</div>
 	<ps-tabs position="top">
-		<ps-tab title="{l s='Orders' mod='packetery'}" id="tab-orders" active="true" icon="icon-AdminParentModules" >
+		<ps-tab title="{l s='Orders' mod='packetery'}" id="tab-orders" {if $active_tab_settings neq 1}active="true"{/if} icon="icon-AdminParentModules" >
 		    {include file="./tab_orders.tpl"}
 		</ps-tab>
-		<ps-tab title="{l s='Settings' mod='packetery'}" id="tab-settings" icon="icon-AdminParentModules" >
+		<ps-tab title="{l s='Settings' mod='packetery'}" id="tab-settings" {if $active_tab_settings eq 1}active="true"{/if} icon="icon-AdminParentModules" >
 		    {include file="./tab_settings.tpl"}
 		</ps-tab>
 		<ps-tab title="{l s='Branches' mod='packetery'}" id="tab-branch" >

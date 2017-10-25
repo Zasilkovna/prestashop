@@ -26,9 +26,11 @@
 */
 
 var widget_type = $('#widget_type').val();
+let widget_lang_pac = '';
 $(document).ready(function(){
 
 	tools.fixextracontent();
+	tools.readAjaxFields();
 
 	$('#packetery-widget .js-country').unbind();
 	$(document).on('change', '#packetery-widget .js-country', function(){
@@ -69,30 +71,35 @@ $(document).ready(function(){
 		var extra = $(this).parentsUntil('.carrier-extra-content').parent();
 		var id_branch = $(this).find('option:selected').val();
 		if (id_branch > 0) {
-			console.log('widget_type '+widget_type);
 			if (widget_type == '0') {
 				$('.confirmPacketeryDeliveryOption').removeClass('disabled');
 				$('.confirmPacketeryDeliveryOption').css("pointer-events", "auto");
-				console.log('confirmPacketeryDeliveryOption');
 			} else {
 				$('button[name="confirmDeliveryOption"]').removeClass('disabled');
 				$('button[name="confirmDeliveryOption"]').css("pointer-events", "auto");
-				console.log('confirmPacketeryDeliveryOption1');
+			}
+			let id_carrier = $('.delivery-option input:checked').val();
+			id_carrier = id_carrier.replace(',', '');
+			var is_cod = 0;
+			var is_ad = $(this).find('option:selected').data('ad');
+			packetery.widgetSaveOrderBranch(id_branch, id_carrier);
+			if (is_ad == 1) {
+				packetery.widgetDetailsClear(extra);
+			} else {
+				packetery.widgetGetDetails(extra);
 			}
 		}
-		var is_cod = 0;
-		var is_ad = $(this).find('option:selected').data('ad');
-		packetery.widgetSaveOrderBranch(id_branch, is_cod);
-		if (is_ad == 1) {
-			packetery.widgetDetailsClear(extra);
-		} else {
-			packetery.widgetGetDetails(extra);
-		}
+
 		return false;
 	});
 });
 
 tools = {
+	readAjaxFields: function() {
+		var raw = $('#ajaxfields').val();
+		var json = decodeURIComponent(raw);
+		widget_lang_pac = JSON.parse(json);
+	},
 	checkwidgetstatus: function(extra) {
 		tools.setcoutrycontext();
 	},
@@ -107,14 +114,28 @@ tools = {
 			$('.continue').css("pointer-events", "none");
 		}
 	},
+	//tools.continueSetEnabled();
 	continueSetEnabled: function() {
-		console.log('continueSetEnabled');
 		if ($('.continue').hasClass('disabled') == true) {
 			$('.continue').removeClass('disabled');
 			$('.continue').css("pointer-events", "auto");
 		}
 	},
-
+	preCheckOneCountryWidget: function() {
+		if (widget_type == 0) {
+			if ($('select.js-country:visible option').length == 1) {
+				$el = $('select.js-country:visible option');
+				var extra = $el.parentsUntil('.carrier-extra-content').parent();
+				packetery.widgetGetCities(extra);
+			}
+		} else {
+			$('select.js-country option').each(function() {
+				$el = $(this);
+				let extra = $el.parentsUntil('.carrier-extra-content').parent();
+				packetery.widgetGetCities(extra);
+			});
+		}
+	},
 	fixextracontent: function() {
 		if ($('.js_packetery_carriers').length == 0) {
 			$('.carrier-extra-content').each(function() {
@@ -126,7 +147,6 @@ tools = {
 				}
 			});
 			$('.delivery-option input').change(function() {
-				console.log('delivery');
 				var id_carrier = $(this).val();
 				id_carrier = id_carrier.replace(',', '');
 				if ($(this).parent().parent().parent().next().hasClass('carrier-extra-content') == true) {
@@ -137,18 +157,16 @@ tools = {
 
 				if ($(extra).hasClass('carrier-extra-content') == true) {
 					if ($(extra).find('#widget_carrier').length > 0) {
-						if (id_carrier == $(extra).find('#widget_carrier').val()) {
-							console.log(id_carrier+' - '+$(extra).find('#widget_carrier').val());
-						} else {
+						if (id_carrier != $(extra).find('#widget_carrier').val()) {
 							tools.continueSetEnabled();
 						}
 					}
 				}
+				//tools.continueSetEnabled();
 
 				if ($(extra).hasClass('carrier-extra-content') == true) {
 					if ($(extra).find('#packetery-widget').length) {
 						var id_branch = $(extra).find('#packetery-widget .js-name option:selected').val();
-						console.log('clicked packetery '+id_branch);
 						if (id_branch > 0) {
 							if (widget_type == 0) {
 								$('button[name="confirmDeliveryOption"]').removeClass('disabled');
@@ -156,6 +174,7 @@ tools = {
 							} else {
 								$('.confirmPacketeryDeliveryOption').removeClass('disabled');
 								$('.confirmPacketeryDeliveryOption').css("pointer-events", "auto");
+								packetery.widgetSaveOrderBranch(id_branch, id_carrier);
 							}
 						} else {
 							if (widget_type == 1) {
@@ -189,6 +208,7 @@ tools = {
 				}
 			});
 		}
+		tools.preCheckOneCountryWidget();
 	}
 }
 
@@ -196,11 +216,10 @@ packetery = {
 	widgetClearField: function(field, extra){
 		var find_field = '#packetery-widget .js-'+field;
 		$(extra).find(find_field).html('');
-		$(extra).find(find_field).html('<option value="0" disabled="" selected>-- please choose --</option>');
+		$(extra).find(find_field).html('<option value="0" disabled="" selected>--'+widget_lang_pac.please_choose+'--</option>');
 	},
 	widgetFillField: function(field, data, extra){
 		if (field == 'country') {
-			//console.log('country');
 			packetery.widgetClearField('city', extra);
 			packetery.widgetClearField('name', extra);
 			$(extra).find('.pack-details-container').html('');
@@ -253,7 +272,6 @@ packetery = {
 	},
 	widgetFillDetails: function(data, extra) {
 		var lang = JSON.parse($('#ajaxfields').val());
-		//console.log(data);
 
 		$(extra).find('.widget_block_title').each(function() {
 			if ($(this).css('display') == 'none') {
@@ -311,11 +329,11 @@ packetery = {
 		}
 	},
 
-	widgetSaveOrderBranch: function(id_branch, is_cod){
+	widgetSaveOrderBranch: function(id_branch, id_carrier){
 	    $.ajax({
 	        type: 'POST',
 	        url: ajaxs.baseuri()+'/modules/packetery/ajax_front.php?action=widgetsaveorderbranch'+ajaxs.checkToken(),
-	        data: {'id_branch': id_branch, 'is_cod':is_cod},
+	        data: {'id_branch': id_branch, 'id_carrier':id_carrier},
 	        beforeSend: function() {
 	        	$("body").toggleClass("wait");
 	        },
@@ -375,7 +393,6 @@ packetery = {
 		var country = $(extra).find('#packetery-widget .js-country option:selected').val();
 		var city = $(extra).find('#packetery-widget .js-city option:selected').val();
 		var id_branch = $(extra).find('#packetery-widget .js-name option:selected').val();
-		//console.log(country);
 	    $.ajax({
 	        type: 'POST',
 	        url: ajaxs.baseuri()+'/modules/packetery/ajax_front.php?action=widgetgetdetails'+ajaxs.checkToken(),
@@ -385,7 +402,6 @@ packetery = {
 	        	$("body").toggleClass("wait");
 	        },
 	        success: function(msg) {
-                //console.log('msg'+msg);
                 data = JSON.parse(msg);
                 packetery.widgetFillDetails(data, this.extra);
 	        },
@@ -398,7 +414,6 @@ packetery = {
 
 ajaxs = {
 	baseuri:  function(){
-		//console.log('baseuri' + $('#baseuri').val());
 		return $('#baseuri').val();
 	},		
 	checkToken:  function(){

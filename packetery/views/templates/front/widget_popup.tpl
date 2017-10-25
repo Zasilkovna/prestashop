@@ -41,22 +41,24 @@
 			<hr>
 			<div class="widget-left">
 				<div class="col-md-6">
-					<select class="form-control form-control-select js-country" name="country" required="">
+					<select class="form-control form-control-select js-country" name="country" >
+					{if $countries_count neq '1'}
 					    <option value="0" disabled="" selected="">{l s='Country' mod='packetery'}</option>
+					{/if}
 						{foreach $countries as $country}
-							<option value="{$country.country|escape:'htmlall':'UTF-8'}">{$country.name|escape:'htmlall':'UTF-8'}</option>
+							<option value="{$country.country|escape:'htmlall':'UTF-8'}" {if $countries_count eq '1'}selected{/if}>{$country.name|escape:'htmlall':'UTF-8'}</option>
 						{/foreach}
 					</select>
 				</div>
 				<br>
 				<div class="col-md-6">
-				    <select class="form-control form-control-select js-city" name="city" required="">
+				    <select class="form-control form-control-select js-city" name="city" >
 				        <option value="0" disabled="" selected="">{l s='City' mod='packetery'}</option>
 					</select>
 				</div>
 				<br>
 				<div class="col-md-6">
-				    <select class="form-control form-control-select js-name" name="name" required="">
+				    <select class="form-control form-control-select js-name" name="name" >
 				        <option value="0" disabled="" selected="">{l s='Branch' mod='packetery'}</option>
 					</select>
 				</div>

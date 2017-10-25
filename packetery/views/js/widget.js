@@ -39,6 +39,11 @@ $(document).ready(function(){
 		packetery.widgetGetDetails();
 		bindsw.branchSave();
 	});
+
+	//check if only one country in box
+	if ($('#packetery-widget .js-country option').length == 1) {
+		packetery.widgetGetCities();
+	}
 });
 
 bindsw = {

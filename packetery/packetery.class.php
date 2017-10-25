@@ -86,6 +86,11 @@ class Packeteryclass
         return $total;
     }
 
+    public static function roundUpMultiples($n, $x = 5)
+    {
+        return (ceil($n)%$x === 0) ? ceil($n) : round(($n+$x/2)/$x)*$x;
+    }
+
     public static function actionCarrierUpdate($params)
     {
         if ($params['id_carrier'] != $params['carrier']->id) {
@@ -161,13 +166,13 @@ class Packeteryclass
 
     public static function insertTab()
     {
-        //$module = new Packetery;
         $tab = new Tab;
+        $module = new Packetery;
         $id_parent = Tab::getIdFromClassName('AdminParentOrders');
         $tab->id_parent = $id_parent;
         $tab->module = 'packetery';
         $tab->class_name = 'Adminpacketery';
-        $tab->name = self::createMultiLangField('Zasilkovna Orders');
+        $tab->name = self::createMultiLangField($module->l('Zasilkovna Orders'));
         $tab->position = $tab->getNewLastPosition($id_parent);
         $tab->add();
         return true;

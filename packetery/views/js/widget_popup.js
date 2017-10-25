@@ -24,9 +24,9 @@
 * Don't forget to prefix your containers with your own identifier
 * to avoid any conflicts with others containers.
 */
-
+let widget_popup_lang_pac = '';
 $(document).ready(function(){
-
+	bindsw.readAjaxFields();
 	if (typeof easypaytextCheckout != "undefined") {
 		bindsw.opcBindsEasy();
 		bindsw.widgetStatusMoveOnLoadEasy();
@@ -55,13 +55,17 @@ $(document).ready(function(){
 
 bindsw = {
 /*POPUP*/
+	readAjaxFields: function() {
+		var raw = $('#ajaxfields').val();
+		var json = decodeURIComponent(raw);
+		widget_popup_lang_pac = JSON.parse(json);
+	},
 /*OPC Knowband Supercheckout*/
+
 	widgetStatusMoveOnLoadSuper: function() {
-		console.log('widgetStatusMoveOnLoadEasy');
 		$('.packetery-widget-status').each(function() {
 			var clone = $(this).clone();
 			var id_carrier = $(this).parent().parent().data('carrier');
-			console.log($('#choosed_carrier').val() +' '+id_carrier);
 			$('.supercheckout_shipping_option[value="'+id_carrier+'"]').parent().next().append(clone);
 			if ($('#choosed_carrier').val() == id_carrier) {
 				$(clone).css('display', 'block');
@@ -83,23 +87,18 @@ bindsw = {
 			for (var i = 0; i < cnt; i++) {
 				var id_carrier = packetery_carriers[i];
 				bindsw.bindCarrierPopupSuper(id_carrier);
-				console.log(id_carrier);
 			}
 		}
 		
 		$('input[name="id_carrier"]').change(function() {
 			var id_carrier = $(this).val();
 			id_carrier = id_carrier.replace(',', '');
-			console.log('id_carrier click');
 			$('.packetery-widget-status').css('display', 'none');
 			$next = $(this).parent().next().find('div');
 			if ($next.hasClass('packetery-widget-status') == true) {
 				$next.css('display', 'block');
-				console.log('found packetery'+'#packetery_widget_popup_'+id_carrier);
 				if ($('#packetery_widget_popup_'+id_carrier).length > 0) {
-					console.log('found popup packetery');
 					if ($('#packetery_widget_popup_'+id_carrier).find('.js-name option:selected').val() == '0') {
-						console.log('#submit_easypay).addClass')
 						$('#submit_easypay').addClass('disabled');
 					}
 				}
@@ -125,10 +124,7 @@ bindsw = {
 		$('.confirmPacketeryDeliveryOption').unbind();
 		$('.confirmPacketeryDeliveryOption').click(function() {
 			var name_branch = $(this).parentsUntil('.popup_content').find('.js-name option:selected').text();
-
 			var id_carrier = $(this).parentsUntil('.popup_content').parent().attr('data-carrier');
-			console.log('id_carrier '+id_carrier);
-			console.log('name_branch '+name_branch);
 
 			$('.carrier_action input[value="'+id_carrier+'"]').parent().next().find('a').text(name_branch);
 			$('#submit_easypay').removeClass('disabled');
@@ -138,11 +134,9 @@ bindsw = {
 
 /*OPC EasyPay*/
 	widgetStatusMoveOnLoadEasy: function() {
-		console.log('widgetStatusMoveOnLoadEasy');
 		$('.packetery-widget-status').each(function() {
 			var clone = $(this).clone();
 			var id_carrier = $(this).parent().parent().data('carrier');
-			console.log($('#choosed_carrier').val() +' '+id_carrier);
 			$('#id_carrier[value="'+id_carrier+'"]').parent().next().append(clone);
 			$(this).remove();
 			$clone = $('.packetery_widget_popup_'+id_carrier+'_open').parent();
@@ -164,21 +158,17 @@ bindsw = {
 			for (var i = 0; i < cnt; i++) {
 				var id_carrier = packetery_carriers[i];
 				bindsw.bindCarrierPopupEasy(id_carrier);
-				console.log(id_carrier);
 			}
 		}
 		
 		$('input[name="id_carrier"]').change(function() {
 			var id_carrier = $(this).val();
 			id_carrier = id_carrier.replace(',', '');
-			console.log('id_carrier click');
 			$('.packetery-widget-status').css('display', 'none');
 			$next = $(this).parent().next().find('div');
 			if ($next.hasClass('packetery-widget-status') == true) {
 				$next.css('display', 'block');
-				console.log('found packetery'+'#packetery_widget_popup_'+id_carrier);
 				if ($('#packetery_widget_popup_'+id_carrier).length > 0) {
-					console.log('found popup packetery');
 					if ($('#packetery_widget_popup_'+id_carrier).find('.js-name option:selected').val() == '0') {
 						if ($('.packetery_widget_popup_'+id_carrier+'_open').data('status') == 0) {
 							bindsw.continueSetDisabled();
@@ -210,8 +200,6 @@ bindsw = {
 			var name_branch = $(this).parentsUntil('.popup_content').find('.js-name option:selected').text();
 
 			var id_carrier = $(this).parentsUntil('.popup_content').parent().attr('data-carrier');
-			console.log('id_carrier '+id_carrier);
-			console.log('name_branch '+name_branch);
 
 			$('.carrier_action input[value="'+id_carrier+'"]').parent().next().find('a').text(name_branch);
 			$('.carrier_action input[value="'+id_carrier+'"]').parent().next().find('a').data('status', '1');
@@ -221,32 +209,40 @@ bindsw = {
 /*END OPC EasyPay*/
 /*CLASSIC*/
 	widgetStatusMoveOnLoadClassic: function() {
-		console.log('widgetStatusMoveOnLoadClassic');
+		let checked_carrier = $('input[id^="delivery_option_"]:checked').val()
+		checked_carrier = checked_carrier.replace(',','');
 		$('.packetery-widget-status').each(function() {
 			var clone = $(this).clone();
 			var id_carrier = $(this).parent().parent().data('carrier');
 
-			console.log(id_carrier);
 			$('input[id="delivery_option_'+id_carrier+'"]').parent().parent().parent().after(clone);
 			$(this).remove();
+			$('.packetery_widget_popup_'+id_carrier+'_open').click(function() {
+				if($(this).find('.js-name option:selected').val() == 0) {
+					let $button = $(this).find('.confirmPacketeryDeliveryOption');
+					if ($button.hasClass('disabled') == false) {
+						$button.addClass('disabled');
+						$button.css("pointer-events", "none");
+					}
+				}
+			});
 			$clone = $('.packetery_widget_popup_'+id_carrier+'_open').parent();
-			if ($('#choosed_carrier').val() == id_carrier) {
+			if (checked_carrier == id_carrier) {
 				$clone.css('display', 'block');
 				if ($clone.data('value') != 1) {
 					bindsw.continueSetDisabled();
 				}
 			}
-			console.log($('input[id="delivery_option_'+id_carrier+'"]').val());
-			var checked_carrier = $('input[id="delivery_option_'+id_carrier+'"]').val();
-			checked_carrier = checked_carrier.replace(',','');
-			if (checked_carrier == id_carrier) {
+
+			var row_packetery_carrier_id = $('input[id="delivery_option_'+id_carrier+'"]').val();
+			row_packetery_carrier_id = row_packetery_carrier_id.replace(',','');
+
+			if (checked_carrier == row_packetery_carrier_id) {
 				$clone.css('display', 'block');
 				if ($('.packetery_widget_popup_'+id_carrier+'_open').data('status') == 0) {
 					bindsw.continueSetDisabled();
-					console.log('default carrier packetery not set');
 				} else {
 					bindsw.continueSetEnabled();
-					console.log('default carrier packetery set');
 				}
 			}
 		});
@@ -260,18 +256,15 @@ bindsw = {
 			for (var i = 0; i < cnt; i++) {
 				var id_carrier = packetery_carriers[i];
 				bindsw.bindCarrierPopup(id_carrier);
-				console.log(id_carrier);
 			}
 		}
 		
 		$('input[id^="delivery_option"]').unbind();
 		$('input[id^="delivery_option"]').change(function() {
-
 			$('.packetery-widget-status').css('display', 'none');
 			$next = $(this).parent().parent().parent().next();
 			if ($next.hasClass('packetery-widget-status') == true) {
 				$next.css('display', 'block');
-				console.log('input[id^="delivery_option"]).change');
 			} else {
 				bindsw.continueSetEnabled();
 				return false;
@@ -286,7 +279,6 @@ bindsw = {
 		});
 	},
 	continueSetDisabled: function() {
-		console.log('continueSetDisabled');
 		if ($('.continue').hasClass('disabled') == false) {
 			$('.continue').addClass('disabled');
 			$('.continue').css("pointer-events", "none");
@@ -296,7 +288,6 @@ bindsw = {
 		}
 	},
 	continueSetEnabled: function() {
-		console.log('continueSetEnabled');
 		$('#submit_easypay').removeClass('disabled');
 		if ($('.continue').hasClass('disabled') == true) {
 			$('.continue').removeClass('disabled');
@@ -310,13 +301,27 @@ bindsw = {
 			var name_branch = $(this).parentsUntil('.popup_content').find('.js-name option:selected').text();
 
 			var id_carrier = $(this).parentsUntil('.popup_content').parent().attr('data-carrier');
-			console.log('id_carrier '+id_carrier);
-			console.log('name_branch '+name_branch);
 			$selected_branch = $('#packetery_widget_popup_'+id_carrier).find('.js-name option:selected');
 
-			$('#delivery_option_'+id_carrier).parent().parent().parent().next().find('a').text(name_branch);
-			$('#delivery_option_'+id_carrier).parent().parent().parent().next().find('a').data('status', '1');
+			$('.packetery-widget-status a').text(widget_popup_lang_pac.please_choose_branch);
+			$('.packetery-widget-status a').data('status', '0');
+
+			$('div.carrier-extra-content.packetery_widget_wrapper:not([id="packetery_widget_popup_'+id_carrier+'"])').each(function() {
+				$block = $(this);
+				packetery.widgetClearField('city', $block);
+				packetery.widgetClearField('name', $block);
+				packetery.widgetDetailsClear($block);
+				bindsw.preCheckOneCountryPopupWidget($block);
+			});
+			//widgetClearField: function(field, extra){
+
+			//$('.packetery_widget_popup_5_open').data('status');
+			//$('#delivery_option_'+id_carrier).parent().parent().parent().next().find('a').text(name_branch);
+			//$('#delivery_option_'+id_carrier).parent().parent().parent().next().find('a').data('status', '1');
+			$('a.packetery_widget_popup_'+id_carrier+'_open').text(name_branch);
+			$('a.packetery_widget_popup_'+id_carrier+'_open').data('status', '1');
 			bindsw.continueSetEnabled();
+			//bindsw.continueSetDisabled();
 		});
 	},
 	bindCarrierPopup: function(id_carrier) {
@@ -328,10 +333,18 @@ bindsw = {
 			blur: false
 		});
 		$('#packetery_widget_popup_'+id_carrier).css('display', 'block');
+		$popup_block = $('#packetery_widget_popup_'+id_carrier);
 		bindsw.bindPopupContinue();
+		bindsw.preCheckOneCountryPopupWidget($popup_block);
 	},
+
+	preCheckOneCountryPopupWidget: function($popup_block) {
+		if ($popup_block.find('select.js-country option').length == 1) {
+			packetery.widgetGetCities($popup_block);
+		}
+	},
+
 	checkContinue: function(id_carrier) {
-		console.log('checkContinue');
 		$selected_branch = $('#packetery_widget_popup_'+id_carrier).find('.js-name option:selected');
 		if (($selected_branch.length > 0) && ($selected_branch.val() != 0)) {
 			$('.continue').removeClass('disabled');
@@ -349,7 +362,9 @@ bindsw = {
 			$('#packetery_widget_popup_'+id_carrier).css('display', 'block');
 
 			bindsw.checkContinue(id_carrier);
+
 			$('#packetery_widget_popup_'+id_carrier).popup('show');
+			//$('#packetery_widget_popup_'+id_carrier).find('.js-name').trigger("change");
 			for (var i = 1; i < 10; i++) {
 				setTimeout(function(){
 					$('#packetery_widget_popup_'+id_carrier).css('display', 'block');
@@ -377,7 +392,7 @@ packetery = {
 	widgetClearField: function(field, extra){
 		var find_field = '#packetery-widget .js-'+field;
 		$(extra).find(find_field).html('');
-		$(extra).find(find_field).html('<option value="0" disabled="" selected>-- please choose --</option>');
+		$(extra).find(find_field).html('<option value="0" disabled="" selected>-- '+widget_popup_lang_pac.please_choose+' --</option>');
 	},
 	widgetFillField: function(field, data, extra){
 		if (field == 'country') {
@@ -492,7 +507,6 @@ packetery = {
 
 	widgetSaveOrderBranch: function(id_branch, is_cod){
 		var id_carrier = $('.packetery_widget_wrapper:visible').data('carrier');
-		console.log('id_carrier '+id_carrier);
 	    $.ajax({
 	        type: 'POST',
 	        url: ajaxs.baseuri()+'/modules/packetery/ajax_front.php?action=widgetsaveorderbranch'+ajaxs.checkToken(),
@@ -565,7 +579,6 @@ packetery = {
 	        	$("body").toggleClass("wait");
 	        },
 	        success: function(msg) {
-                console.log('widgetGetDetails');
                 data = JSON.parse(msg);
                 packetery.widgetFillDetails(data, this.extra);
 	        },

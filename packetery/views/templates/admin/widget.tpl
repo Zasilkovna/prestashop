@@ -31,9 +31,9 @@
 	<div class="widget-left">
 		<div class="col-md-6">
 			<select class="form-control form-control-select js-country" name="country" required="">
-			    <option value="0" disabled="" selected="">{l s='Country' mod='packetery'}</option>
+			    <option value="0" disabled="" {if $countries_count neq '1'}selected{/if}>{l s='Country' mod='packetery'}</option>
 				{foreach $countries as $country}
-					<option value="{$country.country|escape:'htmlall':'UTF-8'}">{$country.name|escape:'htmlall':'UTF-8'}</option>
+					<option value="{$country.country|escape:'htmlall':'UTF-8'}{if $countries_count eq '1'}selected{/if}">{$country.name|escape:'htmlall':'UTF-8'}</option>
 				{/foreach}
 			</select>
 		</div>

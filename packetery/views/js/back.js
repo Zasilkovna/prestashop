@@ -38,7 +38,6 @@ $(document).ready(function(){
 	$('#tab-settings .settings-input select').change(function(){
 		var id = $(this).data('id');
 		var value = $(this).find('option:selected').val();
-		console.log(id+ value);
 		ajaxs.updateSettings(id, value);
 	});
 
@@ -53,7 +52,6 @@ $(document).ready(function(){
 	$('#packetery-carriers-list-table a.edit').click(function() {
 		var url = $(this).attr('href');
 		var id_carrier = getStringParameter('id_carrier', url);
-		//console.log('id_carrier'+id_carrier);
 		ajaxs.removecarrier(id_carrier);
 		$(this).parent().parent().parent().parent().css('display', 'none');
 		return false;
@@ -177,7 +175,7 @@ tools = {
 		$(pstable_jq_select).find('table tbody tr').each(function() {
 			$(this).prepend('<td class="center"><span><input type="checkbox" class="ps-table-checkbox" value="0"/></span></td>');
 		});
-		var head = '<th class="center"><span class="title_box"><input type="checkbox" class="ps-table-checkbox-all" value="0"/><span class="all-fix">All</span></span></th>';
+		var head = '<th class="center"><span class="title_box"><input type="checkbox" class="ps-table-checkbox-all" value="0"/><span class="all-fix">'+lang_pac.all+'</span></span></th>';
 		$(pstable_jq_select).find('table thead tr').prepend(head);
 		binds.checkboxAllTable();
 		binds.order_cod();
@@ -333,7 +331,6 @@ binds = {
 		$('#packetery-orders-table table tr td:nth-child(7)').find('span').unbind();
 		$('#packetery-orders-table table tr td:nth-child(7)').find('span').click(function(){
 			var id_order = $(this).parent().parent().find('td:eq(1) span').text();
-			//console.log(id_order);
 			$('#id_order_widget').val(id_order);
 			$('#change-order-branch').popup('show');
 		});
@@ -354,7 +351,6 @@ binds = {
 	payment_cod: function() {
 		$('#payment-list-table i.status').unbind();
 		$('#payment-list-table i.status').click(function(){
-			//console.log('#payment-list-table i.status');
 			var module_name = $(this).parent().next().find('span').text();
 			if ($(this).hasClass('icon-remove'))
 				var value = 1;
@@ -367,7 +363,6 @@ binds = {
 	carrier_cod: function() {
 		$('#packetery-carriers-list-table i.status').unbind();
 		$('#packetery-carriers-list-table i.status').click(function(){
-			//console.log('#packetery-carriers-list-table i.status');
 			var id_carrier = $(this).parent().parent().find('td').first().find('span').text();
 			if ($(this).hasClass('icon-remove'))
 				var value = 1;
@@ -537,7 +532,6 @@ ajaxs = {
 	        	$("body").toggleClass("wait");
 	        },
 	        success: function(msg) {
-	        	console.log('msg '+msg);
                 if (msg == 'ok') {
                 	ajaxs.orderExport(this.id_orders);
 				} else {
@@ -568,7 +562,6 @@ ajaxs = {
 	        	$("body").toggleClass("wait");
 	        },
 	        success: function(msg) {
-	        	console.log(msg);
                 var IS_JSON = true;
 				try {
 					var orders = JSON.parse(msg);
@@ -582,7 +575,6 @@ ajaxs = {
                 		var id_order = orders[i][0];
                 		if (orders[i][1] == 1) {
 	                		var tracking_number = orders[i][2];
-	                		console.log(id_order+' - '+tracking_number);
 	                		var tr = $('#packetery-orders-table tr[data-id-order="'+id_order+'"]');
 	                		$(tr).find('td:eq(8) i').replaceWith('<i class="icon-check status"></i>');
 	                		$(tr).find('td:eq(9)').html('<span><a href="https://www.zasilkovna.cz/Z'+tracking_number+'" target="_blank">Z'+tracking_number+'</a></span>');
@@ -592,10 +584,8 @@ ajaxs = {
                 			var error = orders[i][2];
                 			$('#packetery-export-error').append('<div>Order '+id_order+' '+lang_pac.error_export+' '+error+'</div>');
                 			$('.validation-error').css('display', 'block');
-                			//$('#packetery-orders-table .panel').notify(lang_pac.error+': '+error, "error",{position:"top"});
                 		}
                 	}
-                	//$('#packetery-orders-table .panel').notify(lang_pac.success, "success",{position:"top"});
                 	setTimeout(function() {
                 		$('#packetery-export-success').html('');
                 		$('.r-message-success').css('display', 'none');
@@ -626,7 +616,6 @@ ajaxs = {
 					var tr = $('#packetery-orders-table tr[data-id-order="'+id_order+'"]');
 					$(tr).find('td:eq(6)').html('<span>'+this.name_branch+'</span>');
 					// address delivery
-					console.log('address delivery '+is_ad);
                 	if (is_ad == 1) {
 	                	$(tr).find('td:eq(7) i').replaceWith('<i class="icon-check status"></i>');
 	                } else {
@@ -734,7 +723,8 @@ ajaxs = {
                 if (msg == 'ok') {
 					$('#add-packetery-carrier-block').popup('hide');
 	                setTimeout(function() {
-	                	location.reload();
+	                	let href = location.href+'&active_tab=settings';
+	                	location.href = href;
 	                }, 500);
                 } else {
                 	$('#submit_new_packetery_carrier').notify(lang_pac.error, "error",{position:"top"});
@@ -756,7 +746,6 @@ ajaxs = {
 	        	$("body").toggleClass("wait");
 	        },
 	        success: function(msg) {
-                console.log('count Branches response' + msg);
                 var res = JSON.parse(msg);
                 var cnt = res[0];
                 var last_update = res[1];
@@ -780,7 +769,6 @@ ajaxs = {
 	        	$("body").toggleClass("wait");
 	        },
 	        success: function(msg) {
-                console.log('updateBranches response'+msg);
                 $(this.container).focus();
                 if (msg != 'true')
                 {
@@ -823,7 +811,6 @@ ajaxs = {
 	        	$("body").toggleClass("wait");
 	        },
 	        success: function(msg) {
-                console.log('msg'+msg);
                 if (msg != 'true')
                 {
                     var res = JSON.parse(msg);
@@ -835,9 +822,11 @@ ajaxs = {
                 	var id = this.sid;
 	        		$('#packetery-form input[data-id="'+id+'"]').notify(lang_pac.success, "success",{position:"r"});
 	        		$('#packetery-form select[data-id="'+id+'"]').notify(lang_pac.success, "success",{position:"r"});
-	        		setTimeout(function() {
-	        			ajaxs.updateBranches('#packetery-form input[data-id="2"]', true);
-	        		}, 500);
+	        		if (id == 2) {
+		        		setTimeout(function() {
+		        			ajaxs.updateBranches('#packetery-form input[data-id="2"]', true);
+		        		}, 500);
+	        		}
 	        	}
 	        },
 	        complete: function() {

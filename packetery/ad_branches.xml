@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?><export
-    xmlns="http://www.zasilkovna.cz/api/v3/branch"
-    xmlns:ns="http://www.zasilkovna.cz/api/v3/branch"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.zasilkovna.cz/api/v3/branch http://www.zasilkovna.cz/api/v3/branch.xsd">
+        xmlns="http://www.zasilkovna.cz/api/v3/branch"
+        xmlns:ns="http://www.zasilkovna.cz/api/v3/branch"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.zasilkovna.cz/api/v3/branch http://www.zasilkovna.cz/api/v3/branch.xsd">
   <contacts>
     <contact>
       <country>cz</country>
@@ -14,10 +14,10 @@
       <country>sk</country>
       <phone>+421 221 201 135</phone>
       <email>bratislava@zasielkovna.sk</email>
-      <businessHours>Po-Pi 9:00 – 19:00 hod.</businessHours>
+      <businessHours>Po-Pi 9:00 – 18:00 hod.</businessHours>
     </contact>
   </contacts>
-  <branches>
+    <branches>
     <branch>
       <id>80</id>
       <name>Rakouská pošta</name>
@@ -28,7 +28,7 @@
       <zip>000 00</zip>
       <country>at</country>
       <currency>EUR</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -37,7 +37,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Österreich</region>
       <district></district>
       <labelRouting>A-***-080</labelRouting>
       <labelName>Rakouská pošta</labelName>
@@ -79,7 +79,7 @@
       <zip>000 00</zip>
       <country>bg</country>
       <currency>BGN</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -88,7 +88,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>България</region>
       <district></district>
       <labelRouting>U-***-1234</labelRouting>
       <labelName>Bulharsko DPD</labelName>
@@ -101,13 +101,13 @@
       <openingHours>
         <compactShort></compactShort>
         <compactLong></compactLong>
-        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Tu&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;We&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Th&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Su&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;пн&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;вт&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;ср&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;чт&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;пт&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;сб&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;нд&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
         <regular>
           <monday></monday>
           <tuesday></tuesday>
@@ -130,7 +130,7 @@
       <zip>000 00</zip>
       <country>cz</country>
       <currency>CZK</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -139,7 +139,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>10</maxWeight>
-      <region></region>
+      <region>Česká republika</region>
       <district></district>
       <labelRouting>A-***-013</labelRouting>
       <labelName>Česká pošta</labelName>
@@ -181,7 +181,7 @@
       <zip>000 00</zip>
       <country>cz</country>
       <currency>CZK</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -190,7 +190,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Česká republika</region>
       <district></district>
       <labelRouting>A-***-633</labelRouting>
       <labelName>Česká republika DPD</labelName>
@@ -232,7 +232,7 @@
       <zip>000 00</zip>
       <country>cz</country>
       <currency>CZK</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -241,7 +241,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Česká republika</region>
       <district></district>
       <labelRouting>@-***-153</labelRouting>
       <labelName>Česká republika InTime</labelName>
@@ -283,7 +283,7 @@
       <zip>000 00</zip>
       <country>cz</country>
       <currency>CZK</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -292,7 +292,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Česká republika</region>
       <district></district>
       <labelRouting>B-***-136</labelRouting>
       <labelName>Expresní doručení Brno</labelName>
@@ -334,7 +334,7 @@
       <zip>000 00</zip>
       <country>cz</country>
       <currency>CZK</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -343,7 +343,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Česká republika</region>
       <district></district>
       <labelRouting>T-***-134</labelRouting>
       <labelName>Expresní doručení Ostrava</labelName>
@@ -385,7 +385,7 @@
       <zip>100 00</zip>
       <country>cz</country>
       <currency>CZK</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -394,7 +394,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Česká republika</region>
       <district></district>
       <labelRouting>A-***-257</labelRouting>
       <labelName>Expresní doručení Praha</labelName>
@@ -436,7 +436,7 @@
       <zip>000 00</zip>
       <country>de</country>
       <currency>EUR</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -445,7 +445,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>10</maxWeight>
-      <region></region>
+      <region>Deutschland</region>
       <district></district>
       <labelRouting>A-***-111</labelRouting>
       <labelName>Německá pošta</labelName>
@@ -487,7 +487,7 @@
       <zip>000 00</zip>
       <country>hu</country>
       <currency>HUF</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -496,7 +496,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>30</maxWeight>
-      <region></region>
+      <region>Magyarország</region>
       <district></district>
       <labelRouting>U-***-763</labelRouting>
       <labelName>Maďarská pošta</labelName>
@@ -538,7 +538,7 @@
       <zip>000 00</zip>
       <country>hu</country>
       <currency>HUF</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -547,7 +547,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>30</maxWeight>
-      <region></region>
+      <region>Magyarország</region>
       <district></district>
       <labelRouting>U-***-805</labelRouting>
       <labelName>Maďarsko DPD</labelName>
@@ -589,7 +589,7 @@
       <zip>000 00</zip>
       <country>hu</country>
       <currency>HUF</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -598,7 +598,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>30</maxWeight>
-      <region></region>
+      <region>Magyarország</region>
       <district></district>
       <labelRouting>U-***-151</labelRouting>
       <labelName>Maďarsko Transoflex</labelName>
@@ -640,7 +640,7 @@
       <zip>000 00</zip>
       <country>pl</country>
       <currency>PLN</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -649,7 +649,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Polska</region>
       <district></district>
       <labelRouting>S-***-272</labelRouting>
       <labelName>Polská pošta</labelName>
@@ -662,13 +662,64 @@
       <openingHours>
         <compactShort></compactShort>
         <compactLong></compactLong>
-        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Tu&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;We&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Th&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Su&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;pon&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;wt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;śr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;czw&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;pt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;sob&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;niedz&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <regular>
+          <monday></monday>
+          <tuesday></tuesday>
+          <wednesday></wednesday>
+          <thursday></thursday>
+          <friday></friday>
+          <saturday></saturday>
+          <sunday></sunday>
+        </regular>
+        <exceptions />
+      </openingHours>
+    </branch>
+    <branch>
+      <id>1438</id>
+      <name>Polská pošta 24h</name>
+      <nameStreet>Polská pošta 24h</nameStreet>
+      <place></place>
+      <street></street>
+      <city></city>
+      <zip>000 00</zip>
+      <country>pl</country>
+      <currency>PLN</currency>
+      <exportedUntil>2017-10-18</exportedUntil>
+      <wheelchairAccessible>no</wheelchairAccessible>
+      <latitude>0.00000</latitude>
+      <longitude>0.00000</longitude>
+      <url></url>
+      <dressingRoom>0</dressingRoom>
+      <claimAssistant>0</claimAssistant>
+      <packetConsignment>0</packetConsignment>
+      <maxWeight>5</maxWeight>
+      <region>Polska</region>
+      <district></district>
+      <labelRouting>S-***-1438</labelRouting>
+      <labelName>Polská pošta 24h</labelName>
+      <photos>
+        <photo>
+          <thumbnail>https://www.zasielkovna.sk/images/branch/thumb/stub.jpg</thumbnail>
+          <normal>https://www.zasielkovna.sk/images/branch/normal/stub.jpg</normal>
+        </photo>
+      </photos>
+      <openingHours>
+        <compactShort></compactShort>
+        <compactLong></compactLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;pon&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;wt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;śr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;czw&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;pt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;sob&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;niedz&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
         <regular>
           <monday></monday>
           <tuesday></tuesday>
@@ -691,7 +742,7 @@
       <zip>000 00</zip>
       <country>pl</country>
       <currency>PLN</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -700,7 +751,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Polska</region>
       <district></district>
       <labelRouting>B-***-1406</labelRouting>
       <labelName>Polsko DPD</labelName>
@@ -713,64 +764,13 @@
       <openingHours>
         <compactShort></compactShort>
         <compactLong></compactLong>
-        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Tu&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;We&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Th&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Su&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
-        <regular>
-          <monday></monday>
-          <tuesday></tuesday>
-          <wednesday></wednesday>
-          <thursday></thursday>
-          <friday></friday>
-          <saturday></saturday>
-          <sunday></sunday>
-        </regular>
-        <exceptions />
-      </openingHours>
-    </branch>
-    <branch>
-      <id>590</id>
-      <name>Rumunsko Cargus</name>
-      <nameStreet>Rumunsko Cargus</nameStreet>
-      <place></place>
-      <street></street>
-      <city></city>
-      <zip>000 00</zip>
-      <country>ro</country>
-      <currency>RON</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
-      <wheelchairAccessible>no</wheelchairAccessible>
-      <latitude>0.00000</latitude>
-      <longitude>0.00000</longitude>
-      <url></url>
-      <dressingRoom>0</dressingRoom>
-      <claimAssistant>0</claimAssistant>
-      <packetConsignment>0</packetConsignment>
-      <maxWeight>5</maxWeight>
-      <region></region>
-      <district></district>
-      <labelRouting>U-***-590</labelRouting>
-      <labelName>Rumunsko Cargus</labelName>
-      <photos>
-        <photo>
-          <thumbnail>https://www.zasielkovna.sk/images/branch/thumb/stub.jpg</thumbnail>
-          <normal>https://www.zasielkovna.sk/images/branch/normal/stub.jpg</normal>
-        </photo>
-      </photos>
-      <openingHours>
-        <compactShort></compactShort>
-        <compactLong></compactLong>
-        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Tu&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;We&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Th&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Su&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;pon&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;wt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;śr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;czw&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;pt&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;sob&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;niedz&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
         <regular>
           <monday></monday>
           <tuesday></tuesday>
@@ -793,7 +793,7 @@
       <zip>000 00</zip>
       <country>ro</country>
       <currency>RON</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -802,7 +802,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>România</region>
       <district></district>
       <labelRouting>U-***-836</labelRouting>
       <labelName>Rumunsko DPD</labelName>
@@ -815,13 +815,13 @@
       <openingHours>
         <compactShort></compactShort>
         <compactLong></compactLong>
-        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Tu&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;We&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Th&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Su&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;lun&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;mar&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;mie&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;joi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;vin&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;sâm&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;dum&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
         <regular>
           <monday></monday>
           <tuesday></tuesday>
@@ -844,7 +844,7 @@
       <zip>000 00</zip>
       <country>ro</country>
       <currency>RON</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -853,7 +853,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>România</region>
       <district></district>
       <labelRouting>U-***-762</labelRouting>
       <labelName>Rumunsko FAN</labelName>
@@ -866,13 +866,13 @@
       <openingHours>
         <compactShort></compactShort>
         <compactLong></compactLong>
-        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Tu&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;We&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Th&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Su&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;lun&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;mar&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;mie&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;joi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;vin&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;sâm&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;dum&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
         <regular>
           <monday></monday>
           <tuesday></tuesday>
@@ -895,7 +895,7 @@
       <zip>000 00</zip>
       <country>sk</country>
       <currency>EUR</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -904,7 +904,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Slovenská republika</region>
       <district></district>
       <labelRouting>X-***-131</labelRouting>
       <labelName>Doručenie na adresu SR</labelName>
@@ -917,13 +917,13 @@
       <openingHours>
         <compactShort></compactShort>
         <compactLong></compactLong>
-        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Ut&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Štv&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Pia&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;ut&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;st&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;št&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;pi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;so&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
         <regular>
           <monday></monday>
           <tuesday></tuesday>
@@ -946,7 +946,7 @@
       <zip>000 00</zip>
       <country>sk</country>
       <currency>EUR</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -955,7 +955,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Slovenská republika</region>
       <district></district>
       <labelRouting>X-***-132</labelRouting>
       <labelName>Expresné doručenie Bratislava</labelName>
@@ -968,13 +968,13 @@
       <openingHours>
         <compactShort></compactShort>
         <compactLong></compactLong>
-        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Ut&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Štv&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Pia&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;ut&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;st&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;št&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;pi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;so&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
         <regular>
           <monday></monday>
           <tuesday></tuesday>
@@ -997,7 +997,7 @@
       <zip>000 00</zip>
       <country>sk</country>
       <currency>EUR</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -1006,7 +1006,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Slovenská republika</region>
       <district></district>
       <labelRouting>X-***-016</labelRouting>
       <labelName>Slovenská pošta</labelName>
@@ -1019,13 +1019,13 @@
       <openingHours>
         <compactShort></compactShort>
         <compactLong></compactLong>
-        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Ut&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Štv&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Pia&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;ut&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;st&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;št&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;pi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;so&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
         <regular>
           <monday></monday>
           <tuesday></tuesday>
@@ -1048,7 +1048,7 @@
       <zip>000 00</zip>
       <country>sk</country>
       <currency>EUR</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -1057,7 +1057,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>Slovenská republika</region>
       <district></district>
       <labelRouting>X-***-149</labelRouting>
       <labelName>Slovensko kurýr</labelName>
@@ -1070,13 +1070,13 @@
       <openingHours>
         <compactShort></compactShort>
         <compactLong></compactLong>
-        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Ut&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;St&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Štv&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Pia&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;So&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;po&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;ut&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;st&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;št&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;pi&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;so&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;ne&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
         <regular>
           <monday></monday>
           <tuesday></tuesday>
@@ -1099,7 +1099,7 @@
       <zip>000 00</zip>
       <country>uk</country>
       <currency>GBP</currency>
-      <exportedUntil>2017-06-28</exportedUntil>
+      <exportedUntil>2017-10-18</exportedUntil>
       <wheelchairAccessible>no</wheelchairAccessible>
       <latitude>0.00000</latitude>
       <longitude>0.00000</longitude>
@@ -1108,7 +1108,7 @@
       <claimAssistant>0</claimAssistant>
       <packetConsignment>0</packetConsignment>
       <maxWeight>5</maxWeight>
-      <region></region>
+      <region>United Kingdom</region>
       <district></district>
       <labelRouting>A-***-1120</labelRouting>
       <labelName>Spojené království Royal Mail</labelName>
@@ -1121,13 +1121,13 @@
       <openingHours>
         <compactShort></compactShort>
         <compactLong></compactLong>
-        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mo&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Tu&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;We&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Th&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Fr&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Sa&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;th&gt;Su&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
+        <tableLong>&lt;table class='packetery-hours'&gt;&lt;tr&gt;&lt;th&gt;Mon&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Tue&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Wed&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Thu&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Fri&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Sat&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Sun&lt;/th&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</tableLong>
         <regular>
           <monday></monday>
           <tuesday></tuesday>
@@ -1140,5 +1140,5 @@
         <exceptions />
       </openingHours>
     </branch>
-  </branches>
+    </branches>
 </export>

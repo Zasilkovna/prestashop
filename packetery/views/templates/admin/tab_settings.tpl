@@ -34,22 +34,22 @@
 	</label>
 	<select name="labels_format" class="setting_input labels_format" data-id="4" >
 		<option value="A7 on A7" {if $labels_format eq 'A7 on A7'}selected{/if}>
-			A7 on A7
+			{l s='A7 on A7' mod='packetery'}
 		</option>
 		<option value="A6 on A4" {if $labels_format eq 'A6 on A4'}selected{/if}>
-			A6 on A4
+			{l s='A6 on A4' mod='packetery'}
 		</option>
 		<option value="A7 on A4" {if $labels_format eq 'A7 on A4'}selected{/if}>
-			A7 on A4
+			{l s='A7 on A4' mod='packetery'}
 		</option>
 		<option value="105x35mm on A4" {if $labels_format eq '105x35mm on A4'}selected{/if}>
-			105x35mm on A4
+			{l s='105x35mm on A4' mod='packetery'}
 		</option>
 		<option value="A8 on A8" {if $labels_format eq 'A8 on A8'}selected{/if}>
-			A8 on A8
+			{l s='A8 on A8' mod='packetery'}
 		</option>
 		<option value="A9 on A4" {if $labels_format eq 'A9 on A4'}selected{/if}>
-			A9 on A4
+			{l s='A9 on A4' mod='packetery'}
 		</option>
 	</select>
 	<br>
