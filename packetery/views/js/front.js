@@ -98,7 +98,11 @@ tools = {
 	readAjaxFields: function() {
 		var raw = $('#ajaxfields').val();
 		var json = decodeURIComponent(raw);
-		widget_lang_pac = JSON.parse(json);
+		try {
+			widget_lang_pac = JSON.parse(json);
+		} catch (e) {
+			widget_lang_pac = null;
+		}
 	},
 	checkwidgetstatus: function(extra) {
 		tools.setcoutrycontext();
