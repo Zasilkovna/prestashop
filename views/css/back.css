@@ -1,0 +1,247 @@
+/**
+* 2017 Zlab Solutions
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author    Eugene Zubkov <magrabota@gmail.com>
+*  @copyright 2017 Zlab Solutions
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*
+* Don't forget to prefix your containers with your own identifier
+* to avoid any conflicts with others containers.
+*/
+
+.packetery-total-branches, .packetery-last-branches-update{
+	padding-top: 7px;
+	font-size: 13px;
+}
+
+#update-branches{
+	width: 400px !important;
+}
+
+.r-message-success, .validation-error{
+	display: none;
+}
+
+.pdf_link{
+	width: 100%;
+	height:17px;
+	padding: 6px 0px;
+	margin-top: 5px;
+}
+
+.download_pdf{
+	width:400px !important;
+}
+
+#action_buttons_pc {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+    max-width: 100%;
+}
+
+#action_buttons_pc input{
+	max-width: 100% !important;
+}
+/*PAYMENTS*/
+#payment-list-table .table th:nth-child(3){
+	display: none;
+}
+
+.new_carrier_input {
+
+}
+
+#payment-list-table .table tr td:nth-child(3){
+	display: none;
+}
+/*END PAYMENTS*/
+
+/*ORDERS*/
+/*WIDGET*/
+#change-order-branch{
+	width: 80%;
+	max-width: 730px;
+	/*height: 95%;*/
+	min-height: 500px;
+	background-color: #fff;
+	padding: 15px;
+}
+
+#admin-widget{
+	width: 100%;
+}
+#widget-button-container{
+	position: absolute;
+	bottom: 15px;
+	left: 15px;
+	right: 15px;
+
+	max-width:100%;
+}
+#widget-button-container input{
+	max-width: 100% !important;
+}
+
+/*FRONT WIDGET*/
+.page-order table td, .page-order table th {
+	padding: 0;
+}
+
+.widget_block_title{
+	display:none;
+}
+
+.branch-details p{
+	margin-bottom: 0rem;
+}
+
+#packetery-widget{
+	margin-bottom: 3	0px;
+}
+
+#packetery-widget .col-md-6{
+	float:none;
+}
+
+#packetery-widget .col-md-6{
+	width: 100%;
+}
+
+.branch_details{
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+.widget-left{
+	float:left;
+	width: 49%;
+}
+.widget-right{
+	float:right;
+	width: 49%;
+}
+
+.branch-foto img{
+	max-height: 100%;
+	max-width: 100%;
+	object-fit: contain;
+}
+/*END WIDGET*/
+.export_selected{
+	width:400px !important;
+}
+.ps-table-checkbox-all{
+	position:relative;
+	margin-right: 5px !important;
+}
+.all-fix{
+	margin-bottom: 3px;
+}
+#packetery-orders-table table tr td:nth-child(6){
+	cursor: pointer;
+}
+#packetery-orders-table table tr td:nth-child(7){
+	cursor: pointer;
+}
+.prestaui-paginator{
+	width: 100%;
+	text-align: right;
+}
+.prestaui-paginator a:active{
+	color: black !important;
+}
+/*END ORDERS*/
+
+/*add-carrier-form*/
+.add-carrier-form label{
+    text-align: right;
+    padding-top: 7px;
+}
+
+#add-packetery-carrier-block {
+	position: relative;
+	display: none;
+	max-width: 730px;
+	min-height: 350px;
+	width: 80%;
+	background: #ffffff;
+	overflow: auto;
+	padding: 15px;
+}
+
+.add-carrier-form input,.add-carrier-form  select,.add-carrier-form  textarea{
+	max-width: 500px !important;
+}
+
+.new_carrier_is_cod{
+	margin-top: 10px !important;
+}
+
+input[type="radio"], input[type="checkbox"]{
+	margin-top: 7px;
+}
+/*End add-carrier-form*/
+#submit_new_pocketery_carrier {
+	float: right;
+}
+
+#payment-list-table i.icon-check.status, #ad-carriers-list-table i.icon-check.status{
+	cursor: pointer;
+}
+#payment-list-table i.icon-remove.status, #ad-carriers-list-table i.icon-remove.status{
+	cursor: pointer;
+}
+#packetery-carriers-list-table i.status{
+	cursor: pointer;
+}
+
+#payment-list-table {
+	max-width:550px;
+}
+
+#ad-carriers-list-table .panel {
+	max-width:550px;
+}
+
+#payment-list-table .panel {
+	max-width:550px;
+}
+
+#packetery-carriers-list-table .panel {
+	max-width:550px;
+}
+
+.bootstrap input, select, textarea{
+	max-width: 550px;
+}
+
+#packetery-form label {
+    text-align: right;
+    padding-top: 7px;
+}
+
+#top_packetery_image{
+	float:left !important;
+	margin-top: 10px;
+}
+#top_packetery_text{
+	padding: 15px 50px;
+	font-size: 16px;
+}

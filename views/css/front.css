@@ -1,0 +1,145 @@
+/**
+* 2017 Zlab Solutions
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author    Eugene Zubkov <magrabota@gmail.com>
+*  @copyright 2017 Zlab Solutions
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*
+* Don't forget to prefix your containers with your own identifier
+* to avoid any conflicts with others containers.
+*/
+
+/*WIDGET POPUP*/
+
+#packetery-widget .packetery-widget-status{
+	display: none !important;
+}
+@media (min-width: 768px) {
+	.widget-left .col-md-6, .widget-right .col-md-6 {
+		max-width:100% !important;
+	}
+}
+
+@media (max-width: 991px){
+	.delivery-option {
+		display:block;
+	}
+	.packetery-widget-status a {
+		font-size: 10px !important;
+	}
+}
+
+.packetery-widget-status{
+	width: 100%;
+	display:none;
+	height: 32px;
+	vertical-align: middle;
+	font-size: 18px;
+	clear: both;
+}
+.packetery-widget-status a{
+	color:red !important;
+	padding-left: 1rem;
+}
+
+.popup_wrapper{
+}
+.packetery_widget_wrapper img {
+	max-height: 250px !important;
+	height: auto;
+}
+#packetery-widget h3{
+	padding-left: 15px;
+	padding-top: 15px;
+}
+
+#packetery-widget button{
+	position: absolute;
+	right: 15px;
+	bottom: 15px;
+}
+
+.packetery_widget_wrapper{
+	max-width: 700px;
+	height: 610px;
+	margin: auto;
+	margin-top: 100px;
+	background-color: #fff;
+	display: none;
+}
+/*END WIDGET POPUP*/
+
+/*WIDGET*/
+#widget-button-container{
+	position: absolute;
+
+}
+#widget-button-container input{
+	width: 100%;
+	}
+.page-order table td, .page-order table th {
+	padding: 0;
+}
+
+.widget_block_title{
+	display:none;
+}
+
+.branch-details p{
+	margin-bottom: 0rem;
+}
+
+#packetery-widget{
+	margin-bottom: 3	0px;
+}
+
+.packetery-widget-close {
+	position: absolute;
+	right: 5px;
+	top:1px;
+	cursor: pointer;
+}
+
+#packetery-widget .col-md-6{
+	float:none;
+}
+
+#packetery-widget .col-md-6{
+	width: 100%;
+}
+
+.branch_details{
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+.widget-left{
+	float:left;
+	width: 49%;
+}
+.widget-right{
+	float:right;
+	width: 49%;
+}
+
+.branch-foto img{
+	max-height: 100%;
+	max-width: 100%;
+	object-fit: contain;
+}
+/*END WIDGET*/
