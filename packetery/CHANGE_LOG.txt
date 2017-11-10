@@ -18,4 +18,4 @@
       - translation in widget, the default option in selectBox with branches ("-- please choose --")
       - Slovak module translation
       - documentation en, sk, cz
-2.0.3 - "One page checkout prestashop" module support
+2.0.3 - "One page checkout prestashop" module support, mini fixes, clear code.

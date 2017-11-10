@@ -41,7 +41,7 @@
 			<hr>
 			<div class="widget-left">
 				<div class="col-md-6" style="{if $countries_count eq '1'}display:none;{/if}">
-				<p style="padding-left: 1rem;"><b>Vyberte město</b></p>
+					<p style="padding-left: 1rem;"><b>{l s='Select Country' mod='packetery'}</b></p>
 					<select class="form-control form-control-select js-country" name="country" >
 					{if $countries_count neq '1'}
 					    <option value="0" disabled="" selected="">{l s='Country' mod='packetery'}</option>
@@ -53,14 +53,14 @@
 				</div>
 				<br>
 				<div class="col-md-6">
-				<p style="padding-left: 1rem;"><b>Vyberte město</b></p>
+					<p style="padding-left: 1rem;"><b>{l s='Select City' mod='packetery'}</b></p>
 				    <select class="form-control form-control-select js-city" name="city" >
 				        <option value="0" disabled="" selected="">{l s='City' mod='packetery'}</option>
 					</select>
 				</div>
 				<br>
 				<div class="col-md-6">
-				<p style="padding-left: 1rem;"><b>Následně si vyberte výdejní místo</b></p>
+					<p style="padding-left: 1rem;"><b>{l s='Select Branch' mod='packetery'}</b></p>
 				    <select class="form-control form-control-select js-name" name="name" >
 				        <option value="0" disabled="" selected="">{l s='Branch' mod='packetery'}</option>
 					</select>
