@@ -425,7 +425,6 @@ class PacketeryApi
         ignore_user_abort(true);
         $module = new Packetery();
         if ($response = Tools::file_get_contents($branch_url)) {
-            file_put_contents(_PS_MODULE_DIR_.'/packetery/ad_branches.xml', $response);
             if (Tools::strpos($response, 'invalid API key') == false) {
                 self::dropBranchList($is_ad);
                 $xml = simplexml_load_string($response);

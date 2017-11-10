@@ -39,7 +39,7 @@ class Packetery extends CarrierModule
         $this->widget_type = Packeteryclass::getConfigValueByOption('WIDGET_TYPE');
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.0.2';
+        $this->version = '2.0.3';
         $this->author = 'ZLab Solutions';
         $this->need_instance = 0;
 

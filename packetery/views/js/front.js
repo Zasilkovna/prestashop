@@ -33,7 +33,7 @@ $(document).ready(function(){
 	tools.readAjaxFields();
 
 	$('#packetery-widget .js-country').unbind();
-	$(document).on('change', '#packetery-widget .js-country', function(){
+	$(document).on('change', '#packetery-widget .js-country:visible', function(){
 		if (widget_type == 0) {
 			if ($('.confirmPacketeryDeliveryOption').hasClass('disabled') == false) {
 				$('.confirmPacketeryDeliveryOption').addClass('disabled');
@@ -78,8 +78,13 @@ $(document).ready(function(){
 				$('button[name="confirmDeliveryOption"]').removeClass('disabled');
 				$('button[name="confirmDeliveryOption"]').css("pointer-events", "auto");
 			}
+
 			let id_carrier = $('.delivery-option input:checked').val();
+			if (typeof id_carrier == 'undefined') {
+				id_carrier = $('.delivery_option.selected input').val();
+			}
 			id_carrier = id_carrier.replace(',', '');
+
 			var is_cod = 0;
 			var is_ad = $(this).find('option:selected').data('ad');
 			packetery.widgetSaveOrderBranch(id_branch, id_carrier);
@@ -96,9 +101,11 @@ $(document).ready(function(){
 
 tools = {
 	readAjaxFields: function() {
-		var raw = $('#ajaxfields').val();
-		var json = decodeURIComponent(raw);
-		widget_lang_pac = JSON.parse(json);
+		let raw = $('#ajaxfields').val();
+		if (typeof raw != 'undefined') {
+			let json = decodeURIComponent(raw);
+			widget_lang_pac = JSON.parse(json);
+		}
 	},
 	checkwidgetstatus: function(extra) {
 		tools.setcoutrycontext();
@@ -113,6 +120,9 @@ tools = {
 			$('.continue').addClass('disabled');
 			$('.continue').css("pointer-events", "none");
 		}
+		if ($('#onepagecheckoutps_step_review .btn_place_order').hasClass('disabled') == false) {
+			$('#onepagecheckoutps_step_review .btn_place_order').addClass('disabled');
+		}
 	},
 	//tools.continueSetEnabled();
 	continueSetEnabled: function() {
@@ -120,9 +130,10 @@ tools = {
 			$('.continue').removeClass('disabled');
 			$('.continue').css("pointer-events", "auto");
 		}
+		$('#onepagecheckoutps_step_review .btn_place_order').removeClass('disabled');
 	},
 	preCheckOneCountryWidget: function() {
-		if (widget_type == 0) {
+		if ((widget_type == 0) || (typeof widget_type == 'undefined')) {
 			if ($('select.js-country:visible option').length == 1) {
 				$el = $('select.js-country:visible option');
 				var extra = $el.parentsUntil('.carrier-extra-content').parent();
