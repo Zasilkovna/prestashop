@@ -19,3 +19,4 @@
       - Slovak module translation
       - documentation en, sk, cz
 2.0.3 - "One page checkout prestashop" module support, mini fixes, clear code.
+2.0.3rc2 - fix on install with debug_mode on

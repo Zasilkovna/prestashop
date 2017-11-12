@@ -36,7 +36,17 @@ class Packetery extends CarrierModule
     public $widget_type = 1;
     public function __construct()
     {
-        $this->widget_type = Packeteryclass::getConfigValueByOption('WIDGET_TYPE');
+        if (Packeteryclass::isModuleInstalled()) {
+            $this->widget_type = Packeteryclass::getConfigValueByOption('WIDGET_TYPE');
+            $errors = array();
+            $this->configurationErrors($errors);
+            foreach ($errors as $error) {
+                $this->warning .= $error;
+            }
+        } else {
+            $this->widget_type = 0;
+        }
+
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
         $this->version = '2.0.3';
@@ -57,13 +67,6 @@ class Packetery extends CarrierModule
         $this->description = $this->l('Packetery pick-up points, orders export, and print shipping labels');
             
         $this->ps_versions_compliancy = array('min' => '1.7.0.0', 'max' => _PS_VERSION_);
-        
-        // This is only used in admin of modules, and we're accessing Packetery API here, so don't do that elsewhere.
-        $errors = array();
-        $this->configurationErrors($errors);
-        foreach ($errors as $error) {
-            $this->warning .= $error;
-        }
     }
 
     /**

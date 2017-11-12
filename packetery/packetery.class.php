@@ -31,6 +31,13 @@ require_once(dirname(__FILE__).'/packetery.php');
 
 class Packeteryclass
 {
+    public static function isModuleInstalled()
+    {
+        $sql = "SHOW TABLES LIKE '"._DB_PREFIX_."packetery_settings'";
+        $result = Db::getInstance()->executeS($sql);
+        return $result;
+    }
+
     public static function getPacketeryBranchRow($id_branch)
     {
         $sql = 'SELECT * 
@@ -180,10 +187,12 @@ class Packeteryclass
 
     public static function deleteTab()
     {
-        $id_parent = Tab::getIdFromClassName('Adminpacketery');
-        $tab = new Tab($id_parent);
-        $tab->active = false;
-        $tab->update();
+        $id_tab = Tab::getIdFromClassName('Adminpacketery');
+        if ($id_tab) {
+            $tab = new Tab($id_tab);
+            $tab->active = false;
+            $tab->update();
+        }
         return true;
     }
 
