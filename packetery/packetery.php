@@ -49,7 +49,7 @@ class Packetery extends CarrierModule
 
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.0.3';
+        $this->version = '2.0.3rc2';
         $this->author = 'ZLab Solutions';
         $this->need_instance = 0;
 
