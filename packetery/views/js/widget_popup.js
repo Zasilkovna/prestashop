@@ -25,8 +25,27 @@
 * to avoid any conflicts with others containers.
 */
 let widget_popup_lang_pac = '';
+
+(function(){
+    // Your base, I'm in it!
+    var originalAddClassMethod = jQuery.fn.addClass;
+    var originalRemoveClassMethod = jQuery.fn.removeClass;
+    jQuery.fn.addClass = function(){
+        var result = originalAddClassMethod.apply( this, arguments );
+        jQuery(this).trigger('cssClassChanged');
+        return result;
+    }
+    jQuery.fn.removeClass = function(){
+        var result = originalRemoveClassMethod.apply( this, arguments );
+        jQuery(this).trigger('cssClassRemoved');
+        return result;
+    }
+})();
+
+
 $(document).ready(function(){
 	bindsw.readAjaxFields();
+
 	if (typeof easypaytextCheckout != "undefined") {
 		bindsw.opcBindsEasy();
 		bindsw.widgetStatusMoveOnLoadEasy();
@@ -34,6 +53,24 @@ $(document).ready(function(){
 		if ($('.supercheckout_shipping_option').length > 0) {
 			bindsw.opcBindsSuper();
 			bindsw.widgetStatusMoveOnLoadSuper();
+		} else if(typeof OnePageCheckoutPS != 'undefined') {
+			bindsw.onChangeContinueOpcps();
+			$(document).on('change', 'input[id^="delivery_option_"]', function() {
+				setTimeout(function() {
+					bindsw.opcBindsOpcps();
+					bindsw.widgetStatusMoveOnLoadOpcps();
+				}, 2000);
+			});
+			$(document).on('change', '#delivery_id_country', function() {
+				setTimeout(function() {
+					bindsw.opcBindsOpcps();
+					bindsw.widgetStatusMoveOnLoadOpcps();
+				}, 2000);
+			});
+			setTimeout(function() {
+				bindsw.opcBindsOpcps();
+				bindsw.widgetStatusMoveOnLoadOpcps();
+			}, 2000);
 		} else {
 			bindsw.opcBinds();
 			bindsw.widgetStatusMoveOnLoadClassic();
@@ -57,11 +94,164 @@ bindsw = {
 /*POPUP*/
 	readAjaxFields: function() {
 		var raw = $('#ajaxfields').val();
-		var json = decodeURIComponent(raw);
-		widget_popup_lang_pac = JSON.parse(json);
+		if (typeof raw != 'undefined') {
+			var json = decodeURIComponent(raw);
+			widget_popup_lang_pac = JSON.parse(json);
+		}
 	},
-/*OPC Knowband Supercheckout*/
+/*OPC One Page Checkout Prestashop*/
+	widgetStatusMoveOnLoadOpcps: function() {
+		let checked_carrier = $('input[id^="delivery_option_"]:checked').val()
+		if (typeof checked_carrier == 'undefined') {
+			return false;
+		}
+		//return false;
+		checked_carrier = checked_carrier.replace(',','');
+		$('.packetery-widget-status').each(function() {
+			var clone = $(this).clone();
+			var id_carrier = $(this).parent().parent().attr('data-carrier');
 
+			if (checked_carrier == id_carrier) {
+				if ($('input[id="delivery_option_'+id_carrier+'"]').parent().parent().parent().find('.packetery-widget-status').length == 0) {
+					$('input[id="delivery_option_'+id_carrier+'"]').parent().parent().parent().append(clone);
+				}
+			}
+			//$(this).remove();
+			$('.packetery_widget_popup_'+id_carrier+'_open').click(function() {
+				if($(this).find('.js-name option:selected').val() == 0) {
+					let $button = $(this).find('.confirmPacketeryDeliveryOption');
+					if ($button.hasClass('disabled') == false) {
+						$button.addClass('disabled');
+						$button.css("pointer-events", "none");
+					}
+				}
+			});
+			$clone = $('.packetery_widget_popup_'+id_carrier+'_open').parent();
+			if (checked_carrier == id_carrier) {
+				$clone.css('display', 'block');
+				if ($('.packetery_widget_popup_'+id_carrier+'_open:visible').attr('data-status') != 1) {
+					bindsw.continueSetDisabled();
+				}
+			}
+
+			var row_packetery_carrier_id = $('input[id="delivery_option_'+id_carrier+'"]').val();
+			if (typeof row_packetery_carrier_id == 'undefined') {
+				return true;
+			}
+
+			row_packetery_carrier_id = row_packetery_carrier_id.replace(',','');
+
+			if (checked_carrier == row_packetery_carrier_id) {
+				$clone.css('display', 'block');
+				if ($clone.find('.packetery_widget_popup_'+id_carrier+'_open').data('status') == 0) {
+					bindsw.continueSetDisabled();
+				} else {
+					bindsw.continueSetEnabled();
+				}
+			}
+			setTimeout(function() {
+				bindsw.checkContinueOpcps();
+			}, 500);
+		});
+
+	},
+
+	checkContinueOpcps: function() {
+		if ($('.packetery-widget-status a:visible').length > 0) {
+			if ($('.packetery-widget-status a:visible').data('status') == 1) {
+				bindsw.continueSetEnabled();
+			} else {
+				bindsw.continueSetDisabled();
+			}
+		}
+	},
+
+	onChangeContinueOpcps: function() {
+		$(document).on('cssClassChanged', 'button#btn_place_order', function() {
+			setTimeout(function() {
+				bindsw.checkContinueOpcps();
+			}, 1500);
+		});
+		$(document).on('change', '#btn_place_order', function() {
+			setTimeout(function() {
+				bindsw.checkContinueOpcps();
+			}, 1500);
+		});
+
+
+	},
+
+	opcBindsOpcps: function() {
+		bindsw.readAjaxFields();
+		// initialize each popup
+		$('.packetery-widget-status a').css('font-size', 12);
+		if ($('#js_packetery_carriers').length > 0) {
+			var line = $('#js_packetery_carriers').val();
+			var packetery_carriers = line.split(',');
+			var cnt = packetery_carriers.length;
+			for (var i = 0; i < cnt; i++) {
+				var id_carrier = packetery_carriers[i];
+				bindsw.bindCarrierPopupOpcps(id_carrier);
+			}
+		}
+		
+		$('input[name="id_carrier"]').change(function() {
+			var id_carrier = $(this).val();
+			id_carrier = id_carrier.replace(',', '');
+			$('.packetery-widget-status').css('display', 'none');
+			$next = $(this).parent().next().find('div');
+			if ($next.hasClass('packetery-widget-status') == true) {
+				$next.css('display', 'block');
+				if ($('#packetery_widget_popup_'+id_carrier).length > 0) {
+					if ($('#packetery_widget_popup_'+id_carrier).find('.js-name option:selected').val() == '0') {
+						$('#submit_easypay').addClass('disabled');
+					}
+				}
+			} else {
+				bindsw.continueSetEnabled();
+				return false;
+			}
+			bindsw.showCarrierPopup(id_carrier);
+		});
+	},
+	bindCarrierPopupOpcps: function(id_carrier) {
+		$('#packetery_widget_popup_'+id_carrier).popup({
+			scrolllock: true,
+			autoopen: false,
+			transition: 'all 0.3s',
+			blur: false
+		});
+		$('#packetery_widget_popup_'+id_carrier).css('display', 'block');
+		$popup_block = $('#packetery_widget_popup_'+id_carrier);
+		bindsw.bindPopupContinue();
+		bindsw.preCheckOneCountryPopupWidget($popup_block);
+	},
+	bindPopupContinueOpcps: function() {
+		$('.confirmPacketeryDeliveryOption').unbind();
+		$('.confirmPacketeryDeliveryOption').click(function() {
+			var name_branch = $(this).parentsUntil('.popup_content').find('.js-name option:selected').text();
+
+			var id_carrier = $(this).parentsUntil('.popup_content').parent().attr('data-carrier');
+			$selected_branch = $('#packetery_widget_popup_'+id_carrier).find('.js-name option:selected');
+
+			$('.packetery-widget-status a').text(widget_popup_lang_pac.please_choose_branch);
+			$('.packetery-widget-status a').data('status', '0');
+
+			$('div.carrier-extra-content.packetery_widget_wrapper:not([id="packetery_widget_popup_'+id_carrier+'"])').each(function() {
+				$block = $(this);
+				packetery.widgetClearField('city', $block);
+				packetery.widgetClearField('name', $block);
+				packetery.widgetDetailsClear($block);
+				bindsw.preCheckOneCountryPopupWidget($block);
+			});
+			$('a.packetery_widget_popup_'+id_carrier+'_open').text(name_branch);
+			$('a.packetery_widget_popup_'+id_carrier+'_open').data('status', '1');
+			bindsw.continueSetEnabled();
+		});
+	},
+/*END OPC One Page Checkout Prestashop*/
+
+/*OPC Knowband Supercheckout*/
 	widgetStatusMoveOnLoadSuper: function() {
 		$('.packetery-widget-status').each(function() {
 			var clone = $(this).clone();
@@ -210,6 +400,9 @@ bindsw = {
 /*CLASSIC*/
 	widgetStatusMoveOnLoadClassic: function() {
 		let checked_carrier = $('input[id^="delivery_option_"]:checked').val()
+		if (typeof checked_carrier == 'undefined') {
+			return false;
+		}
 		checked_carrier = checked_carrier.replace(',','');
 		$('.packetery-widget-status').each(function() {
 			var clone = $(this).clone();
@@ -286,9 +479,15 @@ bindsw = {
 		if ($('#submit_easypay').hasClass('disabled') == false) {
 			$('#submit_easypay').addClass('disabled');
 		}
+		if ($('#btn_place_order').hasClass('disabled') == false) {
+			$('#btn_place_order').addClass('disabled');
+			$('#btn_place_order').prop('disabled', true);
+		}
 	},
 	continueSetEnabled: function() {
 		$('#submit_easypay').removeClass('disabled');
+		$('#btn_place_order').removeClass('disabled');
+		$('#btn_place_order').prop('disabled', false);
 		if ($('.continue').hasClass('disabled') == true) {
 			$('.continue').removeClass('disabled');
 			$('.continue').css("pointer-events", "auto");
@@ -340,7 +539,10 @@ bindsw = {
 
 	preCheckOneCountryPopupWidget: function($popup_block) {
 		if ($popup_block.find('select.js-country option').length == 1) {
-			packetery.widgetGetCities($popup_block);
+			if ($popup_block.find('select.js-city option').length < 2) {
+				packetery.widgetGetCities($popup_block);
+			}
+
 		}
 	},
 
