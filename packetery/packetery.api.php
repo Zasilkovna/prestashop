@@ -408,6 +408,11 @@ class PacketeryApi
     public static function updateBranchList($apiPassword = false)
     {
         $api_key = self::getApiKey($apiPassword);
+            
+        if(empty($api_key)) {
+            return false;
+        }
+
         $branch_url = 'https://www.zasilkovna.cz/api/v3/'.$api_key.'/branch.xml';
         $branch_ad_url = 'https://www.zasilkovna.cz/api/v3/'.$api_key.'/branch.xml?type=address-delivery';
         $branches = self::parseBranches($branch_url, 0);
