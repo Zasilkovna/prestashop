@@ -283,6 +283,18 @@ class PacketeryApi
             $packetery_street = $address;
             $packetery_house_number = '';
 
+            /* MISSING $packetery_house_number FIX - START */
+            if (!$packetery_house_number) {
+                $geocode_result = self::geocodeAddress($address);
+                if (!empty($geocode_result['status']) && $geocode_result['status'] === 'OK') {
+                    $packetery_street = $geocode_result['houseStreet'];
+                    $packetery_house_number = $geocode_result['houseNumber'];
+                } else {
+                    var_export($geocode_result);
+                }
+            }
+            /* MISSING $packetery_house_number FIX - END */
+
             $packet_attributes['city'] = $packetery_ad_city;
             $packet_attributes['zip'] = $packetery_ad_zip;
             $packet_attributes['street'] = $packetery_street;
@@ -305,6 +317,34 @@ class PacketeryApi
             }
         }
     }
+    
+    public static function geocodeAddress($address, $key = '[Insert API key]') {
+        $address = urlencode($address);
+        $url = "https://maps.googleapis.com/maps/api/geocode/json?address={$address}&key={$key}";
+        $resp_json = file_get_contents($url);
+        $resp = json_decode($resp_json, true);
+        if (!empty($resp['status']) && $resp['status'] == 'OK') {
+            $houseNumberID = !empty($resp['results'][0]['address_components'][1]['long_name']) ?
+                $resp['results'][0]['address_components'][1]['long_name'] : false;
+            if ($houseNumberID) {
+                return array(
+                    'status' => 'OK',
+                    'houseStreet' => $resp['results'][0]['address_components'][1]['long_name'],
+                    'houseNumber' => ($houseNumberID ? $houseNumberID . '/' : '') . $resp['results'][0]['address_components'][0]['long_name'],
+                );
+            }
+            return array(
+                'status' => 'FAIL',
+                'error' => 'ADDRESS NOT FOUND',
+                'debug' => array(urldecode($address), $resp['results']),
+            );
+        }
+        return array(
+            'status' => 'FAIL',
+            'error' => $resp['status'],
+        );
+    }
+    
 
     public static function validatePacketSoap($packet_attributes, $apiPassword)
     {
