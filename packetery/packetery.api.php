@@ -329,7 +329,7 @@ class PacketeryApi
             if ($houseNumberID) {
                 return array(
                     'status' => 'OK',
-                    'houseStreet' => $resp['results'][0]['address_components'][1]['long_name'],
+                    'houseStreet' => $resp['results'][0]['address_components'][2]['long_name'],
                     'houseNumber' => ($houseNumberID ? $houseNumberID . '/' : '') . $resp['results'][0]['address_components'][0]['long_name'],
                 );
             }
