@@ -17,28 +17,25 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author    Eugene Zubkov <magrabota@gmail.com>
+*  @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-
-
 <div id="faq">
 	<br>
 	<p>{l s='First of all register at http://client.packeta.com/ and copypast API password to its field on module tab.' mod='packetery' }</p>
 	<p>{l s='All settings autosaves.' mod='packetery' }</p>
-	<p>{l s='To add new packetery carrier please click "+" button in top right corner of "PACKETERY CARRIERS" table' mod='packetery' }</p>
-	<p>{l s='Associate Packetery Address delivery services with prestashop carriers(if needed)' mod='packetery' }</p>
+	<p>{l s='To add new packetery carrier please click "+" button in top right corner of "PACKETERY CARRIERS" table.' mod='packetery' }</p>
+	{*<p>{l s='Associate Packetery Address delivery services with prestashop carriers(if needed)' mod='packetery' }</p>*}
 	<p>{l s='' mod='packetery' }</p>
-	<p>{l s='You can change carrier and payment COD setting by clicking on it' mod='packetery' }. {l s='All COD settings in tables is clickable.' mod='packetery' }</p>
-	
-	<p>{l s='Branch name in orders table is clickable.' mod='packetery' } {l s='So you can change branch after order placed.' mod='packetery' }</p>
-	<p>{l s='Branches autoupdating every night.' mod='packetery' }</p>
-	<p>{l s='Tab Branches total is autoupdating (you dont need to reload page).' mod='packetery' }</p>
-	<p>{l s='If you use multistore function eshop field autofills with current shop of your admin panel' mod='packetery' }</p>
-	<p>{l s='To export packets and create shiment choose Zasilkovna associated orders and click "Export selected orders and create shipment"' mod='packetery' }
-	<p>{l s='To print labels choose exported  Zasilkovna associated orders and click "Download pdf labels"' mod='packetery' }</p>
+	<p>{l s='You can change carrier and payment COD setting by clicking on it.' mod='packetery' } {l s='All COD settings in tables is clickable.' mod='packetery' }</p>
 
-	<p>{l s='Have a nice day' mod='packetery' }</p>
+	<p>{l s='You can force the widget to use a specific country and language by selecting a value for the "Fixed Country" and "Fixed Language" select boxes. If nothing is selected, the widget will use data from user address.' mod='packetery' }</p>
+
+	<p>{l s='To export data to a CSV file choose Zasilkovna associated orders and click "CSV Export".' mod='packetery' }
+	<p>{l s='To export packets and create shipment choose Zasilkovna associated orders and click "Export selected orders and create shipment".' mod='packetery' }
+	<p>{l s='To print labels choose exported  Zasilkovna associated orders and click "Download pdf labels".' mod='packetery' }</p>
+
+	<p>{l s='Have a nice day.' mod='packetery' }</p>
 </div>
 

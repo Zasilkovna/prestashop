@@ -17,7 +17,7 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author    Eugene Zubkov <magrabota@gmail.com>
+*  @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
@@ -35,14 +35,14 @@
 		</div>
 	</div>
 	<ps-tabs position="top">
-		<ps-tab title="{l s='Orders' mod='packetery'}" id="tab-orders" {if $active_tab_settings neq 1}active="true"{/if} icon="icon-AdminParentModules" >
+		<ps-tab title="{l s='Orders' mod='packetery'}" id="tab-orders" {if $active_tab eq 'orders' or not $active_tab}active="true"{/if} icon="icon-AdminParentModules" >
 		    {include file="./tab_orders.tpl"}
 		</ps-tab>
-		<ps-tab title="{l s='Settings' mod='packetery'}" id="tab-settings" {if $active_tab_settings eq 1}active="true"{/if} icon="icon-AdminParentModules" >
+		<ps-tab title="{l s='Settings' mod='packetery'}" id="tab-settings" {if $active_tab eq 'settings'}active="true"{/if} icon="icon-AdminParentModules" >
 		    {include file="./tab_settings.tpl"}
 		</ps-tab>
-		<ps-tab title="{l s='Branches' mod='packetery'}" id="tab-branch" >
-		    {include file="./tab_branch.tpl"}
+		<ps-tab title="{l s='Branch' mod='packetery'}" id="tab-branch" {if $active_tab eq 'branch'}active="true"{/if} icon="" >
+			{include file="./tab_branch.tpl"}
 		</ps-tab>
 	    <ps-tab title="{l s='FAQ' mod='packetery'}" id="faq">
 	        {include file="./tab_faq.tpl"}

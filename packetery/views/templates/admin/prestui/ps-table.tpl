@@ -70,7 +70,7 @@
 									<td if={ this.primary_action }>
 										<div class="btn-group-action">
 											<div class="btn-group pull-right">
-												<a href="{ this.base_action_url }&action={ this.primary_action.action }&{ this.identifier }={ row[this.identifier] }" title="{ this.primary_action.title }" class="edit btn btn-default">
+												<a href="{ this.base_action_url }&action={ this.primary_action.action }&{ this.identifier }={ row[this.identifier] }" title="{ this.primary_action.title }" class="{ this.primary_action.class } edit btn btn-default">
 													<i class="icon-{ this.primary_action.icon }"></i> { this.primary_action.title }
 												</a>
 												<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" if={ this.secondary_actions.length }>
@@ -78,7 +78,7 @@
 												</button>
 												<ul class="dropdown-menu" if={ this.secondary_actions.length }>
 													<li each={ elem, index in this.secondary_actions }>
-														<a href="{ this.base_action_url }&action={ elem.action }&{ this.identifier }={ row[this.identifier] }" title="{ elem.title }">
+														<a href="{ this.base_action_url }&action={ elem.action }&{ this.identifier }={ row[this.identifier] }" title="{ elem.title }" class="{ elem.class }">
 															<i class="icon-{ elem.icon }"></i> { elem.title }
 														</a>
 													</li>
@@ -156,12 +156,12 @@
 											</td>
 
 											<td class="right" style="white-space: nowrap;" if={ this.primary_action }>
-												<a href="{ this.base_action_url }&action={ this.primary_action.action }&{ this.identifier }={ row[this.identifier] }" title="{ this.primary_action.title }">
+												<a href="{ this.base_action_url }&action={ this.primary_action.action }&{ this.identifier }={ row[this.identifier] }" title="{ this.primary_action.title }" class="{ this.primary_action.class }">
 													<img src="{ this.primary_action.img }" alt="{ this.primary_action.title }" if={ !this.primary_action.fa }>
 													<i class="fa fa-{ this.primary_action.fa }" if={ this.primary_action.fa }></i>
 												</a>
 
-												<a each={ elem, index in this.secondary_actions } href="{ this.base_action_url }&action={ elem.action }&{ this.identifier }={ row[this.identifier] }" title="{ elem.title }">
+												<a each={ elem, index in this.secondary_actions } href="{ this.base_action_url }&action={ elem.action }&{ this.identifier }={ row[this.identifier] }" title="{ elem.title }" class="{ elem.class }>
 													<img src="{ elem.img }" alt="{ elem.title }" if={ !elem.fa }>
 													<i class="fa fa-{ elem.fa }" if={ elem.fa }></i>
 												</a>

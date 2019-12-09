@@ -17,11 +17,10 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author    Eugene Zubkov <magrabota@gmail.com>
+*  @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-
 <!--Branches count-->
 <label class="control-label col-lg-3" for="packetery-total-branches">
 	{l s='Total Branches' mod='packetery'}:

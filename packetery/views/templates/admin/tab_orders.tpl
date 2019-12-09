@@ -17,11 +17,10 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author    Eugene Zubkov <magrabota@gmail.com>
+*  @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-
 <!--Change Branch-->
 {include file="./order_branch_change.tpl"}
 <!--Change Branch-->
@@ -55,9 +54,13 @@
 	</div>
 
 	<input type="button" class="export_selected btn btn-default btn-block"
-		id="submit_export_orders" value="{l s='Export selected orders and create shipment' mod='packetery'}">
+		id="submit_export_orders" value="{l s='Send selected orders and create shipment' mod='packetery'}">
 
 	<input type="button" class="download_pdf btn btn-default btn-block"
 		id="submit_download_pdf" value="{l s='Download pdf labels' mod='packetery'}">
+	<small>{l s='You can download labels only for orders with tracking number (Sent by "Send selected orders" button)' mod='packetery'}</small>
 	<div class="pdf_link"></div>
+
+	<input type="button" class="export_selected_csv btn btn-default btn-block"
+		   id="submit_export_orders_csv" value="{l s='CSV Export' mod='packetery'}">
 </form>

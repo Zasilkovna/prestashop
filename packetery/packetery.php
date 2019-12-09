@@ -1,28 +1,27 @@
 <?php
 /**
-* 2017 Zlab Solutions
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author    Eugene Zubkov <magrabota@gmail.com>
-*  @copyright 2017 Zlab Solutions
-*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*/
-
+ * 2017 Zlab Solutions
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
+ *  @copyright 2017 Zlab Solutions
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -34,10 +33,15 @@ class Packetery extends CarrierModule
 {
     protected $config_form = false;
     public $widget_type = 1;
+
+    private $supported_countries_trans = array(); /* Used wherever countries with texts are needed */
+    private $supported_languages = array('cs', 'sk', 'pl', 'hu', 'ro', 'en');
+    private $supported_languages_trans = array(); /* Used wherever languages with texts are needed */
+
     public function __construct()
     {
         if (Packeteryclass::isModuleInstalled()) {
-            $this->widget_type = Packeteryclass::getConfigValueByOption('WIDGET_TYPE');
+            $this->widget_type = 1; //Packeteryclass::getConfigValueByOption('WIDGET_TYPE');
             $errors = array();
             $this->configurationErrors($errors);
             foreach ($errors as $error) {
@@ -49,15 +53,25 @@ class Packetery extends CarrierModule
 
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.0.3rc2';
-        $this->author = 'ZLab Solutions';
+        $this->version = '2.1.3';
+        $this->author = 'Packetery a.s.';
         $this->need_instance = 0;
 
         /**
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
          */
         $this->bootstrap = true;
-        $this->limited_countries = array('cz', 'sk', 'pl', 'hu', 'de', 'ro', 'ua');
+        $this->limited_countries = array('cz', 'sk', 'pl', 'hu', 'ro');
+
+        $this->supported_languages_trans = array(
+            'cs' => $this->l('Czech'),
+            'sk' => $this->l('Slovak'),
+            'hu' => $this->l('Hungarian'),
+            'pl' => $this->l('Polish'),
+            'ro' => $this->l('Romanian'),
+            'en' => $this->l('English'),
+        );
+
         parent::__construct();
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
         $desc = $this->l('Get your customers access to pick-up point in Packetery delivery network.');
@@ -65,6 +79,29 @@ class Packetery extends CarrierModule
 
         $this->displayName = $this->l('Packetery');
         $this->description = $this->l('Packetery pick-up points, orders export, and print shipping labels');
+
+        $this->supported_countries_trans = array(
+            [
+                "country" => "cz",
+                "name" => $this->l('Czech Republic')
+            ],
+            [
+                "country" => "hu",
+                "name" => $this->l('Hungary')
+            ],
+            [
+                "country" => "pl",
+                "name" => $this->l('Poland')
+            ],
+            [
+                "country" => "ro",
+                "name" => $this->l('Romania')
+            ],
+            [
+                "country" => "sk",
+                "name" => $this->l('Slovakia')
+            ],
+        );
             
         $this->ps_versions_compliancy = array('min' => '1.7.0.0', 'max' => _PS_VERSION_);
     }
@@ -99,7 +136,7 @@ class Packetery extends CarrierModule
                 $fields[] = $field['Field'];
             }
             $db->execute(
-                'INSERT INTO `' . _DB_PREFIX_ . 'packetery_order`(`' . implode('`, `', $fields) . '`)
+                'INSERT INTO `' . _DB_PREFIX_ . 'packetery_order`(`' . pSQL(implode('`, `', $fields)) . '`)
                 SELECT * FROM `' . _DB_PREFIX_ . 'packetery_order_old`'
             );
             $db->execute('DROP TABLE `' . _DB_PREFIX_ . 'packetery_order_old`');
@@ -203,17 +240,22 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('labels_format', $labels_format);
         $this->context->smarty->assign('widget_type', $this->widget_type);
 
+        $forceCountry = Packeteryclass::getConfigValueByOption('FORCE_COUNTRY');
+        $this->context->smarty->assign('force_country', $forceCountry);
+
+        $forceLanguage = Packeteryclass::getConfigValueByOption('FORCE_LANGUAGE');
+        $this->context->smarty->assign('force_language', $forceLanguage);
+
         $langs = Language::getLanguages();
         $this->context->smarty->assign('langs', $langs);
+
+        $this->context->smarty->assign('supported_countries', $this->supported_countries_trans);
+        $this->context->smarty->assign('supported_languages', $this->supported_languages_trans);
 
         $this->context->smarty->assign('module_dir', $this->_path);
         $id_employee = $this->context->employee->id;
         $settings = Packeteryclass::getConfig();
-        if ($settings[3][1] == '') {
-            $shop = new Shop(Context::getContext()->shop->id);
-            Packeteryclass::updateSetting(3, $shop->domain);
-            $settings[3][1] = $shop->domain;
-        }
+
         $this->context->smarty->assign(array('ps_version'=> _PS_VERSION_));
         $this->context->smarty->assign(array('check_e'=> $id_employee));
 
@@ -224,11 +266,8 @@ class Packetery extends CarrierModule
 
         /*ORDERS*/
         $active_tab = Tools::getValue('active_tab');
-        if ($active_tab == 'settings') {
-            $this->context->smarty->assign('active_tab_settings', 1);
-        } else {
-            $this->context->smarty->assign('active_tab_settings', 0);
-        }
+        $this->context->smarty->assign('active_tab', $active_tab);
+
         $packetery_orders_array = Packeteryclass::getListOrders();
         $packetery_orders = $packetery_orders_array[0];
         $packetery_orders_pages = $packetery_orders_array[1];
@@ -335,10 +374,10 @@ class Packetery extends CarrierModule
         /*BRANCHES*/
         $total_branches = PacketeryApi::countBranches();
         $last_branches_update = '';
-        if ($settings[5][1] != '') {
+        if ($settings[4][1] != '') {
             $date = new DateTime();
-            $date->setTimestamp($settings[5][1]);
-            $last_branches_update = $date->format('Y-m-d H:i:s');
+            $date->setTimestamp($settings[4][1]);
+            $last_branches_update = $date->format('d.m.Y H:i:s');
         }
         $this->context->smarty->assign(
             array('total_branches' => $total_branches, 'last_branches_update' => $last_branches_update)
@@ -381,7 +420,8 @@ class Packetery extends CarrierModule
             $this->context->controller->addjquery();
             $this->context->controller->addJS('https://cdn.jsdelivr.net/riot/2.4.1/riot+compiler.min.js');
             $this->context->controller->addJS($this->_path.'views/js/back.js');
-            $this->context->controller->addJS($this->_path.'views/js/widget.js');
+//            $this->context->controller->addJS($this->_path.'views/js/widget.js');
+            $this->context->controller->addJS($this->_path.'views/js/widget_bo.js');
             $this->context->controller->addCSS($this->_path.'views/css/back.css');
             $this->context->controller->addJS($this->_path.'views/js/notify.js');
             $this->context->controller->addJS($this->_path.'views/js/jquery.popupoverlay.js');
@@ -400,7 +440,6 @@ class Packetery extends CarrierModule
         );
     }
 
-
     public function getOrderShippingCost($params, $shipping_cost)
     {
         if (Context::getContext()->customer->logged == true) {
@@ -409,76 +448,19 @@ class Packetery extends CarrierModule
         return $shipping_cost;
     }
 
-    public function getOrderShippingCostExternal($params)
+    /**
+     * Abstract method from CarrierModule - must be declared just for the sake of it
+     * It doesn't do anything, so just return 0 so the shipping price doesn't change.
+     */
+    public function getOrderShippingCostExternal($cart)
     {
-        return true;
-    }
-
-    protected function addCarrier()
-    {
-        $carrier = new Carrier();
-        $carrier->name = $this->l('Zasilkovna');
-        $carrier->is_module = true;
-        $carrier->active = 1;
-        $carrier->range_behavior = 1;
-        $carrier->need_range = 1;
-        $carrier->shipping_external = false;
-        $carrier->range_behavior = 0;
-        $carrier->external_module_name = $this->name;
-        $carrier->shipping_method = 2;
-
-        foreach (Language::getLanguages() as $lang) {
-            $carrier->delay[$lang['id_lang']] = $this->l('Packetery super fast delivery');
-        }
-
-        if ($carrier->add() == true) {
-            @copy(dirname(__FILE__).'/views/img/carrier_image.png', _PS_SHIP_IMG_DIR_.'/'.(int)$carrier->id.'.png');
-            Configuration::updateValue('PACKETERY_CARRIER_ID', (int)$carrier->id);
-            return $carrier;
-        }
-
-        return false;
-    }
-
-    protected function addGroups($carrier)
-    {
-        $groups_ids = array();
-        $groups = Group::getGroups(Context::getContext()->language->id);
-        foreach ($groups as $group) {
-            $groups_ids[] = $group['id_group'];
-        }
-
-        $carrier->setGroups($groups_ids);
-    }
-
-    protected function addRanges($carrier)
-    {
-        $range_price = new RangePrice();
-        $range_price->id_carrier = $carrier->id;
-        $range_price->delimiter1 = '0';
-        $range_price->delimiter2 = '10000';
-        $range_price->add();
-
-        $range_weight = new RangeWeight();
-        $range_weight->id_carrier = $carrier->id;
-        $range_weight->delimiter1 = '0';
-        $range_weight->delimiter2 = '10000';
-        $range_weight->add();
-    }
-
-    protected function addZones($carrier)
-    {
-        $zones = Zone::getZones();
-
-        foreach ($zones as $zone) {
-            $carrier->addZone($zone['id_zone']);
-        }
+        return 0;
     }
 
     public function displayCarrierExtraContentPrototypeOPC($id_carrier, $id_cart)
     {
         $this->context->smarty->assign('id_carrier', $id_carrier);
-        $countries = PacketeryApi::getCountriesList($id_carrier);
+        $countries = $this->getCountriesList($id_carrier);
         $this->context->smarty->assign('countries', $countries);
         $countries_count = count($countries);
         $this->context->smarty->assign('countries_count', $countries_count);
@@ -500,6 +482,12 @@ class Packetery extends CarrierModule
     /*WIDGET FO*/
 
     /*WIDGET FO for OPC*/
+    /**
+     * * Fixes to make it work with easypay module | TODO: does it work? delete?
+     * @return string
+     * @throws PrestaShopDatabaseException
+     * @throws SmartyException
+     */
     public function hookDisplayFooter()
     {
         if (($this->widget_type == 0) && (Module::isEnabled('easypay') == true)) {
@@ -551,6 +539,12 @@ class Packetery extends CarrierModule
         }
     }
 
+    /**
+     * Normal BO widget
+     * @param $params
+     * @return string
+     * @throws PrestaShopDatabaseException
+     */
     public function hookDisplayBeforeCarrier($params)
     {
         if (!Module::isEnabled('easypay')) {
@@ -592,24 +586,37 @@ class Packetery extends CarrierModule
                     $this->context->smarty->assign('choosed_carrier', $params['cart']->id_carrier);
                     $this->context->smarty->assign('widget_type', 0);
 
-                    $output_vars = $this->context->smarty->fetch(
-                        $this->local_path.'views/templates/front/widget_popup_vars.tpl'
-                    );
                 } else {
                     return '';
                 }
-                return $output_vars.$output;
+                return $output;
             }
         }
     }
     /*END WIDGET FO for OPC*/
 
+    /**
+     * Display widget selection button and chosen branch info for every carrier
+     * @param $params
+     * @return string
+     * @throws PrestaShopDatabaseException
+     * @throws SmartyException
+     */
     public function hookDisplayCarrierExtraContent($params)
     {
+        global $language;
         $this->context->smarty->assign('widget_type', $this->widget_type);
 
         if ($this->widget_type == 1) {
             $id_carrier = $params['carrier']['id'];
+
+            $carrierCountries = [];
+            foreach (Packeteryclass::getCarriersList() as $carrier)
+            {
+                $carrierCountries[$carrier['id_carrier']] = $carrier['country'];
+            }
+            $carrierCountriesJson = json_encode($carrierCountries);
+
             $this->context->smarty->assign('widget_carrier', $id_carrier);
             /*FIELDS FOR AJAX*/
             $ajaxfields = array(
@@ -625,15 +632,57 @@ class Packetery extends CarrierModule
                 'please_choose_branch' => $this->l('Please choose delivery branch')
                 );
             $ajaxfields_json = json_encode($ajaxfields);
+
+            $name_branch = "";
+            $currency_branch = "";
+            $id_branch = "";
+            if(!empty($params['cart']))
+            {
+                $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
+                if (!empty($row['id_branch']))
+                {
+                    $id_branch = $row['id_branch'];
+                }
+                if (!empty($row['name_branch']))
+                {
+                    $name_branch = $row['name_branch'];
+                }
+                if (!empty($row['currency_branch']))
+                {
+                    $currency_branch = $row['currency_branch'];
+                }
+            }
+
+            if(isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery))
+            {
+                $address = new AddressCore($params['cart']->id_address_delivery);
+
+                $countryObj = new CountryCore($address->id_country);
+                $this->context->smarty->assign('customer_country', strtolower($countryObj->iso_code));
+            }
+
+            $this->context->smarty->assign('module_version', $this->version);
+            $this->context->smarty->assign('allowed_countries', json_encode($this->limited_countries));
+            $this->context->smarty->assign('carrier_countries', $carrierCountriesJson);
+            $this->context->smarty->assign('id_branch', $id_branch);
+            $this->context->smarty->assign('name_branch', $name_branch);
+            $this->context->smarty->assign('currency_branch', $currency_branch);
+
             $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
-            /*END FIELDS FOR AJAX*/
+
+            $this->context->smarty->assign('force_country', Packeteryclass::getConfigValueByOption('FORCE_COUNTRY'));
+            $this->context->smarty->assign('force_language', Packeteryclass::getConfigValueByOption('FORCE_LANGUAGE'));
 
             $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
             $this->context->smarty->assign('baseuri', $base_uri);
-            $countries = PacketeryApi::getCountriesList($id_carrier);
+            $countries = $this->getCountriesList($id_carrier);
             $this->context->smarty->assign('countries', $countries);
             $countries_count = count($countries);
             $this->context->smarty->assign('countries_count', $countries_count);
+			$this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
+			$this->context->smarty->assign('language', (array)$language);
+            /*END FIELDS FOR AJAX*/
+
             $output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget.tpl');
             return $output;
         } else {
@@ -643,6 +692,9 @@ class Packetery extends CarrierModule
     /*END WIDGET FO*/
 
     /*WIDGET BO*/
+    /**
+     * Ajax fields for back office
+     */
     public function hookDisplayWidget()
     {
         /*FIELDS FOR AJAX*/
@@ -662,7 +714,9 @@ class Packetery extends CarrierModule
             'success_download_branches' => $this->l('Branches successfuly updated.'),
             'reload5sec' => $this->l('Page will be reloaded in 5 seconds...'),
             'try_download_branches' => $this->l('Trying to download branches. Please wait for download process end...'),
+            'confirm_tracking_exists' => $this->l('Tracking numbers of some selected orders already exist and will be rewritten by new ones. Do you want to continue?'),
             'err_no_branch' => $this->l('Please select destination branch for order(s) - '),
+            'error_export_unknown' => $this->l('There was an error trying to update branch list, check if your API password is correct and try again.'),
             'error_export' => $this->l('not exported. Error: '),
             'err_country' => $this->l('Please select country'),
             'api_wrong' => $this->l('Api password is wrong. Branches will not be updated.'),
@@ -677,28 +731,37 @@ class Packetery extends CarrierModule
         $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
         $this->context->smarty->assign('baseuri', $base_uri);
 
-        $countries = PacketeryApi::getCountriesList();
+        $countries = $this->getCountriesList();
         $countries_count = count($countries);
         $this->context->smarty->assign('countries', $countries);
         $this->context->smarty->assign('countries_count', $countries_count);
     }
     /*END WIDGET BO*/
 
+    /**
+     * Link js and css files
+     */
     public function hookDisplayHeader()
     {
-        PacketeryApi::updateBranchCron();
         $this->context->controller->addJS($this->_path.'views/js/jquery.popupoverlay.js');
         $this->context->controller->addJS($this->_path.'/views/js/front.js');
-        if ($this->widget_type != 1) {
-            $this->context->controller->addJS($this->_path.'views/js/widget_popup.js');
-        }
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
     }
 
     /*ORDERS*/
+    /**
+     * Save packetery order after order is created
+     * @param $params
+     */
     public function hookActionOrderHistoryAddAfter($params)
     {
         Packeteryclass::hookNewOrder($params);
     }
     /*END ORDERS*/
+
+    /*WIDGET*/
+    public function getCountriesList($id_carrier = false)
+    {
+        return $this->supported_countries_trans;
+    }
 }

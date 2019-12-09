@@ -17,11 +17,10 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author    Eugene Zubkov <magrabota@gmail.com>
+*  @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-
 <div id="add-packetery-carrier-block" class="bootstrap">
 
 	<div class="panel">
@@ -49,8 +48,8 @@
 			{l s='Countries:' mod='packetery'}
 		</label>
 		<select name="packetery_carrier_country" id="packetery_carrier_country" data-id="3" multiple="">
-			{foreach  from=$countries item=c}
-				<option value="{$c['country']|escape:'htmlall':'UTF-8'}">{$c.name|escape:'htmlall':'UTF-8'}</option>			
+			{foreach from=$supported_countries item=c}
+				<option value="{$c['country']|escape:'htmlall':'UTF-8'}">{$c.name|escape:'htmlall':'UTF-8'}</option>
 			{/foreach}
 		</select>
 		<br>
@@ -67,7 +66,7 @@
 
 		<label class="control-label col-lg-3" for="action_buttons_pc">
 		</label>
-		new-button-container
+
 		<div class="action_buttons_pc" id="action_buttons_pc" name="action_buttons_pc">
 			<input type="button" class="btn btn-default btn-block"
 				id="submit_new_packetery_carrier" value="{l s='Save' mod='packetery'}">
