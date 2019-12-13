@@ -1,4 +1,4 @@
-# Modul pro PrestaShop
+# Modul pro PrestaShop 1.7
 
 ### Obsah:
 *   [Informace o modulu](https://github.com/Zasilkovna/prestashop#informace-o-modulu)
