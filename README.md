@@ -1,19 +1,10 @@
 # Modul pro PrestaShop 1.7
 
-### Obsah:
-*   [Informace o modulu](https://github.com/Zasilkovna/prestashop#informace-o-modulu)
-*   [Stažení modulu](https://github.com/Zasilkovna/prestashop#sta%C5%BEen%C3%AD-modulu)
-*   [Instalace modulu](https://github.com/Zasilkovna/prestashop#instalace-modulu)
-*   [Nastavení dopravce doručení na adresu](https://github.com/Zasilkovna/prestashop#nastaven%C3%AD-dopravce-doru%C4%8Den%C3%AD-na-adresu)
-
-### Informace o modulu
-TODO
-
 ### Stažení modulu
-[Aktuální verze (Stáhnout »)](https://github.com/Zasilkovna/prestashop/raw/master/releases/prestashop-1.7-packetery-2.1.3.zip)
+[Aktuální verze 2.1.3 (Stáhnout »)](https://github.com/Zasilkovna/prestashop/raw/master/releases/prestashop-1.7-packetery-2.1.3.zip)
 
-### Instalace modulu
-1. Přihlašte se do administrace PrestaShopu, klikněte na záložku "Moduly":
+### Instalace 
+1. Přihlašte se do administrace PrestaShopu, klikněte na záložku "Moduly -> Module Manager".:
 
 ![screen1](https://github.com/Zasilkovna/prestashop/blob/master/doc/img/1-moduly-75%25.png)
 
@@ -21,33 +12,64 @@ TODO
 
 ![screen2](https://github.com/Zasilkovna/prestashop/blob/master/doc/img/2-nahratmodul-75%25.png)
 
-3. Do nově otevřeného okna přetáhněte stažený soubor modulu nebo klikněte na "vyberte soubor" a najděte cestu ke staženému souboru modulu:
+3. Klikněte na "vybrat soubor" a najděte cestu ke staženému souboru modulu:
 
 ![screen3](https://github.com/Zasilkovna/prestashop/blob/master/doc/img/3-nahrat-75%25.png)
 
-4. Po úspěšné instalaci vstupte do konfigurace modulu kliknutím na "Konfigurace":
+### Konfigurace
+
+Po úspěšné instalaci klikněte v hlavním menu na záložku "Objednávky -> Zásilkovna Orders" a vyberte záložku "Nastavení":
 
 ![screen4](https://github.com/Zasilkovna/prestashop/blob/master/doc/img/4-success-75%25.png)
 
-5. V konfiguraci modulu přejděte do záložky "Nastavení":
+#### Nastavení modulu
 
-![screen5](https://github.com/Zasilkovna/prestashop/blob/master/doc/img/5-nastaveni-75%25.png)
+Veškerá nastavení se ukládají automaticky, vždy po opuštění editovaného údaje.
+V případě, že nemáte uživatelský účet na stránkách Zásilkovny, je možné v rámci testování funkcionality modulu či podávání zásilek požádat o testovací účet na mailu Zákaznického servisu: <info@zasilkovna.cz>:
 
-6. V sekci "Nastavení" je nutné zadat heslo API. Vaše heslo API najdete v klientské sekci, v záložce [Můj účet (Přejít »)](http://www.zasilkovna.cz/muj-ucet). V případě, že nemáte uživatelský účet na stránkách Zásilkovny, je možné v rámci testování funkcionality modulu či podávání zásilek požádat o testovací účet na mailu Zákaznického servisu: <info@zasilkovna.cz>:
+ - **Klíč API**  - váš klíč API naleznete v [klientské sekci Zásilkovny](https://client.packeta.com/cs/support/) v části **Klientská podpora**
+ - **Označení odesílatele** - označení odesílatele které máte nastaveno v [klientské sekci](https://client.packeta.com/cs/senders/) v seznamu odesílatelů
+ - **Vynutit zemi** - vyberte země, které se budou nabízet v košíku eshopu při výběru výdejního místa Zásilkovny. Výběr provedete tak, že stisknete 
+ klávesu *Ctrl* + levým tlačítkem myši vyberete požadovanou zemi.  Můžete vybrat více zemí zároveň.  Stejným způsobem zemi odeberete. Jestliže 
+ nevyberete žádnou zemi, budou se nabízet automaticky všechny podporované země.
+ - **Vynutit jazyk** - Jazyk widgetu pro výběr výdejních míst se nastavuje podle aktuálně zvolené jazykové mutace eshopu.  Pokud nastavíte vynucený jazyk,  
+ nastaví se tento jazyk ve widgetu vždy, bez ohledu na nastavenou jazykovou mutaci eshopu.
 
-![screen6](https://github.com/Zasilkovna/prestashop/blob/master/doc/img/6-hesloAPI-75%25.png)
+#### Způsoby dopravy
 
-7. Následujícím krokem je vytvoření způsobu dopravy, který provedete kliknutím na symbol "+" v tabulce "Přidání způsobu dopravy":
+ - Vytvoření nového způsobu dopravy provedete kliknutím na symbol "+" v tabulce "Přidání způsobu dopravy".
+ - Otevře se vyskakovací okno, vlastnosti způsobu dopravy nastavte dle Vašich požadavků. Vybrat více zemí je možné 
+ přidržením tlačítka "Ctrl" a kliknutím na jednotlivé požadované země
+ - Způsob dopravy uložte a zkontrolujte správně vytvořený způsob dopravy
+ - pro smazání způsobu dopravy klikněte na tlačítko "odstranit" 
+ - pokud se jedná o způsob dopravy na dobírku klikněte ve sloupci "Je na dobírku" na červený křížek, který se změní 
+ na zelené zatržítko. 
 
-![screen7](https://github.com/Zasilkovna/prestashop/blob/master/doc/img/7-dopravce-75%25.png)
+#### Způsoby platby
+ - U každého způsobu platby můžete nastavit zda se jedná o platbu.  
+ - Pokud se jedná o platební metodu na dobírku ve sloupci "Je na dobírku" klikněte na červený křížek, 
+ který se automaticky změní na zelené zatržítko.
+  
+#### Seznam dopravců doručení na adresu
+Modul podporuje doručení na adresu přes Zásilkovnu prostřednictvím externích dopravců. Ke každému dopravci můžete 
+přiřadit externího dopravce Zásilkovny a ve sloupci "Je na dobírku" zvolíte, zda se jedná o přepravu na dobírku.
 
-8. Otevře se vyskakovací okno, vlastnosti způsobu dopravy nastavte dle Vašich požadavků. Vybrat více zemí je možné přidržením tlačítka "Ctrl" a kliknutím na jednotlivé požadované země:
+### Výdejní místa
+V záložce výdejní místa naleznete informace o poslední aktualizaci seznamu poboček:
+ - celkový počet poboček
+ - datum a čas poslední aktualizace
 
-![screen8](https://github.com/Zasilkovna/prestashop/blob/master/doc/img/8-dopravapopup-75%25.png)
+Pobočky se aktualizují automatický.  Pro ruční aktualizaci seznamu poboček klikněte na tlačítko "Aktualizace poboček".
 
-9. Způsob dopravy uložte, stránka se automaticky přesměruje zpět na úvodní stránku modulu, v záložce "Nastavení" zkontrolujte správně vytvořený způsob dopravy:
-
-![screen9](https://github.com/Zasilkovna/prestashop/blob/master/doc/img/9-done-75%25.png)
-
-### Nastavení dopravce doručení na adresu
-TODO
+### Objednávky
+V záložce "objednávky" naleznete seznam všech objednávek u kterých byla vybrán způsob dopravy přes Zásilkovnu.
+ - U každé zásilky můžete:
+    - Ve sloupci "Je na dobírku" nastavit/zrušit odeslání na dobírku.
+    - Kliknutím na cílové výdejní místo se otevře okno , kde můžete změnit výdejní míst, kam bude zásilka doručena.  
+ - Označené objednávky můžete kliknutím na tlačítko "CSV export" uložit do csv souboru, který poté nahrajete 
+ do klientské sekce » Import zásilek.
+ - Modul podporuje také automatické odesílání dat k zásilkám.  Označené objednávky odešlete automaticky kliknutím 
+ na tlačítko "Podat vybrané zásilky."  Po úspěšném odeslání se u zásilky doplní její trasovací číslo.  
+ Kliknutím na trasovací číslo se otevře stránka sledování zásilky.
+ - U zásilek které byly podány přes automatické odeslání a mají vyplněné trasovací číslo můžete 
+ vytisknout štítky ve formátu pdf.  Objednávky označte a klikněte na tlačítko "Stažení štítků ve formátu .PDF".
