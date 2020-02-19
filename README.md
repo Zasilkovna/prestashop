@@ -73,3 +73,24 @@ V záložce "objednávky" naleznete seznam všech objednávek u kterých byla vy
  Kliknutím na trasovací číslo se otevře stránka sledování zásilky.
  - U zásilek které byly podány přes automatické odeslání a mají vyplněné trasovací číslo můžete 
  vytisknout štítky ve formátu pdf.  Objednávky označte a klikněte na tlačítko "Stažení štítků ve formátu .PDF".
+ 
+  ## Informace o modulu
+  
+  **Podporované jazyky:**
+  - čeština
+  - angličtina
+  
+  #### Podporovaná verze
+  - PrestaShop verze 1.7.x
+  - Při problému s použitím modulu nás kontaktujte na adrese technicka.podpora@zasilkovna.cz
+  
+  #### Poskytované funkce
+  - Integrace widgetu pro výběr výdejních míst v košíku eshopu
+  - Doručení na adresu přes externí dopravce Zásilkovny
+  - Automatický export zásilek do systému Zásilkovny
+  - Export zásilek do csv souboru, který lze importovat v [klientské sekci](https://client.packeta.com/).
+  
+  ### Omezení
+  - modul v současné době nepodporuje multistore
+  - modul je určen pouze pro výchozí košíky PrestaShopu.  Pokud používáte nějaký one page checkout modul košíku třetí strany,  modul nemusí správně
+  fungovat.
