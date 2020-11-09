@@ -515,34 +515,38 @@ class PacketeryApi
     {
         ignore_user_abort(true);
         $module = new Packetery();
-        if ($response = Tools::file_get_contents($branch_url))
-        {
-            if (Tools::strpos($response, 'invalid API key') == false)
-            {
-                self::dropBranchList();
-                $xml = simplexml_load_string($response);
-                $i = 0;
-                foreach ($xml->branches->branch as $branch)
-                {
-                    self::addBranch($branch);
-                    $i++;
-                }
-                foreach ($xml->carriers->carrier as $carrier)
-                {
-                    self::addCarrier($carrier);
-                    $i++;
-                }
-                return false;
-            }
-            else
-            {
-                return $module->l('Invalid API key');
-            }
-        }
-        else
-        {
-            return $module->l('Cant download branches list. Network error');
-        }
+
+		// changed timeout from default 5 to 30 secs, and try fopen fallback if cUrl fails
+		try {
+			$response = Tools::file_get_contents($branch_url, false, NULL, 30, true);
+		}
+		catch (\Exception $e) {
+			return $module->l($e->getMessage());
+		}
+
+        if (! $response) {
+			return $module->l('Cant download branches list. Network error');
+		}
+
+		if (Tools::strpos($response, 'invalid API key') !== false) {
+			return $module->l('Invalid API key');
+		}
+
+		self::dropBranchList();
+		$xml = simplexml_load_string($response);
+		$i = 0;
+		foreach ($xml->branches->branch as $branch)
+		{
+			self::addBranch($branch);
+			$i++;
+		}
+		foreach ($xml->carriers->carrier as $carrier)
+		{
+			self::addCarrier($carrier);
+			$i++;
+		}
+
+		return false;
     }
 
     public static function getBranches($is_full = false)
