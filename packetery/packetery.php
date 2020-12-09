@@ -659,6 +659,8 @@ class Packetery extends CarrierModule
 
                 $countryObj = new CountryCore($address->id_country);
                 $this->context->smarty->assign('customer_country', strtolower($countryObj->iso_code));
+            } else {
+                $this->context->smarty->assign('customer_country', null);
             }
 
             $this->context->smarty->assign('module_version', $this->version);
