@@ -31,17 +31,6 @@ require_once(dirname(__FILE__) . '/packetery.php');
 
 class Packeteryclass
 {
-    /**
-     * Check if module is installed by checking if packetery_settings table exists
-     * @return array|false|mysqli_result|null|PDOStatement|resource
-     * @throws PrestaShopDatabaseException
-     */
-    public static function isModuleInstalled()
-    {
-        $sql = "SHOW TABLES LIKE '" . _DB_PREFIX_ . "packetery_settings'";
-        $result = Db::getInstance()->executeS($sql);
-        return $result;
-    }
 
     /**
      * Returns branch by ID
@@ -161,20 +150,6 @@ class Packeteryclass
 
         $orders = Db::getInstance()->getRow($sql);
 
-        return $orders;
-    }
-
-    /**
-     * Return packetery order by cart ID
-     * @param $id_cart
-     * @return array|bool|null|object
-     */
-    public static function getPacketeryOrderRowByCart($id_cart)
-    {
-        $sql = 'SELECT po.*
-                    FROM `' . _DB_PREFIX_ . 'packetery_order` po
-                    WHERE po.id_cart = ' . (int)$id_cart;
-        $orders = Db::getInstance()->getRow($sql);
         return $orders;
     }
 
@@ -979,30 +954,20 @@ class Packeteryclass
      */
     public static function getListPayments()
     {
-        $sql = 'SELECT DISTINCT m.name, pp.is_cod
-            FROM `' . _DB_PREFIX_ . 'module` m
-            LEFT JOIN `' . _DB_PREFIX_ . 'hook_module` hm ON hm.id_module = m.id_module
-            LEFT JOIN `' . _DB_PREFIX_ . 'hook` h ON hm.id_hook = h.id_hook
-            LEFT JOIN `' . _DB_PREFIX_ . 'packetery_payment` pp ON pp.module_name = m.name
-            WHERE h.name IN ("payment", "displayPayment", "displayPaymentReturn")
-                AND m.active=1';
-        $result = Db::getInstance()->executeS($sql);
-        $payments = array();
-        foreach ($result as $module)
-        {
-            $instance = Module::getInstanceByName($module['name']);
-            $name = $instance->displayName;
-            if ((isset($module['is_cod'])) && ($module['is_cod']))
-            {
-                $is_cod = 1;
-            }
-            else
-            {
-                $is_cod = 0;
-            }
-            $payments[] = array('name' => $name, 'is_cod' => $is_cod, 'module_name' => $module['name']);
-        }
-        return $payments;
+    	$installedPaymentModules = PaymentModule::getInstalledPaymentModules();
+		$sql = 'SELECT DISTINCT `module_name`, `is_cod`
+            FROM `' . _DB_PREFIX_ . 'packetery_payment`';
+
+		$results = Db::getInstance()->executeS($sql);
+		$paymentModules = array_column($results, 'is_cod', 'module_name');
+
+		$payments = [];
+		foreach ($installedPaymentModules as $installedPaymentModule) {
+			$instance = Module::getInstanceByName($installedPaymentModule['name']);
+			$is_cod = (array_key_exists($installedPaymentModule['name'], $paymentModules) ? (int)$paymentModules[$installedPaymentModule['name']] : 0);
+			$payments[] = ['name' => $instance->displayName , 'is_cod' => $is_cod, 'module_name' => $installedPaymentModule['name']];
+		}
+		return $payments;
     }
 
     /**

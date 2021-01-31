@@ -23,7 +23,6 @@
 *}
 <input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="ajaxfields" id="ajaxfields" value="{$ajaxfields|escape:'htmlall':'UTF-8'}">
-<input type="hidden" name="widget_type" id="widget_type" value="{$widget_type|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="widget_carrier" id="widget_carrier" value="{$widget_carrier|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="widget_force_country" id="widget_force_country"
        value="{$force_country|escape:'htmlall':'UTF-8'}">
@@ -58,24 +57,9 @@
             </div>
         </div>
     </div>
-    <div class="widget-right">
-        <div class="branch-foto">
-        </div>
-    </div>
 
-    <div style="clear:both;margin:10px;"></div>
-
-    <div class="branch_details">
-        <div class="widget-left">
-            <div class="col-md-6">
-                <div>
-                    <div class="widget_block_title"><strong>{l s='Opening Hours:' mod='packetery'}</strong></div>
-                    <div class="pack-details-opening">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <div style="clear:both;"></div>
     <div style="margin: 25px;"></div>
 </div>
+
+<div class="packetery-message-pickup-point-not-selected-error" data-content="{l s='Please select a pick up point before confirming your order' mod='packetery'}"></div>

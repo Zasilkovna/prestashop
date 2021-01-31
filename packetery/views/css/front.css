@@ -74,18 +74,6 @@
 	padding: 0;
 }
 
-.widget_block_title{
-	display:none;
-}
-
-.branch-details p{
-	margin-bottom: 0rem;
-}
-
-#packetery-widget{
-	margin-bottom: 3	0px;
-}
-
 .packetery-widget-close {
 	position: absolute;
 	right: 5px;
@@ -101,18 +89,9 @@
 	width: 100%;
 }
 
-.branch_details{
-	margin-top: 30px;
-	margin-bottom: 30px;
-}
 .widget-left{
 	float:left;
 	width: 100%;
 }
 
-.branch-foto img{
-	max-height: 100%;
-	max-width: 100%;
-	object-fit: contain;
-}
 /*END WIDGET*/

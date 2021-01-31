@@ -3,7 +3,7 @@
 # Module for PrestaShop 1.7
 
 ### Download link
-[Download version 2.1.3](https://github.com/Zasilkovna/prestashop/raw/master/releases/prestashop-1.7-packetery-2.1.3.zip)
+[Download the latest version](https://github.com/Zasilkovna/prestashop/releases/latest)
 
 ### Installation
 1. Log in to the PrestaShop administration, click on the "Modules -> Module Manager" tab:
@@ -67,7 +67,7 @@ print labels in pdf format. Mark orders and click on **Download labels in .PDF f
 - english
 #### Supported versions
 - PrestaShop version 1.7.x
-- If you have problems using the module, please contact us at [support@packeta.com](mailto:suppor@packeta.com)
+- If you have problems using the module, please contact us at [support@packeta.com](mailto:support@packeta.com)
 
 #### Supported functions 
 - Integration of widget for pickup points selections in the eshop cart
@@ -83,7 +83,7 @@ the module may not work properly.
 # Modul pro PrestaShop 1.7
 
 ### Stažení modulu
-[Aktuální verze 2.1.3 (Stáhnout »)](https://github.com/Zasilkovna/prestashop/raw/master/releases/prestashop-1.7-packetery-2.1.3.zip)
+[Aktuální verze (Stáhnout »)](https://github.com/Zasilkovna/prestashop/releases/latest)
 
 ### Instalace 
 1. Přihlašte se do administrace PrestaShopu, klikněte na záložku "Moduly -> Module Manager".:
@@ -175,5 +175,4 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
   ### Omezení
   - modul v současné době nepodporuje multistore
   - modul je určen pouze pro výchozí košíky PrestaShopu.  Pokud používáte nějaký one page checkout modul košíku třetí 
-  strany,  modul nemusí správně
-  fungovat.
+  strany,  modul nemusí správně fungovat.

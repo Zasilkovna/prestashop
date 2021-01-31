@@ -24,3 +24,9 @@
 2.1.1 - Bugfixes
 2.1.2 - Bugfixes & Code revision
 2.1.3 - Customer Name & Surname taken from delivery address instead of the customer themself
+2.1.4 - Fixed: Import branches from the feed - changed timeout from default 5 to 30 secs, and try fopen fallback if cUrl fails
+	  - Fixed: Display an error message if SOAP is disabled
+	  - Deleted unused files and code
+	  - Refactored front.js
+	  - Added: Generic support framework for third-party OPC modules
+	  - Fixed: getListPayments() - compatibility with PS 1.7.7
