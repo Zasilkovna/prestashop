@@ -2,7 +2,7 @@
 <module>
     <name>packetery</name>
     <displayName><![CDATA[Z&aacute;silkovna]]></displayName>
-    <version><![CDATA[2.1.3]]></version>
+    <version><![CDATA[2.1.4]]></version>
     <description><![CDATA[Vyzved&aacute;vac&iacute; body Packetery, export objedn&aacute;vek a tisk &scaron;t&iacute;tků pro přepravu]]></description>
     <author><![CDATA[Packetery a.s.]]></author>
     <tab><![CDATA[shipping_logistics]]></tab>

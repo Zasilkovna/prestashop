@@ -48,9 +48,6 @@ function upgrade_module_2_1($object)
                 case 'LAST_BRANCHES_UPDATE':
                     $insert[] = ['id'=>4, 'option'=>'LAST_BRANCHES_UPDATE', 'value'=>$oldSetting['value']];
                     break;
-                case 'WIDGET_TYPE':
-                    $insert[] = ['id'=>5, 'option'=>'WIDGET_TYPE', 'value'=>$oldSetting['value']];
-                    break;
                 case 'FORCE_COUNTRY':
                     $insert[] = ['id'=>6, 'option'=>'FORCE_COUNTRY', 'value'=>$oldSetting['value']];
                     break;
@@ -77,9 +74,6 @@ function upgrade_module_2_1($object)
                     break;
                 case 4:
                     $insert[] = ['id'=>4, 'option'=>'LAST_BRANCHES_UPDATE', 'value'=>''];
-                    break;
-                case 5:
-                    $insert[] = ['id'=>5, 'option'=>'WIDGET_TYPE', 'value'=>''];
                     break;
                 case 6:
                     $insert[] = ['id'=>6, 'option'=>'FORCE_COUNTRY', 'value'=>''];

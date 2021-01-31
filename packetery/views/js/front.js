@@ -1,117 +1,142 @@
-$.getScript("https://widget.packeta.com/www/js/library.js");
-var widget_type = $('#widget_type').val();
-let widget_lang_pac = '';
+// non-blocking AJAX loading, speeds up page load
+$.getScript("https://widget.packeta.com/www/js/library.js")
+    .fail(function() {
+        console.error('Unable to load Packeta Widget.');
+    });
+
 var country = 'cz,sk'; /* Default countries */
-$(document).ready(function ()
-{
-    if ($(".zas-box").length)
-        initializePacketaWidget();
 
-    tools.fixextracontent();
 
-    $(document).on('change', '#packetery-widget .js-name', function ()
-    {
-        var extra = $(this).parentsUntil('.carrier-extra-content').parent();
-        var id_branch = $("#packeta-branch-id").val();
-        var name_branch = $("#packeta-branch-name").val();
-        var currency_branch = $("#packeta-branch-currency").val();
-        if (id_branch > 0 && id_branch !== "")
-        {
-            tools.continueSetEnabled();
+function PacketeryCheckoutModulesManager() {
+    // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
+    this.supportedModules = ['Standard', 'Unknown', 'Supercheckout'];
+    this.loadedModules = [];
+    this.detectedModule = null;
 
-            let id_carrier = $('.delivery-option input:checked').val();
-            if (typeof id_carrier == 'undefined')
-            {
-                id_carrier = $('.delivery_option.selected input').val();
+    this.loadModules = function() {
+        this.loadedModules = [];
+        var manager = this;
+
+        this.supportedModules.forEach(function (moduleId) {
+            // moduleId = 'Standard' => className = 'PacketeryCheckoutModuleStandard'
+            var className = 'PacketeryCheckoutModule' + moduleId;
+
+            // if really loaded via hookDisplayHeader()
+            if (typeof window[className] !== 'undefined') {
+                manager.loadedModules.push(window[className]);
             }
-            id_carrier = id_carrier.replace(',', '');
+        });
+    };
 
-            var is_ad = $(this).find('option:selected').data('ad');
-            packetery.widgetSaveOrderBranch(id_branch, id_carrier, name_branch);
-            if (is_ad == 1)
-            {
-                packetery.widgetDetailsClear(extra);
-            } else
-            {
-                packetery.widgetGetDetails(extra);
-            }
+    this.detectModule = function () {
+        if (this.detectedModule !== null) {
+            return this.detectedModule;
         }
 
-        return false;
-    });
+        if (this.loadedModules.length === 0) {
+            this.loadModules();
+        }
+
+        var manager = this;
+        this.loadedModules.forEach(function (module) {
+            if ((manager.detectedModule === null) && module.findDeliveryOptions().length) {
+                manager.detectedModule = module;
+            }
+        });
+
+        return this.detectedModule;
+    };
+
+    // in case we need to change this in the future
+    this.getCarrierId = function ($selectedInput) {
+        return $selectedInput.val().replace(',', '');
+    }
+}
+var packeteryModulesManager = new PacketeryCheckoutModulesManager();
+
+
+$(document).ready(function ()
+{
+    if ($(".zas-box").length) {
+        onShippingLoadedCallback();
+    }
 });
 
 window.initializePacketaWidget = function ()
 {
     // set YOUR Packeta API key
-    var packetaApiKey = jQuery("#packeta-api-key").val();
+    var packetaApiKey = $("#packeta-api-key").val();
 
-    var countries = JSON.parse($('#allowed_countries').val());
+    // no Packetery carrier enabled
+    if (typeof packetaApiKey === 'undefined') {
+        return;
+    }
+
+    var allowedCountries = JSON.parse($('#allowed_countries').val());
 
     // parameters
-    var language = 'en';
 
-    if ($('#shop-language').val() != '')
-    {
-        language = $('#shop-language').val();
+    var customerCountry = $('#customer_country').val();
+    if (customerCountry !== '' && allowedCountries.indexOf(customerCountry) !== -1) {
+        country = customerCountry;
     }
 
     /* Overwrite default countries with forced country or customer country */
-    if ($('#widget_force_country').val() != "" && countries.indexOf($('#widget_force_country').val()) != -1)
-    {
-        country = $('#widget_force_country').val();
+    var forceCountry = $('#widget_force_country').val();
+    if (forceCountry !== "" && allowedCountries.indexOf(forceCountry) !== -1) {
+        country = forceCountry;
     }
-    else if ($('#customer_country').val() != '' && countries.indexOf($('#customer_country').val()) != -1)
-    {
-        country = $('#customer_country').val();
+
+
+    var language = 'en';
+
+    var shopLanguage = $('#shop-language').val();
+    if (shopLanguage !== '') {
+        language = shopLanguage;
     }
 
     /* Override language with forced language if it's set */
-    if ($('#widget_force_language').val() != "")
-    {
-        language = $('#widget_force_language').val();
+    var forceLanguage = $('#widget_force_language').val();
+    if (forceLanguage !== "") {
+        language = forceLanguage;
     }
 
-    $('.open-packeta-widget').click(function (e)
-    {
+    $('.open-packeta-widget').click(function (e) {
         e.preventDefault();
         var module_version = $('#module_version').val(); // Get module version for widget
         Packeta.Widget.pick(packetaApiKey, function (pickupPoint)
         {
+            var
+              module = packeteryModulesManager.detectModule(),
+              $selectedDeliveryOption = module.getSelectedInput(),
+              $widgetParent = module.getWidgetParent($selectedDeliveryOption);
+
             if (pickupPoint != null)
             {
-                /* Get carrier row */
-                var parent = $('.delivery-option input:checked').parents('.delivery-option').next();
-
                 /* Add ID and name to inputs */
-                $(parent).find('.packeta-branch-id').val(pickupPoint.id);
-                $(parent).find('.packeta-branch-name').val(pickupPoint.name);
+                $widgetParent.find('.packeta-branch-id').val(pickupPoint.id);
+                $widgetParent.find('.packeta-branch-name').val(pickupPoint.name);
 
                 // We let customer know, which branch he picked by filling html inputs
-                $(parent).find('.picked-delivery-place').html(pickupPoint.name);
+                $widgetParent.find('.picked-delivery-place').html(pickupPoint.name);
 
-                tools.continueSetEnabled();
+                module.enableSubmitButton();
 
                 /* Get ID of selected carrier */
-                let id_carrier = $('.delivery-option input:checked').val();
-                if (typeof id_carrier == 'undefined')
-                {
-                    id_carrier = $('.delivery_option.selected input').val();
-                }
-                id_carrier = id_carrier.replace(',', '');
+                var id_carrier = packeteryModulesManager.getCarrierId($selectedDeliveryOption);
 
                 /* Save packetery order without order ID - just cart id so we can access carrier data later */
                 packetery.widgetSaveOrderBranch(pickupPoint.id, id_carrier, pickupPoint.name);
+
+                if (module !== null) {
+                    module.hideValidationErrors();
+                }
             }
             else
             {
-                /* Get carrier row */
-                var parent = $('.delivery-option input:checked').parents('.delivery-option').next();
-
                 /* If point isn't selected - disable */
-                if($(parent).find('.packeta-branch-id').val() == "")
-                {
-                    tools.continueSetDisabled();
+                if($widgetParent.find('.packeta-branch-id').val() === "") {
+                    module.disableSubmitButton();
                 }
             }
         }, {appIdentity: 'prestashop-1.7-packeta-' + module_version, country: country, language: language});
@@ -119,392 +144,87 @@ window.initializePacketaWidget = function ()
 };
 
 tools = {
-    readAjaxFields: function ()
+    fixextracontent: function (country)
     {
-        let raw = $('#ajaxfields').val();
-        if (typeof raw != 'undefined')
-        {
-            let json = decodeURIComponent(raw);
-            widget_lang_pac = JSON.parse(json);
-        }
-    },
+        var module = packeteryModulesManager.detectModule();
 
-    continueSetDisabled: function ()
-    {
-        if ($('.continue').hasClass('disabled') == false)
-        {
-            $('.continue').addClass('disabled');
-            $('.continue').css("pointer-events", "none");
+        if (module === null) {
+            return;
         }
-        if ($('#onepagecheckoutps_step_review .btn_place_order').hasClass('disabled') == false)
-        {
-            $('#onepagecheckoutps_step_review .btn_place_order').addClass('disabled');
-        }
-    },
 
-    continueSetEnabled: function ()
-    {
-        if ($('.continue').hasClass('disabled') == true)
+        $('.carrier-extra-content').each(function ()
         {
-            $('.continue').removeClass('disabled');
-            $('.continue').css("pointer-events", "auto");
-        }
-        $('#onepagecheckoutps_step_review .btn_place_order').removeClass('disabled');
-    },
-    preCheckOneCountryWidget: function ()
-    {
-        if ((widget_type == 0) || (typeof widget_type == 'undefined'))
-        {
-            if ($('select.js-country:visible option').length == 1)
-            {
-                $el = $('select.js-country:visible option');
-                var extra = $el.parentsUntil('.carrier-extra-content').parent();
-                packetery.widgetGetCities(extra);
+            var $extra = $(this);
+            if (! $extra.find('#packetery-widget').length) {
+                return;
             }
-        } else
+
+            var widget_carrier = $extra.find('#widget_carrier').val();
+            var carrierCountries = $extra.find('#carrier_countries').val();
+
+            carrierCountries = JSON.parse(carrierCountries);
+            if (carrierCountries[widget_carrier].indexOf(country) === -1) {
+                $extra.find('#open-packeta-widget').hide();
+                $extra.find('#selected-branch').hide();
+                $extra.find('#invalid-country-carrier').show();
+            }
+
+            /* Only displayed extra content */
+            if ($extra.css('display') === 'block') {
+                /* And branch is not set, disable */
+                var id_branch = $extra.find(".packeta-branch-id").val();
+                if (id_branch <= 0) {
+                    module.disableSubmitButton();
+                }
+            }
+        });
+
+        /* Enable / Disable continue buttons after carrier change */
+
+        var $deliveryInputs = module.findDeliveryOptions();
+        $deliveryInputs.change(function ()
         {
-            $('select.js-country option').each(function ()
-            {
-                $el = $(this);
-                let extra = $el.parentsUntil('.carrier-extra-content').parent();
-                packetery.widgetGetCities(extra);
-            });
-        }
-    },
-    fixextracontent: function ()
-    {
-        if ($('.js_packetery_carriers').length == 0)
-        {
-            $('.carrier-extra-content').each(function ()
-            {
+            var
+                $this = $(this),
+                id_carrier = packeteryModulesManager.getCarrierId($this)
+                $extra = module.getWidgetParent($this);
 
-                var widget_carrier = $(this).find('#widget_carrier');
-                var valid_countries = $(this).find('#carrier_countries').val();
+            // if selected carrier is not Packetery then enable Continue button and we're done here
+            if (! $extra.find('#packetery-widget').length) {
+                module.enableSubmitButton();
+                return;
+            }
 
-                if (typeof valid_countries != 'undefined' && widget_carrier.length)
-                {
-                    widget_carrier = $(widget_carrier).val();
-                    valid_countries = JSON.parse(valid_countries);
-                    if (typeof valid_countries[widget_carrier] != 'undefined')
-                    {
-                        if (valid_countries[widget_carrier].indexOf(country) == -1)
-                        {
-                            $(this).find('#open-packeta-widget').hide();
-                            $(this).find('#selected-branch').hide();
-                            $(this).find('#invalid-country-carrier').show();
-                        }
-                    }
-                }
-
-                /* Only displayed extra content */
-                if ($(this).css('display') == 'block')
-                {
-                    /* If there's packetery-widget div */
-                    if ($(this).find('#packetery-widget').length)
-                    {
-                        /* And branch is not set, disable */
-                        var id_branch = $(this).find(".packeta-branch-id").val();
-                        if (id_branch == 0 || id_branch == "")
-                        {
-                            $('button[name="confirmDeliveryOption"]').addClass('disabled');
-                            $('button[name="confirmDeliveryOption"]').css("pointer-events", "none");
-                        }
-                    }
-                }
-            });
-
-            /* Enable / Disable continue buttons after carrier change */
-            $('.delivery-option input').change(function ()
-            {
-                var id_carrier = $(this).val();
-                id_carrier = id_carrier.replace(',', '');
-
-                var extra = $(this).parents('.delivery-option').next();
-
-                if ($(extra).hasClass('carrier-extra-content') == true)
-                {
-                    if ($(extra).find('#widget_carrier').length > 0)
-                    {
-                        if (id_carrier != $(extra).find('#widget_carrier').val())
-                        {
-                            tools.continueSetEnabled();
-                        }
-                    }
-                }
-
-                if ($(extra).hasClass('carrier-extra-content') == true)
-                {
-                    if ($(extra).find('#packetery-widget').length)
-                    {
-                        var id_branch = $(extra).find(".packeta-branch-id").val();
-                        var name_branch = $(extra).find(".packeta-branch-name").val();
-                        if (id_branch > 0 && id_branch !== "")
-                        {
-                            $('button[name="confirmDeliveryOption"]').removeClass('disabled');
-                            $('button[name="confirmDeliveryOption"]').css("pointer-events", "auto");
-                            packetery.widgetSaveOrderBranch(id_branch, id_carrier, name_branch);
-                        } else
-                        {
-                            $('button[name="confirmDeliveryOption"]').addClass('disabled');
-                            $('button[name="confirmDeliveryOption"]').css("pointer-events", "none");
-                        }
-                    } else
-                    {
-                        if (widget_type == 1)
-                        {
-                            $('button[name="confirmDeliveryOption"]').removeClass('disabled');
-                            $('button[name="confirmDeliveryOption"]').css("pointer-events", "auto");
-                        } else
-                        {
-                            $('.confirmPacketeryDeliveryOption').removeClass('disabled');
-                            $('.confirmPacketeryDeliveryOption').css("pointer-events", "auto");
-                        }
-                    }
-                }
-                var id_carrier = $(this).val();
-            });
-        }
-        tools.preCheckOneCountryWidget();
+            var id_branch = $extra.find(".packeta-branch-id").val();
+            if (id_branch > 0) {
+                var name_branch = $extra.find(".packeta-branch-name").val();
+                module.enableSubmitButton();
+                packetery.widgetSaveOrderBranch(id_branch, id_carrier, name_branch);
+            } else {
+                module.disableSubmitButton();
+            }
+        });
     }
 }
 
 packetery = {
-    widgetClearField: function (field, extra)
-    {
-        var find_field = '#packetery-widget .js-' + field;
-        $(extra).find(find_field).html('');
-        $(extra).find(find_field).html('<option value="0" disabled="" selected>--' + widget_lang_pac.please_choose + '--</option>');
-    },
-    widgetFillField: function (field, data, extra)
-    {
-        if (field == 'country')
-        {
-            packetery.widgetClearField('city', extra);
-            packetery.widgetClearField('name', extra);
-            $(extra).find('.pack-details-container').html('');
-        } else if (field == 'city')
-        {
-            packetery.widgetClearField('city', extra);
-            packetery.widgetClearField('name', extra);
-            $(extra).find('.pack-details-container').html('');
-        } else if (field == 'name')
-        {
-            packetery.widgetClearField('name', extra);
-            var id_branch = 1;
-        }
-
-        var find_field = '#packetery-widget .js-' + field;
-        var cnt = data.length;
-        for (var i = 0; i < cnt; i++)
-        {
-            if (cnt == 1)
-            {
-                var selected = 'selected';
-                $(extra).find(find_field + ' option:selected').prop('selected', false);
-            } else
-            {
-                var selected = '';
-            }
-            if (id_branch > 0)
-            {
-                var is_ad = 0;
-                is_ad = data[i]['is_ad'];
-                id_branch = data[i]['id_branch'];
-                $(extra).find(find_field).append('<option value="' + id_branch + '" data-ad="' + is_ad + '" ' + selected + '>' + data[i][field] + '</option>');
-            } else
-            {
-                if (field == 'city')
-                {
-                    var is_ad = 0;
-                    is_ad = data[i]['is_ad'];
-                    $(extra).find(find_field).append('<option value="' + data[i][field] + '" data-ad="' + is_ad + '" ' + selected + '>' + data[i][field] + '</option>');
-                } else
-                {
-                    $(extra).find(find_field).append('<option value="' + data[i][field] + '" ' + selected + '>' + data[i][field] + '</option>');
-                }
-
-            }
-        }
-        if (cnt == 1)
-        {
-            $(extra).find(find_field).change();
-        }
-    },
-    widgetDetailsClear: function (extra)
-    {
-        $(extra).find('.widget_block_title').css('display', 'none');
-        $(extra).find('.branch-foto').html('');
-        //left
-        $(extra).find('.pack-details-container').html('');
-
-        //right
-        $(extra).find('.pack-details-opening').html('');
-    },
-    widgetFillDetails: function (data, extra)
-    {
-        var lang = JSON.parse($('#ajaxfields').val());
-
-        $(extra).find('.widget_block_title').each(function ()
-        {
-            if ($(this).css('display') == 'none')
-            {
-                $(this).css('display', 'block');
-            }
-        });
-
-        // foto
-        $(extra).find('.branch-foto').html('<div class="col-md-6"><a href="' + data.url + '" target="_blank"><img src="' + data.img + '" id="branch-image" /></a></div>');
-
-        //right
-        if (data.dressing_room == 1)
-            var dressing_room = lang.yes;
-        else
-            var dressing_room = lang.no;
-        if (data.claim_assistant == 1)
-            var claim_assistant = lang.yes;
-        else
-            var claim_assistant = lang.no;
-        if (data.packet_consignment == 1)
-            var packet_consignment = lang.yes;
-        else
-            var packet_consignment = lang.no;
-
-        $(extra).find('.pack-details-container').html('<div class="branch-details"></div>');
-        if (data.region.length > 0)
-            $(extra).find('.pack-details-container .branch-details').append('<p>' + data.region + ', ' + data.city + '</p>');
-        else
-            $(extra).find('.pack-details-container .branch-details').append('<p>' + data.city + '</p>');
-        $(extra).find('.pack-details-container .branch-details').append('<p>' + data.street + '</p>');
-        $(extra).find('.pack-details-container .branch-details').append('<p>' + data.place + '</p>');
-        $(extra).find('.pack-details-container .branch-details').append('<p>' + lang.zip + ': ' + data['zip'] + '</p>');
-        $(extra).find('.pack-details-container .branch-details').append('<p>' + lang.max_weight + ': ' + data.max_weight + '</p>');
-        $(extra).find('.pack-details-container .branch-details').append('<p>' + lang.dressing_room + ': ' + dressing_room + '</p>');
-        $(extra).find('.pack-details-container .branch-details').append('<p>' + lang.claim_assistant + ': ' + claim_assistant + '</p>');
-        $(extra).find('.pack-details-container .branch-details').append('<p>' + lang.packet_consignment + ': ' + packet_consignment + '</p>');
-        $(extra).find('.pack-details-container .branch-details').append('<p><a href="' + data['url'] + '" target="_blank">' + lang.moredetails + '</a></p>');
-
-        //left
-        $(extra).find('.pack-details-opening').html('<div class="col-md-6"></div>');
-        var ohcs_html = data.opening_hours_short;
-        var ohcl_html = data.opening_hours_long;
-        var ohtable_html = data.opening_hours;
-        if (ohcl_html.length > 0)
-        {
-            $(extra).find('.pack-details-opening').append('<div>' + ohcl_html + '</div>');
-            return true;
-        }
-        if (ohtable_html.length > 0)
-        {
-            $(extra).find('.pack-details-opening').append('<div>' + ohtable_html + '</div>');
-            return true;
-        }
-        if (ohcs_html.length > 0)
-        {
-            $(extra).find('.pack-details-opening').append('<div>' + ohcs_html + '</div>');
-            return true;
-        }
-    },
-
     widgetSaveOrderBranch: function (id_branch, id_carrier, name_branch)
     {
         $.ajax({
             type: 'POST',
             url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=widgetsaveorderbranch' + ajaxs.checkToken(),
             data: {'id_branch': id_branch, 'id_carrier': id_carrier, 'name_branch': name_branch},
-            beforeSend: function ()
-            {
+            beforeSend: function () {
                 $("body").toggleClass("wait");
             },
-            success: function (msg)
-            {
+            success: function (msg) {
                 return true;
             },
-            complete: function ()
-            {
+            complete: function () {
                 $("body").toggleClass("wait");
             },
         });
-    },
-
-    widgetGetCities: function (extra)
-    {
-        var country = $(extra).find('#packetery-widget .js-country option:selected').val();
-        packetery.widgetDetailsClear();
-        $.ajax({
-            type: 'POST',
-            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=widgetgetcities' + ajaxs.checkToken(),
-            data: {'country': country},
-            extra: extra,
-            beforeSend: function ()
-            {
-                $("body").toggleClass("wait");
-            },
-            success: function (msg)
-            {
-                data = JSON.parse(msg);
-                packetery.widgetFillField('city', data, this.extra);
-            },
-            complete: function ()
-            {
-                $("body").toggleClass("wait");
-            },
-        });
-    },
-
-    widgetGetNames: function (extra)
-    {
-        var country = $(extra).find('#packetery-widget .js-country option:selected').val();
-        var city = $(extra).find('#packetery-widget .js-city option:selected').val();
-        var is_ad = $(extra).find('#packetery-widget .js-city option:selected').data('ad');
-        packetery.widgetDetailsClear(extra);
-        $.ajax({
-            type: 'POST',
-            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=widgetgetnames' + ajaxs.checkToken(),
-            data: {'country': country, 'city': city, 'is_ad': is_ad},
-            extra: extra,
-            beforeSend: function ()
-            {
-                $("body").toggleClass("wait");
-            },
-            success: function (msg)
-            {
-                data = JSON.parse(msg);
-                packetery.widgetFillField('name', data, this.extra)
-            },
-            complete: function ()
-            {
-                $("body").toggleClass("wait");
-            },
-        });
-    },
-    widgetGetDetails: function (extra)
-    {
-        var country = $(extra).find('#packetery-widget .js-country option:selected').val();
-        var city = $(extra).find('#packetery-widget .js-city option:selected').val();
-        var id_branch = $(extra).find('#packetery-widget .js-name option:selected').val();
-        $.ajax({
-            type: 'POST',
-            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=widgetgetdetails' + ajaxs.checkToken(),
-            data: {'country': country, 'city': city, 'id_branch': id_branch},
-            extra: extra,
-            beforeSend: function ()
-            {
-                $("body").toggleClass("wait");
-            },
-            success: function (msg)
-            {
-                data = JSON.parse(msg);
-                if (data)
-                {
-                    packetery.widgetFillDetails(data, this.extra);
-                }
-            },
-            complete: function ()
-            {
-                $("body").toggleClass("wait");
-            },
-        });
-    },
+    }
 }
 
 ajaxs = {
@@ -518,37 +238,8 @@ ajaxs = {
     },
 }
 
-var getUrlParameter = function getUrlParameter(sParam)
-{
-    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
 
-    for (i = 0; i < sURLVariables.length; i++)
-    {
-        sParameterName = sURLVariables[i].split('=');
-
-        if (sParameterName[0] === sParam)
-        {
-            return sParameterName[1] === undefined ? true : sParameterName[1];
-        }
-    }
-};
-
-var getStringParameter = function getUrlParameter(sParam, url)
-{
-    var sPageURL = decodeURIComponent(url),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
-    for (i = 0; i < sURLVariables.length; i++)
-    {
-        sParameterName = sURLVariables[i].split('=');
-
-        if (sParameterName[0] === sParam)
-        {
-            return sParameterName[1] === undefined ? true : sParameterName[1];
-        }
-    }
-};
+function onShippingLoadedCallback() {
+    initializePacketaWidget();
+    tools.fixextracontent(country);
+}

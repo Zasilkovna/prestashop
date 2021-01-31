@@ -32,7 +32,6 @@ include_once(dirname(__file__).'/packetery.api.php');
 class Packetery extends CarrierModule
 {
     protected $config_form = false;
-    public $widget_type = 1;
 
     private $supported_countries_trans = array(); /* Used wherever countries with texts are needed */
     private $supported_languages = array('cs', 'sk', 'pl', 'hu', 'ro', 'en');
@@ -40,20 +39,15 @@ class Packetery extends CarrierModule
 
     public function __construct()
     {
-        if (Packeteryclass::isModuleInstalled()) {
-            $this->widget_type = 1; //Packeteryclass::getConfigValueByOption('WIDGET_TYPE');
-            $errors = array();
-            $this->configurationErrors($errors);
-            foreach ($errors as $error) {
-                $this->warning .= $error;
-            }
-        } else {
-            $this->widget_type = 0;
-        }
+		$errors = [];
+		$this->configurationErrors($errors);
+		foreach ($errors as $error) {
+			$this->warning .= $error;
+		}
 
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.1.3';
+        $this->version = '2.1.4';
         $this->author = 'Packetery a.s.';
         $this->need_instance = 0;
 
@@ -146,9 +140,7 @@ class Packetery extends CarrierModule
             $this->registerHook('actionOrderHistoryAddAfter') &&
             $this->registerHook('backOfficeHeader') &&
             $this->registerHook('displayCarrierExtraContent') &&
-            $this->registerHook('displayBeforeCarrier') &&
             $this->registerHook('displayHeader') &&
-            $this->registerHook('displayFooter') &&
             $this->registerHook('actionCarrierUpdate') &&
             Packeteryclass::insertTab();
     }
@@ -238,7 +230,6 @@ class Packetery extends CarrierModule
 
         $labels_format = Packeteryclass::getConfigValueByOption('LABEL_FORMAT');
         $this->context->smarty->assign('labels_format', $labels_format);
-        $this->context->smarty->assign('widget_type', $this->widget_type);
 
         $forceCountry = Packeteryclass::getConfigValueByOption('FORCE_COUNTRY');
         $this->context->smarty->assign('force_country', $forceCountry);
@@ -420,7 +411,6 @@ class Packetery extends CarrierModule
             $this->context->controller->addjquery();
             $this->context->controller->addJS('https://cdn.jsdelivr.net/riot/2.4.1/riot+compiler.min.js');
             $this->context->controller->addJS($this->_path.'views/js/back.js');
-//            $this->context->controller->addJS($this->_path.'views/js/widget.js');
             $this->context->controller->addJS($this->_path.'views/js/widget_bo.js');
             $this->context->controller->addCSS($this->_path.'views/css/back.css');
             $this->context->controller->addJS($this->_path.'views/js/notify.js');
@@ -457,144 +447,6 @@ class Packetery extends CarrierModule
         return 0;
     }
 
-    public function displayCarrierExtraContentPrototypeOPC($id_carrier, $id_cart)
-    {
-        $this->context->smarty->assign('id_carrier', $id_carrier);
-        $countries = $this->getCountriesList($id_carrier);
-        $this->context->smarty->assign('countries', $countries);
-        $countries_count = count($countries);
-        $this->context->smarty->assign('countries_count', $countries_count);
-        $p_order_row = Packeteryclass::getPacketeryOrderRowByCart($id_cart);
-        if ($p_order_row) {
-            if (!isset($p_order_row['name_branch']) || ($p_order_row['id_carrier'] != $id_carrier)) {
-                $name_branch = '0';
-            } else {
-                $name_branch = $p_order_row['name_branch'];
-            }
-        } else {
-            $name_branch = '0';
-        }
-        $this->context->smarty->assign('choosed_branch', $name_branch);
-
-        $output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget_popup.tpl');
-        return $output;
-    }
-    /*WIDGET FO*/
-
-    /*WIDGET FO for OPC*/
-    /**
-     * * Fixes to make it work with easypay module | TODO: does it work? delete?
-     * @return string
-     * @throws PrestaShopDatabaseException
-     * @throws SmartyException
-     */
-    public function hookDisplayFooter()
-    {
-        if (($this->widget_type == 0) && (Module::isEnabled('easypay') == true)) {
-            $packetery_carriers_list = array();
-            $packetery_carriers_list = Packeteryclass::getCarriersList();
-            if (count($packetery_carriers_list) > 0) {
-                $output = '';
-                $carriers = array();
-                foreach ($packetery_carriers_list as $carrier) {
-                    $id_carrier = $carrier['id_carrier'];
-                    $id_cart = Context::getContext()->cart->id;
-                    $output .= $this->displayCarrierExtraContentPrototypeOPC($id_carrier, $id_cart);
-                    $carriers[] = $id_carrier;
-                }
-                $this->context->smarty->assign('js_packetery_carriers', implode(',', $carriers));
-                if (__PS_BASE_URI__ == '/') {
-                    $base_uri = '';
-                } else {
-                    $base_uri = Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-                }
-                $this->context->smarty->assign('baseuri', $base_uri);
-                /*FIELDS FOR AJAX*/
-                $ajaxfields = array(
-                    'zip' => $this->l('ZIP'),
-                    'moredetails' => $this->l('More details'),
-                    'max_weight' => $this->l('Max weight'),
-                    'dressing_room' => $this->l('Dressing room'),
-                    'packet_consignment' => $this->l('Packet consignment'),
-                    'claim_assistant' => $this->l('Claim assistant'),
-                    'yes' => $this->l('Yes'),
-                    'no' => $this->l('No'),
-                    'all' => $this->l('All'),
-                    'please_choose' => $this->l('please choose'),
-                    'please_choose_branch' => $this->l('Please choose delivery branch')
-                    );
-                $ajaxfields_json = json_encode($ajaxfields);
-                $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
-                /*END FIELDS FOR AJAX*/
-                $this->context->smarty->assign('choosed_carrier', 100);
-                $this->context->smarty->assign('widget_type', 0);
-
-                $output_vars = $this->context->smarty->fetch(
-                    $this->local_path.'views/templates/front/widget_popup_vars.tpl'
-                );
-            } else {
-                return '';
-            }
-            return $output_vars.$output;
-        }
-    }
-
-    /**
-     * Normal BO widget
-     * @param $params
-     * @return string
-     * @throws PrestaShopDatabaseException
-     */
-    public function hookDisplayBeforeCarrier($params)
-    {
-        if (!Module::isEnabled('easypay')) {
-            if ($this->widget_type == 0) {
-                $packetery_carriers_list = array();
-                $packetery_carriers_list = Packeteryclass::getCarriersList();
-                if (count($packetery_carriers_list) > 0) {
-                    $output = '';
-                    $carriers = array();
-                    foreach ($packetery_carriers_list as $carrier) {
-                        $id_carrier = $carrier['id_carrier'];
-                        $id_cart = $params['cart']->id;
-                        $output .= $this->displayCarrierExtraContentPrototypeOPC($id_carrier, $id_cart, $params);
-                        $carriers[] = $id_carrier;
-                    }
-                    $this->context->smarty->assign('js_packetery_carriers', implode(',', $carriers));
-                    if (__PS_BASE_URI__ == '/') {
-                        $base_uri = '';
-                    } else {
-                        $base_uri = Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-                    }
-                    $this->context->smarty->assign('baseuri', $base_uri);
-                    /*FIELDS FOR AJAX*/
-                    $ajaxfields = array(
-                        'zip' => $this->l('ZIP'),
-                        'moredetails' => $this->l('More details'),
-                        'max_weight' => $this->l('Max weight'),
-                        'dressing_room' => $this->l('Dressing room'),
-                        'packet_consignment' => $this->l('Packet consignment'),
-                        'claim_assistant' => $this->l('Claim assistant'),
-                        'yes' => $this->l('Yes'),
-                        'no' => $this->l('No'),
-                        'please_choose' => $this->l('please choose'),
-                        'please_choose_branch' => $this->l('Please choose delivery branch')
-                        );
-                    $ajaxfields_json = json_encode($ajaxfields);
-                    $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
-                    /*END FIELDS FOR AJAX*/
-                    $this->context->smarty->assign('choosed_carrier', $params['cart']->id_carrier);
-                    $this->context->smarty->assign('widget_type', 0);
-
-                } else {
-                    return '';
-                }
-                return $output;
-            }
-        }
-    }
-    /*END WIDGET FO for OPC*/
-
     /**
      * Display widget selection button and chosen branch info for every carrier
      * @param $params
@@ -605,91 +457,86 @@ class Packetery extends CarrierModule
     public function hookDisplayCarrierExtraContent($params)
     {
         global $language;
-        $this->context->smarty->assign('widget_type', $this->widget_type);
 
-        if ($this->widget_type == 1) {
-            $id_carrier = $params['carrier']['id'];
 
-            $carrierCountries = [];
-            foreach (Packeteryclass::getCarriersList() as $carrier)
-            {
-                $carrierCountries[$carrier['id_carrier']] = $carrier['country'];
-            }
-            $carrierCountriesJson = json_encode($carrierCountries);
+		$id_carrier = $params['carrier']['id'];
 
-            $this->context->smarty->assign('widget_carrier', $id_carrier);
-            /*FIELDS FOR AJAX*/
-            $ajaxfields = array(
-                'zip' => $this->l('ZIP'),
-                'moredetails' => $this->l('More details'),
-                'max_weight' => $this->l('Max weight'),
-                'dressing_room' => $this->l('Dressing room'),
-                'packet_consignment' => $this->l('Packet consignment'),
-                'claim_assistant' => $this->l('Claim assistant'),
-                'yes' => $this->l('Yes'),
-                'no' => $this->l('No'),
-                'please_choose' => $this->l('please choose'),
-                'please_choose_branch' => $this->l('Please choose delivery branch')
-                );
-            $ajaxfields_json = json_encode($ajaxfields);
+		$carrierCountries = [];
+		foreach (Packeteryclass::getCarriersList() as $carrier)
+		{
+			$carrierCountries[$carrier['id_carrier']] = $carrier['country'];
+		}
+		$carrierCountriesJson = json_encode($carrierCountries);
 
-            $name_branch = "";
-            $currency_branch = "";
-            $id_branch = "";
-            if(!empty($params['cart']))
-            {
-                $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
-                if (!empty($row['id_branch']))
-                {
-                    $id_branch = $row['id_branch'];
-                }
-                if (!empty($row['name_branch']))
-                {
-                    $name_branch = $row['name_branch'];
-                }
-                if (!empty($row['currency_branch']))
-                {
-                    $currency_branch = $row['currency_branch'];
-                }
-            }
+		$this->context->smarty->assign('widget_carrier', $id_carrier);
+		/*FIELDS FOR AJAX*/
+		$ajaxfields = array(
+			'zip' => $this->l('ZIP'),
+			'moredetails' => $this->l('More details'),
+			'max_weight' => $this->l('Max weight'),
+			'dressing_room' => $this->l('Dressing room'),
+			'packet_consignment' => $this->l('Packet consignment'),
+			'claim_assistant' => $this->l('Claim assistant'),
+			'yes' => $this->l('Yes'),
+			'no' => $this->l('No'),
+			'please_choose' => $this->l('please choose'),
+			'please_choose_branch' => $this->l('Please choose delivery branch')
+			);
+		$ajaxfields_json = json_encode($ajaxfields);
 
-            if(isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery))
-            {
-                $address = new AddressCore($params['cart']->id_address_delivery);
+		$name_branch = "";
+		$currency_branch = "";
+		$id_branch = "";
+		if(!empty($params['cart']))
+		{
+			$row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
+			if (!empty($row['id_branch']))
+			{
+				$id_branch = $row['id_branch'];
+			}
+			if (!empty($row['name_branch']))
+			{
+				$name_branch = $row['name_branch'];
+			}
+			if (!empty($row['currency_branch']))
+			{
+				$currency_branch = $row['currency_branch'];
+			}
+		}
 
-                $countryObj = new CountryCore($address->id_country);
-                $this->context->smarty->assign('customer_country', strtolower($countryObj->iso_code));
-            }
+		if(isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery))
+		{
+			$address = new AddressCore($params['cart']->id_address_delivery);
 
-            $this->context->smarty->assign('module_version', $this->version);
-            $this->context->smarty->assign('allowed_countries', json_encode($this->limited_countries));
-            $this->context->smarty->assign('carrier_countries', $carrierCountriesJson);
-            $this->context->smarty->assign('id_branch', $id_branch);
-            $this->context->smarty->assign('name_branch', $name_branch);
-            $this->context->smarty->assign('currency_branch', $currency_branch);
+			$countryObj = new CountryCore($address->id_country);
+			$this->context->smarty->assign('customer_country', strtolower($countryObj->iso_code));
+		}
 
-            $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
+		$this->context->smarty->assign('module_version', $this->version);
+		$this->context->smarty->assign('allowed_countries', json_encode($this->limited_countries));
+		$this->context->smarty->assign('carrier_countries', $carrierCountriesJson);
+		$this->context->smarty->assign('id_branch', $id_branch);
+		$this->context->smarty->assign('name_branch', $name_branch);
+		$this->context->smarty->assign('currency_branch', $currency_branch);
 
-            $this->context->smarty->assign('force_country', Packeteryclass::getConfigValueByOption('FORCE_COUNTRY'));
-            $this->context->smarty->assign('force_language', Packeteryclass::getConfigValueByOption('FORCE_LANGUAGE'));
+		$this->context->smarty->assign('ajaxfields', $ajaxfields_json);
 
-            $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-            $this->context->smarty->assign('baseuri', $base_uri);
-            $countries = $this->getCountriesList($id_carrier);
-            $this->context->smarty->assign('countries', $countries);
-            $countries_count = count($countries);
-            $this->context->smarty->assign('countries_count', $countries_count);
-			$this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
-			$this->context->smarty->assign('language', (array)$language);
-            /*END FIELDS FOR AJAX*/
+		$this->context->smarty->assign('force_country', Packeteryclass::getConfigValueByOption('FORCE_COUNTRY'));
+		$this->context->smarty->assign('force_language', Packeteryclass::getConfigValueByOption('FORCE_LANGUAGE'));
 
-            $output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget.tpl');
-            return $output;
-        } else {
-            return '';
-        }
+		$base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+		$this->context->smarty->assign('baseuri', $base_uri);
+		$countries = $this->getCountriesList($id_carrier);
+		$this->context->smarty->assign('countries', $countries);
+		$countries_count = count($countries);
+		$this->context->smarty->assign('countries_count', $countries_count);
+		$this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
+		$this->context->smarty->assign('language', (array)$language);
+		/*END FIELDS FOR AJAX*/
+
+		$output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget.tpl');
+		return $output;
     }
-    /*END WIDGET FO*/
 
     /*WIDGET BO*/
     /**
@@ -743,9 +590,23 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayHeader()
     {
-        $this->context->controller->addJS($this->_path.'views/js/jquery.popupoverlay.js');
-        $this->context->controller->addJS($this->_path.'/views/js/front.js');
-        $this->context->controller->addCSS($this->_path.'/views/css/front.css');
+        $js = [
+            'jquery.popupoverlay.js',
+            'front.js',
+        ];
+
+        $iterator = new GlobIterator(__DIR__ . '/views/js/checkout-modules/*.js', FilesystemIterator::CURRENT_AS_FILEINFO);
+        foreach($iterator as $entry) {
+            $js[] = 'checkout-modules/' . $entry->getBasename();
+        }
+
+        foreach ($js as $file) {
+//            $this->context->controller->addJS($this->_path . 'views/js/' . $file);
+            $uri = $this->_path . 'views/js/' . $file;
+            $this->context->controller->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
+        }
+
+        $this->context->controller->addCSS($this->_path.'views/css/front.css');
     }
 
     /*ORDERS*/

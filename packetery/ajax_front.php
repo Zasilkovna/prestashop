@@ -33,15 +33,6 @@ if ($token !== $real_token) {
 }
 switch (Tools::getValue('action')) {
     /*FRONT*/
-    case 'widgetgetcities':
-        PacketeryApi::widgetGetCitiesAjax();
-        break;
-    case 'widgetgetnames':
-        PacketeryApi::widgetGetNamesAjax();
-        break;
-    case 'widgetgetdetails':
-        PacketeryApi::widgetGetDetailsAjax();
-        break;
     case 'widgetsaveorderbranch':
         PacketeryApi::widgetSaveOrderBranch();
         break;

@@ -78,7 +78,6 @@ $sql[] = 'INSERT INTO `'._DB_PREFIX_."packetery_settings` (`id`, `option`, `valu
 			(2, 'ESHOP_ID', ''),
             (3, 'LABEL_FORMAT', 'A7 on A4'),
             (4, 'LAST_BRANCHES_UPDATE', ''),
-            (5, 'WIDGET_TYPE', '1'),
             (6, 'FORCE_COUNTRY', ''),
             (7, 'FORCE_LANGUAGE', '')";
 
