@@ -39,19 +39,21 @@ class Packetery extends CarrierModule
 
     public function __construct()
     {
-		$errors = [];
-		$this->configurationErrors($errors);
-		foreach ($errors as $error) {
-			$this->warning .= $error;
+		$this->name = 'packetery';
+		$this->tab = 'shipping_logistics';
+		$this->version = '2.1.4';
+		$this->author = 'Packetery a.s.';
+		$this->need_instance = 0;
+
+		if(Module::isInstalled($this->name)) {
+			$errors = [];
+			$this->configurationErrors($errors);
+			foreach ($errors as $error) {
+				$this->warning .= $error;
+			}
 		}
 
-        $this->name = 'packetery';
-        $this->tab = 'shipping_logistics';
-        $this->version = '2.1.4';
-        $this->author = 'Packetery a.s.';
-        $this->need_instance = 0;
-
-        /**
+		/**
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
          */
         $this->bootstrap = true;
