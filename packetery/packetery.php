@@ -44,7 +44,7 @@ class Packetery extends CarrierModule
 		$this->version = '2.1.4';
 		$this->author = 'Packetery a.s.';
 		$this->need_instance = 0;
-    $this->is_configurable = 1
+    	$this->is_configurable = 1;
 
 		if(Module::isInstalled($this->name)) {
 			$errors = [];
@@ -54,8 +54,7 @@ class Packetery extends CarrierModule
 			}
 		}
 
-
-		    /**
+		/**
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
          */
         $this->bootstrap = true;
