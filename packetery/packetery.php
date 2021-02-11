@@ -50,12 +50,12 @@ class Packetery extends CarrierModule
         $this->version = '2.1.4';
         $this->author = 'Packetery a.s.';
         $this->need_instance = 0;
+        $this->is_configurable = 1;
 
         /**
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
          */
         $this->bootstrap = true;
-        $this->limited_countries = array('cz', 'sk', 'pl', 'hu', 'ro');
 
         $this->supported_languages_trans = array(
             'cs' => $this->l('Czech'),
