@@ -260,7 +260,7 @@ class PacketeryApi
             {
                 return array(
                     0,
-                    $module->l('Cant find order currency rate between order and branch, order - ' . $id_order)
+                    $module->l('Can\'t find order currency rate between order and branch, order') . ' - ' . $id_order,
                 );
             }
         }
@@ -849,7 +849,7 @@ class PacketeryApi
         $name_branch = Tools::getValue('name_branch');
 
         $is_ad = 0;
-        $packetery_carrier_row = Packeteryclass::getPacketeryCarrierRow($id_carrier);
+        $packetery_carrier_row = Packeteryclass::getPacketeryCarrierRow((int)$id_carrier);
         $is_cod = $packetery_carrier_row['is_cod'];
 
         $currency = CurrencyCore::getCurrency(Context::getContext()->cart->id_currency);

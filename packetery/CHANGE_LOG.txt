@@ -30,3 +30,4 @@
 	  - Refactored front.js
 	  - Added: Generic support framework for third-party OPC modules
 	  - Fixed: getListPayments() - compatibility with PS 1.7.7
+2.1.5 - Transport administration update

@@ -144,7 +144,7 @@ window.initializePacketaWidget = function ()
 };
 
 tools = {
-    fixextracontent: function (country)
+    fixextracontent: function ()
     {
         var module = packeteryModulesManager.detectModule();
 
@@ -159,14 +159,12 @@ tools = {
                 return;
             }
 
-            var widget_carrier = $extra.find('#widget_carrier').val();
-            var carrierCountries = $extra.find('#carrier_countries').val();
-
-            carrierCountries = JSON.parse(carrierCountries);
-            if (carrierCountries[widget_carrier].indexOf(country) === -1) {
+            var carrierId = String($extra.find('#carrier_id').val());
+            var zpointCarriers = $extra.find('#zpoint_carriers').val();
+            zpointCarriers = JSON.parse(zpointCarriers);
+            if (!zpointCarriers.includes(carrierId)) {
                 $extra.find('#open-packeta-widget').hide();
                 $extra.find('#selected-branch').hide();
-                $extra.find('#invalid-country-carrier').show();
             }
 
             /* Only displayed extra content */
@@ -241,5 +239,5 @@ ajaxs = {
 
 function onShippingLoadedCallback() {
     initializePacketaWidget();
-    tools.fixextracontent(country);
+    tools.fixextracontent();
 }
