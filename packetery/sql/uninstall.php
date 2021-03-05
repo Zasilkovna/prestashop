@@ -32,13 +32,12 @@ $sql = array();
 
 // remove our carrier and payment table, keep order table for reinstall
 $sql[] ='UPDATE `' . _DB_PREFIX_ . 'carrier` 
-			SET deleted=1,
-				active=0
-			WHERE external_module_name="packetery"
-            	OR id_carrier IN (SELECT id_carrier 
-        							FROM `' . _DB_PREFIX_ . 'packetery_carrier`)';
+			SET `deleted` = 1,
+				`active` = 0
+			WHERE `external_module_name` = "packetery"
+            	OR `id_carrier` IN (SELECT `id_carrier` 
+        							FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`)';
 
-$sql[] ='DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_carrier`';
 $sql[] ='DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';
 $sql[] ='DROP TABLE IF EXISTS` ' . _DB_PREFIX_ . 'packetery_address_delivery`';
 

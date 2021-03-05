@@ -30,7 +30,8 @@
        value="{$force_language|escape:'htmlall':'UTF-8'}">
 <input type="hidden" id="shop-language" name="shop-language" value="{$language['iso_code']|escape:'htmlall':'UTF-8'}">
 <input type="hidden" id="customer_country" name="customer_country" value="{$customer_country|escape:'htmlall':'UTF-8'}">
-<input type="hidden" id="carrier_countries" name="carrier_countries" value="{$carrier_countries}">
+<input type="hidden" id="carrier_data" name="carrier_data" value="{$carrier_data}">
+<input type="hidden" id="pickup_branch_id" name="pickup_branch_id" value="{$pickup_branch_id}">
 <input type="hidden" id="allowed_countries" name="allowed_countries" value="{$allowed_countries}">
 <input type="hidden" id="module_version" name="module_version" value="{$module_version}">
 <!--Packetery widget-->
@@ -40,8 +41,6 @@
             <div class="zas-box">
                 <button class="btn btn-sm btn-success pull-left open-packeta-widget"
                         id="open-packeta-widget">{l s='Select pick-up point:' mod='packetery'}</button>
-                <span class="pull-left" id="invalid-country-carrier"
-                      style="display:none; color:red">{l s='This carrier is unavailable for your country' mod='packetery'}</span>
                 <br>
                 <ul id="selected-branch">
                     <li>{l s='Selected pick-up point:' mod='packetery'}

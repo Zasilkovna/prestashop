@@ -48,6 +48,7 @@ switch (Tools::getValue('action'))
         PacketeryApi::updateBranchListAjax();
         break;
     /*SETTINGS*/
+        /*
     case 'new_weight_rule':
         Packeteryclass::newPacketeryWeightRule();
         break;
@@ -63,13 +64,16 @@ switch (Tools::getValue('action'))
     case 'remove_carrier':
         Packeteryclass::removePacketeryCarrier();
         break;
+        */
     case 'change_payment_cod':
         Packeteryclass::changePaymentCodAjax();
         break;
 
+        /*
     case 'change_carrier_cod':
         Packeteryclass::changeCarrierCodAjax();
         break;
+        */
     case 'change_ad_carrier_cod':
         Packeteryclass::changeAdCarrierCodAjax();
         break;
@@ -93,9 +97,11 @@ switch (Tools::getValue('action'))
     case 'order_export':
         PacketeryApi::ordersExportAjax();
         break;
+        /*
     case 'export_order_csv':
         Packeteryclass::exportOrdersCsv();
         break;
+        */
     case 'download_pdf':
         PacketeryApi::downloadPdfAjax();
         break;

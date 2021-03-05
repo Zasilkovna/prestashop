@@ -144,7 +144,7 @@ window.initializePacketaWidget = function ()
 };
 
 tools = {
-    fixextracontent: function (country)
+    fixextracontent: function ()
     {
         var module = packeteryModulesManager.detectModule();
 
@@ -160,13 +160,17 @@ tools = {
             }
 
             var widget_carrier = $extra.find('#widget_carrier').val();
-            var carrierCountries = $extra.find('#carrier_countries').val();
+            var carrierData = $extra.find('#carrier_data').val();
+            carrierData = JSON.parse(carrierData);
+            // TODO: rework
+            //var pickupBranchId = $extra.find('#pickup_branch_id').val();
 
-            carrierCountries = JSON.parse(carrierCountries);
-            if (carrierCountries[widget_carrier].indexOf(country) === -1) {
+            // TODO: test and remove
+            console.log(carrierData);
+            console.log(widget_carrier);
+            if (carrierData[widget_carrier] !== 'show_widget') {
                 $extra.find('#open-packeta-widget').hide();
                 $extra.find('#selected-branch').hide();
-                $extra.find('#invalid-country-carrier').show();
             }
 
             /* Only displayed extra content */
@@ -241,5 +245,5 @@ ajaxs = {
 
 function onShippingLoadedCallback() {
     initializePacketaWidget();
-    tools.fixextracontent(country);
+    tools.fixextracontent();
 }

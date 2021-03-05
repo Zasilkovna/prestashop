@@ -23,7 +23,7 @@ $(document).ready(function(){
     binds.add_new_weight_rule();
 	/**/
 	/*ADD CARRIER*/
-	binds.add_new_packetery_carrier();
+	//binds.add_new_packetery_carrier();
 
 	$('#packetery-carriers-list-table a.edit').click(function() {
 		var url = $(this).attr('href');
@@ -44,13 +44,15 @@ $(document).ready(function(){
 
 	/*End SETTINGS ACTIONS*/
 	
-	$('#add-packetery-carrier-block').popup();
+	//$('#add-packetery-carrier-block').popup();
 	$('#change-order-branch').popup();
 
+	/*
 	$('#packetery-carriers-list-table i.process-icon-new').click(function(){
         $('#add-packetery-carrier-block').popup('show');
 		return false;
 	});
+	 */
 
     $('.packetery-weight-rules-table i.process-icon-new').click(function(){
         $('.country-iso').val($(this).closest('.packetery-weight-rules-table')[0].dataset.country);
@@ -213,17 +215,22 @@ tools = {
 		var json_ad = decodeURIComponent($('#json_ad').val());
 		$('#ad-carriers-list-table table tr td:nth-child(3)').each(function() {
 			var id_branch = $(this).find('span').text();
-			var select = tools.buildselect(json_ad, id_branch);
+			var pickup_branch_id = $('#pickup_branch_id').val();
+			var pickup_branch_name = $('#pickup_branch_name').val();
+			var select = tools.buildselect(json_ad, id_branch, pickup_branch_id, pickup_branch_name);
 			$(this).html(select);
 		});
 		binds.ad_carrier_select();
 	},
-	buildselect: function(json, id_branch_default) {
-		var html = '';
-		html+= '<select name="selected_ad_carrier" id="selected_ad_carrier">';
-		html+= '<option value="0">--</option>';
+	buildselect: function(json, id_branch_default, pickup_branch_id, pickup_branch_name) {
+		// TODO: show hint to update branches if no carriers available
 		var carriers = JSON.parse(json);
 		var cnt = carriers.length;
+		var html = '';
+		html+= '<select name="selected_ad_carrier" id="selected_ad_carrier">';
+		html+= '<option value="">--</option>';
+		html+= '<option value="' + pickup_branch_id + '"' +
+			(pickup_branch_id === id_branch_default  ? ' selected' : '') + '>' + pickup_branch_name + '</option>';
 		for (var i = 0; i < cnt; i++) {
 			if (carriers[i]['id_branch'] == id_branch_default)
 				var selected = 'selected';
@@ -332,6 +339,7 @@ binds = {
             return false;
         });
     },
+	/*
 	add_new_packetery_carrier: function() {
 		$('#submit_new_packetery_carrier').click(function(){
 			var name = $('.new_carrier_name').val();
@@ -358,7 +366,7 @@ binds = {
 			return false;
 		});
 	},
-
+*/
 
 	uncheckboxAllTable: function() {
 		$('#packetery-orders-table').find('.ps-table-checkbox').prop('checked', false);
@@ -840,7 +848,7 @@ ajaxs = {
             },
         });
 	},
-
+/*
 	new_carrier: function(name, delay, countries, is_cod, logo){
 	    $.ajax({
 	        type: 'POST',
@@ -866,7 +874,7 @@ ajaxs = {
 	        },		
 	    });
 	},
-
+*/
 	getCountBranches: function(){
 	    $.ajax({
 	        type: 'POST',
@@ -903,6 +911,8 @@ ajaxs = {
 
                 if (msg != 'true')
                 {
+					/* TODO: Uncaught SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data
+                    loader stays shown, everything seems ok after reload */
                     var res = JSON.parse(msg);
                     var id = res[0];
                     var message = res[1];
@@ -931,6 +941,10 @@ ajaxs = {
 	        	}
 
 	        },
+			error: function() {
+	        	// TODO: prepare message for user
+				console.log('Branches update failed. Is API key provided?');
+			},
 	        complete: function() {
 	            $("body").toggleClass("wait");
 	        },		

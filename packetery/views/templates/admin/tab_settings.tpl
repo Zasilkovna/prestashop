@@ -83,22 +83,13 @@
 	<br>
 </div>
 
-<!--Add carrier-->
-{include file="./carrier_packetery_add.tpl" }
- <!--End add-packetery-carrier-block-->
-<br><hr><br>
-
-<!--Packetery Carriers list-->
-<label class="control-label col-lg-3" for="packetery-carriers-list-table">
-</label>
-<ps-table id="packetery-carriers-list-table" name="packetery-carriers-list-table" header="{l s='Packetery Carriers' mod='packetery'}" icon="icon-users" content="{$packetery_carriers_list|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>
-<br><hr><br>
-
 <!--Address Delivery Carriers List-->
 <input type="hidden" name="json_ad" id="json_ad" value='{$ad_array}'>
+<input type="hidden" name="pickup_branch_id" id="pickup_branch_id" value='{$pickup_branch_id}'>
+<input type="hidden" name="pickup_branch_name" id="pickup_branch_name" value='{$pickup_branch_name}'>
 <label class="control-label col-lg-3" for="ad-carriers-list-table">
 </label>
-<ps-table id="ad-carriers-list-table" header="{l s='Address Delivery Carriers List' mod='packetery'}" icon="icon-users" content="{$packetery_list_ad_carriers|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>
+<ps-table id="ad-carriers-list-table" header="{l s='Carriers List' mod='packetery'}" icon="icon-users" content="{$packetery_list_ad_carriers|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>
 <br><hr><br>
 
 <!--Payment list-->

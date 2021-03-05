@@ -65,10 +65,6 @@
 	display: none;
 }
 
-.new_carrier_input {
-
-}
-
 #payment-list-table .table tr td:nth-child(3){
 	display: none;
 }
@@ -111,10 +107,6 @@
 
 .branch-details p{
 	margin-bottom: 0rem;
-}
-
-#packetery-widget{
-	margin-bottom: 3	0px;
 }
 
 #packetery-widget .col-md-6{
@@ -185,7 +177,7 @@
 	overflow: auto;
 	padding: 15px;
 }
-
+/*
 #add-packetery-carrier-block {
 	position: relative;
 	display: none;
@@ -204,7 +196,7 @@
 .new_carrier_is_cod{
 	margin-top: 10px !important;
 }
-
+*/
 .export_selected_csv{
 	margin-top: 20px;
 }
