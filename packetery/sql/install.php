@@ -49,6 +49,8 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'packetery_payment` (
             `is_cod` tinyint(1) not null default 0
         ) engine='._MYSQL_ENGINE_.' default charset=utf8;';
 
+// TODO: id_branch null
+// TODO: is_pickup_point
 $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'packetery_address_delivery` (
             `id_carrier` int not null primary key,
             `id_branch` int null,
