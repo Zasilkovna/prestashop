@@ -48,6 +48,15 @@ switch (Tools::getValue('action'))
         PacketeryApi::updateBranchListAjax();
         break;
     /*SETTINGS*/
+    case 'new_weight_rule':
+        Packeteryclass::newPacketeryWeightRule();
+        break;
+    case 'remove_weight_rule':
+        Packeteryclass::removePacketeryWeightRule();
+        break;
+    case 'get_weight_rule':
+        Packeteryclass::getPacketeryWeightRule();
+        break;
     case 'change_payment_cod':
         Packeteryclass::changePaymentCodAjax();
         break;
@@ -73,6 +82,9 @@ switch (Tools::getValue('action'))
         break;
     case 'order_export':
         PacketeryApi::ordersExportAjax();
+        break;
+    case 'export_order_csv':
+        Packeteryclass::exportOrdersCsv();
         break;
     case 'download_pdf':
         PacketeryApi::downloadPdfAjax();

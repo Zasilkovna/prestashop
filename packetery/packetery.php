@@ -316,6 +316,7 @@ class Packetery extends CarrierModule
         /*END AD CARRIER LIST*/
 
         /*PAYMENT LIST*/
+        $payment_list = array();
         $payment_list = Packeteryclass::getListPayments();
         $this->context->smarty->assign(array(
             'payment_list' => Tools::jsonEncode(array(

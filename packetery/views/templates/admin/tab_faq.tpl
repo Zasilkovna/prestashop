@@ -23,9 +23,10 @@
 *}
 <div id="faq">
 	<br>
-	<p>{l s='First of all register at http://client.packeta.com/ and copypaste API password to its field on module tab.' mod='packetery' }</p>
+	<p>{l s='First of all register at http://client.packeta.com/ and copypast API password to its field on module tab.' mod='packetery' }</p>
 	<p>{l s='All settings autosaves.' mod='packetery' }</p>
-
+	{*<p>{l s='Associate Packetery Address delivery services with prestashop carriers(if needed)' mod='packetery' }</p>*}
+	<p>{l s='' mod='packetery' }</p>
 	<p>{l s='You can change carrier and payment COD setting by clicking on it.' mod='packetery' } {l s='All COD settings in tables is clickable.' mod='packetery' }</p>
 
 	<p>{l s='You can force the widget to use a specific country and language by selecting a value for the "Fixed Country" and "Fixed Language" select boxes. If nothing is selected, the widget will use data from user address.' mod='packetery' }</p>
@@ -36,3 +37,4 @@
 
 	<p>{l s='Have a nice day.' mod='packetery' }</p>
 </div>
+

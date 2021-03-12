@@ -109,6 +109,10 @@
 	margin-bottom: 0rem;
 }
 
+#packetery-widget{
+	margin-bottom: 3	0px;
+}
+
 #packetery-widget .col-md-6{
 	float:none;
 }
@@ -167,6 +171,17 @@
     padding-top: 7px;
 }
 
+#add-weight-rule-block {
+	position: relative;
+	display: none;
+	max-width: 730px;
+	min-height: 350px;
+	width: 80%;
+	background: #ffffff;
+	overflow: auto;
+	padding: 15px;
+}
+
 .export_selected_csv{
 	margin-top: 20px;
 }
@@ -195,6 +210,10 @@ input[type="radio"], input[type="checkbox"]{
 }
 
 #payment-list-table .panel {
+	max-width:550px;
+}
+
+.packetery-weight-rules-table .panel{
 	max-width:550px;
 }
 

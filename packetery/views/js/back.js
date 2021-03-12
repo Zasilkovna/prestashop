@@ -18,10 +18,35 @@ $(document).ready(function(){
 	binds.payment_cod();
 	binds.ad_carrier_cod();
 	/*End Change cod payment*/
+	/**/
+    binds.add_new_weight_rule();
+	/**/
+
+    $('.packetery-weight-rules-table a.action-remove').click(function() {
+        var url = $(this).attr('href');
+        var id = getStringParameter('id', url);
+        ajaxs.remove_weight_rule(id);
+        $(this).parent().parent().parent().parent().css('display', 'none');
+        return false;
+    });
 
 	/*End SETTINGS ACTIONS*/
 	
 	$('#change-order-branch').popup();
+
+    $('.packetery-weight-rules-table i.process-icon-new').click(function(){
+        $('.country-iso').val($(this).closest('.packetery-weight-rules-table')[0].dataset.country);
+        $('#add-weight-rule-block').popup('show');
+        return false;
+    });
+
+    $('.packetery-weight-rules-table a.action-edit').click(function(){
+        var url = $(this).attr('href');
+        var id = getStringParameter('id', url);
+        ajaxs.get_weight_rule(id);
+
+        return false;
+    });
 
 	$('#update-branches').click(function(){
 		ajaxs.updateBranches('#update-branches', false);
@@ -281,6 +306,18 @@ binds = {
 			{
                 alert("Nejsou vybrány žádné objednávky");
             }
+        });
+    },
+    add_new_weight_rule: function() {
+        $('#submit_new_weight_rule').click(function(){
+            var country = $('.country-iso').val();
+            var min = $('.min-weight').val();
+            var max = $('.max-weight').val();
+            var price = $('.price').val();
+            var id = $('.id-weight-rule').val();
+
+            ajaxs.new_weight_rule(min, max, price, country, id);
+            return false;
         });
     },
 
@@ -626,6 +663,107 @@ ajaxs = {
 	        complete: function() {
 	            $("body").toggleClass("wait");
 	        },		
+	    });
+	},
+
+    get_weight_rule: function(id){
+        $.ajax({
+            type: 'POST',
+            url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=get_weight_rule'+ajaxs.checkToken(),
+            data: {'id_weight_rule':id},
+            beforeSend: function() {
+                $("body").toggleClass("wait");
+            },
+            success: function(data) {
+            	data = JSON.parse(data);
+
+                if(!$.isEmptyObject(data))
+                {
+                    $('#add-weight-rule-block .id-weight-rule').val(id);
+                    $('#add-weight-rule-block .country-iso').val(data['country']);
+                    $('#add-weight-rule-block .min-weight').val(data['min_weight']);
+                    $('#add-weight-rule-block .max-weight').val(data['max_weight']);
+                    $('#add-weight-rule-block .price').val(data['price']);
+                }
+
+                $('#add-weight-rule-block').popup('show');
+            },
+            complete: function() {
+                $("body").toggleClass("wait");
+            },
+        });
+	},
+
+	remove_weight_rule: function(id){
+        $.ajax({
+            type: 'POST',
+            url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=remove_weight_rule'+ajaxs.checkToken(),
+            data: {'id_weight_rule':id},
+            beforeSend: function() {
+                $("body").toggleClass("wait");
+            },
+            success: function(msg) {
+                if (msg == 'ok') {
+                    $('#packetery-weight-rules-table .panel').notify(lang_pac.success, "success",{position:"top"});
+                } else {
+                    $('#packetery-weight-rules-table .panel').notify(lang_pac.error, "error",{position:"top"});
+                }
+            },
+            complete: function() {
+                $("body").toggleClass("wait");
+            },
+        });
+	},
+
+	new_weight_rule: function(min, max, price, country, id){
+        $.ajax({
+            type: 'POST',
+            url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=new_weight_rule'+ajaxs.checkToken(),
+            data: {'min':min, 'max':max, 'price':price, 'country':country, 'id':id},
+            beforeSend: function() {
+                $("body").toggleClass("wait");
+            },
+            success: function(msg) {
+                if (msg == 'ok') {
+                    $('#add-weight-rule-block').popup('hide');
+                    setTimeout(function() {
+                        let href = location.href+'&active_tab=settings';
+                        location.href = href;
+                    }, 500);
+                } else {
+                    $('#submit_new_weight_rule').notify(lang_pac.error+"! "+msg, "error",{position:"top"});
+                }
+
+            },
+            complete: function() {
+                $("body").toggleClass("wait");
+            },
+        });
+	},
+
+	new_carrier: function(name, delay, countries, is_cod, logo){
+	    $.ajax({
+	        type: 'POST',
+	        url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=new_carrier'+ajaxs.checkToken(),
+	        data: {'name':name, 'delay':delay, 'countries':countries, 'is_cod':is_cod, 'logo':logo},
+	        beforeSend: function() {
+	        	$("body").toggleClass("wait");
+	        },
+	        success: function(msg) {
+                if (msg == 'ok') {
+					$('#add-packetery-carrier-block').popup('hide');
+	                setTimeout(function() {
+	                	let href = location.href+'&active_tab=settings';
+	                	location.href = href;
+	                }, 500);
+                } else {
+                	$('#submit_new_packetery_carrier').notify(lang_pac.error, "error",{position:"top"});
+                }
+
+	        },
+	        complete: function() {
+	            $("body").toggleClass("wait");
+	        },
 	    });
 	},
 
