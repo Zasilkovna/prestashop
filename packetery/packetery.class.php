@@ -683,35 +683,33 @@ class Packeteryclass
         $isPacketeryCarrier = ($db->getValue('SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
             WHERE id_carrier=' . (int)$carrierId) == 1);
 
-        $carrierUpdate = [];
         if ($branchId === '' && $isPacketeryCarrier) {
             $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
             $result = $db->delete('packetery_address_delivery', '`id_carrier` = ' . ((int)$carrierId));
         } else {
             $fieldsToSet = [];
-            $fieldsToSet['name_branch'] = pSQL($branchName);
-            $fieldsToSet['currency_branch'] = pSQL($branchCurrency);
-
             if ($branchId === self::ZPOINT) {
                 $fieldsToSet['id_branch'] = null;
                 $fieldsToSet['is_pickup_point'] = 1;
+                $fieldsToSet['name_branch'] = null;
+                $fieldsToSet['currency_branch'] = null;
                 $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
             } else {
                 $fieldsToSet['id_branch'] = (int)$branchId;
                 $fieldsToSet['is_pickup_point'] = 0;
+                $fieldsToSet['name_branch'] = pSQL($branchName);
+                $fieldsToSet['currency_branch'] = pSQL($branchCurrency);
                 $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
             }
             if ($isPacketeryCarrier) {
-                $result = $db->update('packetery_address_delivery', $fieldsToSet, '`id_carrier` = ' . ((int)$carrierId));
+                $result = $db->update('packetery_address_delivery', $fieldsToSet, '`id_carrier` = ' . ((int)$carrierId), 0, true);
             } else {
                 $fieldsToSet['is_cod'] = 0;
                 $fieldsToSet['id_carrier'] = (int)$carrierId;
                 $result = $db->insert('packetery_address_delivery', $fieldsToSet, true);
             }
         }
-        if ($carrierUpdate) {
-            $db->update('carrier', $carrierUpdate, '`id_carrier` = ' . ((int)$carrierId), 0, true);
-        }
+        $db->update('carrier', $carrierUpdate, '`id_carrier` = ' . ((int)$carrierId), 0, true);
 
         return $result;
     }
