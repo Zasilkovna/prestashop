@@ -165,12 +165,6 @@
 }
 /*END ORDERS*/
 
-/*add-carrier-form*/
-.add-carrier-form label{
-    text-align: right;
-    padding-top: 7px;
-}
-
 #add-weight-rule-block {
 	position: relative;
 	display: none;

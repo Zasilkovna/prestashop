@@ -741,32 +741,6 @@ ajaxs = {
         });
 	},
 
-	new_carrier: function(name, delay, countries, is_cod, logo){
-	    $.ajax({
-	        type: 'POST',
-	        url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=new_carrier'+ajaxs.checkToken(),
-	        data: {'name':name, 'delay':delay, 'countries':countries, 'is_cod':is_cod, 'logo':logo},
-	        beforeSend: function() {
-	        	$("body").toggleClass("wait");
-	        },
-	        success: function(msg) {
-                if (msg == 'ok') {
-					$('#add-packetery-carrier-block').popup('hide');
-	                setTimeout(function() {
-	                	let href = location.href+'&active_tab=settings';
-	                	location.href = href;
-	                }, 500);
-                } else {
-                	$('#submit_new_packetery_carrier').notify(lang_pac.error, "error",{position:"top"});
-                }
-
-	        },
-	        complete: function() {
-	            $("body").toggleClass("wait");
-	        },
-	    });
-	},
-
 	getCountBranches: function(){
 	    $.ajax({
 	        type: 'POST',
