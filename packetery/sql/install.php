@@ -44,13 +44,6 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'packetery_order` (
 		    unique(id_cart)
 		) engine='._MYSQL_ENGINE_.' default charset=utf8;';
 
-$sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'packetery_carrier` (
-	        `id_carrier` int not null primary key,
-	        `country` varchar(255) not null,
-	        `list_type` tinyint not null,
-	        `is_cod` tinyint(1) not null default 0
-	    ) engine='._MYSQL_ENGINE_.' default charset=utf8;';
-
 $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'packetery_payment` (
             `module_name` varchar(255) not null primary key,
             `is_cod` tinyint(1) not null default 0
@@ -58,12 +51,12 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'packetery_payment` (
 
 $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'packetery_address_delivery` (
             `id_carrier` int not null primary key,
-            `id_branch` int not null,
-            `name_branch` varchar(255) not null,
-            `currency_branch` char(3) not null,
-            `is_cod` tinyint(1) not null default 0
+            `id_branch` int null,
+            `name_branch` varchar(255) null,
+            `currency_branch` char(3) null,
+            `is_cod` tinyint(1) not null default 0,
+            `is_pickup_point` tinyint(1) not null default 0
         ) engine='._MYSQL_ENGINE_.' default charset=utf8;';
-
 
 $sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'packetery_settings`';
 $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'packetery_settings` (

@@ -849,7 +849,7 @@ class PacketeryApi
         $name_branch = Tools::getValue('name_branch');
 
         $is_ad = 0;
-        $packetery_carrier_row = Packeteryclass::getPacketeryCarrierRow($id_carrier);
+        $packetery_carrier_row = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
         $is_cod = $packetery_carrier_row['is_cod'];
 
         $currency = CurrencyCore::getCurrency(Context::getContext()->cart->id_currency);

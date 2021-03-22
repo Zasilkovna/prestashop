@@ -31,6 +31,8 @@ require_once(dirname(__FILE__) . '/packetery.php');
 
 class Packeteryclass
 {
+    // only for mixing with branch ids
+    const ZPOINT = 'zpoint';
 
     /**
      * Returns branch by ID
@@ -127,11 +129,9 @@ class Packeteryclass
     {
         if ($params['id_carrier'] != $params['carrier']->id)
         {
-            Db::getInstance()->execute(
-                'UPDATE `' . _DB_PREFIX_ . 'packetery_carrier`
-                    SET id_carrier=' . ((int)$params['carrier']->id) . '
-                    WHERE id_carrier=' . ((int)$params['id_carrier'])
-            );
+            Db::getInstance()->update('packetery_address_delivery',
+                ['id_carrier' => ((int)$params['carrier']->id)],
+                '`id_carrier` = ' . ((int)$params['id_carrier']));
         }
     }
 
@@ -330,86 +330,56 @@ class Packeteryclass
     public static function hookNewOrder($params)
     {
         // tested hookActionOrderHistoryAddAfter
-        $id_order = (int)$params['order_history']->id_order;
-        $id_cart = (int)$params['cart']->id;
-        $id_carrier = (int)$params['cart']->id_carrier;
-        $order = new Order($id_order);
-        $module_name = $order->module;
+        $orderId = (int)$params['order_history']->id_order;
+        $cartId = (int)$params['cart']->id;
+        $carrierId = (int)$params['cart']->id_carrier;
+        $order = new Order($orderId);
+        $moduleName = $order->module;
         $module = new Packetery;
 
-        $db = DB::getInstance();
-        $sql_is_packetery_carrier = 'SELECT is_cod from `' . _DB_PREFIX_ . 'packetery_carrier`
-                                        WHERE id_carrier=' . (int)$id_carrier;
-
-        $sql_is_packetery_ad_carrier = 'SELECT is_cod, id_branch, name_branch, currency_branch
-                                        from `' . _DB_PREFIX_ . 'packetery_address_delivery`
-                                        WHERE id_carrier=' . (int)$id_carrier;
-
-        if ($packetery_carrier = $db->getRow($sql_is_packetery_carrier))
-        {
-            $sql_is_packetery_order = 'SELECT 1 from `' . _DB_PREFIX_ . 'packetery_order`
-                                        WHERE id_cart=' . (int)$id_cart;
-
-            if (!$db->getValue($sql_is_packetery_order))
-            {
-                $db->execute(
-                    'INSERT IGNORE INTO `' . _DB_PREFIX_ . 'packetery_order` 
-                    SET id_cart=' . (int)$id_cart
-                );
-                $db->execute(
-                    'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-                    SET id_branch=0, 
-                        name_branch="' . $module->l('Please select branch') . '", 
-                        currency_branch="",
-                        is_ad = 0
-                    WHERE id_cart=' . (int)$id_cart
-                );
-            }
-        }
-        elseif ($packetery_carrier = $db->getRow($sql_is_packetery_ad_carrier))
-        {
-            // update address delivery
-            $db->execute(
-                'INSERT IGNORE INTO `' . _DB_PREFIX_ . 'packetery_order` 
-                SET id_cart=' . (int)$id_cart
-            );
-            $db->execute(
-                'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-                SET id_branch=' . (int)$packetery_carrier['id_branch'] . ', 
-                    name_branch="' . pSQL($packetery_carrier['name_branch']) . '", 
-                    currency_branch="' . pSQL($packetery_carrier['currency_branch']) . '",
-                    is_ad = 1
-                WHERE id_cart=' . (int)$id_cart
-            );
-        }
-        else
-        {
+        $carrier = self::getPacketeryCarrierById($carrierId);
+        if (!$carrier) {
             return;
         }
 
-        // Update set id_order in bridge
-        $db->execute(
-            'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-            SET id_order=' . (int)$id_order . '
-            WHERE id_cart=' . (int)$id_cart
-        );
+        $orderData = [];
+        if (!$carrier['is_pickup_point']) {
+            $orderData['id_branch'] = (int)$carrier['id_branch'];
+            $orderData['name_branch'] = pSQL($carrier['name_branch']);
+            $orderData['currency_branch'] = pSQL($carrier['currency_branch']);
+            $orderData['is_ad'] = 1;
+        } else {
+            $isPacketeryOrder = Db::getInstance()->getValue(
+                'SELECT 1 from `' . _DB_PREFIX_ . 'packetery_order` WHERE id_cart=' . $cartId);
 
-        /*Determine is COD*/
-        $carrier_is_cod = ($packetery_carrier['is_cod'] == 1);
-        $payment_is_cod = ($db->getValue(
-                'SELECT is_cod 
-            FROM `' . _DB_PREFIX_ . 'packetery_payment` 
-            WHERE module_name="' . pSQL($module_name) . '"'
-            ) == 1);
-        if ($carrier_is_cod || $payment_is_cod)
-        {
-            $db->execute(
-                'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-                SET is_cod=1 
-                WHERE id_order=' . (int)$id_order
-            );
+            if (!$isPacketeryOrder) {
+                $orderData['id_branch'] = 0;
+                $orderData['name_branch'] = $module->l('Please select branch');
+                $orderData['currency_branch'] = '';
+                $orderData['is_ad'] = 0;
+            }
         }
-        /*END COD*/
+
+        $db = Db::getInstance();
+        if (!empty($orderData)) {
+            $orderData['id_cart'] = $cartId;
+            $db->insert('packetery_order', $orderData, true, true, Db::ON_DUPLICATE_KEY);
+        }
+
+        // Update cart order id in packetery_order
+        $fieldsToUpdate['id_order'] = $orderId;
+
+        // Determine if is COD
+        $carrier_is_cod = ($carrier['is_cod'] == 1);
+        $payment_is_cod = ($db->getValue(
+                'SELECT `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_payment` 
+                WHERE module_name="' . pSQL($moduleName) . '"'
+            ) == 1);
+        if ($carrier_is_cod || $payment_is_cod) {
+            $fieldsToUpdate['is_cod'] = 1;
+        }
+
+        $db->update('packetery_order', $fieldsToUpdate, '`id_cart` = ' . $cartId);
     }
 
     /**
@@ -603,180 +573,17 @@ class Packeteryclass
     }
     /*END ORDERS*/
 
-    /*CARRIERS*/
-    /*REMOVE CARRIER*/
-    /**
-     *  Function called by Ajax to delete a given packetery carrier record.
-     */
-    public static function removePacketeryCarrier()
-    {
-        $id_carrier = (int)Tools::getValue('id_carrier');
-        $sql = 'UPDATE `' . _DB_PREFIX_ . 'carrier` 
-                SET deleted=1,
-                    active=0
-                WHERE external_module_name="packetery"
-                    AND id_carrier=' . (int)$id_carrier;
-        if (Db::getInstance()->execute($sql))
-        {
-            echo 'ok';
-        }
-        else
-        {
-            die('There was an issue trying to remove the option, please try again later.');
-        }
-    }
-    /*END REMOVE CARRIER*/
-
-    /**
-     * New carrier - called by ajax
-     */
-    public static function newPacketeryCarrier()
-    {
-        $carrier = self::newCarrier();
-        self::addZones($carrier);
-        self::addGroups($carrier);
-        self::addRanges($carrier);
-        echo "ok";
-    }
-
-    /**
-     * @return Carrier
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    protected static function newCarrier()
-    {
-        $name = Tools::getValue('name');
-        $delay = Tools::getValue('delay');
-        $countries = Tools::getValue('countries');
-        $is_cod = Tools::getValue('is_cod');
-        $carrier = new Carrier();
-        $carrier->name = $name;
-        $carrier->is_module = true;
-        $carrier->active = 1;
-        $carrier->need_range = 1;
-        $carrier->shipping_external = 0; // doesnt use own shipping rules
-        $carrier->range_behavior = true; // true disables this carrier if outside weight range
-        $carrier->external_module_name = "packetery";
-        $carrier->shipping_method = defined('Carrier::SHIPPING_METHOD_WEIGHT') ? Carrier::SHIPPING_METHOD_WEIGHT : 1;
-        $carrier->max_weight = 5;
-
-        foreach (Language::getLanguages() as $lang)
-        {
-            $carrier->delay[$lang['id_lang']] = $delay;
-        }
-
-        if ($carrier->add() == true)
-        {
-            @copy(dirname(__FILE__) . '/views/img/carrier_image.jpg', _PS_SHIP_IMG_DIR_ . '/' . (int)$carrier->id . '.jpg');
-            Configuration::updateValue('PACKETERY_CARRIER_ID', (int)$carrier->id);
-        }
-
-        /*INSERT PACKETERY CARRIER*/
-        self::addCarrierToBridge($carrier->id, $countries, $is_cod);
-        /*END INSERT PACKETERY CARRIER*/
-        return $carrier;
-    }
-
-    /**
-     * Add packetery carrier to eshop carriers
-     * @param $id_carrier
-     * @param $countries
-     * @param $is_cod
-     * @return bool
-     */
-    protected static function addCarrierToBridge($id_carrier, $countries, $is_cod)
-    {
-        $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_carrier` 
-                SET 
-                    id_carrier=' . (int)$id_carrier . ', 
-                    country="' . pSQL($countries ? $countries : 'cz,sk') . '", 
-                    list_type = 1,  
-                    is_cod=' . ($is_cod ? (int)$is_cod : 0) . ';';
-        $result = Db::getInstance()->execute($sql);
-        return $result;
-    }
-
-    /**
-     * Add carrier to customer groups
-     * @param $carrier
-     */
-    protected static function addGroups($carrier)
-    {
-        $groups_ids = array();
-        $groups = Group::getGroups(Context::getContext()->language->id);
-        foreach ($groups as $group)
-        {
-            $groups_ids[] = $group['id_group'];
-        }
-        $carrier->setGroups($groups_ids);
-    }
-
-    /**
-     * Add price ranges to carrier
-     * @param $carrier
-     */
-    protected static function addRanges($carrier)
-    {
-        $range_price = new RangePrice();
-        $range_price->id_carrier = $carrier->id;
-        $range_price->delimiter1 = '0';
-        $range_price->delimiter2 = '10000';
-        $range_price->add();
-
-        $range_weight = new RangeWeight();
-        $range_weight->id_carrier = $carrier->id;
-        $range_weight->delimiter1 = '0';
-        $range_weight->delimiter2 = '10000';
-        $range_weight->add();
-    }
-
-    /**
-     * Add carrier to zones
-     * @param $carrier
-     */
-    protected static function addZones($carrier)
-    {
-        $zones = Zone::getZones();
-
-        foreach ($zones as $zone)
-        {
-            if (Tools::strpos($zone['name'], 'rope') > 0)
-            {
-                $carrier->addZone($zone['id_zone']);
-            }
-        }
-    }
-    /*END NEW CARRIER*/
-
     /**
      * Get packetery carrier
-     * @param $id_carrier
+     * @param int $id_carrier
      * @return array|bool|null|object
      */
-    public static function getPacketeryCarrierRow($id_carrier)
+    public static function getPacketeryCarrierById($id_carrier)
     {
-        $sql = 'SELECT *
-                FROM `' . _DB_PREFIX_ . 'packetery_carrier`
-                WHERE id_carrier=' . (int)$id_carrier;
-        $result = Db::getInstance()->getRow($sql);
-        return $result;
-    }
-
-    /**
-     * Get all active packetery carriers
-     * @return array|false|mysqli_result|null|PDOStatement|resource
-     * @throws PrestaShopDatabaseException
-     */
-    public static function getCarriersList()
-    {
-        $sql = 'SELECT c.id_carrier, c.name, pc.country, pc.list_type, pc.is_cod
-            FROM `' . _DB_PREFIX_ . 'carrier` c 
-            JOIN `' . _DB_PREFIX_ . 'packetery_carrier` pc
-                ON(pc.id_carrier=c.id_carrier)
-            WHERE c.deleted=0';
-        $result = Db::getInstance()->executeS($sql);
-        return $result;
+        return Db::getInstance()->getRow('
+            SELECT `id_branch`, `name_branch`, `currency_branch`, `is_pickup_point`, `is_cod`
+            FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
+            WHERE `id_carrier` = ' . $id_carrier);
     }
 
     /**
@@ -784,64 +591,15 @@ class Packeteryclass
      * @return array|false|mysqli_result|null|PDOStatement|resource
      * @throws PrestaShopDatabaseException
      */
-    public static function getListAddressDeliveryCarriers()
+    public static function getPacketeryCarriersList()
     {
-        $sql = 'SELECT pad.*, c.name, c.id_carrier
-                FROM `' . _DB_PREFIX_ . 'carrier` c
-                LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` pad using(id_carrier)
-                WHERE c.external_module_name<>"packetery"
-                  AND c.id_carrier not in (select id_carrier from `' . _DB_PREFIX_ . 'packetery_carrier`)
-                  AND c.deleted=0
-                  AND c.active=1
-        ';
-        $result = Db::getInstance()->executeS($sql);
-        return $result;
-    }
-
-    /**
-     * Change carrier COD - called by AJAX
-     */
-    public static function changeCarrierCodAjax()
-    {
-        $result = self::changeCarrierCod();
-        if ($result)
-        {
-            echo 'ok';
-        }
-        else
-        {
-            echo '';
-        }
-    }
-
-    /**
-     * Change carrier COD in DB
-     * @return bool|void
-     */
-    public static function changeCarrierCod()
-    {
-        $id_carrier = Tools::getValue('id_carrier');
-        $is_cod = Tools::getValue('value');
-        if (!isset($id_carrier) || (!isset($is_cod)))
-        {
-            return;
-        }
-        $db = Db::getInstance();
-        $sql_is_set_carrier = 'SELECT 1 
-                            FROM `' . _DB_PREFIX_ . 'packetery_carrier` 
-                            WHERE id_carrier=' . (int)$id_carrier . '';
-        if ($db->getValue($sql_is_set_carrier) == 1)
-        {
-            $sql_update_carrier_cod = 'UPDATE `' . _DB_PREFIX_ . 'packetery_carrier` 
-                                        SET is_cod=' . (int)$is_cod . ' 
-                                        WHERE id_carrier=' . (int)$id_carrier . '';
-            $result = $db->execute($sql_update_carrier_cod);
-        }
-        else
-        {
-            $result = false;
-        }
-        return $result;
+        return Db::getInstance()->executeS('
+            SELECT `c`.`id_carrier`, `c`.`name`, `pad`.`id_branch`, `pad`.`is_cod`, `pad`.`is_pickup_point` 
+            FROM `' . _DB_PREFIX_ . 'carrier` `c`
+            LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` USING(`id_carrier`)
+            WHERE `c`.`deleted` = 0
+            AND `c`.`active` = 1
+        ');
     }
 
     /**
@@ -894,9 +652,9 @@ class Packeteryclass
     /**
      * Add address delivery to carrier - called by ajax
      */
-    public static function setAdCarrierAjax()
+    public static function setPacketeryCarrierAjax()
     {
-        $result = self::setAdCarrier();
+        $result = self::setPacketeryCarrier();
         if ($result)
         {
             echo 'ok';
@@ -911,39 +669,48 @@ class Packeteryclass
      * Add address delivery to carrier in DB
      * @return bool
      */
-    public static function setAdCarrier()
+    private static function setPacketeryCarrier()
     {
-        $id_branch = Tools::getValue('id_branch');
-        $name_branch = Tools::getValue('branch_name');
-        $currency_branch = Tools::getValue('currency_branch');
-        $id_carrier = Tools::getValue('id_carrier');
-        if (!isset($id_carrier) || !isset($id_branch))
-        {
+        $branchName = Tools::getValue('branch_name');
+        $branchCurrency = Tools::getValue('currency_branch');
+        if (!Tools::getIsset('id_carrier') || !Tools::getIsset('id_branch')) {
             return false;
         }
+        $carrierId = Tools::getValue('id_carrier');
+        $branchId = Tools::getValue('id_branch');
+
         $db = Db::getInstance();
-        $sql_is_set_carrier = 'SELECT 1 
-                            FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` 
-                            WHERE id_carrier=' . (int)$id_carrier . '';
-        if ($db->getValue($sql_is_set_carrier) == 1)
-        {
-            $sql_update_ad_carrier = 'UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery` 
-                                        SET name_branch="' . pSQL($name_branch) . '", 
-                                            currency_branch="' . pSQL($currency_branch) . '", 
-                                            id_branch=' . (int)$id_branch . ' 
-                                        WHERE id_carrier=' . (int)$id_carrier . '';
-            $result = $db->execute($sql_update_ad_carrier);
+        $isPacketeryCarrier = ($db->getValue('SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
+            WHERE id_carrier=' . (int)$carrierId) == 1);
+
+        if ($branchId === '' && $isPacketeryCarrier) {
+            $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
+            $result = $db->delete('packetery_address_delivery', '`id_carrier` = ' . ((int)$carrierId));
+        } else {
+            $fieldsToSet = [];
+            if ($branchId === self::ZPOINT) {
+                $fieldsToSet['id_branch'] = null;
+                $fieldsToSet['is_pickup_point'] = 1;
+                $fieldsToSet['name_branch'] = null;
+                $fieldsToSet['currency_branch'] = null;
+                $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
+            } else {
+                $fieldsToSet['id_branch'] = (int)$branchId;
+                $fieldsToSet['is_pickup_point'] = 0;
+                $fieldsToSet['name_branch'] = pSQL($branchName);
+                $fieldsToSet['currency_branch'] = pSQL($branchCurrency);
+                $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
+            }
+            if ($isPacketeryCarrier) {
+                $result = $db->update('packetery_address_delivery', $fieldsToSet, '`id_carrier` = ' . ((int)$carrierId), 0, true);
+            } else {
+                $fieldsToSet['is_cod'] = 0;
+                $fieldsToSet['id_carrier'] = (int)$carrierId;
+                $result = $db->insert('packetery_address_delivery', $fieldsToSet, true);
+            }
         }
-        else
-        {
-            $sql_insert_ad_carrier = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_address_delivery` 
-                                        SET name_branch="' . pSQL($name_branch) . '", 
-                                            currency_branch="' . pSQL($currency_branch) . '", 
-                                            id_branch=' . (int)$id_branch . ',
-                                            is_cod = 0, 
-                                            id_carrier=' . (int)$id_carrier . ';';
-            $result = $db->execute($sql_insert_ad_carrier);
-        }
+        $db->update('carrier', $carrierUpdate, '`id_carrier` = ' . ((int)$carrierId), 0, true);
+
         return $result;
     }
 

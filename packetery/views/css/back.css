@@ -65,10 +65,6 @@
 	display: none;
 }
 
-.new_carrier_input {
-
-}
-
 #payment-list-table .table tr td:nth-child(3){
 	display: none;
 }
@@ -169,12 +165,6 @@
 }
 /*END ORDERS*/
 
-/*add-carrier-form*/
-.add-carrier-form label{
-    text-align: right;
-    padding-top: 7px;
-}
-
 #add-weight-rule-block {
 	position: relative;
 	display: none;
@@ -184,25 +174,6 @@
 	background: #ffffff;
 	overflow: auto;
 	padding: 15px;
-}
-
-#add-packetery-carrier-block {
-	position: relative;
-	display: none;
-	max-width: 730px;
-	min-height: 350px;
-	width: 80%;
-	background: #ffffff;
-	overflow: auto;
-	padding: 15px;
-}
-
-.add-carrier-form input,.add-carrier-form  select,.add-carrier-form  textarea{
-	max-width: 500px !important;
-}
-
-.new_carrier_is_cod{
-	margin-top: 10px !important;
 }
 
 .export_selected_csv{
@@ -223,9 +194,6 @@ input[type="radio"], input[type="checkbox"]{
 #payment-list-table i.icon-remove.status, #ad-carriers-list-table i.icon-remove.status{
 	cursor: pointer;
 }
-#packetery-carriers-list-table i.status{
-	cursor: pointer;
-}
 
 #payment-list-table {
 	max-width:550px;
@@ -236,10 +204,6 @@ input[type="radio"], input[type="checkbox"]{
 }
 
 #payment-list-table .panel {
-	max-width:550px;
-}
-
-#packetery-carriers-list-table .panel{
 	max-width:550px;
 }
 

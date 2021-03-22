@@ -16,23 +16,11 @@ $(document).ready(function(){
 
 	/*Change cod payment*/
 	binds.payment_cod();
-	binds.carrier_cod();
 	binds.ad_carrier_cod();
 	/*End Change cod payment*/
 	/**/
     binds.add_new_weight_rule();
 	/**/
-	/*ADD CARRIER*/
-	binds.add_new_packetery_carrier();
-
-	$('#packetery-carriers-list-table a.edit').click(function() {
-		var url = $(this).attr('href');
-		var id_carrier = getStringParameter('id_carrier', url);
-		ajaxs.removecarrier(id_carrier);
-		$(this).parent().parent().parent().parent().css('display', 'none');
-		return false;
-	});
-	/*END ADD CARRIER*/
 
     $('.packetery-weight-rules-table a.action-remove').click(function() {
         var url = $(this).attr('href');
@@ -44,13 +32,7 @@ $(document).ready(function(){
 
 	/*End SETTINGS ACTIONS*/
 	
-	$('#add-packetery-carrier-block').popup();
 	$('#change-order-branch').popup();
-
-	$('#packetery-carriers-list-table i.process-icon-new').click(function(){
-        $('#add-packetery-carrier-block').popup('show');
-		return false;
-	});
 
     $('.packetery-weight-rules-table i.process-icon-new').click(function(){
         $('.country-iso').val($(this).closest('.packetery-weight-rules-table')[0].dataset.country);
@@ -212,20 +194,26 @@ tools = {
 	ad_list_build: function() {
 		var json_ad = decodeURIComponent($('#json_ad').val());
 		$('#ad-carriers-list-table table tr td:nth-child(3)').each(function() {
-			var id_branch = $(this).find('span').text();
-			var select = tools.buildselect(json_ad, id_branch);
+			var id_branch_chosen = $(this).find('span').text();
+			var zpoint = $('#zpoint').val();
+			var packeta_pickup_point = $('#packeta_pickup_point').val();
+			var is_pickup_point = parseInt($(this).parent().find('.hidden span').text());
+			var select = tools.buildselect(json_ad, id_branch_chosen, zpoint, packeta_pickup_point, is_pickup_point);
 			$(this).html(select);
 		});
 		binds.ad_carrier_select();
 	},
-	buildselect: function(json, id_branch_default) {
-		var html = '';
-		html+= '<select name="selected_ad_carrier" id="selected_ad_carrier">';
-		html+= '<option value="0">--</option>';
+	buildselect: function(json, id_branch_chosen, zpoint, packeta_pickup_point, is_pickup_point) {
+		// TODO: show hint to update branches if no carriers available
 		var carriers = JSON.parse(json);
 		var cnt = carriers.length;
+		var html = '';
+		html+= '<select name="selected_ad_carrier" id="selected_ad_carrier">';
+		html+= '<option value="">--</option>';
+		html+= '<option value="' + zpoint + '"' +
+			(is_pickup_point ? ' selected' : '') + '>' + packeta_pickup_point + '</option>';
 		for (var i = 0; i < cnt; i++) {
-			if (carriers[i]['id_branch'] == id_branch_default)
+			if (carriers[i]['id_branch'] == id_branch_chosen)
 				var selected = 'selected';
 			else
 				var selected = '';
@@ -332,33 +320,6 @@ binds = {
             return false;
         });
     },
-	add_new_packetery_carrier: function() {
-		$('#submit_new_packetery_carrier').click(function(){
-			var name = $('.new_carrier_name').val();
-			var delay = $('.new_carrier_delay').val();
-			var countries = [];
-			$('#packetery_carrier_country option:selected').each(function(i) {
-				countries[i] = $(this).val();
-			});
-			var country_str = countries.join();
-
-			if ($('.new_carrier_is_cod').prop('checked') == true)
-				var is_cod = 1;
-			else
-				var is_cod = 0;
-
-			var logo = $('input[name=new_carrier_logo]:checked').data('option');
-			if (logo == undefined)
-				var logo = 'no';
-			if (countries.length == 0) {
-				$('#packetery_carrier_country').notify(lang_pac.error+' :'+lang_pac.err_country, "error",{position:"top"});
-				return false;
-			}
-			ajaxs.new_carrier(name, delay, country_str, is_cod, logo);
-			return false;
-		});
-	},
-
 
 	uncheckboxAllTable: function() {
 		$('#packetery-orders-table').find('.ps-table-checkbox').prop('checked', false);
@@ -412,18 +373,6 @@ binds = {
 			else
 				var value = 0;
 			ajaxs.change_payment_cod(module_name, value, this);
-		});
-	},
-
-	carrier_cod: function() {
-		$('#packetery-carriers-list-table i.status').unbind();
-		$('#packetery-carriers-list-table i.status').click(function(){
-			var id_carrier = $(this).parent().parent().find('td').first().find('span').text();
-			if ($(this).hasClass('icon-remove'))
-				var value = 1;
-			else
-				var value = 0;
-			ajaxs.change_carrier_cod(id_carrier, value, this);
 		});
 	},
 
@@ -489,34 +438,6 @@ ajaxs = {
 	                $('#ad-carriers-list-table .panel').notify(lang_pac.success, "success",{position:"top"});
                 } else {
                 	$('#ad-carriers-list-table .panel').notify(lang_pac.error, "error",{position:"top"});
-                }
-	        },
-	        complete: function() {
-	            $("body").toggleClass("wait");
-	        },		
-	    });
-	},
-
-	change_carrier_cod: function(id_carrier, value, container){
-	    $.ajax({
-	        type: 'POST',
-	        url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=change_carrier_cod'+ajaxs.checkToken(),
-	        data: {'id_carrier':id_carrier, 'value':value},
-	        container: container,
-	        beforeSend: function() {
-	        	$("body").toggleClass("wait");
-	        },
-	        success: function(msg) {
-                if (msg == 'ok') {
-                	if (value == 1) {
-	                	$(this.container).replaceWith('<i class="icon-check status"></i>');
-	                } else {
-	                	$(this.container).replaceWith('<i class="icon-remove status"></i>');
-	                }
-	                binds.carrier_cod();
-	                $('#packetery-carriers-list-table .panel').notify(lang_pac.success, "success",{position:"top"});
-                } else {
-                	$('#packetery-carriers-list-table .panel').notify(lang_pac.error+': '+msg, "error",{position:"top"});
                 }
 	        },
 	        complete: function() {
@@ -745,27 +666,6 @@ ajaxs = {
 	    });
 	},
 
-	removecarrier: function(id_carrier){
-	    $.ajax({
-	        type: 'POST',
-	        url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=remove_carrier'+ajaxs.checkToken(),
-	        data: {'id_carrier':id_carrier},
-	        beforeSend: function() {
-	        	$("body").toggleClass("wait");
-	        },
-	        success: function(msg) {
-                if (msg == 'ok') {
-					$('#packetery-carriers-list-table .panel').notify(lang_pac.success, "success",{position:"top"});
-                } else {
-                	$('#packetery-carriers-list-table .panel').notify(lang_pac.error, "error",{position:"top"});
-                }
-	        },
-	        complete: function() {
-	            $("body").toggleClass("wait");
-	        },		
-	    });
-	},
-
     get_weight_rule: function(id){
         $.ajax({
             type: 'POST',
@@ -841,32 +741,6 @@ ajaxs = {
         });
 	},
 
-	new_carrier: function(name, delay, countries, is_cod, logo){
-	    $.ajax({
-	        type: 'POST',
-	        url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=new_carrier'+ajaxs.checkToken(),
-	        data: {'name':name, 'delay':delay, 'countries':countries, 'is_cod':is_cod, 'logo':logo},
-	        beforeSend: function() {
-	        	$("body").toggleClass("wait");
-	        },
-	        success: function(msg) {
-                if (msg == 'ok') {
-					$('#add-packetery-carrier-block').popup('hide');
-	                setTimeout(function() {
-	                	let href = location.href+'&active_tab=settings';
-	                	location.href = href;
-	                }, 500);
-                } else {
-                	$('#submit_new_packetery_carrier').notify(lang_pac.error, "error",{position:"top"});
-                }
-
-	        },
-	        complete: function() {
-	            $("body").toggleClass("wait");
-	        },		
-	    });
-	},
-
 	getCountBranches: function(){
 	    $.ajax({
 	        type: 'POST',
@@ -903,6 +777,8 @@ ajaxs = {
 
                 if (msg != 'true')
                 {
+					/* TODO: Uncaught SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data
+                    loader stays shown, everything seems ok after reload */
                     var res = JSON.parse(msg);
                     var id = res[0];
                     var message = res[1];
@@ -931,6 +807,10 @@ ajaxs = {
 	        	}
 
 	        },
+			error: function() {
+	        	// TODO: prepare message for user
+				console.log('Branches update failed. Is API key provided?');
+			},
 	        complete: function() {
 	            $("body").toggleClass("wait");
 	        },		

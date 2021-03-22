@@ -23,14 +23,14 @@
 *}
 <input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="ajaxfields" id="ajaxfields" value="{$ajaxfields|escape:'htmlall':'UTF-8'}">
-<input type="hidden" name="widget_carrier" id="widget_carrier" value="{$widget_carrier|escape:'htmlall':'UTF-8'}">
+<input type="hidden" name="carrier_id" id="carrier_id" value="{$carrier_id|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="widget_force_country" id="widget_force_country"
        value="{$force_country|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="widget_force_language" id="widget_force_language"
        value="{$force_language|escape:'htmlall':'UTF-8'}">
 <input type="hidden" id="shop-language" name="shop-language" value="{$language['iso_code']|escape:'htmlall':'UTF-8'}">
 <input type="hidden" id="customer_country" name="customer_country" value="{$customer_country|escape:'htmlall':'UTF-8'}">
-<input type="hidden" id="carrier_countries" name="carrier_countries" value="{$carrier_countries}">
+<input type="hidden" id="zpoint_carriers" name="zpoint_carriers" value="{$zpoint_carriers}">
 <input type="hidden" id="allowed_countries" name="allowed_countries" value="{$allowed_countries}">
 <input type="hidden" id="module_version" name="module_version" value="{$module_version}">
 <!--Packetery widget-->
@@ -40,8 +40,6 @@
             <div class="zas-box">
                 <button class="btn btn-sm btn-success pull-left open-packeta-widget"
                         id="open-packeta-widget">{l s='Select pick-up point:' mod='packetery'}</button>
-                <span class="pull-left" id="invalid-country-carrier"
-                      style="display:none; color:red">{l s='This carrier is unavailable for your country' mod='packetery'}</span>
                 <br>
                 <ul id="selected-branch">
                     <li>{l s='Selected pick-up point:' mod='packetery'}

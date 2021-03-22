@@ -57,24 +57,14 @@ switch (Tools::getValue('action'))
     case 'get_weight_rule':
         Packeteryclass::getPacketeryWeightRule();
         break;
-    case 'new_carrier':
-        Packeteryclass::newPacketeryCarrier();
-        break;
-    case 'remove_carrier':
-        Packeteryclass::removePacketeryCarrier();
-        break;
     case 'change_payment_cod':
         Packeteryclass::changePaymentCodAjax();
-        break;
-
-    case 'change_carrier_cod':
-        Packeteryclass::changeCarrierCodAjax();
         break;
     case 'change_ad_carrier_cod':
         Packeteryclass::changeAdCarrierCodAjax();
         break;
     case 'set_ad_carrier_association':
-        Packeteryclass::setAdCarrierAjax();
+        Packeteryclass::setPacketeryCarrierAjax();
         break;
     /*END SETTINGS*/
     /*ORDERS*/

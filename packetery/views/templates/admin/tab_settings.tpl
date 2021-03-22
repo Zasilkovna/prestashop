@@ -83,22 +83,13 @@
 	<br>
 </div>
 
-<!--Add carrier-->
-{include file="./carrier_packetery_add.tpl" }
- <!--End add-packetery-carrier-block-->
-<br><hr><br>
-
-<!--Packetery Carriers list-->
-<label class="control-label col-lg-3" for="packetery-carriers-list-table">
-</label>
-<ps-table id="packetery-carriers-list-table" name="packetery-carriers-list-table" header="{l s='Packetery Carriers' mod='packetery'}" icon="icon-users" content="{$packetery_carriers_list|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>
-<br><hr><br>
-
 <!--Address Delivery Carriers List-->
 <input type="hidden" name="json_ad" id="json_ad" value='{$ad_array}'>
+<input type="hidden" name="zpoint" id="zpoint" value='{$zpoint}'>
+<input type="hidden" name="packeta_pickup_point" id="packeta_pickup_point" value='{$packeta_pickup_point}'>
 <label class="control-label col-lg-3" for="ad-carriers-list-table">
 </label>
-<ps-table id="ad-carriers-list-table" header="{l s='Address Delivery Carriers List' mod='packetery'}" icon="icon-users" content="{$packetery_list_ad_carriers|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>
+<ps-table id="ad-carriers-list-table" header="{l s='Carriers List' mod='packetery'}" icon="icon-users" content="{$packetery_list_ad_carriers|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>
 <br><hr><br>
 
 <!--Payment list-->

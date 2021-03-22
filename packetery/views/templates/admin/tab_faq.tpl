@@ -25,7 +25,6 @@
 	<br>
 	<p>{l s='First of all register at http://client.packeta.com/ and copypast API password to its field on module tab.' mod='packetery' }</p>
 	<p>{l s='All settings autosaves.' mod='packetery' }</p>
-	<p>{l s='To add new packetery carrier please click "+" button in top right corner of "PACKETERY CARRIERS" table.' mod='packetery' }</p>
 	{*<p>{l s='Associate Packetery Address delivery services with prestashop carriers(if needed)' mod='packetery' }</p>*}
 	<p>{l s='' mod='packetery' }</p>
 	<p>{l s='You can change carrier and payment COD setting by clicking on it.' mod='packetery' } {l s='All COD settings in tables is clickable.' mod='packetery' }</p>
