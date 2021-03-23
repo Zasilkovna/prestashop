@@ -34,8 +34,6 @@ class Packetery extends CarrierModule
     protected $config_form = false;
 
     private $supported_countries_trans = array(); /* Used wherever countries with texts are needed */
-    private $supported_languages = array('cs', 'sk', 'pl', 'hu', 'ro', 'en');
-    private $supported_languages_trans = array(); /* Used wherever languages with texts are needed */
 
     public function __construct()
     {
@@ -58,15 +56,6 @@ class Packetery extends CarrierModule
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
          */
         $this->bootstrap = true;
-
-        $this->supported_languages_trans = array(
-            'cs' => $this->l('Czech'),
-            'sk' => $this->l('Slovak'),
-            'hu' => $this->l('Hungarian'),
-            'pl' => $this->l('Polish'),
-            'ro' => $this->l('Romanian'),
-            'en' => $this->l('English'),
-        );
 
         parent::__construct();
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
@@ -98,7 +87,7 @@ class Packetery extends CarrierModule
                 "name" => $this->l('Slovakia')
             ],
         );
-            
+
         $this->ps_versions_compliancy = array('min' => '1.7.0.0', 'max' => _PS_VERSION_);
     }
 
@@ -233,17 +222,8 @@ class Packetery extends CarrierModule
         $labels_format = Packeteryclass::getConfigValueByOption('LABEL_FORMAT');
         $this->context->smarty->assign('labels_format', $labels_format);
 
-        $forceCountry = Packeteryclass::getConfigValueByOption('FORCE_COUNTRY');
-        $this->context->smarty->assign('force_country', $forceCountry);
-
-        $forceLanguage = Packeteryclass::getConfigValueByOption('FORCE_LANGUAGE');
-        $this->context->smarty->assign('force_language', $forceLanguage);
-
         $langs = Language::getLanguages();
         $this->context->smarty->assign('langs', $langs);
-
-        $this->context->smarty->assign('supported_countries', $this->supported_countries_trans);
-        $this->context->smarty->assign('supported_languages', $this->supported_languages_trans);
 
         $this->context->smarty->assign('module_dir', $this->_path);
         $id_employee = $this->context->employee->id;
@@ -481,16 +461,12 @@ class Packetery extends CarrierModule
 		}
 
 		$this->context->smarty->assign('module_version', $this->version);
-		$this->context->smarty->assign('allowed_countries', json_encode($this->limited_countries));
 		$this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
 		$this->context->smarty->assign('id_branch', $id_branch);
 		$this->context->smarty->assign('name_branch', $name_branch);
 		$this->context->smarty->assign('currency_branch', $currency_branch);
 
 		$this->context->smarty->assign('ajaxfields', $ajaxfields_json);
-
-		$this->context->smarty->assign('force_country', Packeteryclass::getConfigValueByOption('FORCE_COUNTRY'));
-		$this->context->smarty->assign('force_language', Packeteryclass::getConfigValueByOption('FORCE_LANGUAGE'));
 
 		$base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
 		$this->context->smarty->assign('baseuri', $base_uri);

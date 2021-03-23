@@ -10,12 +10,6 @@ $_MODULE['<{packetery}prestashop>packetery.class_828032870ec0f9d5b619c4219ab6096
 $_MODULE['<{packetery}prestashop>packetery.class_7bc075f26a8b9b23412e3371a5bc18b7'] = 'Api heslo je nesprávne. Pobočky nebudú aktualizované.';
 $_MODULE['<{packetery}prestashop>packetery.class_3a2f7eb090541a1fffae68f276e8d62e'] = 'Api heslo musí byť reťazec';
 $_MODULE['<{packetery}prestashop>packetery.class_99e509047c59de9aff57deb5c3b80a1c'] = 'E-shop ID must be a String';
-$_MODULE['<{packetery}prestashop>packetery_83ff4480cdf2900ae83bf30d95774d76'] = 'Čeština';
-$_MODULE['<{packetery}prestashop>packetery_9accc467b159e7ce158e53209c0cde2a'] = 'Slovenština';
-$_MODULE['<{packetery}prestashop>packetery_7b86112ec6401fd8f06ab5251d1a68fe'] = 'Maďarština';
-$_MODULE['<{packetery}prestashop>packetery_c730389bc8d99e59c867766babdd48b5'] = 'Polština';
-$_MODULE['<{packetery}prestashop>packetery_efa7394ecaa7fc7076a9da13a77236b8'] = 'Rumunština';
-$_MODULE['<{packetery}prestashop>packetery_78463a384a5aa4fad5fa73e2f506ecfc'] = 'Angličtina';
 $_MODULE['<{packetery}prestashop>packetery_f2becb2721c101bf9a5036ee5e1569b0'] = 'Získajte svojim zákazníkom prístup k bodom vyzdvihnutia v sieti Packetery.';
 $_MODULE['<{packetery}prestashop>packetery_bd11fa2d60004375eabb73c555e2581c'] = 'Export objednávok do systému Packetery.';
 $_MODULE['<{packetery}prestashop>packetery_c4b0cd796c76b526201e7e4909fabde8'] = 'Packetery';

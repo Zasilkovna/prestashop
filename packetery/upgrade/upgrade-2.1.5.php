@@ -43,5 +43,7 @@ function upgrade_module_2_1_5($object)
 
     return Db::getInstance()->execute('
         DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_carrier`;
+        
+        DELETE FROM `' . _DB_PREFIX_ . 'ps_packetery_settings` WHERE `option` IN("FORCE_COUNTRY", "FORCE_LANGUAGE");
     ');
 }
