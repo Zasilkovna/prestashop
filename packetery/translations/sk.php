@@ -80,7 +80,6 @@ $_MODULE['<{packetery}prestashop>tab_faq_b8a4569cf14d482fe842a8548023b44d'] = 'V
 $_MODULE['<{packetery}prestashop>tab_faq_d7ff1196b62cd74860211cbbf0cfae34'] = 'Združené služby Packetery Adresa doručovacie služby s prestashop dopravcovi (v prípade potreby)';
 $_MODULE['<{packetery}prestashop>tab_faq_2fc227865a9bb1ebc02591e08cec82e8'] = 'Můžete změnit nastavení dopravce a platby COD pomocí tlačítka.';
 $_MODULE['<{packetery}prestashop>tab_faq_7c1eb022a0b92177edfbea9ae714e066'] = 'Na všetky nastavenia COD v tabuľkách sa dá kliknúť.';
-$_MODULE['<{packetery}prestashop>tab_faq_b273b1b18ac51253b0d6e27aa6537aa1'] = 'Je možné vynutit použití specifické země a jazyka ve widgetu nastavením hodnot \"Vynucená země\" a \"Vynucený jazyk\". Pokud jsou hodnoty prázdné, vybere se země podle adresy zákazníka.';
 $_MODULE['<{packetery}prestashop>tab_faq_36ec6b4be652400a8641a0c56d7eb471'] = 'Pro export dat do CSV souboru zvolte objednávky, které chcete vyexportovat na záložce \"Objednávky\" a klikněte na tlačítko \"CSV Export\".';
 $_MODULE['<{packetery}prestashop>tab_faq_36678367cfb83eb206a068341138f5e0'] = 'Pro přímé podání zásilek přes api vyberte objednávky a klikněte na tlačítko \"Podat vybrané zásilky\".';
 $_MODULE['<{packetery}prestashop>tab_faq_bb7b10967c0203a5d833cbf9468d2af6'] = 'Chcete-li vytisknout štítky, zvolte objednávky podané přes api a klikněte na tlačítko \"Stažení štítků ve formátu .pdf\". Tuto operaci nelze provést pro objednávky dosud nepodané přes api.';
