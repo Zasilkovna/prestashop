@@ -28,9 +28,6 @@
 	{*<p>{l s='Associate Packetery Address delivery services with prestashop carriers(if needed)' mod='packetery' }</p>*}
 	<p>{l s='' mod='packetery' }</p>
 	<p>{l s='You can change carrier and payment COD setting by clicking on it.' mod='packetery' } {l s='All COD settings in tables is clickable.' mod='packetery' }</p>
-
-	<p>{l s='You can force the widget to use a specific country and language by selecting a value for the "Fixed Country" and "Fixed Language" select boxes. If nothing is selected, the widget will use data from user address.' mod='packetery' }</p>
-
 	<p>{l s='To export data to a CSV file choose Zasilkovna associated orders and click "CSV Export".' mod='packetery' }
 	<p>{l s='To export packets and create shipment choose Zasilkovna associated orders and click "Export selected orders and create shipment".' mod='packetery' }
 	<p>{l s='To print labels choose exported  Zasilkovna associated orders and click "Download pdf labels".' mod='packetery' }</p>

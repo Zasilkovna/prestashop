@@ -109,9 +109,6 @@ $_MODULE['<{packetery}prestashop>tab_settings_1e5b2eadf83c2678a69f1d4608b673c8']
 $_MODULE['<{packetery}prestashop>tab_settings_ff0c01bbc46cf7e4687f36889fbb9270'] = '1/4 A4, tisk na A4, 4ks/stránka';
 $_MODULE['<{packetery}prestashop>tab_settings_4b7b2401eede004b1901ebd3f73bb286'] = '1/8 A4, přímý tisk, 1ks/stránka';
 $_MODULE['<{packetery}prestashop>tab_settings_b457f4aa9f09cd579e9df57dd154ed57'] = '1/16 A4, přímý tisk, 1ks/stránka';
-$_MODULE['<{packetery}prestashop>tab_settings_1c05a79de1941301f22f35442221ab22'] = 'Vynucená země';
-$_MODULE['<{packetery}prestashop>tab_settings_9efc314b65237d5d646e1b817372afc6'] = '---';
-$_MODULE['<{packetery}prestashop>tab_settings_db323df1faec7125ff9bf65e8a4c8bd2'] = 'Vynucený jazyk';
 $_MODULE['<{packetery}prestashop>tab_settings_5ece607071fe59ddc4c88dc6abfe2310'] = 'Nenalezeny žádné položky';
 $_MODULE['<{packetery}prestashop>tab_settings_2f5fdf39f1e94a9a62df58227b00845b'] = 'Seznam dopravců';
 $_MODULE['<{packetery}prestashop>tab_settings_4be6bfa1b6a3582a32fcd1653dc24067'] = 'Seznam způsobů platby';
