@@ -55,32 +55,6 @@
 		</option>
 	</select>
 	<br>
-
-	<label class="control-label col-lg-3" for="force_country">
-		{l s='Fixed Country' mod='packetery'}
-	</label>
-	<select name="force_country" class="setting_input" data-id="6">
-		<option value="" {if $force_country eq ''}selected{/if}>
-			{l s='---' mod='packetery'}
-		</option>
-		{foreach from=$supported_countries item=c}
-			<option value="{$c['country']|escape:'htmlall':'UTF-8'}" {if $force_country eq $c['country']}selected{/if}>{$c.name|escape:'htmlall':'UTF-8'}</option>
-		{/foreach}
-	</select>
-	<br>
-
-	<label class="control-label col-lg-3" for="force_language">
-		{l s='Fixed Language' mod='packetery'}
-	</label>
-	<select name="force_language" class="setting_input" data-id="7">
-		<option value="" {if $force_language eq ''}selected{/if}>
-			{l s='---' mod='packetery'}
-		</option>
-		{foreach  from=$supported_languages key=k item=c}
-			<option value="{$k|escape:'htmlall':'UTF-8'}" {if $force_language eq $k}selected{/if}>{$c|escape:'htmlall':'UTF-8'}</option>
-		{/foreach}
-	</select>
-	<br>
 </div>
 
 <!--Address Delivery Carriers List-->

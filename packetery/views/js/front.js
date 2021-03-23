@@ -72,33 +72,18 @@ window.initializePacketaWidget = function ()
         return;
     }
 
-    var allowedCountries = JSON.parse($('#allowed_countries').val());
-
     // parameters
 
     var customerCountry = $('#customer_country').val();
-    if (customerCountry !== '' && allowedCountries.indexOf(customerCountry) !== -1) {
+    if (customerCountry !== '') {
         country = customerCountry;
     }
-
-    /* Overwrite default countries with forced country or customer country */
-    var forceCountry = $('#widget_force_country').val();
-    if (forceCountry !== "" && allowedCountries.indexOf(forceCountry) !== -1) {
-        country = forceCountry;
-    }
-
 
     var language = 'en';
 
     var shopLanguage = $('#shop-language').val();
     if (shopLanguage !== '') {
         language = shopLanguage;
-    }
-
-    /* Override language with forced language if it's set */
-    var forceLanguage = $('#widget_force_language').val();
-    if (forceLanguage !== "") {
-        language = forceLanguage;
     }
 
     $('.open-packeta-widget').click(function (e) {
