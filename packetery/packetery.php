@@ -432,12 +432,12 @@ class Packetery extends CarrierModule
 			);
 		$ajaxfields_json = json_encode($ajaxfields);
 
-		$name_branch = "";
-		$currency_branch = "";
-		$id_branch = "";
-        $pickupPointType = "";
-        $carrierId = "";
-        $carrierPickupPointId = "";
+		$name_branch = '';
+		$currency_branch = '';
+		$id_branch = '';
+        $pickupPointType = 'internal';
+        $carrierId = '';
+        $carrierPickupPointId = '';
 		if(!empty($params['cart']))
 		{
             $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
@@ -454,8 +454,6 @@ class Packetery extends CarrierModule
                 $carrierId = $row['id_branch'];
             } else {
                 $id_branch = $row['id_branch'];
-                $pickupPointType = 'internal';
-                $carrierId = '';
             }
         }
 

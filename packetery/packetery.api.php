@@ -317,7 +317,7 @@ class PacketeryApi
             'phone' => $customer_phone,
             'addressId' => $packetery_order['id_branch'],
             'currency' => $branch_currency_iso,
-            'cod' => (int)$cod,
+            'cod' => $cod,
             'value' => $total,
             'eshop' => $shop_name,
         );
