@@ -47,6 +47,12 @@
                        value="{$packeta_api_key}">
                 <input type="hidden" id="packeta-branch-name" class="packeta-branch-name" name="packeta-branch-name"
                        value="{$name_branch}">
+                <input type="hidden" id="packeta-pickup-point-type" class="packeta-pickup-point-type" name="packeta-pickup-point-type"
+                       value="{$pickup_point_type}">
+                <input type="hidden" id="packeta-carrier-id" class="packeta-carrier-id" name="packeta-carrier-id"
+                       value="{$packeta_carrier_id}">
+                <input type="hidden" id="packeta-carrier-pickup-point-id" class="packeta-carrier-pickup-point-id" name="packeta-carrier-pickup-point-id"
+                       value="{$carrier_pickup_point_id}">
             </div>
         </div>
     </div>
