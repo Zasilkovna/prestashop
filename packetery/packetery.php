@@ -440,21 +440,23 @@ class Packetery extends CarrierModule
         $carrierPickupPointId = "";
 		if(!empty($params['cart']))
 		{
-			$row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
-			// to be consistent with widget behavior
-            $id_branch = ($row['is_carrier'] == 1 ? $row['carrier_pickup_point'] : $row['id_branch']);
+            $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
 
-			if (!empty($row['name_branch']))
-			{
-				$name_branch = $row['name_branch'];
-			}
-			if (!empty($row['currency_branch']))
-			{
-				$currency_branch = $row['currency_branch'];
-			}
-            $pickupPointType = ($row['is_carrier'] == 1 ? 'external' : 'internal');
-            $carrierId = ($row['is_carrier'] == 1 ? $row['id_branch'] : '');
+            $name_branch = $row['name_branch'];
+            $currency_branch = $row['currency_branch'];
             $carrierPickupPointId = $row['carrier_pickup_point'];
+
+            if ($row['is_carrier'] == 1) {
+                // to be consistent with widget behavior
+                $id_branch = $row['carrier_pickup_point'];
+
+                $pickupPointType = 'external';
+                $carrierId = $row['id_branch'];
+            } else {
+                $id_branch = $row['id_branch'];
+                $pickupPointType = 'internal';
+                $carrierId = '';
+            }
         }
 
 		if(isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery))

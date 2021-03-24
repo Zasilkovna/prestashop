@@ -316,8 +316,8 @@ class PacketeryApi
             'email' => (string)$customer_email,
             'phone' => $customer_phone,
             'addressId' => $packetery_order['id_branch'],
-            'currency' => (string)$branch_currency_iso,
-            'cod' => (string)$cod,
+            'currency' => $branch_currency_iso,
+            'cod' => (int)$cod,
             'value' => $total,
             'eshop' => $shop_name,
         );
@@ -859,9 +859,9 @@ class PacketeryApi
 
         $id_branch = Tools::getValue('id_branch');
         $name_branch = Tools::getValue('name_branch');
-        $pickup_point_type = Tools::getValue('pickup_point_type');
-        $carrier_id = (Tools::getIsset('carrier_id') ? Tools::getValue('carrier_id') : null);
-        $carrier_pickup_point_id = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
+        $pickupPointType = Tools::getValue('pickup_point_type');
+        $carrierId = (Tools::getIsset('carrier_id') ? Tools::getValue('carrier_id') : null);
+        $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
 
         $packetery_carrier_row = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
         $is_cod = $packetery_carrier_row['is_cod'];
@@ -883,10 +883,10 @@ class PacketeryApi
             'is_cod' => (int)$is_cod,
             'is_ad' => 0,
         ];
-        if ($pickup_point_type === 'external') {
+        if ($pickupPointType === 'external') {
             $packeteryOrderFields['is_carrier'] = 1;
-            $packeteryOrderFields['id_branch'] = (int)$carrier_id;
-            $packeteryOrderFields['carrier_pickup_point'] = pSQL($carrier_pickup_point_id);
+            $packeteryOrderFields['id_branch'] = (int)$carrierId;
+            $packeteryOrderFields['carrier_pickup_point'] = pSQL($carrierPickupPointId);
         }
 
         $db = Db::getInstance();
