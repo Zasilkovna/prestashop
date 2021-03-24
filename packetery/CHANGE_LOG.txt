@@ -35,3 +35,4 @@
       - Updated: Transport administration - removal of adding carriers on the module side, solved similarly to
         address delivery by pairing existing carriers with the module.
       - Removed: country and language forcing
+      - Added: Widget v6 support.
