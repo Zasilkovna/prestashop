@@ -432,25 +432,30 @@ class Packetery extends CarrierModule
 			);
 		$ajaxfields_json = json_encode($ajaxfields);
 
-		$name_branch = "";
-		$currency_branch = "";
-		$id_branch = "";
+		$name_branch = '';
+		$currency_branch = '';
+		$id_branch = '';
+        $pickupPointType = 'internal';
+        $carrierId = '';
+        $carrierPickupPointId = '';
 		if(!empty($params['cart']))
 		{
-			$row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
-			if (!empty($row['id_branch']))
-			{
-				$id_branch = $row['id_branch'];
-			}
-			if (!empty($row['name_branch']))
-			{
-				$name_branch = $row['name_branch'];
-			}
-			if (!empty($row['currency_branch']))
-			{
-				$currency_branch = $row['currency_branch'];
-			}
-		}
+            $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
+
+            $name_branch = $row['name_branch'];
+            $currency_branch = $row['currency_branch'];
+            $carrierPickupPointId = $row['carrier_pickup_point'];
+
+            if ($row['is_carrier'] == 1) {
+                // to be consistent with widget behavior
+                $id_branch = $row['carrier_pickup_point'];
+
+                $pickupPointType = 'external';
+                $carrierId = $row['id_branch'];
+            } else {
+                $id_branch = $row['id_branch'];
+            }
+        }
 
 		if(isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery))
 		{
@@ -465,6 +470,9 @@ class Packetery extends CarrierModule
 		$this->context->smarty->assign('id_branch', $id_branch);
 		$this->context->smarty->assign('name_branch', $name_branch);
 		$this->context->smarty->assign('currency_branch', $currency_branch);
+		$this->context->smarty->assign('pickup_point_type', $pickupPointType);
+		$this->context->smarty->assign('packeta_carrier_id', $carrierId);
+		$this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
 
 		$this->context->smarty->assign('ajaxfields', $ajaxfields_json);
 

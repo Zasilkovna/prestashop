@@ -1,5 +1,5 @@
 // non-blocking AJAX loading, speeds up page load
-$.getScript("https://widget.packeta.com/www/js/library.js")
+$.getScript("https://widget.packeta.com/v6/www/js/library.js")
     .fail(function() {
         console.error('Unable to load Packeta Widget.');
     });
@@ -46,11 +46,6 @@ function PacketeryCheckoutModulesManager() {
 
         return this.detectedModule;
     };
-
-    // in case we need to change this in the future
-    this.getCarrierId = function ($selectedInput) {
-        return $selectedInput.val().replace(',', '');
-    }
 }
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 
@@ -98,20 +93,26 @@ window.initializePacketaWidget = function ()
 
             if (pickupPoint != null)
             {
-                /* Add ID and name to inputs */
+                /* Save needed pickup point attributes to inputs */
                 $widgetParent.find('.packeta-branch-id').val(pickupPoint.id);
                 $widgetParent.find('.packeta-branch-name').val(pickupPoint.name);
+                $widgetParent.find('.packeta-pickup-point-type').val(pickupPoint.pickupPointType);
+                $widgetParent.find('.packeta-carrier-id').val(pickupPoint.carrierId);
+                $widgetParent.find('.packeta-carrier-pickup-point-id').val(pickupPoint.carrierPickupPointId);
 
                 // We let customer know, which branch he picked by filling html inputs
                 $widgetParent.find('.picked-delivery-place').html(pickupPoint.name);
 
                 module.enableSubmitButton();
 
-                /* Get ID of selected carrier */
-                var id_carrier = packeteryModulesManager.getCarrierId($selectedDeliveryOption);
-
                 /* Save packetery order without order ID - just cart id so we can access carrier data later */
-                packetery.widgetSaveOrderBranch(pickupPoint.id, id_carrier, pickupPoint.name);
+                packetery.widgetSaveOrderBranch(
+                    pickupPoint.id,
+                    pickupPoint.name,
+                    pickupPoint.pickupPointType,
+                    pickupPoint.carrierId,
+                    pickupPoint.carrierPickupPointId
+                );
 
                 if (module !== null) {
                     module.hideValidationErrors();
@@ -169,7 +170,6 @@ tools = {
         {
             var
                 $this = $(this),
-                id_carrier = packeteryModulesManager.getCarrierId($this)
                 $extra = module.getWidgetParent($this);
 
             // if selected carrier is not Packetery then enable Continue button and we're done here
@@ -181,8 +181,11 @@ tools = {
             var id_branch = $extra.find(".packeta-branch-id").val();
             if (id_branch > 0) {
                 var name_branch = $extra.find(".packeta-branch-name").val();
+                var pickup_point_type = $extra.find(".packeta-pickup-point-type").val();
+                var carrier_id = $extra.find(".packeta-carrier-id").val();
+                var carrier_pickup_point_id = $extra.find(".packeta-carrier-pickup-point-id").val();
                 module.enableSubmitButton();
-                packetery.widgetSaveOrderBranch(id_branch, id_carrier, name_branch);
+                packetery.widgetSaveOrderBranch(id_branch, name_branch, pickup_point_type, carrier_id, carrier_pickup_point_id);
             } else {
                 module.disableSubmitButton();
             }
@@ -191,12 +194,18 @@ tools = {
 }
 
 packetery = {
-    widgetSaveOrderBranch: function (id_branch, id_carrier, name_branch)
+    widgetSaveOrderBranch: function (id_branch, name_branch, pickup_point_type, carrier_id, carrier_pickup_point_id)
     {
         $.ajax({
             type: 'POST',
             url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=widgetsaveorderbranch' + ajaxs.checkToken(),
-            data: {'id_branch': id_branch, 'id_carrier': id_carrier, 'name_branch': name_branch},
+            data: {
+                'id_branch': id_branch,
+                'name_branch': name_branch,
+                'pickup_point_type': pickup_point_type,
+                'carrier_id': carrier_id,
+                'carrier_pickup_point_id': carrier_pickup_point_id
+            },
             beforeSend: function () {
                 $("body").toggleClass("wait");
             },

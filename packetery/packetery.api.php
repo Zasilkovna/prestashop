@@ -243,7 +243,6 @@ class PacketeryApi
         $module = new Packetery;
         $id_order = $order->id;
         $packetery_order = Packeteryclass::getPacketeryOrderRow($id_order);
-        $id_branch = $packetery_order['id_branch'];
         $id_address_delivery = $order->id_address_delivery;
         $address_delivery = new Address($id_address_delivery);
         $is_packetery_ad = $packetery_order['is_ad'];
@@ -311,17 +310,21 @@ class PacketeryApi
         $customer_email = $customer->email;
 
         $packet_attributes = array(
-            'number' => "$id_order",
+            'number' => (string)$id_order,
             'name' => empty($address_delivery->firstname) ? "$customer_fname" : $address_delivery->firstname,
             'surname' => empty($address_delivery->lastname) ? "$customer_lname" : $address_delivery->lastname,
-            'email' => "$customer_email",
-            'phone' => "$customer_phone",
-            'addressId' => "{$id_branch}",
-            'currency' => "$branch_currency_iso",
-            'cod' => "$cod",
+            'email' => (string)$customer_email,
+            'phone' => $customer_phone,
+            'addressId' => $packetery_order['id_branch'],
+            'currency' => $branch_currency_iso,
+            'cod' => $cod,
             'value' => $total,
-            'eshop' => $shop_name
+            'eshop' => $shop_name,
         );
+
+        if ($packetery_order['is_carrier']) {
+            $packet_attributes['carrierPickupPoint'] = $packetery_order['carrier_pickup_point'];
+        }
 
         if (!(Tools::strlen($customer_email) > 1))
         {
@@ -844,54 +847,57 @@ class PacketeryApi
     public static function widgetSaveOrderBranch()
     {
         $id_cart = Context::getContext()->cart->id;
-        $id_branch = Tools::getValue('id_branch');
-        $id_carrier = Tools::getValue('id_carrier');
-        $name_branch = Tools::getValue('name_branch');
+        $id_carrier = Context::getContext()->cart->id_carrier;
 
-        $is_ad = 0;
+        if (!isset($id_cart) ||
+            !Tools::getIsset('id_branch') ||
+            !Tools::getIsset('name_branch') ||
+            !Tools::getIsset('pickup_point_type')
+        ) {
+            return false;
+        }
+
+        $id_branch = Tools::getValue('id_branch');
+        $name_branch = Tools::getValue('name_branch');
+        $pickupPointType = Tools::getValue('pickup_point_type');
+        $carrierId = (Tools::getIsset('carrier_id') ? Tools::getValue('carrier_id') : null);
+        $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
+
         $packetery_carrier_row = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
         $is_cod = $packetery_carrier_row['is_cod'];
 
         $currency = CurrencyCore::getCurrency(Context::getContext()->cart->id_currency);
         $currency_branch = $currency['iso_code'];
 
-        if (!isset($id_cart) ||
-            !isset($id_branch) ||
-            !isset($name_branch) ||
-            !isset($currency_branch) ||
+        if (!isset($currency_branch) ||
             !isset($is_cod)
-        )
-        {
+        ) {
             return false;
         }
+
+        $packeteryOrderFields = [
+            'id_branch' => (int)$id_branch,
+            'name_branch' => pSQL($name_branch),
+            'currency_branch' => pSQL($currency_branch),
+            'id_carrier' => (int)$id_carrier,
+            'is_cod' => (int)$is_cod,
+            'is_ad' => 0,
+        ];
+        if ($pickupPointType === 'external') {
+            $packeteryOrderFields['is_carrier'] = 1;
+            $packeteryOrderFields['id_branch'] = (int)$carrierId;
+            $packeteryOrderFields['carrier_pickup_point'] = pSQL($carrierPickupPointId);
+        }
+
         $db = Db::getInstance();
-        $sql_is_set_order = 'SELECT 1 
-                            FROM `' . _DB_PREFIX_ . 'packetery_order` 
-                            WHERE id_cart=' . (int)$id_cart . ';';
-        if ($db->getValue($sql_is_set_order) == 1)
-        {
-            $sql_update_order = 'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-                                        SET name_branch="' . pSQL($name_branch) . '", 
-                                            currency_branch="' . pSQL($currency_branch) . '", 
-                                            id_branch=' . (int)$id_branch . ', 
-                                            is_cod=' . (int)$is_cod . ', 
-                                            id_carrier=' . (int)$id_carrier . ',
-                                            is_ad = ' . (int)$is_ad . '
-                                        WHERE id_cart=' . (int)$id_cart . ';';
-            $result = $db->execute($sql_update_order);
+        $isOrderSaved = $db->getValue('SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . ((int)$id_cart));
+        if ($isOrderSaved) {
+            $result = $db->update('packetery_order', $packeteryOrderFields, '`id_cart` = ' . ((int)$id_cart));
+        } else {
+            $packeteryOrderFields['id_cart'] = ((int)$id_cart);
+            $result = $db->insert('packetery_order', $packeteryOrderFields);
         }
-        else
-        {
-            $sql_insert_order = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_order` 
-                                        SET name_branch="' . pSQL($name_branch) . '", 
-                                            currency_branch="' . pSQL($currency_branch) . '", 
-                                            id_branch=' . (int)$id_branch . ',
-                                            is_cod=' . (int)$is_cod . ', 
-                                            id_carrier=' . (int)$id_carrier . ', 
-                                            is_ad = ' . (int)$is_ad . ',
-                                            id_cart=' . (int)$id_cart . ';';
-            $result = $db->execute($sql_insert_order);
-        }
+
         return $result;
     }
 

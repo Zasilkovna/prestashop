@@ -144,7 +144,7 @@ class Packeteryclass
      */
     public static function getPacketeryOrderRow($id_order)
     {
-        $sql = 'SELECT * 
+        $sql = 'SELECT `id_branch`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point` 
                     FROM `' . _DB_PREFIX_ . 'packetery_order` 
                     WHERE id_order = ' . (int)$id_order;
 
@@ -269,7 +269,7 @@ class Packeteryclass
                 'Currency' => $currency->iso_code,
                 'Value' => $total,
                 'Weight' => $order->getTotalWeight(),
-                'Pickupoint' => $packeteryOrder['id_branch'],
+                'PickupPointOrCarrier' => $packeteryOrder['id_branch'],
                 'SenderLabel' => $senderLabel,
                 'AdultContent' => "",
                 'DelayedDelivery' => "",
@@ -277,10 +277,11 @@ class Packeteryclass
                 'House Number' => $houseNo,
                 'City' => $address['city'],
                 'ZIP' => $address['postcode'],
-                'CarrierPickup' => "", //This for address delivery
+                'CarrierPickupPoint' => $packeteryOrder['carrier_pickup_point'],
                 'Width' => "",
                 'Height' => "",
                 'Depth' => "",
+                'Note' => "",
             ];
 
             self::setPacketeryExport($order_id, TRUE);
