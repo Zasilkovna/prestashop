@@ -54,10 +54,7 @@ You can find information about the last update of the list of pickup points in t
 
 ### Orders
 In the **Orders** tab you will find a list of all orders for which the Packeta shipping method has been selected.
-- For each packet you can:
-    - In the "Cash on delivery" column, set / cancel cash on delivery.
-    - Clicking on the destination pickup point opens a window where you can change the pickup points to which the
-      consignment will be delivered.
+- For each packet you can set / cancel cash on delivery in the "Cash on delivery" column.
 - Marked orders can be saved to csv file by clicking on the **CSV export** button which you will upload then to
   the client section in » Shipments import.
 - The module also supports automatic sending of data to shipments. Send marked orders automatically by clicking on
@@ -149,9 +146,7 @@ Pobočky se aktualizují automaticky. Pro ruční aktualizaci seznamu poboček k
 
 ### Objednávky
 V záložce **objednávky** naleznete seznam všech objednávek u kterých byla vybrán způsob dopravy přes Zásilkovnu.
-- U každé zásilky můžete:
-    - Ve sloupci **Je na dobírku** nastavit/zrušit odeslání na dobírku.
-    - Kliknutím na cílové výdejní místo se otevře okno , kde můžete změnit výdejní míst, kam bude zásilka doručena.
+- U každé zásilky můžete ve sloupci **Je na dobírku** nastavit/zrušit odeslání na dobírku.
 - Označené objednávky můžete kliknutím na tlačítko **CSV export** uložit do csv souboru, který poté nahrajete
   do [klientské sekce](https://client.packeta.com/) » Import zásilek.
 - Modul podporuje také automatické odesílání dat k zásilkám.  Označené objednávky odešlete automaticky kliknutím

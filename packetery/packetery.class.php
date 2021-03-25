@@ -35,20 +35,6 @@ class Packeteryclass
     const ZPOINT = 'zpoint';
 
     /**
-     * Returns branch by ID
-     * @param $id_branch
-     * @return array|bool|null|object
-     */
-    public static function getPacketeryBranchRow($id_branch)
-    {
-        $sql = 'SELECT * 
-                    FROM `' . _DB_PREFIX_ . 'packetery_branch` 
-                    WHERE id_branch = ' . (int)$id_branch;
-        $branches = Db::getInstance()->getRow($sql);
-        return $branches;
-    }
-
-    /**
      * Converts price from order currency to branch currency
      * @param $order_currency_iso
      * @param $branch_currency_iso
@@ -467,63 +453,6 @@ class Packeteryclass
         $result = Db::getInstance()->execute($sql_update_order_tn);
         return $result;
     }
-
-    /**
-     * Change branch in order grid - Called by AJAX
-     */
-    public static function changeOrderBranchAjax()
-    {
-        $result = self::changeOrderBranch();
-        if ($result)
-        {
-            echo 'ok';
-        }
-        else
-        {
-            $module = new Packetery();
-            echo $module->l('Error while trying to save the settings.');
-        }
-    }
-
-    /**
-     * Change order branch in database
-     * @return bool
-     */
-    public static function changeOrderBranch()
-    {
-        $id_order = Tools::getValue('id_order');
-        $id_branch = Tools::getValue('id_branch');
-        $name_branch = Tools::getValue('name_branch');
-
-        if (!isset($id_order) || (!isset($id_branch)) || (!isset($name_branch)))
-        {
-            return false;
-        }
-        $db = Db::getInstance();
-        $sql_is_set_order = 'SELECT 1 
-                            FROM `' . _DB_PREFIX_ . 'packetery_order` 
-                            WHERE id_order=' . (int)$id_order . ';';
-
-        if ($db->getValue($sql_is_set_order) == 1)
-        {
-            $branch_row = self::getPacketeryBranchRow($id_branch);
-            $is_ad = $branch_row['is_ad'];
-            $currency = $branch_row['currency'];
-            $sql_update_order_branch = 'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-                                        SET id_branch=' . (int)$id_branch . ',
-                                            name_branch=\'' . pSQL($name_branch) . '\',
-                                            currency_branch = \'' . pSQL($currency) . '\',
-                                            is_ad = ' . (int)$is_ad . '
-                                        WHERE id_order=' . (int)$id_order . ';';
-            $result = $db->execute($sql_update_order_branch);
-        }
-        else
-        {
-            return false;
-        }
-        return $result;
-    }
-
 
     /**
      * Change order COD - Called by AJAX
