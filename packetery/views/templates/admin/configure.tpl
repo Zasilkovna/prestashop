@@ -27,6 +27,8 @@
 
 <input type="hidden" name="check_e" id="check_e" value="{$check_e|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
+<input type="hidden" name="ajaxfields" id="ajaxfields" value="{$ajaxfields}">
+
 <div id="packetery-form">
 	<div id="top_packetery">
 		<img id ="top_packetery_image" src="{$module_dir|escape:'html':'UTF-8'}/logo.png" id="payment-logo" class="pull-right" />

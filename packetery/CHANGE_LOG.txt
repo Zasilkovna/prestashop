@@ -36,3 +36,4 @@
         address delivery by pairing existing carriers with the module.
       - Removed: country and language forcing
       - Added: Widget v6 support.
+      - Removed: possibility to change order branch (preparation for future upgrade)

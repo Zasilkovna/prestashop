@@ -345,7 +345,41 @@ class Packetery extends CarrierModule
             ))
         ));
         /*END CARRIERS*/
-        $this->hookDisplayWidget();
+
+        /*FIELDS FOR AJAX*/
+        // TODO: review all lang_pac translations - check if used in back.js
+        $ajaxfields = array(
+            'zip' => $this->l('ZIP'),
+            'moredetails' => $this->l('More details'),
+            'max_weight' => $this->l('Max weight'),
+            'dressing_room' => $this->l('Dressing room'),
+            'packet_consignment' => $this->l('Packet consignment'),
+            'claim_assistant' => $this->l('Claim assistant'),
+            'yes' => $this->l('Yes'),
+            'no' => $this->l('No'),
+            'all' => $this->l('All'),
+            'error' => $this->l('Error'),
+            'success' => $this->l('Success'),
+            'success_export' => $this->l('Successfuly exported'),
+            'success_download_branches' => $this->l('Branches successfuly updated.'),
+            'reload5sec' => $this->l('Page will be reloaded in 5 seconds...'),
+            'try_download_branches' => $this->l('Trying to download branches. Please wait for download process end...'),
+            'confirm_tracking_exists' => $this->l('Tracking numbers of some selected orders already exist and will be rewritten by new ones. Do you want to continue?'),
+            'err_no_branch' => $this->l('Please select destination branch for order(s) - '),
+            'error_export_unknown' => $this->l('There was an error trying to update branch list, check if your API password is correct and try again.'),
+            'error_export' => $this->l('not exported. Error: '),
+            'err_country' => $this->l('Please select country'),
+            'api_wrong' => $this->l('Api password is wrong. Branches will not be updated.'),
+            'please_choose' => $this->l('please choose'),
+            'please_choose_branch' => $this->l('Please choose delivery branch')
+        );
+        $ajaxfields_json = json_encode($ajaxfields);
+        $ajaxfields_json = rawurlencode($ajaxfields_json);
+        $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
+        /*END FIELDS FOR AJAX*/
+
+        $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+        $this->context->smarty->assign('baseuri', $base_uri);
 
         $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
         $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/prestui/ps-tags.tpl');
@@ -361,10 +395,8 @@ class Packetery extends CarrierModule
             $this->context->controller->addjquery();
             $this->context->controller->addJS('https://cdn.jsdelivr.net/riot/2.4.1/riot+compiler.min.js');
             $this->context->controller->addJS($this->_path.'views/js/back.js');
-            $this->context->controller->addJS($this->_path.'views/js/widget_bo.js');
             $this->context->controller->addCSS($this->_path.'views/css/back.css');
             $this->context->controller->addJS($this->_path.'views/js/notify.js');
-            $this->context->controller->addJS($this->_path.'views/js/jquery.popupoverlay.js');
         }
     }
 
@@ -418,6 +450,7 @@ class Packetery extends CarrierModule
 
 		$this->context->smarty->assign('carrier_id', $id_carrier);
 		/*FIELDS FOR AJAX*/
+        // TODO: remove - ajaxfields not used in front.js
 		$ajaxfields = array(
 			'zip' => $this->l('ZIP'),
 			'moredetails' => $this->l('More details'),
@@ -490,60 +523,12 @@ class Packetery extends CarrierModule
 		return $output;
     }
 
-    /*WIDGET BO*/
-    /**
-     * Ajax fields for back office
-     */
-    public function hookDisplayWidget()
-    {
-        /*FIELDS FOR AJAX*/
-        $ajaxfields = array(
-            'zip' => $this->l('ZIP'),
-            'moredetails' => $this->l('More details'),
-            'max_weight' => $this->l('Max weight'),
-            'dressing_room' => $this->l('Dressing room'),
-            'packet_consignment' => $this->l('Packet consignment'),
-            'claim_assistant' => $this->l('Claim assistant'),
-            'yes' => $this->l('Yes'),
-            'no' => $this->l('No'),
-            'all' => $this->l('All'),
-            'error' => $this->l('Error'),
-            'success' => $this->l('Success'),
-            'success_export' => $this->l('Successfuly exported'),
-            'success_download_branches' => $this->l('Branches successfuly updated.'),
-            'reload5sec' => $this->l('Page will be reloaded in 5 seconds...'),
-            'try_download_branches' => $this->l('Trying to download branches. Please wait for download process end...'),
-            'confirm_tracking_exists' => $this->l('Tracking numbers of some selected orders already exist and will be rewritten by new ones. Do you want to continue?'),
-            'err_no_branch' => $this->l('Please select destination branch for order(s) - '),
-            'error_export_unknown' => $this->l('There was an error trying to update branch list, check if your API password is correct and try again.'),
-            'error_export' => $this->l('not exported. Error: '),
-            'err_country' => $this->l('Please select country'),
-            'api_wrong' => $this->l('Api password is wrong. Branches will not be updated.'),
-            'please_choose' => $this->l('please choose'),
-            'please_choose_branch' => $this->l('Please choose delivery branch')
-            );
-        $ajaxfields_json = json_encode($ajaxfields);
-        $ajaxfields_json = rawurlencode($ajaxfields_json);
-        $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
-        /*END FIELDS FOR AJAX*/
-
-        $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-        $this->context->smarty->assign('baseuri', $base_uri);
-
-        $countries = $this->getCountriesList();
-        $countries_count = count($countries);
-        $this->context->smarty->assign('countries', $countries);
-        $this->context->smarty->assign('countries_count', $countries_count);
-    }
-    /*END WIDGET BO*/
-
     /**
      * Link js and css files
      */
     public function hookDisplayHeader()
     {
         $js = [
-            'jquery.popupoverlay.js',
             'front.js',
         ];
 

@@ -753,97 +753,7 @@ class PacketeryApi
     }
     /*END BRANCHES*/
 
-    public static function widgetGetCountries($country_iso_code = false)
-    {
-        $id_lang = Context::getContext()->language->id;
-        if ($country_iso_code)
-        {
-            $country = (string)Tools::strtolower($country_iso_code);
-        }
-        else
-        {
-            $country = (string)Tools::getValue('country');
-        }
-        $sql = 'SELECT DISTINCT pb.country, cl.name
-                FROM ' . _DB_PREFIX_ . 'packetery_branch pb
-                LEFT JOIN ' . _DB_PREFIX_ . 'country c ON c.iso_code=UPPER(pb.country)
-                LEFT JOIN ' . _DB_PREFIX_ . 'country_lang cl ON c.id_country=cl.id_country 
-                    AND id_lang=' . (int)$id_lang . '
-                WHERE country=\'' . pSQL($country) . '\' 
-                    AND pb.is_ad=0
-                ORDER BY city;';
-        $result = Db::getInstance()->executeS($sql);
-        return $result;
-    }
-
-    public static function widgetGetCities()
-    {
-        $module = new Packetery;
-        $country = (string)Tools::getValue('country');
-        $sql = 'SELECT DISTINCT city, is_ad
-                FROM ' . _DB_PREFIX_ . 'packetery_branch
-                WHERE country=\'' . pSQL($country) . '\'
-                    AND is_ad=0
-                ORDER BY city;';
-        $result = Db::getInstance()->executeS($sql);
-        $i = 0;
-        foreach ($result as $res)
-        {
-            if ($res['is_ad'] == 1)
-            {
-                $result[$i]['city'] = $module->l('Address delivery');
-            }
-            $i++;
-        }
-        return $result;
-    }
-
-    public static function widgetGetCitiesAjax()
-    {
-        $cities = self::widgetGetCities();
-        echo Tools::jsonEncode($cities);
-    }
-
-    public static function widgetGetNames()
-    {
-        $country = (string)Tools::getValue('country');
-        $city = (string)Tools::getValue('city');
-        $is_ad = Tools::getValue('is_ad');
-        if ($is_ad == 0)
-        {
-            $sql = 'SELECT DISTINCT name, id_branch, is_ad
-                    FROM ' . _DB_PREFIX_ . 'packetery_branch
-                    WHERE country=\'' . pSQL($country) . '\'
-                        AND city=\'' . pSQL($city) . '\'
-                        AND is_ad=0
-                    GROUP BY name';
-            $result = Db::getInstance()->executeS($sql);
-        }
-        elseif ($is_ad == 1)
-        {
-            $sql = 'SELECT DISTINCT name, id_branch, is_ad
-                    FROM ' . _DB_PREFIX_ . 'packetery_branch
-                    WHERE country=\'' . pSQL($country) . '\'
-                        AND is_ad=' . (int)$is_ad . '
-                    GROUP BY name';
-            $result = Db::getInstance()->executeS($sql);
-        }
-        return $result;
-    }
-
-    public static function widgetSaveOrderBranchAjax()
-    {
-        $result = self::widgetSaveOrderBranch();
-        if ($result)
-        {
-            echo 'ok';
-        }
-        else
-        {
-            echo 'Something went wrong.';
-        }
-    }
-
+    /*WIDGET*/
     public static function widgetSaveOrderBranch()
     {
         $id_cart = Context::getContext()->cart->id;
@@ -899,49 +809,6 @@ class PacketeryApi
         }
 
         return $result;
-    }
-
-    public static function getBranchObject($id_branch)
-    {
-        $sql = 'SELECT * 
-                FROM ' . _DB_PREFIX_ . 'packetery_branch
-                WHERE id_branch = ' . (int)$id_branch . ';';
-        $result = Db::getInstance()->getRow($sql);
-        return $result;
-    }
-
-    public static function widgetGetNamesAjax()
-    {
-        $names = self::widgetGetNames();
-        echo Tools::jsonEncode($names);
-    }
-
-    public static function widgetGetDetailsAjax()
-    {
-        $id_branch = Tools::getValue('id_branch');
-        $details = self::widgetGetDetails($id_branch);
-        echo Tools::jsonEncode($details);
-    }
-
-    public static function widgetGetDetails($id_branch)
-    {
-        $sql = 'SELECT *
-                FROM ' . _DB_PREFIX_ . 'packetery_branch
-                WHERE id_branch=' . (int)$id_branch . ';';
-        $details = Db::getInstance()->getRow($sql);
-        if (isset($details['opening_hours_short']))
-        {
-            $details['opening_hours_short'] = html_entity_decode($details['opening_hours_short']);
-        }
-        if (isset($details['opening_hours_long']))
-        {
-            $details['opening_hours_long'] = html_entity_decode($details['opening_hours_long']);
-        }
-        if (isset($details['opening_hours']))
-        {
-            $details['opening_hours'] = html_entity_decode($details['opening_hours']);
-        }
-        return $details;
     }
     /*END WIDGET*/
 }
