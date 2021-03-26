@@ -21,8 +21,6 @@
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
-<input type="hidden" name="ajaxfields" id="ajaxfields" value="{$ajaxfields}">
 
 <!--Orders sheet-->
 <form class="form-horizontal">
