@@ -37,3 +37,4 @@
       - Removed: country and language forcing
       - Added: Widget v6 support.
       - Removed: possibility to change order branch (preparation for future upgrade)
+      - Added: associated countries to carriers list

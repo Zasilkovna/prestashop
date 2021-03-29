@@ -275,11 +275,27 @@ class Packetery extends CarrierModule
 
         /*AD CARRIER LIST*/
         $packetery_list_ad_carriers = Packeteryclass::getPacketeryCarriersList();
+        foreach ($packetery_list_ad_carriers as $index => $packeteryCarrier) {
+            // get active countries associated with carrier, translations are not available
+            $countries = Db::getInstance()->executeS('
+                SELECT `cl`.`name` 
+                FROM `' . _DB_PREFIX_ . 'carrier_zone` `cz`
+                JOIN `' . _DB_PREFIX_ . 'country` `c` ON `c`.`id_zone` = `cz`.`id_zone`
+                JOIN `' . _DB_PREFIX_ . 'country_lang` `cl` ON (`cl`.`id_country` = `c`.`id_country` AND `cl`.`id_lang` = ' . (int)Configuration::get('PS_LANG_DEFAULT') . ') 
+                WHERE `cz`.`id_carrier` = ' . (int)$packeteryCarrier['id_carrier'] . '
+                AND `c`.`active` = 1
+                ORDER BY `cl`.`name`
+            ');
+            $countriesToAdd = array_column($countries, 'name');
+            $packetery_list_ad_carriers[$index]['countries'] = implode(', ', $countriesToAdd);
+        }
+
         $this->context->smarty->assign(array(
             'packetery_list_ad_carriers' => Tools::jsonEncode(array(
                 'columns' => array(
                     array('content' => $this->l('ID'), 'key' => 'id_carrier', 'center' => true),
-                    array('content' => $this->l('Carrier'), 'key' => 'name', 'center' => true),
+                    array('content' => $this->l('Carrier'), 'key' => 'name'),
+                    array('content' => $this->l('Countries'), 'key' => 'countries'),
                     array(
                         'content' => $this->l('Is delivery via Packetery'),
                         'key' => 'id_branch',
@@ -301,7 +317,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign(array(
             'payment_list' => Tools::jsonEncode(array(
                 'columns' => array(
-                    array('content' => $this->l('Module'), 'key' => 'name', 'center' => true),
+                    array('content' => $this->l('Module'), 'key' => 'name'),
                     array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
                     array('content' => $this->l('module_name'), 'key' => 'module_name', 'center' => true),
                 ),
