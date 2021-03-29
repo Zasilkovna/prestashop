@@ -274,20 +274,21 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('packeta_pickup_point', $this->l('Packeta pickup point'));
 
         /*AD CARRIER LIST*/
-        $packetery_list_ad_carriers = Packeteryclass::getPacketeryCarriersList();
-        foreach ($packetery_list_ad_carriers as $index => $packeteryCarrier) {
-            // get active countries associated with carrier, translations are not available
-            $countries = Db::getInstance()->executeS('
-                SELECT `cl`.`name` 
-                FROM `' . _DB_PREFIX_ . 'carrier_zone` `cz`
-                JOIN `' . _DB_PREFIX_ . 'country` `c` ON `c`.`id_zone` = `cz`.`id_zone`
-                JOIN `' . _DB_PREFIX_ . 'country_lang` `cl` ON (`cl`.`id_country` = `c`.`id_country` AND `cl`.`id_lang` = ' . (int)Configuration::get('PS_LANG_DEFAULT') . ') 
-                WHERE `cz`.`id_carrier` = ' . (int)$packeteryCarrier['id_carrier'] . '
-                AND `c`.`active` = 1
-                ORDER BY `cl`.`name`
-            ');
-            $countriesToAdd = array_column($countries, 'name');
-            $packetery_list_ad_carriers[$index]['countries'] = implode(', ', $countriesToAdd);
+        $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
+        foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
+            $carrier = new Carrier($packeteryCarrier['id_carrier']);
+            $carrierZones = $carrier->getZones();
+            $carrierCountries = [];
+            foreach ($carrierZones as $carrierZone) {
+                $zoneCountries = Country::getCountriesByZoneId($carrierZone['id_zone'], Configuration::get('PS_LANG_DEFAULT'));
+                foreach ($zoneCountries as $zoneCountry) {
+                    if ($zoneCountry['active']) {
+                        $carrierCountries[] = $zoneCountry['name'];
+                    }
+                }
+            }
+            $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
+            $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
         }
 
         $this->context->smarty->assign(array(
@@ -295,6 +296,7 @@ class Packetery extends CarrierModule
                 'columns' => array(
                     array('content' => $this->l('ID'), 'key' => 'id_carrier', 'center' => true),
                     array('content' => $this->l('Carrier'), 'key' => 'name'),
+                    array('content' => $this->l('Zones'), 'key' => 'zones'),
                     array('content' => $this->l('Countries'), 'key' => 'countries'),
                     array(
                         'content' => $this->l('Is delivery via Packetery'),
@@ -304,7 +306,7 @@ class Packetery extends CarrierModule
                     array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
                     array('content' => $this->l('Packeta pickup point'), 'key' => 'is_pickup_point', 'hidden' => true),
                 ),
-                'rows' => $packetery_list_ad_carriers,
+                'rows' => $packeteryListAdCarriers,
                 'url_params' => array('configure' => $this->name),
                 'identifier' => 'id_carrier',
             ))

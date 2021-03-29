@@ -164,7 +164,7 @@ tools = {
 	},
 	ad_list_build: function() {
 		var json_ad = decodeURIComponent($('#json_ad').val());
-		$('#ad-carriers-list-table table tr td:nth-child(4)').each(function() {
+		$('#ad-carriers-list-table table tr td:nth-child(5)').each(function() {
 			var id_branch_chosen = $(this).find('span').text();
 			var zpoint = $('#zpoint').val();
 			var packeta_pickup_point = $('#packeta_pickup_point').val();
