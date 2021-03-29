@@ -274,12 +274,30 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('packeta_pickup_point', $this->l('Packeta pickup point'));
 
         /*AD CARRIER LIST*/
-        $packetery_list_ad_carriers = Packeteryclass::getPacketeryCarriersList();
+        $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
+        foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
+            $carrier = new Carrier($packeteryCarrier['id_carrier']);
+            $carrierZones = $carrier->getZones();
+            $carrierCountries = [];
+            foreach ($carrierZones as $carrierZone) {
+                $zoneCountries = Country::getCountriesByZoneId($carrierZone['id_zone'], Configuration::get('PS_LANG_DEFAULT'));
+                foreach ($zoneCountries as $zoneCountry) {
+                    if ($zoneCountry['active']) {
+                        $carrierCountries[] = $zoneCountry['name'];
+                    }
+                }
+            }
+            $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
+            $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
+        }
+
         $this->context->smarty->assign(array(
             'packetery_list_ad_carriers' => Tools::jsonEncode(array(
                 'columns' => array(
                     array('content' => $this->l('ID'), 'key' => 'id_carrier', 'center' => true),
-                    array('content' => $this->l('Carrier'), 'key' => 'name', 'center' => true),
+                    array('content' => $this->l('Carrier'), 'key' => 'name'),
+                    array('content' => $this->l('Zones'), 'key' => 'zones'),
+                    array('content' => $this->l('Countries'), 'key' => 'countries'),
                     array(
                         'content' => $this->l('Is delivery via Packetery'),
                         'key' => 'id_branch',
@@ -288,7 +306,7 @@ class Packetery extends CarrierModule
                     array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
                     array('content' => $this->l('Packeta pickup point'), 'key' => 'is_pickup_point', 'hidden' => true),
                 ),
-                'rows' => $packetery_list_ad_carriers,
+                'rows' => $packeteryListAdCarriers,
                 'url_params' => array('configure' => $this->name),
                 'identifier' => 'id_carrier',
             ))
@@ -301,7 +319,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign(array(
             'payment_list' => Tools::jsonEncode(array(
                 'columns' => array(
-                    array('content' => $this->l('Module'), 'key' => 'name', 'center' => true),
+                    array('content' => $this->l('Module'), 'key' => 'name'),
                     array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
                     array('content' => $this->l('module_name'), 'key' => 'module_name', 'center' => true),
                 ),

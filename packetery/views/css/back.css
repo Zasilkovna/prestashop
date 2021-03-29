@@ -114,18 +114,6 @@ input[type="radio"], input[type="checkbox"]{
 	cursor: pointer;
 }
 
-#payment-list-table {
-	max-width:550px;
-}
-
-#ad-carriers-list-table .panel {
-	max-width:550px;
-}
-
-#payment-list-table .panel {
-	max-width:550px;
-}
-
 .bootstrap input, select, textarea{
 	max-width: 550px;
 }
