@@ -38,3 +38,4 @@
       - Added: Widget v6 support.
       - Removed: possibility to change order branch (preparation for future upgrade)
       - Added: associated countries to carriers list
+      - Updated: CSV export version upgraded to version 6
