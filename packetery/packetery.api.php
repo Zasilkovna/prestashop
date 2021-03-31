@@ -685,12 +685,7 @@ class PacketeryApi
 
     public static function addCarrier($carrier)
     {
-        if ($carrier->pickupPoints != "false")
-        {
-            return false;
-        }
-
-        $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'packetery_branch VALUES(
+        $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_branch` VALUES(
                     ' . (int)$carrier->id . ',
                     \'' . (string)addslashes($carrier->name) . '\',
                     \'' . (string)addslashes($carrier->labelName) . '\',
@@ -717,7 +712,8 @@ class PacketeryApi
                     \'\',
                     \'\',
                     \'\',
-                    1
+                    ' . ((string)$carrier->pickupPoints === 'false' ? 1 : 0) . ',
+                    ' . ((string)$carrier->pickupPoints === 'true' ? 1 : 0) . '
                     );';
 
         $result = Db::getInstance()->execute($sql);
@@ -733,12 +729,12 @@ class PacketeryApi
         return $result;
     }
 
-    public static function getAdBranchesList()
+    public static function getAdAndExternalCarriers()
     {
-        $sql = 'SELECT id_branch, name, country, city, street, zip, url, max_weight, currency
-                FROM ' . _DB_PREFIX_ . 'packetery_branch
-                WHERE is_ad = 1
-                ORDER BY country, name';
+        $sql = 'SELECT `id_branch`, `name`, `country`, `currency`, `is_pickup_point`
+                FROM `' . _DB_PREFIX_ . 'packetery_branch`
+                WHERE `is_ad` = 1 OR `is_pickup_point` = 1
+                ORDER BY `country`, `name`';
         $result = Db::getInstance()->executeS($sql);
         $branches = array();
         foreach ($result as $branch)
@@ -746,7 +742,8 @@ class PacketeryApi
             $branches[] = array(
                 'id_branch' => $branch['id_branch'],
                 'name' => $branch['name'] . ', ' . Tools::strtoupper($branch['country']),
-                'currency' => $branch['currency']
+                'currency' => $branch['currency'],
+                'pickup_point_type' => ($branch['is_pickup_point'] ? 'external' : null),
             );
         }
         return $branches;

@@ -34,7 +34,10 @@ $sql = array();
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';
 
 $sql[] = 'UPDATE `' . _DB_PREFIX_ . 'carrier` SET `is_module` = 0, `external_module_name` = NULL, `need_range` = 0
-    WHERE `id_carrier` IN (SELECT `id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` WHERE `is_pickup_point` = 1)';
+    WHERE `id_carrier` IN (
+        SELECT `id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
+        WHERE `pickup_point_type` IS NOT NULL
+    )';
 
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
 
