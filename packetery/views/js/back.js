@@ -163,32 +163,39 @@ tools = {
 		return field_vars;
 	},
 	ad_list_build: function() {
-		var json_ad = decodeURIComponent($('#json_ad').val());
+		var carriers_json = decodeURIComponent($('#carriers_json').val());
 		$('#ad-carriers-list-table table tr td:nth-child(5)').each(function() {
 			var id_branch_chosen = $(this).find('span').text();
 			var zpoint = $('#zpoint').val();
-			var packeta_pickup_point = $('#packeta_pickup_point').val();
-			var is_pickup_point = parseInt($(this).parent().find('.hidden span').text());
-			var select = tools.buildselect(json_ad, id_branch_chosen, zpoint, packeta_pickup_point, is_pickup_point);
+			var pp_all = $('#pp_all').val();
+			var packeta_pickup_points = $('#packeta_pickup_points').val();
+			var all_packeta_pickup_points = $('#all_packeta_pickup_points').val();
+			var pickup_point_type = $(this).parent().find('.hidden span').text();
+			var select = tools.buildselect(carriers_json, id_branch_chosen, zpoint, packeta_pickup_points, pp_all, all_packeta_pickup_points, pickup_point_type);
 			$(this).html(select);
 		});
 		binds.ad_carrier_select();
 	},
-	buildselect: function(json, id_branch_chosen, zpoint, packeta_pickup_point, is_pickup_point) {
+	buildselect: function(carriers_json, id_branch_chosen, zpoint, packeta_pickup_points, pp_all, all_packeta_pickup_points, pickup_point_type) {
 		// TODO: show hint to update branches if no carriers available
-		var carriers = JSON.parse(json);
+		var carriers = JSON.parse(carriers_json);
 		var cnt = carriers.length;
 		var html = '';
 		html+= '<select name="selected_ad_carrier" id="selected_ad_carrier">';
 		html+= '<option value="">--</option>';
-		html+= '<option value="' + zpoint + '"' +
-			(is_pickup_point ? ' selected' : '') + '>' + packeta_pickup_point + '</option>';
+		html+= '<option value="' + zpoint + '" data-pickup-point-type="internal"' +
+			(pickup_point_type === 'internal' ? ' selected' : '') + '>' + packeta_pickup_points + '</option>';
+		html+= '<option value="' + pp_all + '" data-pickup-point-type="external"' +
+			((pickup_point_type === 'external' && id_branch_chosen === '') ? ' selected' : '') + '>' +
+			all_packeta_pickup_points + '</option>';
 		for (var i = 0; i < cnt; i++) {
 			if (carriers[i]['id_branch'] == id_branch_chosen)
 				var selected = 'selected';
 			else
 				var selected = '';
-			html += '<option value="'+carriers[i]['id_branch']+'" data-currency="'+carriers[i]['currency']+'" '+selected+'>'+carriers[i]['name']+'</option>';
+			html += '<option value="' + carriers[i]['id_branch'] + '" data-currency="' + carriers[i]['currency'] + '"' +
+				'data-pickup-point-type="' + carriers[i]['pickup_point_type'] + '" ' + selected + '>' +
+				carriers[i]['name'] + '</option>';
 		}
 		html+= '</select>';
 		return html;
@@ -344,7 +351,8 @@ binds = {
 			var id_branch = $(this).find('option:selected').val();
 			var branch_name = $(this).find('option:selected').text();
 			var currency = $(this).find('option:selected').data('currency');
-			ajaxs.set_ad_carrier_association(id_carrier, id_branch, branch_name, currency);
+			var pickup_point_type = $(this).find('option:selected').data('pickup-point-type');
+			ajaxs.set_ad_carrier_association(id_carrier, id_branch, branch_name, currency, pickup_point_type);
 		});
 	},
 }
@@ -375,11 +383,17 @@ ajaxs = {
 	    });		
 	},
 
-	set_ad_carrier_association: function(id_carrier, id_branch, branch_name, currency){
+	set_ad_carrier_association: function(id_carrier, id_branch, branch_name, currency, pickup_point_type){
 	    $.ajax({
 	        type: 'POST',
 	        url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=set_ad_carrier_association'+ajaxs.checkToken(),
-	        data: {'id_carrier':id_carrier, 'id_branch':id_branch, 'branch_name':branch_name, 'currency_branch':currency},
+	        data: {
+	        	'id_carrier': id_carrier,
+				'id_branch': id_branch,
+				'branch_name': branch_name,
+				'currency_branch': currency,
+				'pickup_point_type': pickup_point_type,
+			},
 	        beforeSend: function() {
 	        	$("body").toggleClass("wait");
 	        },

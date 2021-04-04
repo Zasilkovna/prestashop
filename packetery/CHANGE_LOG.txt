@@ -39,3 +39,5 @@
       - Removed: possibility to change order branch (preparation for future upgrade)
       - Added: associated countries to carriers list
       - Updated: CSV export version upgraded to version 6
+      - Added: possibility to pair carriers with carriers to external pickup points and to distinguish between
+        Packeta pickup points only and all pickup points

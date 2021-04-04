@@ -33,6 +33,7 @@ class Packeteryclass
 {
     // only for mixing with branch ids
     const ZPOINT = 'zpoint';
+    const PP_ALL = 'pp_all';
 
     /**
      * Converts price from order currency to branch currency
@@ -330,14 +331,14 @@ class Packeteryclass
         }
 
         $orderData = [];
-        if (!$carrier['is_pickup_point']) {
+        if ($carrier['pickup_point_type'] === null) {
             $orderData['id_branch'] = (int)$carrier['id_branch'];
             $orderData['name_branch'] = pSQL($carrier['name_branch']);
             $orderData['currency_branch'] = pSQL($carrier['currency_branch']);
             $orderData['is_ad'] = 1;
         } else {
             $isPacketeryOrder = Db::getInstance()->getValue(
-                'SELECT 1 from `' . _DB_PREFIX_ . 'packetery_order` WHERE id_cart=' . $cartId);
+                'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId);
 
             if (!$isPacketeryOrder) {
                 $orderData['id_branch'] = 0;
@@ -511,7 +512,7 @@ class Packeteryclass
     public static function getPacketeryCarrierById($id_carrier)
     {
         return Db::getInstance()->getRow('
-            SELECT `id_branch`, `name_branch`, `currency_branch`, `is_pickup_point`, `is_cod`
+            SELECT `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`
             FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
             WHERE `id_carrier` = ' . $id_carrier);
     }
@@ -524,7 +525,7 @@ class Packeteryclass
     public static function getPacketeryCarriersList()
     {
         return Db::getInstance()->executeS('
-            SELECT `c`.`id_carrier`, `c`.`name`, `pad`.`id_branch`, `pad`.`is_cod`, `pad`.`is_pickup_point` 
+            SELECT `c`.`id_carrier`, `c`.`name`, `pad`.`id_branch`, `pad`.`is_cod`, `pad`.`pickup_point_type` 
             FROM `' . _DB_PREFIX_ . 'carrier` `c`
             LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` USING(`id_carrier`)
             WHERE `c`.`deleted` = 0
@@ -603,6 +604,8 @@ class Packeteryclass
     {
         $branchName = Tools::getValue('branch_name');
         $branchCurrency = Tools::getValue('currency_branch');
+        $pickupPointType = Tools::getValue('pickup_point_type');
+
         if (!Tools::getIsset('id_carrier') || !Tools::getIsset('id_branch')) {
             return false;
         }
@@ -617,18 +620,21 @@ class Packeteryclass
             $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
             $result = $db->delete('packetery_address_delivery', '`id_carrier` = ' . ((int)$carrierId));
         } else {
-            $fieldsToSet = [];
-            if ($branchId === self::ZPOINT) {
+            $fieldsToSet = [
+                'pickup_point_type' => $pickupPointType,
+            ];
+            if ($branchId === self::ZPOINT || $branchId === self::PP_ALL) {
                 $fieldsToSet['id_branch'] = null;
-                $fieldsToSet['is_pickup_point'] = 1;
                 $fieldsToSet['name_branch'] = null;
                 $fieldsToSet['currency_branch'] = null;
-                $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
             } else {
                 $fieldsToSet['id_branch'] = (int)$branchId;
-                $fieldsToSet['is_pickup_point'] = 0;
                 $fieldsToSet['name_branch'] = pSQL($branchName);
                 $fieldsToSet['currency_branch'] = pSQL($branchCurrency);
+            }
+            if ($pickupPointType) {
+                $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
+            } else {
                 $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
             }
             if ($isPacketeryCarrier) {

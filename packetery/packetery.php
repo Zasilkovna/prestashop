@@ -266,12 +266,11 @@ class Packetery extends CarrierModule
         /*END ORDERS*/
 
         /*CARRIERS*/
-        $ad_array = PacketeryApi::getAdBranchesList();
-        $json_ad_array = json_encode($ad_array);
-        $raw_ad_array = rawurlencode($json_ad_array);
-        $this->context->smarty->assign('ad_array', $raw_ad_array);
+        $this->context->smarty->assign('carriers_json', rawurlencode(json_encode(PacketeryApi::getAdAndExternalCarriers())));
         $this->context->smarty->assign('zpoint', Packeteryclass::ZPOINT);
-        $this->context->smarty->assign('packeta_pickup_point', $this->l('Packeta pickup point'));
+        $this->context->smarty->assign('pp_all', Packeteryclass::PP_ALL);
+        $this->context->smarty->assign('packeta_pickup_points', $this->l('Packeta pickup points'));
+        $this->context->smarty->assign('all_packeta_pickup_points', $this->l('Packeta pickup points (Packeta + carriers)'));
 
         /*AD CARRIER LIST*/
         $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
@@ -304,7 +303,7 @@ class Packetery extends CarrierModule
                         'center' => true
                     ),
                     array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
-                    array('content' => $this->l('Packeta pickup point'), 'key' => 'is_pickup_point', 'hidden' => true),
+                    array('content' => $this->l('Packeta pickup point'), 'key' => 'pickup_point_type', 'hidden' => true),
                 ),
                 'rows' => $packeteryListAdCarriers,
                 'url_params' => array('configure' => $this->name),
@@ -462,7 +461,8 @@ class Packetery extends CarrierModule
 
         $zPointCarriers = Db::getInstance()->executeS(
             'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
-            JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`) WHERE `c`.`deleted` = 0 AND `pad`.`is_pickup_point` = 1'
+            JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`)
+            WHERE `c`.`deleted` = 0 AND `pad`.`pickup_point_type` IS NOT NULL'
         );
         $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
 
@@ -516,8 +516,17 @@ class Packetery extends CarrierModule
 			$this->context->smarty->assign('customer_country', strtolower($countryObj->iso_code));
 		}
 
+        $widgetCarriers = '';
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
+        if ($packeteryCarrier['pickup_point_type'] === 'external' && $packeteryCarrier['id_branch']) {
+            $widgetCarriers = $packeteryCarrier['id_branch'];
+        } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
+            $widgetCarriers = 'packeta';
+        }
+
 		$this->context->smarty->assign('module_version', $this->version);
 		$this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
+        $this->context->smarty->assign('widget_carriers', $widgetCarriers);
 		$this->context->smarty->assign('id_branch', $id_branch);
 		$this->context->smarty->assign('name_branch', $name_branch);
 		$this->context->smarty->assign('currency_branch', $currency_branch);

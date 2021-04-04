@@ -81,14 +81,15 @@ window.initializePacketaWidget = function ()
         language = shopLanguage;
     }
 
+    var module = packeteryModulesManager.detectModule();
+    var widgetCarriers = module.getWidgetParent(module.getSelectedInput()).find('#widget_carriers').val();
+
     $('.open-packeta-widget').click(function (e) {
         e.preventDefault();
         var module_version = $('#module_version').val(); // Get module version for widget
         Packeta.Widget.pick(packetaApiKey, function (pickupPoint)
         {
-            var
-              module = packeteryModulesManager.detectModule(),
-              $selectedDeliveryOption = module.getSelectedInput(),
+            var $selectedDeliveryOption = module.getSelectedInput(),
               $widgetParent = module.getWidgetParent($selectedDeliveryOption);
 
             if (pickupPoint != null)
@@ -125,7 +126,12 @@ window.initializePacketaWidget = function ()
                     module.disableSubmitButton();
                 }
             }
-        }, {appIdentity: 'prestashop-1.7-packeta-' + module_version, country: country, language: language});
+        }, {
+            appIdentity: 'prestashop-1.7-packeta-' + module_version,
+            country: country,
+            language: language,
+            carriers: widgetCarriers,
+        });
     });
 };
 

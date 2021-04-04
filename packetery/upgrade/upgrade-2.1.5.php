@@ -14,6 +14,9 @@ function upgrade_module_2_1_5($object)
         CHANGE `id_branch` `id_branch` int(11) NULL,
         CHANGE `name_branch` `name_branch` varchar(255) NULL,
         CHANGE `currency_branch` `currency_branch` char(3) NULL,
+        ADD `pickup_point_type` varchar(40) NULL;
+        
+        ALTER TABLE `' . _DB_PREFIX_ . 'packetery_branch`
         ADD `is_pickup_point` tinyint(1) NOT NULL DEFAULT 0;
     ');
     if ($result === false) {
@@ -32,7 +35,7 @@ function upgrade_module_2_1_5($object)
                 $carriersToPair[] = [
                     'id_carrier' => $oldPacketeryCarrier['id_carrier'],
                     'is_cod' => $oldPacketeryCarrier['is_cod'],
-                    'is_pickup_point' => 1,
+                    'pickup_point_type' => 'internal',
                 ];
             }
         }

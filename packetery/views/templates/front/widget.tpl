@@ -27,6 +27,7 @@
 <input type="hidden" id="shop-language" name="shop-language" value="{$language['iso_code']|escape:'htmlall':'UTF-8'}">
 <input type="hidden" id="customer_country" name="customer_country" value="{$customer_country|escape:'htmlall':'UTF-8'}">
 <input type="hidden" id="zpoint_carriers" name="zpoint_carriers" value="{$zpoint_carriers}">
+<input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
 <input type="hidden" id="module_version" name="module_version" value="{$module_version}">
 <!--Packetery widget-->
 <div id="packetery-widget">
