@@ -87,15 +87,17 @@ window.initializePacketaWidget = function ()
     }
 
     var module = packeteryModulesManager.detectModule();
-    var widgetCarriers = module.getWidgetParent(module.getSelectedInput()).find('#widget_carriers').val();
+    window.widgetCarriers = module.getWidgetParent(module.getSelectedInput()).find('#widget_carriers').val();
 
     $('.open-packeta-widget').click(function (e) {
         e.preventDefault();
         var module_version = $('#module_version').val(); // Get module version for widget
         Packeta.Widget.pick(packetaApiKey, function (pickupPoint)
         {
-            var $selectedDeliveryOption = module.getSelectedInput(),
-              $widgetParent = module.getWidgetParent($selectedDeliveryOption);
+            var
+                module = packeteryModulesManager.detectModule(),
+                $selectedDeliveryOption = module.getSelectedInput(),
+                $widgetParent = module.getWidgetParent($selectedDeliveryOption);
 
             if (pickupPoint != null)
             {
@@ -139,7 +141,7 @@ window.initializePacketaWidget = function ()
             appIdentity: 'prestashop-1.7-packeta-' + module_version,
             country: country,
             language: language,
-            carriers: widgetCarriers,
+            carriers: window.widgetCarriers,
         });
     });
 };
@@ -194,8 +196,10 @@ tools = {
                 return;
             }
 
+            window.widgetCarriers = $extra.find("#widget_carriers").val();
+
             var id_branch = $extra.find(".packeta-branch-id").val();
-            if (id_branch > 0) {
+            if (id_branch !== '') {
                 var name_branch = $extra.find(".packeta-branch-name").val();
                 var pickup_point_type = $extra.find(".packeta-pickup-point-type").val();
                 var carrier_id = $extra.find(".packeta-carrier-id").val();
