@@ -510,13 +510,13 @@ class Packetery extends CarrierModule
             }
         }
 
-		if(isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery))
-		{
-			$address = new AddressCore($params['cart']->id_address_delivery);
-
-			$countryObj = new CountryCore($address->id_country);
-			$this->context->smarty->assign('customer_country', strtolower($countryObj->iso_code));
-		}
+        $customerCountry = '';
+        if (isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery)) {
+            $address = new AddressCore($params['cart']->id_address_delivery);
+            $countryObj = new CountryCore($address->id_country);
+            $customerCountry = strtolower($countryObj->iso_code);
+        }
+        $this->context->smarty->assign('customer_country', $customerCountry);
 
         $widgetCarriers = '';
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
