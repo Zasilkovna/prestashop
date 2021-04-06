@@ -677,6 +677,7 @@ class PacketeryApi
                     \'' . pSQL((string)addslashes($opening_hours_compact_short)) . '\',
                     \'' . pSQL((string)addslashes($opening_hours_compact_long)) . '\',
                     \'' . pSQL((string)addslashes($opening_hours_regular)) . '\',
+                    0,
                     0
                     );';
         $result = Db::getInstance()->execute($sql);
@@ -754,11 +755,11 @@ class PacketeryApi
     public static function widgetSaveOrderBranch()
     {
         $id_cart = Context::getContext()->cart->id;
-        $id_carrier = Context::getContext()->cart->id_carrier;
 
         if (!isset($id_cart) ||
             !Tools::getIsset('id_branch') ||
             !Tools::getIsset('name_branch') ||
+            !Tools::getIsset('id_carrier') ||
             !Tools::getIsset('pickup_point_type')
         ) {
             return false;
@@ -766,6 +767,7 @@ class PacketeryApi
 
         $id_branch = Tools::getValue('id_branch');
         $name_branch = Tools::getValue('name_branch');
+        $id_carrier = Tools::getValue('id_carrier');
         $pickupPointType = Tools::getValue('pickup_point_type');
         $carrierId = (Tools::getIsset('carrier_id') ? Tools::getValue('carrier_id') : null);
         $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
