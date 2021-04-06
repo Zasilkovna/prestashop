@@ -288,8 +288,8 @@ class Packetery extends CarrierModule
             }
             $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
             $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
-            $packeteryListAdCarriers[$index]['name'] =
-                ($packeteryCarrier['name'] === '0' ? Carrier::getCarrierNameFromShopName() : $packeteryCarrier['name']);
+            // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
+            $packeteryListAdCarriers[$index]['name'] = ($packeteryCarrier['name'] !== '0' ?: Carrier::getCarrierNameFromShopName());
         }
 
         $this->context->smarty->assign(array(
