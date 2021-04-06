@@ -288,6 +288,8 @@ class Packetery extends CarrierModule
             }
             $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
             $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
+            $packeteryListAdCarriers[$index]['name'] =
+                ($packeteryCarrier['name'] === '0' ? Carrier::getCarrierNameFromShopName() : $packeteryCarrier['name']);
         }
 
         $this->context->smarty->assign(array(
