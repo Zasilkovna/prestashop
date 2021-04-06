@@ -677,6 +677,7 @@ class PacketeryApi
                     \'' . pSQL((string)addslashes($opening_hours_compact_short)) . '\',
                     \'' . pSQL((string)addslashes($opening_hours_compact_long)) . '\',
                     \'' . pSQL((string)addslashes($opening_hours_regular)) . '\',
+                    0,
                     0
                     );';
         $result = Db::getInstance()->execute($sql);
@@ -754,11 +755,11 @@ class PacketeryApi
     public static function widgetSaveOrderBranch()
     {
         $id_cart = Context::getContext()->cart->id;
-        $id_carrier = Context::getContext()->cart->id_carrier;
 
         if (!isset($id_cart) ||
             !Tools::getIsset('id_branch') ||
             !Tools::getIsset('name_branch') ||
+            !Tools::getIsset('prestashop_carrier_id') ||
             !Tools::getIsset('pickup_point_type')
         ) {
             return false;
@@ -766,11 +767,12 @@ class PacketeryApi
 
         $id_branch = Tools::getValue('id_branch');
         $name_branch = Tools::getValue('name_branch');
+        $prestashopCarrierId = Tools::getValue('prestashop_carrier_id');
         $pickupPointType = Tools::getValue('pickup_point_type');
-        $carrierId = (Tools::getIsset('carrier_id') ? Tools::getValue('carrier_id') : null);
+        $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
         $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
 
-        $packetery_carrier_row = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
+        $packetery_carrier_row = Packeteryclass::getPacketeryCarrierById((int)$prestashopCarrierId);
         $is_cod = $packetery_carrier_row['is_cod'];
 
         $currency = CurrencyCore::getCurrency(Context::getContext()->cart->id_currency);
@@ -786,13 +788,13 @@ class PacketeryApi
             'id_branch' => (int)$id_branch,
             'name_branch' => pSQL($name_branch),
             'currency_branch' => pSQL($currency_branch),
-            'id_carrier' => (int)$id_carrier,
+            'id_carrier' => (int)$prestashopCarrierId,
             'is_cod' => (int)$is_cod,
             'is_ad' => 0,
         ];
         if ($pickupPointType === 'external') {
             $packeteryOrderFields['is_carrier'] = 1;
-            $packeteryOrderFields['id_branch'] = (int)$carrierId;
+            $packeteryOrderFields['id_branch'] = (int)$widgetCarrierId;
             $packeteryOrderFields['carrier_pickup_point'] = pSQL($carrierPickupPointId);
         }
 

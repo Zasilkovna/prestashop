@@ -351,7 +351,7 @@ class Packeteryclass
         $db = Db::getInstance();
         if (!empty($orderData)) {
             $orderData['id_cart'] = $cartId;
-            $db->insert('packetery_order', $orderData, true, true, Db::ON_DUPLICATE_KEY);
+            $db->insert('packetery_order', $orderData, false, true, Db::ON_DUPLICATE_KEY);
         }
 
         // Update cart order id in packetery_order

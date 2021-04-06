@@ -46,6 +46,11 @@ function PacketeryCheckoutModulesManager() {
 
         return this.detectedModule;
     };
+
+    // in case we need to change this in the future
+    this.getCarrierId = function ($selectedInput) {
+        return $selectedInput.val().replace(',', '');
+    }
 }
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 
@@ -82,15 +87,25 @@ window.initializePacketaWidget = function ()
     }
 
     var module = packeteryModulesManager.detectModule();
-    var widgetCarriers = module.getWidgetParent(module.getSelectedInput()).find('#widget_carriers').val();
+    window.widgetCarriers = module.getWidgetParent(module.getSelectedInput()).find('#widget_carriers').val();
 
     $('.open-packeta-widget').click(function (e) {
         e.preventDefault();
         var module_version = $('#module_version').val(); // Get module version for widget
+        var widgetOptions = {
+            appIdentity: 'prestashop-1.7-packeta-' + module_version,
+            country: country,
+            language: language,
+        };
+        if (window.widgetCarriers !== '') {
+            widgetOptions.carriers = window.widgetCarriers;
+        }
         Packeta.Widget.pick(packetaApiKey, function (pickupPoint)
         {
-            var $selectedDeliveryOption = module.getSelectedInput(),
-              $widgetParent = module.getWidgetParent($selectedDeliveryOption);
+            var
+                module = packeteryModulesManager.detectModule(),
+                $selectedDeliveryOption = module.getSelectedInput(),
+                $widgetParent = module.getWidgetParent($selectedDeliveryOption);
 
             if (pickupPoint != null)
             {
@@ -106,8 +121,12 @@ window.initializePacketaWidget = function ()
 
                 module.enableSubmitButton();
 
+                /* Get ID of selected carrier */
+                var prestashopCarrierId = packeteryModulesManager.getCarrierId($selectedDeliveryOption);
+
                 /* Save packetery order without order ID - just cart id so we can access carrier data later */
                 packetery.widgetSaveOrderBranch(
+                    prestashopCarrierId,
                     pickupPoint.id,
                     pickupPoint.name,
                     pickupPoint.pickupPointType,
@@ -126,12 +145,7 @@ window.initializePacketaWidget = function ()
                     module.disableSubmitButton();
                 }
             }
-        }, {
-            appIdentity: 'prestashop-1.7-packeta-' + module_version,
-            country: country,
-            language: language,
-            carriers: widgetCarriers,
-        });
+        }, widgetOptions);
     });
 };
 
@@ -176,6 +190,7 @@ tools = {
         {
             var
                 $this = $(this),
+                prestashop_carrier_id = packeteryModulesManager.getCarrierId($this),
                 $extra = module.getWidgetParent($this);
 
             // if selected carrier is not Packetery then enable Continue button and we're done here
@@ -184,14 +199,16 @@ tools = {
                 return;
             }
 
+            window.widgetCarriers = $extra.find("#widget_carriers").val();
+
             var id_branch = $extra.find(".packeta-branch-id").val();
-            if (id_branch > 0) {
+            if (id_branch !== '') {
                 var name_branch = $extra.find(".packeta-branch-name").val();
                 var pickup_point_type = $extra.find(".packeta-pickup-point-type").val();
-                var carrier_id = $extra.find(".packeta-carrier-id").val();
+                var widget_carrier_id = $extra.find(".packeta-carrier-id").val();
                 var carrier_pickup_point_id = $extra.find(".packeta-carrier-pickup-point-id").val();
                 module.enableSubmitButton();
-                packetery.widgetSaveOrderBranch(id_branch, name_branch, pickup_point_type, carrier_id, carrier_pickup_point_id);
+                packetery.widgetSaveOrderBranch(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id);
             } else {
                 module.disableSubmitButton();
             }
@@ -200,16 +217,17 @@ tools = {
 }
 
 packetery = {
-    widgetSaveOrderBranch: function (id_branch, name_branch, pickup_point_type, carrier_id, carrier_pickup_point_id)
+    widgetSaveOrderBranch: function (prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id)
     {
         $.ajax({
             type: 'POST',
             url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=widgetsaveorderbranch' + ajaxs.checkToken(),
             data: {
+                'prestashop_carrier_id': prestashop_carrier_id,
                 'id_branch': id_branch,
                 'name_branch': name_branch,
                 'pickup_point_type': pickup_point_type,
-                'carrier_id': carrier_id,
+                'widget_carrier_id': widget_carrier_id,
                 'carrier_pickup_point_id': carrier_pickup_point_id
             },
             beforeSend: function () {

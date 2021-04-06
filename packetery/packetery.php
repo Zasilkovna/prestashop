@@ -288,6 +288,9 @@ class Packetery extends CarrierModule
             }
             $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
             $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
+            // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
+            $packeteryListAdCarriers[$index]['name'] =
+                ($packeteryCarrier['name'] === '0' ? Carrier::getCarrierNameFromShopName() : $packeteryCarrier['name']);
         }
 
         $this->context->smarty->assign(array(
@@ -508,13 +511,13 @@ class Packetery extends CarrierModule
             }
         }
 
-		if(isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery))
-		{
-			$address = new AddressCore($params['cart']->id_address_delivery);
-
-			$countryObj = new CountryCore($address->id_country);
-			$this->context->smarty->assign('customer_country', strtolower($countryObj->iso_code));
-		}
+        $customerCountry = '';
+        if (isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery)) {
+            $address = new AddressCore($params['cart']->id_address_delivery);
+            $countryObj = new CountryCore($address->id_country);
+            $customerCountry = strtolower($countryObj->iso_code);
+        }
+        $this->context->smarty->assign('customer_country', $customerCountry);
 
         $widgetCarriers = '';
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
