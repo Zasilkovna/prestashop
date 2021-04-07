@@ -43,3 +43,4 @@
         Packeta pickup points only and all pickup points
       - Fixed: correctly display the name of the carrier identical to the name of the e-shop on the module setting page
       - Fixed: Undefined index: customer_country in DEV mode
+      - Added: module version to static files
