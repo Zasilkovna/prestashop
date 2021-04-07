@@ -42,7 +42,12 @@ $sql[] = 'UPDATE `' . _DB_PREFIX_ . 'carrier` SET `is_module` = 0, `external_mod
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
 
 foreach ($sql as $query) {
-    if (Db::getInstance()->execute($query) == false) {
-        return false;
+    try {
+        if (Db::getInstance()->execute($query) == false) {
+            return false;
+        }
+    } catch (PrestaShopDatabaseException $exception) {
+        PrestaShopLogger::addLog($this->l('Exception raised during Packetery module uninstall:') . ' ' .
+            $exception->getMessage(), 3, null, null, null, true);
     }
 }
