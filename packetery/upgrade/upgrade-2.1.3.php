@@ -59,7 +59,10 @@ function upgrade_module_2_1_3($object)
     }
 
     foreach ($updateData as $settingData) {
-        Db::getInstance()->insert('packetery_settings', $settingData, false, true, Db::ON_DUPLICATE_KEY);
+        $result = Db::getInstance()->insert('packetery_settings', $settingData, false, true, Db::ON_DUPLICATE_KEY);
+        if ($result === false) {
+            return false;
+        }
     }
 
     return true;
