@@ -414,9 +414,9 @@ class Packetery extends CarrierModule
         if ((Tools::getValue('module_name') == $this->name) || (Tools::getValue('configure') == $this->name)) {
             $this->context->controller->addjquery();
             $this->context->controller->addJS('https://cdn.jsdelivr.net/riot/2.4.1/riot+compiler.min.js');
-            $this->context->controller->addJS($this->_path.'views/js/back.js');
-            $this->context->controller->addCSS($this->_path.'views/css/back.css');
-            $this->context->controller->addJS($this->_path.'views/js/notify.js');
+            $this->context->controller->addJS($this->_path . 'views/js/back.js?v=' . $this->version);
+            $this->context->controller->addCSS($this->_path . 'views/css/back.css?v=' . $this->version, 'all', null, false);
+            $this->context->controller->addJS($this->_path . 'views/js/notify.js');
         }
     }
 
@@ -559,7 +559,7 @@ class Packetery extends CarrierModule
     public function hookDisplayHeader()
     {
         $js = [
-            'front.js',
+            'front.js?v=' . $this->version,
         ];
 
         $iterator = new GlobIterator(__DIR__ . '/views/js/checkout-modules/*.js', FilesystemIterator::CURRENT_AS_FILEINFO);
@@ -573,7 +573,7 @@ class Packetery extends CarrierModule
             $this->context->controller->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
         }
 
-        $this->context->controller->addCSS($this->_path.'views/css/front.css');
+        $this->context->controller->registerStylesheet('packetery-front', $this->_path . 'views/css/front.css?v=' . $this->version, ['server' => 'remote']);
     }
 
     /*ORDERS*/
