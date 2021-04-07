@@ -29,41 +29,39 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_2_1_3($object)
 {
     $oldSettings = Db::getInstance()->executeS('SELECT * FROM `' . _DB_PREFIX_ . 'packetery_settings`');
-    $updateData = [];
+    $insertData = [];
     foreach ($oldSettings as $oldSetting) {
         switch (strtoupper($oldSetting['option'])) {
             case 'APIKEY':
+                // no longer needed
+                break;
             case 'APIPASS':
-                $updateData[] = ['id' => 1, 'option' => 'APIPASS', 'value' => $oldSetting['value']];
+                $insertData[] = ['id' => 1, 'option' => 'APIPASS', 'value' => $oldSetting['value']];
                 break;
             case 'ESHOPDOMAIN':
-            case 'ESHOP_ID':
-                $updateData[] = ['id' => 2, 'option' => 'ESHOP_ID', 'value' => $oldSetting['value']];
+                $insertData[] = ['id' => 2, 'option' => 'ESHOP_ID', 'value' => $oldSetting['value']];
                 break;
             case 'LABEL_FORMAT':
-                $updateData[] = ['id' => 3, 'option' => 'LABEL_FORMAT', 'value' => $oldSetting['value']];
+                $insertData[] = ['id' => 3, 'option' => 'LABEL_FORMAT', 'value' => $oldSetting['value']];
                 break;
             case 'LAST_BRANCHES_UPDATE':
-                $updateData[] = ['id' => 4, 'option' => 'LAST_BRANCHES_UPDATE', 'value' => $oldSetting['value']];
+                $insertData[] = ['id' => 4, 'option' => 'LAST_BRANCHES_UPDATE', 'value' => $oldSetting['value']];
                 break;
             case 'WIDGET_TYPE':
-                $updateData[] = ['id' => 5, 'option' => 'WIDGET_TYPE', 'value' => $oldSetting['value']];
+                $insertData[] = ['id' => 5, 'option' => 'WIDGET_TYPE', 'value' => $oldSetting['value']];
                 break;
             case 'FORCE_COUNTRY':
-                $updateData[] = ['id' => 6, 'option' => 'FORCE_COUNTRY', 'value' => $oldSetting['value']];
+                $insertData[] = ['id' => 6, 'option' => 'FORCE_COUNTRY', 'value' => $oldSetting['value']];
                 break;
             case 'FORCE_LANG':
-                $updateData[] = ['id' => 7, 'option' => 'FORCE_LANGUAGE', 'value' => $oldSetting['value']];
+                $insertData[] = ['id' => 7, 'option' => 'FORCE_LANGUAGE', 'value' => $oldSetting['value']];
                 break;
         }
     }
 
-    foreach ($updateData as $settingData) {
-        $result = Db::getInstance()->insert('packetery_settings', $settingData, false, true, Db::ON_DUPLICATE_KEY);
-        if ($result === false) {
-            return false;
-        }
+    $result = Db::getInstance()->execute('TRUNCATE TABLE `' . _DB_PREFIX_ . 'packetery_settings`');
+    if ($result === false) {
+        return false;
     }
-
-    return true;
+    return Db::getInstance()->insert('packetery_settings', $insertData);
 }
