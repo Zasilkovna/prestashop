@@ -23,15 +23,12 @@
 *}
 <div id="faq">
 	<br>
-	<p>{l s='First of all register at http://client.packeta.com/ and copypast API password to its field on module tab.' mod='packetery' }</p>
+	<p>{l s='First of all register at http://client.packeta.com/ and copypaste API password to its field on module tab.' mod='packetery' }</p>
 	<p>{l s='All settings autosaves.' mod='packetery' }</p>
-	{*<p>{l s='Associate Packetery Address delivery services with prestashop carriers(if needed)' mod='packetery' }</p>*}
-	<p>{l s='' mod='packetery' }</p>
 	<p>{l s='You can change carrier and payment COD setting by clicking on it.' mod='packetery' } {l s='All COD settings in tables is clickable.' mod='packetery' }</p>
 	<p>{l s='To export data to a CSV file choose Zasilkovna associated orders and click "CSV Export".' mod='packetery' }
 	<p>{l s='To export packets and create shipment choose Zasilkovna associated orders and click "Export selected orders and create shipment".' mod='packetery' }
 	<p>{l s='To print labels choose exported  Zasilkovna associated orders and click "Download pdf labels".' mod='packetery' }</p>
-
 	<p>{l s='Have a nice day.' mod='packetery' }</p>
 </div>
 

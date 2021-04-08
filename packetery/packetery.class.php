@@ -827,7 +827,7 @@ class Packeteryclass
                 }
                 else
                 {
-                    return $packetery->l('Identifikátor e-shopu musí být řetězec.');
+                    return $packetery->l('E-shop ID must be a string');
                 }
                 break;
             default:
