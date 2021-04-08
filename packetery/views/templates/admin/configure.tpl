@@ -33,7 +33,7 @@
 	<div id="top_packetery">
 		<img id ="top_packetery_image" src="{$module_dir|escape:'html':'UTF-8'}/logo.png" id="payment-logo" class="pull-right" />
 		<div id="top_packetery_text">
-			<i class="icon icon-truck"></i> {l s='Zasilkovna Dashboard' mod='packetery'}
+			<i class="icon icon-truck"></i> {l s='Packeta Dashboard' mod='packetery'}
 		</div>
 	</div>
 	<ps-tabs position="top">

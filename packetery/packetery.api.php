@@ -47,7 +47,7 @@ class PacketeryApi
         if ($id_orders == '')
         {
             $module = new Packetery;
-            echo $module->l('Please choose orders first. ');
+            echo $module->l('Please choose orders first.');
             return false;
         }
         $packets = Packeteryclass::getTrackingFromOrders($id_orders);
@@ -168,7 +168,7 @@ class PacketeryApi
         if ($id_orders == '')
         {
             $module = new Packetery;
-            echo $module->l('Please choose orders first. ');
+            echo $module->l('Please choose orders first.');
             return false;
         }
         $id_orders = explode(',', $id_orders);
@@ -529,7 +529,7 @@ class PacketeryApi
 		}
 
         if (! $response) {
-			return $module->l('Cant download branches list. Network error');
+			return $module->l('Can\'t download branches list. Network error.');
 		}
 
 		if (Tools::strpos($response, 'invalid API key') !== false) {

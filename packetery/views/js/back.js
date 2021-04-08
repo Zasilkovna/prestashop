@@ -475,7 +475,7 @@ ajaxs = {
                 if (msg == 'ok') {
                 	ajaxs.orderExport(this.id_orders);
 				} else {
-					$('#packetery-orders-table .panel').notify(lang_pac.err_no_branch+': '+msg, "error",{position:"top"});
+					$('#packetery-orders-table .panel').notify(lang_pac.err_no_branch + ' - : ' + msg, "error", {position: "top"});
 				}
 				$('#packetery-orders-table').find('.ps-table-checkbox').prop('checked', false);
 	        },

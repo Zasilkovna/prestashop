@@ -22,7 +22,6 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
-<input type="hidden" name="ajaxfields" id="ajaxfields" value="{$ajaxfields|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="carrier_id" id="carrier_id" value="{$carrier_id|escape:'htmlall':'UTF-8'}">
 <input type="hidden" id="shop-language" name="shop-language" value="{$language['iso_code']|escape:'htmlall':'UTF-8'}">
 <input type="hidden" id="customer_country" name="customer_country" value="{$customer_country|escape:'htmlall':'UTF-8'}">

@@ -40,7 +40,7 @@ class Packetery extends CarrierModule
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
 		$this->version = '2.1.5';
-		$this->author = 'Packetery a.s.';
+		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
 
@@ -59,11 +59,11 @@ class Packetery extends CarrierModule
 
         parent::__construct();
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
-        $desc = $this->l('Get your customers access to pick-up point in Packetery delivery network.');
-        $desc .= $this->l('Export orders to Packetery system.');
+        $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
+        $desc .= $this->l('Export orders to Packeta system.');
 
-        $this->displayName = $this->l('Packetery');
-        $this->description = $this->l('Packetery pick-up points, orders export, and print shipping labels');
+        $this->displayName = $this->l('Packeta');
+        $this->description = $this->l('Packeta pick-up points, orders export, and print shipping labels');
 
         $this->supported_countries_trans = array(
             [
@@ -177,14 +177,14 @@ class Packetery extends CarrierModule
         @touch($fn);
         if (!is_writable($fn)) {
             $error[] = $this->l(
-                'The Packetery module folder must be writable for the branch selection to work properly.'
+                'The Packeta module folder must be writable for the branch selection to work properly.'
             );
             $have_error = true;
         }
 
         if (!self::transportMethod()) {
             $error[] = $this->l(
-                'No way to access Packetery API is available on the web server:
+                'No way to access Packeta API is available on the web server:
                 please allow CURL module or allow_url_fopen setting.'
             );
             $have_error = true;
@@ -196,11 +196,11 @@ class Packetery extends CarrierModule
         }
         $test = "http://www.zasilkovna.cz/api/$key/test";
         if (!$key) {
-            $error[] = $this->l('Packetery API pass is not set.');
+            $error[] = $this->l('Packeta API password is not set.');
             $have_error = true;
         } elseif (!$error) {
             if (Tools::file_get_contents($test) != 1) {
-                $error[] = $this->l('Cannot access Packetery API with specified key. Possibly the API key is wrong.');
+                $error[] = $this->l('Cannot access Packeta API with specified password. Possibly the API password is wrong.');
                 $have_error = true;
             }
         }
@@ -301,7 +301,7 @@ class Packetery extends CarrierModule
                     array('content' => $this->l('Zones'), 'key' => 'zones'),
                     array('content' => $this->l('Countries'), 'key' => 'countries'),
                     array(
-                        'content' => $this->l('Is delivery via Packetery'),
+                        'content' => $this->l('Is delivery via Packeta'),
                         'key' => 'id_branch',
                         'center' => true
                     ),
@@ -367,31 +367,18 @@ class Packetery extends CarrierModule
         /*END CARRIERS*/
 
         /*FIELDS FOR AJAX*/
-        // TODO: review all lang_pac translations - check if used in back.js
         $ajaxfields = array(
-            'zip' => $this->l('ZIP'),
-            'moredetails' => $this->l('More details'),
-            'max_weight' => $this->l('Max weight'),
-            'dressing_room' => $this->l('Dressing room'),
-            'packet_consignment' => $this->l('Packet consignment'),
-            'claim_assistant' => $this->l('Claim assistant'),
-            'yes' => $this->l('Yes'),
-            'no' => $this->l('No'),
             'all' => $this->l('All'),
             'error' => $this->l('Error'),
             'success' => $this->l('Success'),
-            'success_export' => $this->l('Successfuly exported'),
-            'success_download_branches' => $this->l('Branches successfuly updated.'),
+            'success_export' => $this->l('Successfully exported'),
+            'success_download_branches' => $this->l('Branches successfully updated.'),
             'reload5sec' => $this->l('Page will be reloaded in 5 seconds...'),
             'try_download_branches' => $this->l('Trying to download branches. Please wait for download process end...'),
             'confirm_tracking_exists' => $this->l('Tracking numbers of some selected orders already exist and will be rewritten by new ones. Do you want to continue?'),
-            'err_no_branch' => $this->l('Please select destination branch for order(s) - '),
+            'err_no_branch' => $this->l('Please select destination branch for order(s)'),
             'error_export_unknown' => $this->l('There was an error trying to update branch list, check if your API password is correct and try again.'),
-            'error_export' => $this->l('not exported. Error: '),
-            'err_country' => $this->l('Please select country'),
-            'api_wrong' => $this->l('Api password is wrong. Branches will not be updated.'),
-            'please_choose' => $this->l('please choose'),
-            'please_choose_branch' => $this->l('Please choose delivery branch')
+            'error_export' => $this->l('not exported. Error:'),
         );
         $ajaxfields_json = json_encode($ajaxfields);
         $ajaxfields_json = rawurlencode($ajaxfields_json);
@@ -470,21 +457,6 @@ class Packetery extends CarrierModule
         $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
 
 		$this->context->smarty->assign('carrier_id', $id_carrier);
-		/*FIELDS FOR AJAX*/
-        // TODO: remove - ajaxfields not used in front.js
-		$ajaxfields = array(
-			'zip' => $this->l('ZIP'),
-			'moredetails' => $this->l('More details'),
-			'max_weight' => $this->l('Max weight'),
-			'dressing_room' => $this->l('Dressing room'),
-			'packet_consignment' => $this->l('Packet consignment'),
-			'claim_assistant' => $this->l('Claim assistant'),
-			'yes' => $this->l('Yes'),
-			'no' => $this->l('No'),
-			'please_choose' => $this->l('please choose'),
-			'please_choose_branch' => $this->l('Please choose delivery branch')
-			);
-		$ajaxfields_json = json_encode($ajaxfields);
 
 		$name_branch = '';
 		$currency_branch = '';
@@ -536,8 +508,6 @@ class Packetery extends CarrierModule
 		$this->context->smarty->assign('pickup_point_type', $pickupPointType);
 		$this->context->smarty->assign('packeta_carrier_id', $carrierId);
 		$this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
-
-		$this->context->smarty->assign('ajaxfields', $ajaxfields_json);
 
 		$base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
 		$this->context->smarty->assign('baseuri', $base_uri);

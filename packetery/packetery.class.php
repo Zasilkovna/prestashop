@@ -289,7 +289,7 @@ class Packeteryclass
         $tab->id_parent = $id_parent;
         $tab->module = 'packetery';
         $tab->class_name = 'Adminpacketery';
-        $tab->name = self::createMultiLangField($module->l('Zasilkovna Orders'));
+        $tab->name = self::createMultiLangField($module->l('Packeta Orders'));
         $tab->position = $tab->getNewLastPosition($id_parent);
         $tab->add();
         return true;
@@ -787,7 +787,7 @@ class Packeteryclass
             }
             else
             {
-                echo json_encode(array(9, $module->l('Cant update setting')));
+                echo json_encode(array(9, $module->l('Can\'t update setting')));
             }
         }
         else
