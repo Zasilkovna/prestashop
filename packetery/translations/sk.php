@@ -114,4 +114,5 @@ $_MODULE['<{packetery}prestashop>configure_7442e29d7d53e549b78d93c46b8cdcfc'] = 
 $_MODULE['<{packetery}prestashop>configure_f4f70727dc34561dfde1a3c529b6205c'] = 'Nastavenie';
 $_MODULE['<{packetery}prestashop>configure_dacdb83ade6c4e8878717e206175dfd8'] = 'Výdejní místa';
 $_MODULE['<{packetery}prestashop>configure_1fe917b01f9a3f87fa2d7d3b7643fac1'] = 'Často kladené otázky';
+$_MODULE['<{packetery}prestashop>uninstall_e21a827831f90240feccbb1f8fd8c7e3'] = 'Při odinstalování modulu Zásilkovny nastala výjimka:';
 $_MODULE['<{packetery}prestashop>adminpacketerycontroller_40537165e87412bef1e5ffca218d6186'] = 'Zasilkona';
