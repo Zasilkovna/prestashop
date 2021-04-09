@@ -31,7 +31,7 @@ class AdminpacketeryController extends ModuleAdminController
         $this->bootstrap = true;
         $this->html = '';
         $this->display = 'view';
-        $this->meta_title = $this->l('Zasilkona');
+        $this->meta_title = $this->l('Packeta');
         $context = Context::getContext();
 
         if (isset($context->employee) && ($context->employee->id > 0)) {

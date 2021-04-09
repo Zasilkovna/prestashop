@@ -138,11 +138,11 @@ V případě, že nemáte uživatelský účet na stránkách Zásilkovny, je mo
   který se automaticky změní na zelené zatržítko.
 
 ### Výdejní místa
-V záložce výdejní místa naleznete informace o poslední aktualizaci seznamu poboček:
-- celkový počet poboček
+V záložce výdejní místa naleznete informace o poslední aktualizaci seznamu výdejních míst:
+- celkový počet výdejních míst
 - datum a čas poslední aktualizace
 
-Pobočky se aktualizují automaticky. Pro ruční aktualizaci seznamu poboček klikněte na tlačítko **Aktualizace poboček**.
+Výdejní místa se aktualizují automaticky. Pro ruční aktualizaci seznamu výdejních míst klikněte na tlačítko **Aktualizace výdejních míst**.
 
 ### Objednávky
 V záložce **objednávky** naleznete seznam všech objednávek u kterých byla vybrán způsob dopravy přes Zásilkovnu.

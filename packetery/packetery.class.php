@@ -289,7 +289,7 @@ class Packeteryclass
         $tab->id_parent = $id_parent;
         $tab->module = 'packetery';
         $tab->class_name = 'Adminpacketery';
-        $tab->name = self::createMultiLangField($module->l('Zasilkovna Orders'));
+        $tab->name = self::createMultiLangField($module->l('Packeta Orders'));
         $tab->position = $tab->getNewLastPosition($id_parent);
         $tab->add();
         return true;
@@ -342,7 +342,7 @@ class Packeteryclass
 
             if (!$isPacketeryOrder) {
                 $orderData['id_branch'] = 0;
-                $orderData['name_branch'] = $module->l('Please select branch');
+                $orderData['name_branch'] = $module->l('Please select pickup point');
                 $orderData['currency_branch'] = '';
                 $orderData['is_ad'] = 0;
             }
@@ -787,7 +787,7 @@ class Packeteryclass
             }
             else
             {
-                echo json_encode(array(9, $module->l('Cant update setting')));
+                echo json_encode(array(9, $module->l('Can\'t update setting')));
             }
         }
         else
@@ -808,7 +808,7 @@ class Packeteryclass
                 {
                     if (Tools::strlen($value) !== 32)
                     {
-                        return $packetery->l('Api password is wrong. Branches will not be updated.');
+                        return $packetery->l('Api password is wrong. Pickup points will not be updated.');
                     }
                     else
                     {
@@ -827,7 +827,7 @@ class Packeteryclass
                 }
                 else
                 {
-                    return $packetery->l('Identifikátor e-shopu musí být řetězec.');
+                    return $packetery->l('E-shop ID must be a string');
                 }
                 break;
             default:
