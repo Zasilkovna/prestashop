@@ -33,8 +33,6 @@ class Packetery extends CarrierModule
 {
     protected $config_form = false;
 
-    private $supported_countries_trans = array(); /* Used wherever countries with texts are needed */
-
     public function __construct()
     {
 		$this->name = 'packetery';
@@ -64,29 +62,6 @@ class Packetery extends CarrierModule
 
         $this->displayName = $this->l('Packeta');
         $this->description = $this->l('Packeta pick-up points, orders export, and print shipping labels');
-
-        $this->supported_countries_trans = array(
-            [
-                "country" => "cz",
-                "name" => $this->l('Czech Republic')
-            ],
-            [
-                "country" => "hu",
-                "name" => $this->l('Hungary')
-            ],
-            [
-                "country" => "pl",
-                "name" => $this->l('Poland')
-            ],
-            [
-                "country" => "ro",
-                "name" => $this->l('Romania')
-            ],
-            [
-                "country" => "sk",
-                "name" => $this->l('Slovakia')
-            ],
-        );
 
         $this->ps_versions_compliancy = array('min' => '1.7.0.0', 'max' => _PS_VERSION_);
     }
@@ -177,7 +152,7 @@ class Packetery extends CarrierModule
         @touch($fn);
         if (!is_writable($fn)) {
             $error[] = $this->l(
-                'The Packeta module folder must be writable for the branch selection to work properly.'
+                'The Packeta module folder must be writable for the pickup point selection to work properly.'
             );
             $have_error = true;
         }
@@ -253,7 +228,7 @@ class Packetery extends CarrierModule
                     array('content' => $this->l('Total Price'), 'key' => 'total', 'center' => true),
                     array('content' => $this->l('Order Date'), 'key' => 'date', 'center' => true),
                     array('content' => $this->l('Is COD'), 'bool' => true, 'key' => 'is_cod'),
-                    array('content' => $this->l('Destination branch'), 'key' => 'name_branch', 'center' => true),
+                    array('content' => $this->l('Destination pickup point'), 'key' => 'name_branch', 'center' => true),
                     array('content' => $this->l('Address delivery'), 'key' => 'is_ad', 'bool' => true,'center' => true),
                     array('content' => $this->l('Exported'), 'key' => 'exported', 'bool' => true, 'center' => true),
                     array('content' => $this->l('Tracking number'), 'key' => 'tracking_number', 'center' => true)
@@ -372,12 +347,12 @@ class Packetery extends CarrierModule
             'error' => $this->l('Error'),
             'success' => $this->l('Success'),
             'success_export' => $this->l('Successfully exported'),
-            'success_download_branches' => $this->l('Branches successfully updated.'),
+            'success_download_branches' => $this->l('Pickup points successfully updated.'),
             'reload5sec' => $this->l('Page will be reloaded in 5 seconds...'),
-            'try_download_branches' => $this->l('Trying to download branches. Please wait for download process end...'),
+            'try_download_branches' => $this->l('Trying to download pickup points. Please wait for download process end...'),
             'confirm_tracking_exists' => $this->l('Tracking numbers of some selected orders already exist and will be rewritten by new ones. Do you want to continue?'),
-            'err_no_branch' => $this->l('Please select destination branch for order(s)'),
-            'error_export_unknown' => $this->l('There was an error trying to update branch list, check if your API password is correct and try again.'),
+            'err_no_branch' => $this->l('Please select destination pickup point for order(s)'),
+            'error_export_unknown' => $this->l('There was an error trying to update list of pickup points, check if your API password is correct and try again.'),
             'error_export' => $this->l('not exported. Error:'),
         );
         $ajaxfields_json = json_encode($ajaxfields);
@@ -511,10 +486,6 @@ class Packetery extends CarrierModule
 
 		$base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
 		$this->context->smarty->assign('baseuri', $base_uri);
-		$countries = $this->getCountriesList($id_carrier);
-		$this->context->smarty->assign('countries', $countries);
-		$countries_count = count($countries);
-		$this->context->smarty->assign('countries_count', $countries_count);
 		$this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
 		$this->context->smarty->assign('language', (array)$language);
 		/*END FIELDS FOR AJAX*/
@@ -557,9 +528,4 @@ class Packetery extends CarrierModule
     }
     /*END ORDERS*/
 
-    /*WIDGET*/
-    public function getCountriesList($id_carrier = false)
-    {
-        return $this->supported_countries_trans;
-    }
 }

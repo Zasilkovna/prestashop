@@ -342,7 +342,7 @@ class Packeteryclass
 
             if (!$isPacketeryOrder) {
                 $orderData['id_branch'] = 0;
-                $orderData['name_branch'] = $module->l('Please select branch');
+                $orderData['name_branch'] = $module->l('Please select pickup point');
                 $orderData['currency_branch'] = '';
                 $orderData['is_ad'] = 0;
             }
@@ -808,7 +808,7 @@ class Packeteryclass
                 {
                     if (Tools::strlen($value) !== 32)
                     {
-                        return $packetery->l('Api password is wrong. Branches will not be updated.');
+                        return $packetery->l('Api password is wrong. Pickup points will not be updated.');
                     }
                     else
                     {

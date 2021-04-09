@@ -43,11 +43,8 @@
 		<ps-tab title="{l s='Settings' mod='packetery'}" id="tab-settings" {if $active_tab eq 'settings'}active="true"{/if} icon="icon-AdminParentModules" >
 		    {include file="./tab_settings.tpl"}
 		</ps-tab>
-		<ps-tab title="{l s='Branch' mod='packetery'}" id="tab-branch" {if $active_tab eq 'branch'}active="true"{/if} icon="" >
+		<ps-tab title="{l s='Pickup points' mod='packetery'}" id="tab-branch" {if $active_tab eq 'branch'}active="true"{/if} icon="" >
 			{include file="./tab_branch.tpl"}
 		</ps-tab>
-	    <ps-tab title="{l s='FAQ' mod='packetery'}" id="faq">
-	        {include file="./tab_faq.tpl"}
-	    </ps-tab>
 	</ps-tabs>
 </div>

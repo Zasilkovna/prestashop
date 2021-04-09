@@ -259,7 +259,7 @@ class PacketeryApi
             {
                 return array(
                     0,
-                    $module->l('Can\'t find order currency rate between order and branch, order') . ' - ' . $id_order,
+                    $module->l('Can\'t find order currency rate between order and pickup point, order') . ' - ' . $id_order,
                 );
             }
         }
@@ -529,7 +529,7 @@ class PacketeryApi
 		}
 
         if (! $response) {
-			return $module->l('Can\'t download branches list. Network error.');
+			return $module->l('Can\'t download list of pickup points. Network error.');
 		}
 
 		if (Tools::strpos($response, 'invalid API key') !== false) {
