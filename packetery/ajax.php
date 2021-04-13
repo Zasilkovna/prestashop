@@ -23,15 +23,23 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+if (!defined('_PS_ADMIN_DIR_')) {
+    define('_PS_ADMIN_DIR_', getcwd());
+}
+
 include_once(dirname(__file__) . '/packetery.class.php');
 include_once(dirname(__file__) . '/packetery.api.php');
 
-$token = Tools::getValue('token');
-$id_employee = Tools::getValue('check_e');
-$real_token = Packeteryclass::getAdminToken($id_employee);
+if (
+    !Context::getContext()->employee ||
+    !Context::getContext()->employee->isLoggedBack()
+) {
+    header($_SERVER['SERVER_PROTOCOL'] . ' 403 Forbidden');
 
-if ($token !== $real_token)
-{
+    // used only by adminOrderChangeBranch so far
+    $packetery = new Packetery();
+    echo json_encode(['error' => $packetery->l('Please log in to the administration again.')]);
+
     exit;
 }
 
@@ -75,6 +83,10 @@ switch (Tools::getValue('action'))
         PacketeryApi::downloadPdfAjax();
         break;
     /*END ORDERS*/
+    /* Admin Orders */
+    case 'adminOrderChangeBranch':
+        Packeteryclass::adminOrderChangeBranch();
+        break;
     default:
         exit;
 }

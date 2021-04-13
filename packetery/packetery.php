@@ -86,7 +86,7 @@ class Packetery extends CarrierModule
         } else {
             $have_old_table = false;
         }
-        
+
         include(dirname(__FILE__).'/sql/install.php');
 
         // copy data from old order table
@@ -108,6 +108,8 @@ class Packetery extends CarrierModule
             $this->registerHook('displayCarrierExtraContent') &&
             $this->registerHook('displayHeader') &&
             $this->registerHook('actionCarrierUpdate') &&
+            $this->registerHook('actionAdminControllerSetMedia') &&
+            $this->registerHooksWithVersionCheck() &&
             Packeteryclass::insertTab();
     }
 
@@ -116,6 +118,18 @@ class Packetery extends CarrierModule
         Packeteryclass::deleteTab();
 
         include(dirname(__FILE__).'/sql/uninstall.php');
+
+        if (
+            !$this->unregisterHook('actionOrderHistoryAddAfter') ||
+            !$this->unregisterHook('backOfficeHeader') ||
+            !$this->unregisterHook('displayCarrierExtraContent') ||
+            !$this->unregisterHook('displayHeader') ||
+            !$this->unregisterHook('actionCarrierUpdate') ||
+            !$this->unregisterHook('actionAdminControllerSetMedia') ||
+            !$this->unregisterHooksWithVersionCheck()
+        ) {
+            return false;
+        }
 
         return parent::uninstall();
     }
@@ -205,7 +219,6 @@ class Packetery extends CarrierModule
         $settings = Packeteryclass::getConfig();
 
         $this->context->smarty->assign(array('ps_version'=> _PS_VERSION_));
-        $this->context->smarty->assign(array('check_e'=> $id_employee));
 
         $this->context->smarty->assign(array('settings'=> $settings));
         $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
@@ -376,8 +389,6 @@ class Packetery extends CarrierModule
         if ((Tools::getValue('module_name') == $this->name) || (Tools::getValue('configure') == $this->name)) {
             $this->context->controller->addjquery();
             $this->context->controller->addJS('https://cdn.jsdelivr.net/riot/2.4.1/riot+compiler.min.js');
-            $this->context->controller->addJS($this->_path . 'views/js/back.js?v=' . $this->version);
-            $this->context->controller->addCSS($this->_path . 'views/css/back.css?v=' . $this->version, 'all', null, false);
             $this->context->controller->addJS($this->_path . 'views/js/notify.js');
         }
     }
@@ -474,7 +485,7 @@ class Packetery extends CarrierModule
             $widgetCarriers = 'packeta';
         }
 
-		$this->context->smarty->assign('module_version', $this->version);
+        $this->context->smarty->assign('app_identity', Packeteryclass::APP_IDENTITY_PREFIX . $this->version);
 		$this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
         $this->context->smarty->assign('widget_carriers', $widgetCarriers);
 		$this->context->smarty->assign('id_branch', $id_branch);
@@ -527,5 +538,75 @@ class Packetery extends CarrierModule
         Packeteryclass::hookNewOrder($params);
     }
     /*END ORDERS*/
+
+    public function packeteryHookDisplayAdminOrder($params)
+    {
+        $apiKey = Packeteryclass::getConfigValueByOption('APIPASS');
+        $packeteryOrder = Db::getInstance()->getRow(
+            'SELECT `po`.`is_carrier`, `po`.`name_branch`, `c`.`iso_code` AS `country`
+            FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
+            JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
+            JOIN `' . _DB_PREFIX_ . 'address` `a` ON `a`.`id_address` = `o`.`id_address_delivery` 
+            JOIN `' . _DB_PREFIX_ . 'country` `c` ON `c`.`id_country` = `a`.`id_country`
+            WHERE `po`.`id_order` = ' . ((int)$params['id_order'])
+        );
+        if (!$apiKey || !$packeteryOrder) {
+            return;
+        }
+
+        $isCarrier = (bool)$packeteryOrder['is_carrier'];
+        $this->context->smarty->assign('isCarrier', $isCarrier);
+        $this->context->smarty->assign('branchName', $packeteryOrder['name_branch']);
+        if (!$isCarrier) {
+            $employee = Context::getContext()->employee;
+            $widgetOptions = [
+                'api_key' => $apiKey,
+                'app_identity' => Packeteryclass::APP_IDENTITY_PREFIX . $this->version,
+                'country' => strtolower($packeteryOrder['country']),
+                'module_dir' => _MODULE_DIR_,
+                'order_id' => $params['id_order'],
+                'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
+            ];
+            $this->context->smarty->assign('widgetOptions', $widgetOptions);
+        }
+        return $this->display(__FILE__, 'display_order_main.tpl');
+    }
+
+    // removed in 1.7.7 in favor of displayAdminOrderMain
+    public function hookDisplayAdminOrderLeft($params)
+    {
+        return $this->packeteryHookDisplayAdminOrder($params);
+    }
+
+    // since 1.7.7
+    public function hookDisplayAdminOrderMain($params)
+    {
+        return $this->packeteryHookDisplayAdminOrder($params);
+    }
+
+    public function registerHooksWithVersionCheck()
+    {
+        $hookName = 'displayAdminOrderMain';
+        if (version_compare(_PS_VERSION_, '1.7.7', '<')) {
+            $hookName = 'displayAdminOrderLeft';
+        }
+        return $this->registerHook($hookName);
+    }
+
+    private function unregisterHooksWithVersionCheck()
+    {
+        $hookName = 'displayAdminOrderMain';
+        if (version_compare(_PS_VERSION_, '1.7.7', '<')) {
+            $hookName = 'displayAdminOrderLeft';
+        }
+        return $this->unregisterHook($hookName);
+    }
+
+    // hook used everywhere in administration
+    public function hookActionAdminControllerSetMedia()
+    {
+        $this->context->controller->addCSS($this->_path . 'views/css/back.css?v=' . $this->version, 'all', null, false);
+        $this->context->controller->addJS($this->_path . 'views/js/back.js?v=' . $this->version);
+    }
 
 }

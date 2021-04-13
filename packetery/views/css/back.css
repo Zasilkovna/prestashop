@@ -34,32 +34,21 @@
 	width: 400px !important;
 }
 
-.r-message-success, .validation-error{
+#packetery-form .r-message-success, #packetery-form .validation-error {
 	display: none;
 }
 
-.pdf_link{
+#packetery-form .pdf_link {
 	width: 100%;
-	height:17px;
-	padding: 6px 0px;
+	height: 17px;
+	padding: 6px 0;
 	margin-top: 5px;
 }
 
-.download_pdf{
+#packetery-form .download_pdf {
 	width:400px !important;
 }
 
-#action_buttons_pc {
-    position: absolute;
-    bottom: 15px;
-    left: 15px;
-    right: 15px;
-    max-width: 100%;
-}
-
-#action_buttons_pc input{
-	max-width: 100% !important;
-}
 /*PAYMENTS*/
 #payment-list-table .table th:nth-child(3){
 	display: none;
@@ -71,40 +60,34 @@
 /*END PAYMENTS*/
 
 /*ORDERS*/
-.export_selected, .export_selected_csv{
+#packetery-form .export_selected, #packetery-form .export_selected_csv {
 	width:400px !important;
 }
-.ps-table-checkbox-all{
+#packetery-form .ps-table-checkbox-all {
 	position:relative;
 	margin-right: 5px !important;
 }
-.all-fix{
+#packetery-form .all-fix {
 	margin-bottom: 3px;
 }
 #packetery-orders-table table tr td:nth-child(6){
 	cursor: pointer;
 }
-.prestaui-paginator{
+#packetery-form .prestaui-paginator {
 	width: 100%;
 	text-align: right;
 }
-.prestaui-paginator a:active{
+#packetery-form .prestaui-paginator a:active {
 	color: black !important;
 }
 /*END ORDERS*/
 
-.export_selected_csv{
+#packetery-form .export_selected_csv {
 	margin-top: 20px;
 }
 
-input[type="radio"], input[type="checkbox"]{
+#packetery-form input[type="radio"], #packetery-form input[type="checkbox"] {
 	margin-top: 7px;
-}
-
-/* TODO: remove, unused */
-/*End add-carrier-form*/
-#submit_new_pocketery_carrier {
-	float: right;
 }
 
 #payment-list-table i.icon-check.status, #ad-carriers-list-table i.icon-check.status{
@@ -114,7 +97,7 @@ input[type="radio"], input[type="checkbox"]{
 	cursor: pointer;
 }
 
-.bootstrap input, select, textarea{
+#packetery-form input, #packetery-form select, #packetery-form textarea {
 	max-width: 550px;
 }
 
@@ -130,4 +113,34 @@ input[type="radio"], input[type="checkbox"]{
 #top_packetery_text{
 	padding: 15px 50px;
 	font-size: 16px;
+}
+
+/* admin order widget button */
+a.open-packeta-widget {
+	color: white;
+	background-color: #4cbb6c;
+	display: inline-block;
+	text-align: center;
+	height: 50px;
+	padding: .75rem .5rem;
+	border-radius: .2rem;
+	border: 1px solid transparent;
+	font-size: 14px;
+}
+a.open-packeta-widget:hover, a.open-packeta-widget:focus {
+	background-color: #3a9a56;
+	border-color: #389252;
+	text-decoration: none;
+}
+
+.packetery-error {
+	display: none;
+	padding-left: 3.5rem;
+}
+/* for 1.7.6 */
+#content.bootstrap .packetery h3.card-header-title {
+	margin: 0;
+}
+.bootstrap a.open-packeta-widget:hover, .bootstrap a.open-packeta-widget:focus {
+	color: white;
 }

@@ -25,7 +25,6 @@
 	<ps-alert-error>{l s='Soap is disabled. You have to enable Soap on your server' mod='packetery'}</ps-alert-error>
 {/if}
 
-<input type="hidden" name="check_e" id="check_e" value="{$check_e|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="ajaxfields" id="ajaxfields" value="{$ajaxfields}">
 

@@ -4,8 +4,14 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/* @var $object Packetery */
 function upgrade_module_2_1_5($object)
 {
+    if (!$object->registerHooksWithVersionCheck() ||
+        !$object->registerHook('actionAdminControllerSetMedia')) {
+        return false;
+    }
+
     $result = Db::getInstance()->execute('
         DELETE FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
         WHERE `id_branch` = 0;

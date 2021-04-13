@@ -45,3 +45,5 @@
       - Fixed: Undefined index: customer_country in DEV mode
       - Fixed: Upgrade script of version 2.1.3
       - Added: module version to static files
+      - Added: information about branch or address delivery carrier into order administration
+        and possibility to change branch using widget
