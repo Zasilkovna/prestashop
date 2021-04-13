@@ -96,9 +96,9 @@ window.initializePacketaWidget = function ()
 
     $('.open-packeta-widget').click(function (e) {
         e.preventDefault();
-        var module_version = $('#module_version').val(); // Get module version for widget
+        var app_identity = $('#app_identity').val(); // Get module version for widget
         var widgetOptions = {
-            appIdentity: 'prestashop-1.7-packeta-' + module_version,
+            appIdentity: app_identity,
             country: country,
             language: language,
         };

@@ -24,13 +24,13 @@
  */
 
 require_once(dirname(__FILE__) . '../../../config/config.inc.php');
-require_once(dirname(__FILE__) . '../../../init.php');
 require_once(dirname(__FILE__) . '../../../classes/Cookie.php');
 include_once(dirname(__file__) . '/packetery.api.php');
 require_once(dirname(__FILE__) . '/packetery.php');
 
 class Packeteryclass
 {
+    const APP_IDENTITY_PREFIX = 'prestashop-1.7-packeta-';
     // only for mixing with branch ids
     const ZPOINT = 'zpoint';
     const PP_ALL = 'pp_all';
@@ -845,4 +845,28 @@ class Packeteryclass
         return $res;
     }
     /*END COMMON FUNCTIONS*/
+
+    public static function adminOrderChangeBranch()
+    {
+        if (!Tools::getIsset('order_id') || !Tools::getIsset('pickup_point')) {
+            return false;
+        }
+
+        $orderId = (int)Tools::getValue('order_id');
+        $pickupPoint = Tools::getValue('pickup_point');
+
+        $packeteryOrderFields = [
+            'id_branch' => (int)$pickupPoint['id'],
+            'name_branch' => pSQL($pickupPoint['name']),
+            'currency_branch' => pSQL($pickupPoint['currency']),
+        ];
+        if ($pickupPoint['pickupPointType'] == 'external') {
+            $packeteryOrderFields['is_carrier'] = 1;
+            $packeteryOrderFields['id_branch'] = (int)$pickupPoint['carrierId'];
+            $packeteryOrderFields['carrier_pickup_point'] = pSQL($pickupPoint['carrierPickupPointId']);
+        }
+        Db::getInstance()->update('packetery_order', $packeteryOrderFields, '`id_order` = ' . $orderId);
+
+        echo json_encode(['result' => 'ok']);
+    }
 }

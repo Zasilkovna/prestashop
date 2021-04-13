@@ -2,6 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
+$_MODULE['<{packetery}prestashop>ajax_1c01e109818be1612f087bf808d99f71'] = 'Přihlaste se prosím znovu do administrace.';
 $_MODULE['<{packetery}prestashop>packetery.api_5552dc553d496d4b06866ca45b890b4a'] = 'Najprv vyberte objednávky.';
 $_MODULE['<{packetery}prestashop>packetery.api_40580ead2944ee1f216ef9be35c18eb4'] = 'Nepodařilo se nalézt směnný kurz mezi objednávkou a pobočkou, objednávka';
 $_MODULE['<{packetery}prestashop>packetery.api_3593dc2dea08cf4567f70933c079f6a9'] = 'Žiaden e-mail nie je pridelený zákazníkovi.';
@@ -61,6 +62,10 @@ $_MODULE['<{packetery}prestashop>packetery.class_1097d15ac9e833bc9ee47161243ebc9
 $_MODULE['<{packetery}prestashop>packetery.class_8ea5600de48afe182f5edb18804e4afc'] = 'Api heslo je nesprávne. Pobočky nebudú aktualizované.';
 $_MODULE['<{packetery}prestashop>packetery.class_3a2f7eb090541a1fffae68f276e8d62e'] = 'Api heslo musí byť reťazec';
 $_MODULE['<{packetery}prestashop>packetery.class_ab3b1beeac423938ea69874f04a3ab14'] = 'Identifikátor e-shopu musí být řetězec';
+$_MODULE['<{packetery}prestashop>display_order_main_4a93d9164aad959a6abc2de389170ac9'] = 'Zásilkovna';
+$_MODULE['<{packetery}prestashop>display_order_main_914419aa32f04011357d3b604a86d7eb'] = 'Dopravce';
+$_MODULE['<{packetery}prestashop>display_order_main_ee5c5839980b47f1893220655a3de0fb'] = 'Výdejní místo';
+$_MODULE['<{packetery}prestashop>display_order_main_128ca07a3ac6521356117915e983660d'] = 'Změnit výdejní místo';
 $_MODULE['<{packetery}prestashop>tab_orders_6a3a997a0c7df6c54747d82080367a33'] = 'Stránky:';
 $_MODULE['<{packetery}prestashop>tab_orders_7442e29d7d53e549b78d93c46b8cdcfc'] = 'Objednávky:';
 $_MODULE['<{packetery}prestashop>tab_orders_5ece607071fe59ddc4c88dc6abfe2310'] = 'Nenašli sa žiadne položky';
