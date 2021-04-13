@@ -719,10 +719,22 @@ $(document).ready(function () {
 						action: 'adminOrderChangeBranch',
 						order_id: widgetOptions['order_id'],
 						pickup_point: pickupPoint,
-					}, 'json').done(function (data) {
-						$('.picked-delivery-place').text(pickupPoint.name);
-					}).fail(function (data) {
-						$('.packetery-error').text(JSON.parse(data.responseText).error).slideDown();
+					}, function (data) {
+						if (data.result === 'ok') {
+							$('.picked-delivery-place').text(pickupPoint.name);
+						}
+					}, 'json').fail(function (data) {
+						try {
+							var JSONresponse = JSON.parse(data.responseText);
+							$('.packetery-error').text(JSONresponse.error).slideDown();
+						} catch (e) {
+							if (data.responseText) {
+								// display error in DEV mode
+								$('.packetery-error').html(data.responseText).slideDown();
+							} else {
+								$('.packetery-error').text(widgetOptions['msg_error']).slideDown();
+							}
+						}
 					});
 				}
 			}, {

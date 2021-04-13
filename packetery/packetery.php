@@ -541,7 +541,7 @@ class Packetery extends CarrierModule
 
     public function packeteryHookDisplayAdminOrder($params)
     {
-        $apiKey = Packeteryclass::getConfigValueByOption('APIPASS');
+        $apiKey = PacketeryApi::getApiKey();
         $packeteryOrder = Db::getInstance()->getRow(
             'SELECT `po`.`is_carrier`, `po`.`name_branch`, `c`.`iso_code` AS `country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
@@ -566,6 +566,7 @@ class Packetery extends CarrierModule
                 'module_dir' => _MODULE_DIR_,
                 'order_id' => $params['id_order'],
                 'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
+                'msg_error' => $this->l('Error while trying to save the settings.'),
             ];
             $this->context->smarty->assign('widgetOptions', $widgetOptions);
         }
