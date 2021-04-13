@@ -25,6 +25,7 @@
 
 include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
+require_once(dirname(__FILE__) . '../../../init.php');
 
 // TODO: use Context::getContext()->customer->isLogged() instead?
 $token = Tools::getValue('token');

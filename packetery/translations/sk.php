@@ -54,6 +54,7 @@ $_MODULE['<{packetery}prestashop>packetery_ee90bdb5836984e4bb59875948544ad1'] = 
 $_MODULE['<{packetery}prestashop>packetery_04973e4f636a6a6403c889bdf7e8dd86'] = 'Vyberte prosím cieľovú pobočku pre objednávky -';
 $_MODULE['<{packetery}prestashop>packetery_ade0fd28ba0f51f9d8ac0c0803b020d0'] = 'Nastala chyba při pokusu o aktualizaci poboček, zkontrolujte, zda máte správně zadané heslo API a zkuste spustit aktualizaci znovu.';
 $_MODULE['<{packetery}prestashop>packetery_43e4c4c34b72c8ee0421d21983d8d8a7'] = 'neexportované. Chyba:';
+$_MODULE['<{packetery}prestashop>packetery_029fb74a19c890683f2c2d8e33431d42'] = 'Chyba při uložení nastavení.';
 $_MODULE['<{packetery}prestashop>packetery.class_ddd6dc80580e42e39480b99a2fd30e1e'] = 'Objednávky Zásielkovňa';
 $_MODULE['<{packetery}prestashop>packetery.class_9aa49c5a01dab7e49c73343b47e995a2'] = 'Prosím vyberte pobočku';
 $_MODULE['<{packetery}prestashop>packetery.class_029fb74a19c890683f2c2d8e33431d42'] = 'Chyba při uložení nastavení.';
