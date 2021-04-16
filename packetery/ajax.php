@@ -35,11 +35,6 @@ if (
     !Context::getContext()->employee->isLoggedBack()
 ) {
     header($_SERVER['SERVER_PROTOCOL'] . ' 403 Forbidden');
-
-    // used only by adminOrderChangeBranch so far
-    $packetery = new Packetery();
-    echo json_encode(['error' => $packetery->l('Please log in to the administration again.')]);
-
     exit;
 }
 
@@ -83,10 +78,6 @@ switch (Tools::getValue('action'))
         PacketeryApi::downloadPdfAjax();
         break;
     /*END ORDERS*/
-    /* Admin Orders */
-    case 'adminOrderChangeBranch':
-        Packeteryclass::adminOrderChangeBranch();
-        break;
     default:
         exit;
 }

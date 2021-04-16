@@ -564,11 +564,44 @@ class Packetery extends CarrierModule
                 'app_identity' => Packeteryclass::APP_IDENTITY_PREFIX . $this->version,
                 'country' => strtolower($packeteryOrder['country']),
                 'module_dir' => _MODULE_DIR_,
-                'order_id' => $params['id_order'],
                 'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
-                'msg_error' => $this->l('Error while trying to save the settings.'),
             ];
             $this->context->smarty->assign('widgetOptions', $widgetOptions);
+            $this->context->smarty->assign('orderId', $params['id_order']);
+
+            // see https://devdocs.prestashop.com/1.7/modules/core-updates/1.7.5/
+            if (version_compare(_PS_VERSION_, '1.7.5', '<')) {
+                // Code compliant from PrestaShop 1.5 to 1.7.4
+                $returnUrl = $this->context->link->getAdminLink('AdminOrders') . '&id_order=' . $params['id_order'] . '&vieworder#packetaPickupPointChange';
+            } else {
+                // Recommended code from PrestaShop 1.7.5
+                $returnUrl = $this->context->link->getAdminLink('AdminOrders', true, [], ['id_order' => $params['id_order'], 'vieworder' => 1]) . '#packetaPickupPointChange';
+            }
+            $this->context->smarty->assign('returnUrl', $returnUrl);
+
+            if (Tools::getIsset('order_id') && Tools::getIsset('pickup_point')) {
+                $orderId = (int)Tools::getValue('order_id');
+                $pickupPoint = json_decode(Tools::getValue('pickup_point'));
+
+                $packeteryOrderFields = [
+                    'id_branch' => (int)$pickupPoint->id,
+                    'name_branch' => pSQL($pickupPoint->name),
+                    'currency_branch' => pSQL($pickupPoint->currency),
+                ];
+                if ($pickupPoint->pickupPointType == 'external') {
+                    $packeteryOrderFields['is_carrier'] = 1;
+                    $packeteryOrderFields['id_branch'] = (int)$pickupPoint->carrierId;
+                    $packeteryOrderFields['carrier_pickup_point'] = pSQL($pickupPoint->carrierPickupPointId);
+                }
+                $updateResult = Db::getInstance()->update('packetery_order', $packeteryOrderFields, '`id_order` = ' . $orderId);
+                if ($updateResult) {
+                    $this->context->smarty->assign('messageSuccess', $this->l('Pickup point has been successfully changed.'));
+                    // overwrite
+                    $this->context->smarty->assign('branchName', $pickupPoint->name);
+                } else {
+                    $this->context->smarty->assign('messageError', $this->l('Pickup point could not be changed.'));
+                }
+            }
         }
         return $this->display(__FILE__, 'display_order_main.tpl');
     }

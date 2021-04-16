@@ -846,27 +846,4 @@ class Packeteryclass
     }
     /*END COMMON FUNCTIONS*/
 
-    public static function adminOrderChangeBranch()
-    {
-        if (!Tools::getIsset('order_id') || !Tools::getIsset('pickup_point')) {
-            return false;
-        }
-
-        $orderId = (int)Tools::getValue('order_id');
-        $pickupPoint = Tools::getValue('pickup_point');
-
-        $packeteryOrderFields = [
-            'id_branch' => (int)$pickupPoint['id'],
-            'name_branch' => pSQL($pickupPoint['name']),
-            'currency_branch' => pSQL($pickupPoint['currency']),
-        ];
-        if ($pickupPoint['pickupPointType'] == 'external') {
-            $packeteryOrderFields['is_carrier'] = 1;
-            $packeteryOrderFields['id_branch'] = (int)$pickupPoint['carrierId'];
-            $packeteryOrderFields['carrier_pickup_point'] = pSQL($pickupPoint['carrierPickupPointId']);
-        }
-        Db::getInstance()->update('packetery_order', $packeteryOrderFields, '`id_order` = ' . $orderId);
-
-        echo json_encode(['result' => 'ok']);
-    }
 }

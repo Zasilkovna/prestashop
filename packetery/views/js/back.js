@@ -715,27 +715,8 @@ $(document).ready(function () {
 			event.preventDefault();
 			Packeta.Widget.pick(widgetOptions['api_key'], function (pickupPoint) {
 				if (pickupPoint !== null) {
-					$.post(widgetOptions['module_dir'] + 'packetery/ajax.php', {
-						action: 'adminOrderChangeBranch',
-						order_id: widgetOptions['order_id'],
-						pickup_point: pickupPoint,
-					}, function (data) {
-						if (data.result === 'ok') {
-							$('.picked-delivery-place').text(pickupPoint.name);
-						}
-					}, 'json').fail(function (data) {
-						try {
-							var JSONresponse = JSON.parse(data.responseText);
-							$('.packetery-error').text(JSONresponse.error).slideDown();
-						} catch (e) {
-							if (data.responseText) {
-								// display error in DEV mode
-								$('.packetery-error').html(data.responseText).slideDown();
-							} else {
-								$('.packetery-error').text(widgetOptions['msg_error']).slideDown();
-							}
-						}
-					});
+					$('.packetery form input[name="pickup_point"]').val(JSON.stringify(pickupPoint));
+					$('.picked-delivery-place').text(pickupPoint.name);
 				}
 			}, {
 				appIdentity: widgetOptions['app_identity'],
