@@ -2,7 +2,6 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{packetery}prestashop>ajax_1c01e109818be1612f087bf808d99f71'] = 'Přihlaste se prosím znovu do administrace.';
 $_MODULE['<{packetery}prestashop>packetery.api_5552dc553d496d4b06866ca45b890b4a'] = 'Najprv vyberte objednávky.';
 $_MODULE['<{packetery}prestashop>packetery.api_40580ead2944ee1f216ef9be35c18eb4'] = 'Nepodařilo se nalézt směnný kurz mezi objednávkou a pobočkou, objednávka';
 $_MODULE['<{packetery}prestashop>packetery.api_3593dc2dea08cf4567f70933c079f6a9'] = 'Žiaden e-mail nie je pridelený zákazníkovi.';
@@ -54,7 +53,8 @@ $_MODULE['<{packetery}prestashop>packetery_ee90bdb5836984e4bb59875948544ad1'] = 
 $_MODULE['<{packetery}prestashop>packetery_04973e4f636a6a6403c889bdf7e8dd86'] = 'Vyberte prosím cieľovú pobočku pre objednávky -';
 $_MODULE['<{packetery}prestashop>packetery_ade0fd28ba0f51f9d8ac0c0803b020d0'] = 'Nastala chyba při pokusu o aktualizaci poboček, zkontrolujte, zda máte správně zadané heslo API a zkuste spustit aktualizaci znovu.';
 $_MODULE['<{packetery}prestashop>packetery_43e4c4c34b72c8ee0421d21983d8d8a7'] = 'neexportované. Chyba:';
-$_MODULE['<{packetery}prestashop>packetery_029fb74a19c890683f2c2d8e33431d42'] = 'Chyba při uložení nastavení.';
+$_MODULE['<{packetery}prestashop>packetery_b18ce70ed15a7a117141d6ee14f9138c'] = 'Výdejní místo bylo úspěšně změněno.';
+$_MODULE['<{packetery}prestashop>packetery_f1111e5bc2fc07a2985e5273341fbd7b'] = 'Výdejní místo se nepodařilo změnit.';
 $_MODULE['<{packetery}prestashop>packetery.class_ddd6dc80580e42e39480b99a2fd30e1e'] = 'Objednávky Zásielkovňa';
 $_MODULE['<{packetery}prestashop>packetery.class_9aa49c5a01dab7e49c73343b47e995a2'] = 'Prosím vyberte pobočku';
 $_MODULE['<{packetery}prestashop>packetery.class_029fb74a19c890683f2c2d8e33431d42'] = 'Chyba při uložení nastavení.';
@@ -67,6 +67,7 @@ $_MODULE['<{packetery}prestashop>display_order_main_4a93d9164aad959a6abc2de38917
 $_MODULE['<{packetery}prestashop>display_order_main_914419aa32f04011357d3b604a86d7eb'] = 'Dopravce';
 $_MODULE['<{packetery}prestashop>display_order_main_ee5c5839980b47f1893220655a3de0fb'] = 'Výdejní místo';
 $_MODULE['<{packetery}prestashop>display_order_main_128ca07a3ac6521356117915e983660d'] = 'Změnit výdejní místo';
+$_MODULE['<{packetery}prestashop>display_order_main_c9cc8cce247e49bae79f15173ce97354'] = 'Uložit';
 $_MODULE['<{packetery}prestashop>tab_orders_6a3a997a0c7df6c54747d82080367a33'] = 'Stránky:';
 $_MODULE['<{packetery}prestashop>tab_orders_7442e29d7d53e549b78d93c46b8cdcfc'] = 'Objednávky:';
 $_MODULE['<{packetery}prestashop>tab_orders_5ece607071fe59ddc4c88dc6abfe2310'] = 'Nenašli sa žiadne položky';
