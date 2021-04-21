@@ -16,55 +16,9 @@ $(document).ready(function(){
 
 	/*Change cod payment*/
 	binds.payment_cod();
-	binds.carrier_cod();
 	binds.ad_carrier_cod();
 	/*End Change cod payment*/
-	/**/
-    binds.add_new_weight_rule();
-	/**/
-	/*ADD CARRIER*/
-	binds.add_new_packetery_carrier();
-
-	$('#packetery-carriers-list-table a.edit').click(function() {
-		var url = $(this).attr('href');
-		var id_carrier = getStringParameter('id_carrier', url);
-		ajaxs.removecarrier(id_carrier);
-		$(this).parent().parent().parent().parent().css('display', 'none');
-		return false;
-	});
-	/*END ADD CARRIER*/
-
-    $('.packetery-weight-rules-table a.action-remove').click(function() {
-        var url = $(this).attr('href');
-        var id = getStringParameter('id', url);
-        ajaxs.remove_weight_rule(id);
-        $(this).parent().parent().parent().parent().css('display', 'none');
-        return false;
-    });
-
 	/*End SETTINGS ACTIONS*/
-	
-	$('#add-packetery-carrier-block').popup();
-	$('#change-order-branch').popup();
-
-	$('#packetery-carriers-list-table i.process-icon-new').click(function(){
-        $('#add-packetery-carrier-block').popup('show');
-		return false;
-	});
-
-    $('.packetery-weight-rules-table i.process-icon-new').click(function(){
-        $('.country-iso').val($(this).closest('.packetery-weight-rules-table')[0].dataset.country);
-        $('#add-weight-rule-block').popup('show');
-        return false;
-    });
-
-    $('.packetery-weight-rules-table a.action-edit').click(function(){
-        var url = $(this).attr('href');
-        var id = getStringParameter('id', url);
-        ajaxs.get_weight_rule(id);
-
-        return false;
-    });
 
 	$('#update-branches').click(function(){
 		ajaxs.updateBranches('#update-branches', false);
@@ -76,7 +30,6 @@ $(document).ready(function(){
 	tools.psTableAddCheckbox('#packetery-orders-table');
 	tools.psTableAddDataOrder('#packetery-orders-table');
 
-	binds.order_change_branch();
 	binds.order_update();
 	binds.order_download_pdf();
 	binds.order_export();
@@ -210,26 +163,39 @@ tools = {
 		return field_vars;
 	},
 	ad_list_build: function() {
-		var json_ad = decodeURIComponent($('#json_ad').val());
-		$('#ad-carriers-list-table table tr td:nth-child(3)').each(function() {
-			var id_branch = $(this).find('span').text();
-			var select = tools.buildselect(json_ad, id_branch);
+		var carriers_json = decodeURIComponent($('#carriers_json').val());
+		$('#ad-carriers-list-table table tr td:nth-child(5)').each(function() {
+			var id_branch_chosen = $(this).find('span').text();
+			var zpoint = $('#zpoint').val();
+			var pp_all = $('#pp_all').val();
+			var packeta_pickup_points = $('#packeta_pickup_points').val();
+			var all_packeta_pickup_points = $('#all_packeta_pickup_points').val();
+			var pickup_point_type = $(this).parent().find('.hidden span').text();
+			var select = tools.buildselect(carriers_json, id_branch_chosen, zpoint, packeta_pickup_points, pp_all, all_packeta_pickup_points, pickup_point_type);
 			$(this).html(select);
 		});
 		binds.ad_carrier_select();
 	},
-	buildselect: function(json, id_branch_default) {
+	buildselect: function(carriers_json, id_branch_chosen, zpoint, packeta_pickup_points, pp_all, all_packeta_pickup_points, pickup_point_type) {
+		// TODO: show hint to update branches if no carriers available
+		var carriers = JSON.parse(carriers_json);
+		var cnt = carriers.length;
 		var html = '';
 		html+= '<select name="selected_ad_carrier" id="selected_ad_carrier">';
-		html+= '<option value="0">--</option>';
-		var carriers = JSON.parse(json);
-		var cnt = carriers.length;
+		html+= '<option value="">--</option>';
+		html+= '<option value="' + zpoint + '" data-pickup-point-type="internal"' +
+			(pickup_point_type === 'internal' ? ' selected' : '') + '>' + packeta_pickup_points + '</option>';
+		html+= '<option value="' + pp_all + '" data-pickup-point-type="external"' +
+			((pickup_point_type === 'external' && id_branch_chosen === '') ? ' selected' : '') + '>' +
+			all_packeta_pickup_points + '</option>';
 		for (var i = 0; i < cnt; i++) {
-			if (carriers[i]['id_branch'] == id_branch_default)
+			if (carriers[i]['id_branch'] == id_branch_chosen)
 				var selected = 'selected';
 			else
 				var selected = '';
-			html += '<option value="'+carriers[i]['id_branch']+'" data-currency="'+carriers[i]['currency']+'" '+selected+'>'+carriers[i]['name']+'</option>';
+			html += '<option value="' + carriers[i]['id_branch'] + '" data-currency="' + carriers[i]['currency'] + '"' +
+				'data-pickup-point-type="' + carriers[i]['pickup_point_type'] + '" ' + selected + '>' +
+				carriers[i]['name'] + '</option>';
 		}
 		html+= '</select>';
 		return html;
@@ -320,45 +286,6 @@ binds = {
             }
         });
     },
-    add_new_weight_rule: function() {
-        $('#submit_new_weight_rule').click(function(){
-            var country = $('.country-iso').val();
-            var min = $('.min-weight').val();
-            var max = $('.max-weight').val();
-            var price = $('.price').val();
-            var id = $('.id-weight-rule').val();
-
-            ajaxs.new_weight_rule(min, max, price, country, id);
-            return false;
-        });
-    },
-	add_new_packetery_carrier: function() {
-		$('#submit_new_packetery_carrier').click(function(){
-			var name = $('.new_carrier_name').val();
-			var delay = $('.new_carrier_delay').val();
-			var countries = [];
-			$('#packetery_carrier_country option:selected').each(function(i) {
-				countries[i] = $(this).val();
-			});
-			var country_str = countries.join();
-
-			if ($('.new_carrier_is_cod').prop('checked') == true)
-				var is_cod = 1;
-			else
-				var is_cod = 0;
-
-			var logo = $('input[name=new_carrier_logo]:checked').data('option');
-			if (logo == undefined)
-				var logo = 'no';
-			if (countries.length == 0) {
-				$('#packetery_carrier_country').notify(lang_pac.error+' :'+lang_pac.err_country, "error",{position:"top"});
-				return false;
-			}
-			ajaxs.new_carrier(name, delay, country_str, is_cod, logo);
-			return false;
-		});
-	},
-
 
 	uncheckboxAllTable: function() {
 		$('#packetery-orders-table').find('.ps-table-checkbox').prop('checked', false);
@@ -380,15 +307,6 @@ binds = {
 			});
 		});
 
-	},
-
-	order_change_branch: function() {
-		$('#packetery-orders-table table tr td:nth-child(7)').find('span').unbind();
-		$('#packetery-orders-table table tr td:nth-child(7)').find('span').click(function(){
-			var id_order = $(this).parent().parent().find('td:eq(1) span').text();
-			$('#id_order_widget').val(id_order);
-			$('#change-order-branch').popup('show');
-		});
 	},
 
 	order_cod: function() {
@@ -415,18 +333,6 @@ binds = {
 		});
 	},
 
-	carrier_cod: function() {
-		$('#packetery-carriers-list-table i.status').unbind();
-		$('#packetery-carriers-list-table i.status').click(function(){
-			var id_carrier = $(this).parent().parent().find('td').first().find('span').text();
-			if ($(this).hasClass('icon-remove'))
-				var value = 1;
-			else
-				var value = 0;
-			ajaxs.change_carrier_cod(id_carrier, value, this);
-		});
-	},
-
 	ad_carrier_cod: function() {
 		$('#ad-carriers-list-table i.status').unbind();
 		$('#ad-carriers-list-table i.status').click(function(){
@@ -445,7 +351,8 @@ binds = {
 			var id_branch = $(this).find('option:selected').val();
 			var branch_name = $(this).find('option:selected').text();
 			var currency = $(this).find('option:selected').data('currency');
-			ajaxs.set_ad_carrier_association(id_carrier, id_branch, branch_name, currency);
+			var pickup_point_type = $(this).find('option:selected').data('pickup-point-type');
+			ajaxs.set_ad_carrier_association(id_carrier, id_branch, branch_name, currency, pickup_point_type);
 		});
 	},
 }
@@ -476,11 +383,17 @@ ajaxs = {
 	    });		
 	},
 
-	set_ad_carrier_association: function(id_carrier, id_branch, branch_name, currency){
+	set_ad_carrier_association: function(id_carrier, id_branch, branch_name, currency, pickup_point_type){
 	    $.ajax({
 	        type: 'POST',
 	        url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=set_ad_carrier_association'+ajaxs.checkToken(),
-	        data: {'id_carrier':id_carrier, 'id_branch':id_branch, 'branch_name':branch_name, 'currency_branch':currency},
+	        data: {
+	        	'id_carrier': id_carrier,
+				'id_branch': id_branch,
+				'branch_name': branch_name,
+				'currency_branch': currency,
+				'pickup_point_type': pickup_point_type,
+			},
 	        beforeSend: function() {
 	        	$("body").toggleClass("wait");
 	        },
@@ -489,34 +402,6 @@ ajaxs = {
 	                $('#ad-carriers-list-table .panel').notify(lang_pac.success, "success",{position:"top"});
                 } else {
                 	$('#ad-carriers-list-table .panel').notify(lang_pac.error, "error",{position:"top"});
-                }
-	        },
-	        complete: function() {
-	            $("body").toggleClass("wait");
-	        },		
-	    });
-	},
-
-	change_carrier_cod: function(id_carrier, value, container){
-	    $.ajax({
-	        type: 'POST',
-	        url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=change_carrier_cod'+ajaxs.checkToken(),
-	        data: {'id_carrier':id_carrier, 'value':value},
-	        container: container,
-	        beforeSend: function() {
-	        	$("body").toggleClass("wait");
-	        },
-	        success: function(msg) {
-                if (msg == 'ok') {
-                	if (value == 1) {
-	                	$(this.container).replaceWith('<i class="icon-check status"></i>');
-	                } else {
-	                	$(this.container).replaceWith('<i class="icon-remove status"></i>');
-	                }
-	                binds.carrier_cod();
-	                $('#packetery-carriers-list-table .panel').notify(lang_pac.success, "success",{position:"top"});
-                } else {
-                	$('#packetery-carriers-list-table .panel').notify(lang_pac.error+': '+msg, "error",{position:"top"});
                 }
 	        },
 	        complete: function() {
@@ -590,7 +475,7 @@ ajaxs = {
                 if (msg == 'ok') {
                 	ajaxs.orderExport(this.id_orders);
 				} else {
-					$('#packetery-orders-table .panel').notify(lang_pac.err_no_branch+': '+msg, "error",{position:"top"});
+					$('#packetery-orders-table .panel').notify(lang_pac.err_no_branch + ' - : ' + msg, "error", {position: "top"});
 				}
 				$('#packetery-orders-table').find('.ps-table-checkbox').prop('checked', false);
 	        },
@@ -656,39 +541,6 @@ ajaxs = {
 	    });
 	},
 
-	changeOrderBranch: function(id_order, id_branch, name_branch, is_ad) {
-	    $.ajax({
-	        type: 'POST',
-	        url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=change_order_branch'+ajaxs.checkToken(),
-	        data: {'id_branch': id_branch, 'id_order':id_order, 'name_branch':name_branch},
-	        name_branch: name_branch,
-	        beforeSend: function() {
-	        	$("body").toggleClass("wait");
-	        },
-	        success: function(msg) {
-                if (msg == 'ok') {
-                	$('#change-order-branch').popup('hide');
-					var tr = $('#packetery-orders-table tr[data-id-order="'+id_order+'"]');
-					$(tr).find('td:eq(6)').html('<span>'+this.name_branch+'</span>');
-					// address delivery
-                	if (is_ad == 1) {
-	                	$(tr).find('td:eq(7) i').replaceWith('<i class="icon-check status"></i>');
-	                } else {
-	                	$(tr).find('td:eq(7) i').replaceWith('<i class="icon-remove status"></i>');
-	                }
-	                binds.order_change_branch();
-	                $('#packetery-orders-table .panel').notify(lang_pac.success, "success",{position:"top"});
-	                //end change data of tr object
-                } else {
-                	$('#packetery-orders-table .panel').notify(lang_pac.error, "error",{position:"top"});
-                }
-	        },
-	        complete: function() {
-	            $("body").toggleClass("wait");
-	        },		
-	    });		
-	},
-
 	change_order_cod: function(id_order, value, container){
 	    $.ajax({
 	        type: 'POST',
@@ -745,128 +597,6 @@ ajaxs = {
 	    });
 	},
 
-	removecarrier: function(id_carrier){
-	    $.ajax({
-	        type: 'POST',
-	        url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=remove_carrier'+ajaxs.checkToken(),
-	        data: {'id_carrier':id_carrier},
-	        beforeSend: function() {
-	        	$("body").toggleClass("wait");
-	        },
-	        success: function(msg) {
-                if (msg == 'ok') {
-					$('#packetery-carriers-list-table .panel').notify(lang_pac.success, "success",{position:"top"});
-                } else {
-                	$('#packetery-carriers-list-table .panel').notify(lang_pac.error, "error",{position:"top"});
-                }
-	        },
-	        complete: function() {
-	            $("body").toggleClass("wait");
-	        },		
-	    });
-	},
-
-    get_weight_rule: function(id){
-        $.ajax({
-            type: 'POST',
-            url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=get_weight_rule'+ajaxs.checkToken(),
-            data: {'id_weight_rule':id},
-            beforeSend: function() {
-                $("body").toggleClass("wait");
-            },
-            success: function(data) {
-            	data = JSON.parse(data);
-
-                if(!$.isEmptyObject(data))
-                {
-                    $('#add-weight-rule-block .id-weight-rule').val(id);
-                    $('#add-weight-rule-block .country-iso').val(data['country']);
-                    $('#add-weight-rule-block .min-weight').val(data['min_weight']);
-                    $('#add-weight-rule-block .max-weight').val(data['max_weight']);
-                    $('#add-weight-rule-block .price').val(data['price']);
-                }
-
-                $('#add-weight-rule-block').popup('show');
-            },
-            complete: function() {
-                $("body").toggleClass("wait");
-            },
-        });
-	},
-
-	remove_weight_rule: function(id){
-        $.ajax({
-            type: 'POST',
-            url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=remove_weight_rule'+ajaxs.checkToken(),
-            data: {'id_weight_rule':id},
-            beforeSend: function() {
-                $("body").toggleClass("wait");
-            },
-            success: function(msg) {
-                if (msg == 'ok') {
-                    $('#packetery-weight-rules-table .panel').notify(lang_pac.success, "success",{position:"top"});
-                } else {
-                    $('#packetery-weight-rules-table .panel').notify(lang_pac.error, "error",{position:"top"});
-                }
-            },
-            complete: function() {
-                $("body").toggleClass("wait");
-            },
-        });
-	},
-
-	new_weight_rule: function(min, max, price, country, id){
-        $.ajax({
-            type: 'POST',
-            url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=new_weight_rule'+ajaxs.checkToken(),
-            data: {'min':min, 'max':max, 'price':price, 'country':country, 'id':id},
-            beforeSend: function() {
-                $("body").toggleClass("wait");
-            },
-            success: function(msg) {
-                if (msg == 'ok') {
-                    $('#add-weight-rule-block').popup('hide');
-                    setTimeout(function() {
-                        let href = location.href+'&active_tab=settings';
-                        location.href = href;
-                    }, 500);
-                } else {
-                    $('#submit_new_weight_rule').notify(lang_pac.error+"! "+msg, "error",{position:"top"});
-                }
-
-            },
-            complete: function() {
-                $("body").toggleClass("wait");
-            },
-        });
-	},
-
-	new_carrier: function(name, delay, countries, is_cod, logo){
-	    $.ajax({
-	        type: 'POST',
-	        url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=new_carrier'+ajaxs.checkToken(),
-	        data: {'name':name, 'delay':delay, 'countries':countries, 'is_cod':is_cod, 'logo':logo},
-	        beforeSend: function() {
-	        	$("body").toggleClass("wait");
-	        },
-	        success: function(msg) {
-                if (msg == 'ok') {
-					$('#add-packetery-carrier-block').popup('hide');
-	                setTimeout(function() {
-	                	let href = location.href+'&active_tab=settings';
-	                	location.href = href;
-	                }, 500);
-                } else {
-                	$('#submit_new_packetery_carrier').notify(lang_pac.error, "error",{position:"top"});
-                }
-
-	        },
-	        complete: function() {
-	            $("body").toggleClass("wait");
-	        },		
-	    });
-	},
-
 	getCountBranches: function(){
 	    $.ajax({
 	        type: 'POST',
@@ -903,6 +633,8 @@ ajaxs = {
 
                 if (msg != 'true')
                 {
+					/* TODO: Uncaught SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data
+                    loader stays shown, everything seems ok after reload */
                     var res = JSON.parse(msg);
                     var id = res[0];
                     var message = res[1];
@@ -931,6 +663,10 @@ ajaxs = {
 	        	}
 
 	        },
+			error: function() {
+	        	// TODO: prepare message for user
+				console.log('Branches update failed. Is API key provided?');
+			},
 	        complete: function() {
 	            $("body").toggleClass("wait");
 	        },		

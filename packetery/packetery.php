@@ -33,16 +33,12 @@ class Packetery extends CarrierModule
 {
     protected $config_form = false;
 
-    private $supported_countries_trans = array(); /* Used wherever countries with texts are needed */
-    private $supported_languages = array('cs', 'sk', 'pl', 'hu', 'ro', 'en');
-    private $supported_languages_trans = array(); /* Used wherever languages with texts are needed */
-
     public function __construct()
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.4';
-		$this->author = 'Packetery a.s.';
+		$this->version = '2.1.5';
+		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
 
@@ -59,46 +55,14 @@ class Packetery extends CarrierModule
          */
         $this->bootstrap = true;
 
-        $this->supported_languages_trans = array(
-            'cs' => $this->l('Czech'),
-            'sk' => $this->l('Slovak'),
-            'hu' => $this->l('Hungarian'),
-            'pl' => $this->l('Polish'),
-            'ro' => $this->l('Romanian'),
-            'en' => $this->l('English'),
-        );
-
         parent::__construct();
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
-        $desc = $this->l('Get your customers access to pick-up point in Packetery delivery network.');
-        $desc .= $this->l('Export orders to Packetery system.');
+        $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
+        $desc .= $this->l('Export orders to Packeta system.');
 
-        $this->displayName = $this->l('Packetery');
-        $this->description = $this->l('Packetery pick-up points, orders export, and print shipping labels');
+        $this->displayName = $this->l('Packeta');
+        $this->description = $this->l('Packeta pick-up points, orders export, and print shipping labels');
 
-        $this->supported_countries_trans = array(
-            [
-                "country" => "cz",
-                "name" => $this->l('Czech Republic')
-            ],
-            [
-                "country" => "hu",
-                "name" => $this->l('Hungary')
-            ],
-            [
-                "country" => "pl",
-                "name" => $this->l('Poland')
-            ],
-            [
-                "country" => "ro",
-                "name" => $this->l('Romania')
-            ],
-            [
-                "country" => "sk",
-                "name" => $this->l('Slovakia')
-            ],
-        );
-            
         $this->ps_versions_compliancy = array('min' => '1.7.0.0', 'max' => _PS_VERSION_);
     }
 
@@ -188,14 +152,14 @@ class Packetery extends CarrierModule
         @touch($fn);
         if (!is_writable($fn)) {
             $error[] = $this->l(
-                'The Packetery module folder must be writable for the branch selection to work properly.'
+                'The Packeta module folder must be writable for the pickup point selection to work properly.'
             );
             $have_error = true;
         }
 
         if (!self::transportMethod()) {
             $error[] = $this->l(
-                'No way to access Packetery API is available on the web server:
+                'No way to access Packeta API is available on the web server:
                 please allow CURL module or allow_url_fopen setting.'
             );
             $have_error = true;
@@ -207,11 +171,11 @@ class Packetery extends CarrierModule
         }
         $test = "http://www.zasilkovna.cz/api/$key/test";
         if (!$key) {
-            $error[] = $this->l('Packetery API pass is not set.');
+            $error[] = $this->l('Packeta API password is not set.');
             $have_error = true;
         } elseif (!$error) {
             if (Tools::file_get_contents($test) != 1) {
-                $error[] = $this->l('Cannot access Packetery API with specified key. Possibly the API key is wrong.');
+                $error[] = $this->l('Cannot access Packeta API with specified password. Possibly the API password is wrong.');
                 $have_error = true;
             }
         }
@@ -233,17 +197,8 @@ class Packetery extends CarrierModule
         $labels_format = Packeteryclass::getConfigValueByOption('LABEL_FORMAT');
         $this->context->smarty->assign('labels_format', $labels_format);
 
-        $forceCountry = Packeteryclass::getConfigValueByOption('FORCE_COUNTRY');
-        $this->context->smarty->assign('force_country', $forceCountry);
-
-        $forceLanguage = Packeteryclass::getConfigValueByOption('FORCE_LANGUAGE');
-        $this->context->smarty->assign('force_language', $forceLanguage);
-
         $langs = Language::getLanguages();
         $this->context->smarty->assign('langs', $langs);
-
-        $this->context->smarty->assign('supported_countries', $this->supported_countries_trans);
-        $this->context->smarty->assign('supported_languages', $this->supported_languages_trans);
 
         $this->context->smarty->assign('module_dir', $this->_path);
         $id_employee = $this->context->employee->id;
@@ -273,7 +228,7 @@ class Packetery extends CarrierModule
                     array('content' => $this->l('Total Price'), 'key' => 'total', 'center' => true),
                     array('content' => $this->l('Order Date'), 'key' => 'date', 'center' => true),
                     array('content' => $this->l('Is COD'), 'bool' => true, 'key' => 'is_cod'),
-                    array('content' => $this->l('Destination branch'), 'key' => 'name_branch', 'center' => true),
+                    array('content' => $this->l('Destination pickup point'), 'key' => 'name_branch', 'center' => true),
                     array('content' => $this->l('Address delivery'), 'key' => 'is_ad', 'bool' => true,'center' => true),
                     array('content' => $this->l('Exported'), 'key' => 'exported', 'bool' => true, 'center' => true),
                     array('content' => $this->l('Tracking number'), 'key' => 'tracking_number', 'center' => true)
@@ -286,66 +241,54 @@ class Packetery extends CarrierModule
         /*END ORDERS*/
 
         /*CARRIERS*/
-        $ad_array = PacketeryApi::getAdBranchesList();
-        $json_ad_array = json_encode($ad_array);
-        $raw_ad_array = rawurlencode($json_ad_array);
-        $this->context->smarty->assign('ad_array', $raw_ad_array);
-        
+        $this->context->smarty->assign('carriers_json', rawurlencode(json_encode(PacketeryApi::getAdAndExternalCarriers())));
+        $this->context->smarty->assign('zpoint', Packeteryclass::ZPOINT);
+        $this->context->smarty->assign('pp_all', Packeteryclass::PP_ALL);
+        $this->context->smarty->assign('packeta_pickup_points', $this->l('Packeta pickup points'));
+        $this->context->smarty->assign('all_packeta_pickup_points', $this->l('Packeta pickup points (Packeta + carriers)'));
+
         /*AD CARRIER LIST*/
-        $packetery_list_ad_carriers = array();
-        $packetery_list_ad_carriers = Packeteryclass::getListAddressDeliveryCarriers();
+        $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
+        foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
+            $carrier = new Carrier($packeteryCarrier['id_carrier']);
+            $carrierZones = $carrier->getZones();
+            $carrierCountries = [];
+            foreach ($carrierZones as $carrierZone) {
+                $zoneCountries = Country::getCountriesByZoneId($carrierZone['id_zone'], Configuration::get('PS_LANG_DEFAULT'));
+                foreach ($zoneCountries as $zoneCountry) {
+                    if ($zoneCountry['active']) {
+                        $carrierCountries[] = $zoneCountry['name'];
+                    }
+                }
+            }
+            $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
+            $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
+            // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
+            $packeteryListAdCarriers[$index]['name'] =
+                ($packeteryCarrier['name'] === '0' ? Carrier::getCarrierNameFromShopName() : $packeteryCarrier['name']);
+        }
+
         $this->context->smarty->assign(array(
             'packetery_list_ad_carriers' => Tools::jsonEncode(array(
                 'columns' => array(
                     array('content' => $this->l('ID'), 'key' => 'id_carrier', 'center' => true),
-                    array('content' => $this->l('Carrier'), 'key' => 'name', 'center' => true),
+                    array('content' => $this->l('Carrier'), 'key' => 'name'),
+                    array('content' => $this->l('Zones'), 'key' => 'zones'),
+                    array('content' => $this->l('Countries'), 'key' => 'countries'),
                     array(
-                        'content' => $this->l('Is Address Delivery via Packetery'),
+                        'content' => $this->l('Is delivery via Packeta'),
                         'key' => 'id_branch',
                         'center' => true
                     ),
                     array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
+                    array('content' => $this->l('Packeta pickup point'), 'key' => 'pickup_point_type', 'hidden' => true),
                 ),
-                'rows' => $packetery_list_ad_carriers,
+                'rows' => $packeteryListAdCarriers,
                 'url_params' => array('configure' => $this->name),
                 'identifier' => 'id_carrier',
             ))
         ));
         /*END AD CARRIER LIST*/
-
-        /*CARRIER LIST*/
-        $packetery_carriers_list = array();
-        $packetery_carriers_list = Packeteryclass::getCarriersList();
-        $this->context->smarty->assign(array(
-            'packetery_carriers_list' => Tools::jsonEncode(array(
-                'columns' => array(
-                    array('content' => $this->l('ID'), 'key' => 'id_carrier', 'center' => true),
-                    array('content' => $this->l('Carrier Name'), 'key' => 'name', 'center' => true),
-                    array('content' => $this->l('Countries'), 'key' => 'country', 'center' => true),
-                    array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
-                ),
-                'rows' => $packetery_carriers_list,
-                'rows_actions' => array(
-                    array(
-                        'title' => $this->l('remove'),
-                        'action' => 'remove_carrier',
-                        'icon' => 'delete',
-                    ),
-                ),
-                'top_actions' => array(
-                    array(
-                        'title' => $this->l('Add Carrier'),
-                        'action' => 'add_carrier',
-                        'icon' => 'add',
-                        'img' => 'themes/default/img/process-icon-new.png',
-                        'fa' => 'plus'
-                    ),
-                ),
-                'url_params' => array('configure' => $this->name),
-                'identifier' => 'id_carrier'
-            ))
-        ));
-        /*END CARRIER LIST*/
 
         /*PAYMENT LIST*/
         $payment_list = array();
@@ -353,7 +296,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign(array(
             'payment_list' => Tools::jsonEncode(array(
                 'columns' => array(
-                    array('content' => $this->l('Module'), 'key' => 'name', 'center' => true),
+                    array('content' => $this->l('Module'), 'key' => 'name'),
                     array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
                     array('content' => $this->l('module_name'), 'key' => 'module_name', 'center' => true),
                 ),
@@ -397,7 +340,28 @@ class Packetery extends CarrierModule
             ))
         ));
         /*END CARRIERS*/
-        $this->hookDisplayWidget();
+
+        /*FIELDS FOR AJAX*/
+        $ajaxfields = array(
+            'all' => $this->l('All'),
+            'error' => $this->l('Error'),
+            'success' => $this->l('Success'),
+            'success_export' => $this->l('Successfully exported'),
+            'success_download_branches' => $this->l('Pickup points successfully updated.'),
+            'reload5sec' => $this->l('Page will be reloaded in 5 seconds...'),
+            'try_download_branches' => $this->l('Trying to download pickup points. Please wait for download process end...'),
+            'confirm_tracking_exists' => $this->l('Tracking numbers of some selected orders already exist and will be rewritten by new ones. Do you want to continue?'),
+            'err_no_branch' => $this->l('Please select destination pickup point for order(s)'),
+            'error_export_unknown' => $this->l('There was an error trying to update list of pickup points, check if your API password is correct and try again.'),
+            'error_export' => $this->l('not exported. Error:'),
+        );
+        $ajaxfields_json = json_encode($ajaxfields);
+        $ajaxfields_json = rawurlencode($ajaxfields_json);
+        $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
+        /*END FIELDS FOR AJAX*/
+
+        $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+        $this->context->smarty->assign('baseuri', $base_uri);
 
         $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
         $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/prestui/ps-tags.tpl');
@@ -412,11 +376,9 @@ class Packetery extends CarrierModule
         if ((Tools::getValue('module_name') == $this->name) || (Tools::getValue('configure') == $this->name)) {
             $this->context->controller->addjquery();
             $this->context->controller->addJS('https://cdn.jsdelivr.net/riot/2.4.1/riot+compiler.min.js');
-            $this->context->controller->addJS($this->_path.'views/js/back.js');
-            $this->context->controller->addJS($this->_path.'views/js/widget_bo.js');
-            $this->context->controller->addCSS($this->_path.'views/css/back.css');
-            $this->context->controller->addJS($this->_path.'views/js/notify.js');
-            $this->context->controller->addJS($this->_path.'views/js/jquery.popupoverlay.js');
+            $this->context->controller->addJS($this->_path . 'views/js/back.js?v=' . $this->version);
+            $this->context->controller->addCSS($this->_path . 'views/css/back.css?v=' . $this->version, 'all', null, false);
+            $this->context->controller->addJS($this->_path . 'views/js/notify.js');
         }
     }
 
@@ -460,78 +422,70 @@ class Packetery extends CarrierModule
     {
         global $language;
 
-
 		$id_carrier = $params['carrier']['id'];
 
-		$carrierCountries = [];
-		foreach (Packeteryclass::getCarriersList() as $carrier)
-		{
-			$carrierCountries[$carrier['id_carrier']] = $carrier['country'];
-		}
-		$carrierCountriesJson = json_encode($carrierCountries);
+        $zPointCarriers = Db::getInstance()->executeS(
+            'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
+            JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`)
+            WHERE `c`.`deleted` = 0 AND `pad`.`pickup_point_type` IS NOT NULL'
+        );
+        $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
 
-		$this->context->smarty->assign('widget_carrier', $id_carrier);
-		/*FIELDS FOR AJAX*/
-		$ajaxfields = array(
-			'zip' => $this->l('ZIP'),
-			'moredetails' => $this->l('More details'),
-			'max_weight' => $this->l('Max weight'),
-			'dressing_room' => $this->l('Dressing room'),
-			'packet_consignment' => $this->l('Packet consignment'),
-			'claim_assistant' => $this->l('Claim assistant'),
-			'yes' => $this->l('Yes'),
-			'no' => $this->l('No'),
-			'please_choose' => $this->l('please choose'),
-			'please_choose_branch' => $this->l('Please choose delivery branch')
-			);
-		$ajaxfields_json = json_encode($ajaxfields);
+		$this->context->smarty->assign('carrier_id', $id_carrier);
 
-		$name_branch = "";
-		$currency_branch = "";
-		$id_branch = "";
+		$name_branch = '';
+		$currency_branch = '';
+		$id_branch = '';
+        $pickupPointType = 'internal';
+        $carrierId = '';
+        $carrierPickupPointId = '';
 		if(!empty($params['cart']))
 		{
-			$row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
-			if (!empty($row['id_branch']))
-			{
-				$id_branch = $row['id_branch'];
-			}
-			if (!empty($row['name_branch']))
-			{
-				$name_branch = $row['name_branch'];
-			}
-			if (!empty($row['currency_branch']))
-			{
-				$currency_branch = $row['currency_branch'];
-			}
-		}
+            $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
 
-		if(isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery))
-		{
-			$address = new AddressCore($params['cart']->id_address_delivery);
+            $name_branch = $row['name_branch'];
+            $currency_branch = $row['currency_branch'];
+            $carrierPickupPointId = $row['carrier_pickup_point'];
 
-			$countryObj = new CountryCore($address->id_country);
-			$this->context->smarty->assign('customer_country', strtolower($countryObj->iso_code));
-		}
+            if ($row['is_carrier'] == 1) {
+                // to be consistent with widget behavior
+                $id_branch = $row['carrier_pickup_point'];
+
+                $pickupPointType = 'external';
+                $carrierId = $row['id_branch'];
+            } else {
+                $id_branch = $row['id_branch'];
+            }
+        }
+
+        $customerCountry = '';
+        if (isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery)) {
+            $address = new AddressCore($params['cart']->id_address_delivery);
+            $countryObj = new CountryCore($address->id_country);
+            $customerCountry = strtolower($countryObj->iso_code);
+        }
+        $this->context->smarty->assign('customer_country', $customerCountry);
+
+        $widgetCarriers = '';
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
+        if ($packeteryCarrier['pickup_point_type'] === 'external' && $packeteryCarrier['id_branch']) {
+            $widgetCarriers = $packeteryCarrier['id_branch'];
+        } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
+            $widgetCarriers = 'packeta';
+        }
 
 		$this->context->smarty->assign('module_version', $this->version);
-		$this->context->smarty->assign('allowed_countries', json_encode($this->limited_countries));
-		$this->context->smarty->assign('carrier_countries', $carrierCountriesJson);
+		$this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
+        $this->context->smarty->assign('widget_carriers', $widgetCarriers);
 		$this->context->smarty->assign('id_branch', $id_branch);
 		$this->context->smarty->assign('name_branch', $name_branch);
 		$this->context->smarty->assign('currency_branch', $currency_branch);
-
-		$this->context->smarty->assign('ajaxfields', $ajaxfields_json);
-
-		$this->context->smarty->assign('force_country', Packeteryclass::getConfigValueByOption('FORCE_COUNTRY'));
-		$this->context->smarty->assign('force_language', Packeteryclass::getConfigValueByOption('FORCE_LANGUAGE'));
+		$this->context->smarty->assign('pickup_point_type', $pickupPointType);
+		$this->context->smarty->assign('packeta_carrier_id', $carrierId);
+		$this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
 
 		$base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
 		$this->context->smarty->assign('baseuri', $base_uri);
-		$countries = $this->getCountriesList($id_carrier);
-		$this->context->smarty->assign('countries', $countries);
-		$countries_count = count($countries);
-		$this->context->smarty->assign('countries_count', $countries_count);
 		$this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
 		$this->context->smarty->assign('language', (array)$language);
 		/*END FIELDS FOR AJAX*/
@@ -540,61 +494,13 @@ class Packetery extends CarrierModule
 		return $output;
     }
 
-    /*WIDGET BO*/
-    /**
-     * Ajax fields for back office
-     */
-    public function hookDisplayWidget()
-    {
-        /*FIELDS FOR AJAX*/
-        $ajaxfields = array(
-            'zip' => $this->l('ZIP'),
-            'moredetails' => $this->l('More details'),
-            'max_weight' => $this->l('Max weight'),
-            'dressing_room' => $this->l('Dressing room'),
-            'packet_consignment' => $this->l('Packet consignment'),
-            'claim_assistant' => $this->l('Claim assistant'),
-            'yes' => $this->l('Yes'),
-            'no' => $this->l('No'),
-            'all' => $this->l('All'),
-            'error' => $this->l('Error'),
-            'success' => $this->l('Success'),
-            'success_export' => $this->l('Successfuly exported'),
-            'success_download_branches' => $this->l('Branches successfuly updated.'),
-            'reload5sec' => $this->l('Page will be reloaded in 5 seconds...'),
-            'try_download_branches' => $this->l('Trying to download branches. Please wait for download process end...'),
-            'confirm_tracking_exists' => $this->l('Tracking numbers of some selected orders already exist and will be rewritten by new ones. Do you want to continue?'),
-            'err_no_branch' => $this->l('Please select destination branch for order(s) - '),
-            'error_export_unknown' => $this->l('There was an error trying to update branch list, check if your API password is correct and try again.'),
-            'error_export' => $this->l('not exported. Error: '),
-            'err_country' => $this->l('Please select country'),
-            'api_wrong' => $this->l('Api password is wrong. Branches will not be updated.'),
-            'please_choose' => $this->l('please choose'),
-            'please_choose_branch' => $this->l('Please choose delivery branch')
-            );
-        $ajaxfields_json = json_encode($ajaxfields);
-        $ajaxfields_json = rawurlencode($ajaxfields_json);
-        $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
-        /*END FIELDS FOR AJAX*/
-
-        $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-        $this->context->smarty->assign('baseuri', $base_uri);
-
-        $countries = $this->getCountriesList();
-        $countries_count = count($countries);
-        $this->context->smarty->assign('countries', $countries);
-        $this->context->smarty->assign('countries_count', $countries_count);
-    }
-    /*END WIDGET BO*/
-
     /**
      * Link js and css files
      */
     public function hookDisplayHeader()
     {
         $js = [
-            'jquery.popupoverlay.js',
-            'front.js',
+            'front.js?v=' . $this->version,
         ];
 
         $iterator = new GlobIterator(__DIR__ . '/views/js/checkout-modules/*.js', FilesystemIterator::CURRENT_AS_FILEINFO);
@@ -608,7 +514,7 @@ class Packetery extends CarrierModule
             $this->context->controller->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
         }
 
-        $this->context->controller->addCSS($this->_path.'views/css/front.css');
+        $this->context->controller->registerStylesheet('packetery-front', $this->_path . 'views/css/front.css?v=' . $this->version, ['server' => 'remote']);
     }
 
     /*ORDERS*/
@@ -622,9 +528,4 @@ class Packetery extends CarrierModule
     }
     /*END ORDERS*/
 
-    /*WIDGET*/
-    public function getCountriesList($id_carrier = false)
-    {
-        return $this->supported_countries_trans;
-    }
 }

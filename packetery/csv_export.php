@@ -15,7 +15,7 @@ $date = date('Y-m-d');
 header('Content-Type: text/csv');
 header('Content-Disposition: attachment; filename="export_'.$date.'.csv"');
 $fp = fopen('php://output', 'wb');
-fputcsv($fp, ['version 5']);
+fputcsv($fp, ['version 6']);
 fputcsv($fp, []);
 foreach ( $orderData as $line ) {
     fputcsv($fp, $line);

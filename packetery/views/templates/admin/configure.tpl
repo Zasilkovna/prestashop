@@ -27,11 +27,13 @@
 
 <input type="hidden" name="check_e" id="check_e" value="{$check_e|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
+<input type="hidden" name="ajaxfields" id="ajaxfields" value="{$ajaxfields}">
+
 <div id="packetery-form">
 	<div id="top_packetery">
 		<img id ="top_packetery_image" src="{$module_dir|escape:'html':'UTF-8'}/logo.png" id="payment-logo" class="pull-right" />
 		<div id="top_packetery_text">
-			<i class="icon icon-truck"></i> {l s='Zasilkovna Dashboard' mod='packetery'}
+			<i class="icon icon-truck"></i> {l s='Packeta Dashboard' mod='packetery'}
 		</div>
 	</div>
 	<ps-tabs position="top">
@@ -41,11 +43,8 @@
 		<ps-tab title="{l s='Settings' mod='packetery'}" id="tab-settings" {if $active_tab eq 'settings'}active="true"{/if} icon="icon-AdminParentModules" >
 		    {include file="./tab_settings.tpl"}
 		</ps-tab>
-		<ps-tab title="{l s='Branch' mod='packetery'}" id="tab-branch" {if $active_tab eq 'branch'}active="true"{/if} icon="" >
+		<ps-tab title="{l s='Pickup points' mod='packetery'}" id="tab-branch" {if $active_tab eq 'branch'}active="true"{/if} icon="" >
 			{include file="./tab_branch.tpl"}
 		</ps-tab>
-	    <ps-tab title="{l s='FAQ' mod='packetery'}" id="faq">
-	        {include file="./tab_faq.tpl"}
-	    </ps-tab>
 	</ps-tabs>
 </div>

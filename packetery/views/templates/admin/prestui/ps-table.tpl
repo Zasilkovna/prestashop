@@ -253,7 +253,7 @@
 		this.columns_keys = []
 
 		for (var i in this.columns) {
-			this.columns_classes.push(this.columns[i].center == true ? 'center' : '')
+			this.columns_classes.push(this.columns[i].center == true ? 'center' : (this.columns[i].hidden == true ? 'hidden' : ''))
 			this.columns_keys.push(this.columns[i].key)
 		}
 

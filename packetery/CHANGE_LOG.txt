@@ -30,3 +30,18 @@
 	  - Refactored front.js
 	  - Added: Generic support framework for third-party OPC modules
 	  - Fixed: getListPayments() - compatibility with PS 1.7.7
+2.1.5 - Fixed: Unpairing of carriers from address delivery via module.
+      - Fixed: Keep pairing of updated carriers with the module
+      - Updated: Transport administration - removal of adding carriers on the module side, solved similarly to
+        address delivery by pairing existing carriers with the module.
+      - Removed: country and language forcing
+      - Added: Widget v6 support.
+      - Removed: possibility to change order branch (preparation for future upgrade)
+      - Added: associated countries to carriers list
+      - Updated: CSV export version upgraded to version 6
+      - Added: possibility to pair carriers with carriers to external pickup points and to distinguish between
+        Packeta pickup points only and all pickup points
+      - Fixed: correctly display the name of the carrier identical to the name of the e-shop on the module setting page
+      - Fixed: Undefined index: customer_country in DEV mode
+      - Fixed: Upgrade script of version 2.1.3
+      - Added: module version to static files

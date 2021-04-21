@@ -55,50 +55,17 @@
 		</option>
 	</select>
 	<br>
-
-	<label class="control-label col-lg-3" for="force_country">
-		{l s='Fixed Country' mod='packetery'}
-	</label>
-	<select name="force_country" class="setting_input" data-id="6">
-		<option value="" {if $force_country eq ''}selected{/if}>
-			{l s='---' mod='packetery'}
-		</option>
-		{foreach from=$supported_countries item=c}
-			<option value="{$c['country']|escape:'htmlall':'UTF-8'}" {if $force_country eq $c['country']}selected{/if}>{$c.name|escape:'htmlall':'UTF-8'}</option>
-		{/foreach}
-	</select>
-	<br>
-
-	<label class="control-label col-lg-3" for="force_language">
-		{l s='Fixed Language' mod='packetery'}
-	</label>
-	<select name="force_language" class="setting_input" data-id="7">
-		<option value="" {if $force_language eq ''}selected{/if}>
-			{l s='---' mod='packetery'}
-		</option>
-		{foreach  from=$supported_languages key=k item=c}
-			<option value="{$k|escape:'htmlall':'UTF-8'}" {if $force_language eq $k}selected{/if}>{$c|escape:'htmlall':'UTF-8'}</option>
-		{/foreach}
-	</select>
-	<br>
 </div>
 
-<!--Add carrier-->
-{include file="./carrier_packetery_add.tpl" }
- <!--End add-packetery-carrier-block-->
-<br><hr><br>
-
-<!--Packetery Carriers list-->
-<label class="control-label col-lg-3" for="packetery-carriers-list-table">
-</label>
-<ps-table id="packetery-carriers-list-table" name="packetery-carriers-list-table" header="{l s='Packetery Carriers' mod='packetery'}" icon="icon-users" content="{$packetery_carriers_list|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>
-<br><hr><br>
-
 <!--Address Delivery Carriers List-->
-<input type="hidden" name="json_ad" id="json_ad" value='{$ad_array}'>
+<input type="hidden" name="carriers_json" id="carriers_json" value='{$carriers_json}'>
+<input type="hidden" name="zpoint" id="zpoint" value='{$zpoint}'>
+<input type="hidden" name="pp_all" id="pp_all" value='{$pp_all}'>
+<input type="hidden" name="packeta_pickup_points" id="packeta_pickup_points" value='{$packeta_pickup_points}'>
+<input type="hidden" name="all_packeta_pickup_points" id="all_packeta_pickup_points" value='{$all_packeta_pickup_points}'>
 <label class="control-label col-lg-3" for="ad-carriers-list-table">
 </label>
-<ps-table id="ad-carriers-list-table" header="{l s='Address Delivery Carriers List' mod='packetery'}" icon="icon-users" content="{$packetery_list_ad_carriers|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>
+<ps-table id="ad-carriers-list-table" header="{l s='Carriers List' mod='packetery'}" icon="icon-users" content="{$packetery_list_ad_carriers|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>
 <br><hr><br>
 
 <!--Payment list-->

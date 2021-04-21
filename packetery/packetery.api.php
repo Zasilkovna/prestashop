@@ -47,7 +47,7 @@ class PacketeryApi
         if ($id_orders == '')
         {
             $module = new Packetery;
-            echo $module->l('Please choose orders first. ');
+            echo $module->l('Please choose orders first.');
             return false;
         }
         $packets = Packeteryclass::getTrackingFromOrders($id_orders);
@@ -168,7 +168,7 @@ class PacketeryApi
         if ($id_orders == '')
         {
             $module = new Packetery;
-            echo $module->l('Please choose orders first. ');
+            echo $module->l('Please choose orders first.');
             return false;
         }
         $id_orders = explode(',', $id_orders);
@@ -243,7 +243,6 @@ class PacketeryApi
         $module = new Packetery;
         $id_order = $order->id;
         $packetery_order = Packeteryclass::getPacketeryOrderRow($id_order);
-        $id_branch = $packetery_order['id_branch'];
         $id_address_delivery = $order->id_address_delivery;
         $address_delivery = new Address($id_address_delivery);
         $is_packetery_ad = $packetery_order['is_ad'];
@@ -260,7 +259,7 @@ class PacketeryApi
             {
                 return array(
                     0,
-                    $module->l('Cant find order currency rate between order and branch, order - ' . $id_order)
+                    $module->l('Can\'t find order currency rate between order and pickup point, order') . ' - ' . $id_order,
                 );
             }
         }
@@ -311,17 +310,21 @@ class PacketeryApi
         $customer_email = $customer->email;
 
         $packet_attributes = array(
-            'number' => "$id_order",
+            'number' => (string)$id_order,
             'name' => empty($address_delivery->firstname) ? "$customer_fname" : $address_delivery->firstname,
             'surname' => empty($address_delivery->lastname) ? "$customer_lname" : $address_delivery->lastname,
-            'email' => "$customer_email",
-            'phone' => "$customer_phone",
-            'addressId' => "{$id_branch}",
-            'currency' => "$branch_currency_iso",
-            'cod' => "$cod",
+            'email' => (string)$customer_email,
+            'phone' => $customer_phone,
+            'addressId' => $packetery_order['id_branch'],
+            'currency' => $branch_currency_iso,
+            'cod' => $cod,
             'value' => $total,
-            'eshop' => $shop_name
+            'eshop' => $shop_name,
         );
+
+        if ($packetery_order['is_carrier']) {
+            $packet_attributes['carrierPickupPoint'] = $packetery_order['carrier_pickup_point'];
+        }
 
         if (!(Tools::strlen($customer_email) > 1))
         {
@@ -521,11 +524,12 @@ class PacketeryApi
 			$response = Tools::file_get_contents($branch_url, false, NULL, 30, true);
 		}
 		catch (\Exception $e) {
-			return $module->l($e->getMessage());
+		    // TODO: log using PrestaShopLogger
+			return $e->getMessage();
 		}
 
         if (! $response) {
-			return $module->l('Cant download branches list. Network error');
+			return $module->l('Can\'t download list of pickup points. Network error.');
 		}
 
 		if (Tools::strpos($response, 'invalid API key') !== false) {
@@ -674,6 +678,7 @@ class PacketeryApi
                     \'' . pSQL((string)addslashes($opening_hours_compact_short)) . '\',
                     \'' . pSQL((string)addslashes($opening_hours_compact_long)) . '\',
                     \'' . pSQL((string)addslashes($opening_hours_regular)) . '\',
+                    0,
                     0
                     );';
         $result = Db::getInstance()->execute($sql);
@@ -682,12 +687,7 @@ class PacketeryApi
 
     public static function addCarrier($carrier)
     {
-        if ($carrier->pickupPoints != "false")
-        {
-            return false;
-        }
-
-        $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'packetery_branch VALUES(
+        $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_branch` VALUES(
                     ' . (int)$carrier->id . ',
                     \'' . (string)addslashes($carrier->name) . '\',
                     \'' . (string)addslashes($carrier->labelName) . '\',
@@ -714,7 +714,8 @@ class PacketeryApi
                     \'\',
                     \'\',
                     \'\',
-                    1
+                    ' . ((string)$carrier->pickupPoints === 'false' ? 1 : 0) . ',
+                    ' . ((string)$carrier->pickupPoints === 'true' ? 1 : 0) . '
                     );';
 
         $result = Db::getInstance()->execute($sql);
@@ -730,12 +731,12 @@ class PacketeryApi
         return $result;
     }
 
-    public static function getAdBranchesList()
+    public static function getAdAndExternalCarriers()
     {
-        $sql = 'SELECT id_branch, name, country, city, street, zip, url, max_weight, currency
-                FROM ' . _DB_PREFIX_ . 'packetery_branch
-                WHERE is_ad = 1
-                ORDER BY country, name';
+        $sql = 'SELECT `id_branch`, `name`, `country`, `currency`, `is_pickup_point`
+                FROM `' . _DB_PREFIX_ . 'packetery_branch`
+                WHERE `is_ad` = 1 OR `is_pickup_point` = 1
+                ORDER BY `country`, `name`';
         $result = Db::getInstance()->executeS($sql);
         $branches = array();
         foreach ($result as $branch)
@@ -743,199 +744,71 @@ class PacketeryApi
             $branches[] = array(
                 'id_branch' => $branch['id_branch'],
                 'name' => $branch['name'] . ', ' . Tools::strtoupper($branch['country']),
-                'currency' => $branch['currency']
+                'currency' => $branch['currency'],
+                'pickup_point_type' => ($branch['is_pickup_point'] ? 'external' : null),
             );
         }
         return $branches;
     }
     /*END BRANCHES*/
 
-    public static function widgetGetCountries($country_iso_code = false)
-    {
-        $id_lang = Context::getContext()->language->id;
-        if ($country_iso_code)
-        {
-            $country = (string)Tools::strtolower($country_iso_code);
-        }
-        else
-        {
-            $country = (string)Tools::getValue('country');
-        }
-        $sql = 'SELECT DISTINCT pb.country, cl.name
-                FROM ' . _DB_PREFIX_ . 'packetery_branch pb
-                LEFT JOIN ' . _DB_PREFIX_ . 'country c ON c.iso_code=UPPER(pb.country)
-                LEFT JOIN ' . _DB_PREFIX_ . 'country_lang cl ON c.id_country=cl.id_country 
-                    AND id_lang=' . (int)$id_lang . '
-                WHERE country=\'' . pSQL($country) . '\' 
-                    AND pb.is_ad=0
-                ORDER BY city;';
-        $result = Db::getInstance()->executeS($sql);
-        return $result;
-    }
-
-    public static function widgetGetCities()
-    {
-        $module = new Packetery;
-        $country = (string)Tools::getValue('country');
-        $sql = 'SELECT DISTINCT city, is_ad
-                FROM ' . _DB_PREFIX_ . 'packetery_branch
-                WHERE country=\'' . pSQL($country) . '\'
-                    AND is_ad=0
-                ORDER BY city;';
-        $result = Db::getInstance()->executeS($sql);
-        $i = 0;
-        foreach ($result as $res)
-        {
-            if ($res['is_ad'] == 1)
-            {
-                $result[$i]['city'] = $module->l('Address delivery');
-            }
-            $i++;
-        }
-        return $result;
-    }
-
-    public static function widgetGetCitiesAjax()
-    {
-        $cities = self::widgetGetCities();
-        echo Tools::jsonEncode($cities);
-    }
-
-    public static function widgetGetNames()
-    {
-        $country = (string)Tools::getValue('country');
-        $city = (string)Tools::getValue('city');
-        $is_ad = Tools::getValue('is_ad');
-        if ($is_ad == 0)
-        {
-            $sql = 'SELECT DISTINCT name, id_branch, is_ad
-                    FROM ' . _DB_PREFIX_ . 'packetery_branch
-                    WHERE country=\'' . pSQL($country) . '\'
-                        AND city=\'' . pSQL($city) . '\'
-                        AND is_ad=0
-                    GROUP BY name';
-            $result = Db::getInstance()->executeS($sql);
-        }
-        elseif ($is_ad == 1)
-        {
-            $sql = 'SELECT DISTINCT name, id_branch, is_ad
-                    FROM ' . _DB_PREFIX_ . 'packetery_branch
-                    WHERE country=\'' . pSQL($country) . '\'
-                        AND is_ad=' . (int)$is_ad . '
-                    GROUP BY name';
-            $result = Db::getInstance()->executeS($sql);
-        }
-        return $result;
-    }
-
-    public static function widgetSaveOrderBranchAjax()
-    {
-        $result = self::widgetSaveOrderBranch();
-        if ($result)
-        {
-            echo 'ok';
-        }
-        else
-        {
-            echo 'Something went wrong.';
-        }
-    }
-
+    /*WIDGET*/
     public static function widgetSaveOrderBranch()
     {
         $id_cart = Context::getContext()->cart->id;
-        $id_branch = Tools::getValue('id_branch');
-        $id_carrier = Tools::getValue('id_carrier');
-        $name_branch = Tools::getValue('name_branch');
 
-        $is_ad = 0;
-        $packetery_carrier_row = Packeteryclass::getPacketeryCarrierRow($id_carrier);
+        if (!isset($id_cart) ||
+            !Tools::getIsset('id_branch') ||
+            !Tools::getIsset('name_branch') ||
+            !Tools::getIsset('prestashop_carrier_id') ||
+            !Tools::getIsset('pickup_point_type')
+        ) {
+            return false;
+        }
+
+        $id_branch = Tools::getValue('id_branch');
+        $name_branch = Tools::getValue('name_branch');
+        $prestashopCarrierId = Tools::getValue('prestashop_carrier_id');
+        $pickupPointType = Tools::getValue('pickup_point_type');
+        $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
+        $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
+
+        $packetery_carrier_row = Packeteryclass::getPacketeryCarrierById((int)$prestashopCarrierId);
         $is_cod = $packetery_carrier_row['is_cod'];
 
         $currency = CurrencyCore::getCurrency(Context::getContext()->cart->id_currency);
         $currency_branch = $currency['iso_code'];
 
-        if (!isset($id_cart) ||
-            !isset($id_branch) ||
-            !isset($name_branch) ||
-            !isset($currency_branch) ||
+        if (!isset($currency_branch) ||
             !isset($is_cod)
-        )
-        {
+        ) {
             return false;
         }
+
+        $packeteryOrderFields = [
+            'id_branch' => (int)$id_branch,
+            'name_branch' => pSQL($name_branch),
+            'currency_branch' => pSQL($currency_branch),
+            'id_carrier' => (int)$prestashopCarrierId,
+            'is_cod' => (int)$is_cod,
+            'is_ad' => 0,
+        ];
+        if ($pickupPointType === 'external') {
+            $packeteryOrderFields['is_carrier'] = 1;
+            $packeteryOrderFields['id_branch'] = (int)$widgetCarrierId;
+            $packeteryOrderFields['carrier_pickup_point'] = pSQL($carrierPickupPointId);
+        }
+
         $db = Db::getInstance();
-        $sql_is_set_order = 'SELECT 1 
-                            FROM `' . _DB_PREFIX_ . 'packetery_order` 
-                            WHERE id_cart=' . (int)$id_cart . ';';
-        if ($db->getValue($sql_is_set_order) == 1)
-        {
-            $sql_update_order = 'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-                                        SET name_branch="' . pSQL($name_branch) . '", 
-                                            currency_branch="' . pSQL($currency_branch) . '", 
-                                            id_branch=' . (int)$id_branch . ', 
-                                            is_cod=' . (int)$is_cod . ', 
-                                            id_carrier=' . (int)$id_carrier . ',
-                                            is_ad = ' . (int)$is_ad . '
-                                        WHERE id_cart=' . (int)$id_cart . ';';
-            $result = $db->execute($sql_update_order);
+        $isOrderSaved = $db->getValue('SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . ((int)$id_cart));
+        if ($isOrderSaved) {
+            $result = $db->update('packetery_order', $packeteryOrderFields, '`id_cart` = ' . ((int)$id_cart));
+        } else {
+            $packeteryOrderFields['id_cart'] = ((int)$id_cart);
+            $result = $db->insert('packetery_order', $packeteryOrderFields);
         }
-        else
-        {
-            $sql_insert_order = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_order` 
-                                        SET name_branch="' . pSQL($name_branch) . '", 
-                                            currency_branch="' . pSQL($currency_branch) . '", 
-                                            id_branch=' . (int)$id_branch . ',
-                                            is_cod=' . (int)$is_cod . ', 
-                                            id_carrier=' . (int)$id_carrier . ', 
-                                            is_ad = ' . (int)$is_ad . ',
-                                            id_cart=' . (int)$id_cart . ';';
-            $result = $db->execute($sql_insert_order);
-        }
+
         return $result;
-    }
-
-    public static function getBranchObject($id_branch)
-    {
-        $sql = 'SELECT * 
-                FROM ' . _DB_PREFIX_ . 'packetery_branch
-                WHERE id_branch = ' . (int)$id_branch . ';';
-        $result = Db::getInstance()->getRow($sql);
-        return $result;
-    }
-
-    public static function widgetGetNamesAjax()
-    {
-        $names = self::widgetGetNames();
-        echo Tools::jsonEncode($names);
-    }
-
-    public static function widgetGetDetailsAjax()
-    {
-        $id_branch = Tools::getValue('id_branch');
-        $details = self::widgetGetDetails($id_branch);
-        echo Tools::jsonEncode($details);
-    }
-
-    public static function widgetGetDetails($id_branch)
-    {
-        $sql = 'SELECT *
-                FROM ' . _DB_PREFIX_ . 'packetery_branch
-                WHERE id_branch=' . (int)$id_branch . ';';
-        $details = Db::getInstance()->getRow($sql);
-        if (isset($details['opening_hours_short']))
-        {
-            $details['opening_hours_short'] = html_entity_decode($details['opening_hours_short']);
-        }
-        if (isset($details['opening_hours_long']))
-        {
-            $details['opening_hours_long'] = html_entity_decode($details['opening_hours_long']);
-        }
-        if (isset($details['opening_hours']))
-        {
-            $details['opening_hours'] = html_entity_decode($details['opening_hours']);
-        }
-        return $details;
     }
     /*END WIDGET*/
 }

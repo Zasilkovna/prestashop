@@ -21,10 +21,7 @@
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<!--Change Branch-->
-{include file="./order_branch_change.tpl"}
-<!--Change Branch-->
- 
+
 <!--Orders sheet-->
 <form class="form-horizontal">
 	<input type="hidden" name="po_pages" id="po_pages" value="{$po_pages|escape:'htmlall':'UTF-8'}">

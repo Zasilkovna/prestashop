@@ -48,33 +48,14 @@ switch (Tools::getValue('action'))
         PacketeryApi::updateBranchListAjax();
         break;
     /*SETTINGS*/
-    case 'new_weight_rule':
-        Packeteryclass::newPacketeryWeightRule();
-        break;
-    case 'remove_weight_rule':
-        Packeteryclass::removePacketeryWeightRule();
-        break;
-    case 'get_weight_rule':
-        Packeteryclass::getPacketeryWeightRule();
-        break;
-    case 'new_carrier':
-        Packeteryclass::newPacketeryCarrier();
-        break;
-    case 'remove_carrier':
-        Packeteryclass::removePacketeryCarrier();
-        break;
     case 'change_payment_cod':
         Packeteryclass::changePaymentCodAjax();
-        break;
-
-    case 'change_carrier_cod':
-        Packeteryclass::changeCarrierCodAjax();
         break;
     case 'change_ad_carrier_cod':
         Packeteryclass::changeAdCarrierCodAjax();
         break;
     case 'set_ad_carrier_association':
-        Packeteryclass::setAdCarrierAjax();
+        Packeteryclass::setPacketeryCarrierAjax();
         break;
     /*END SETTINGS*/
     /*ORDERS*/
@@ -84,35 +65,16 @@ switch (Tools::getValue('action'))
     case 'change_order_cod':
         Packeteryclass::changeOrderCodAjax();
         break;
-    case 'change_order_branch':
-        Packeteryclass::changeOrderBranchAjax();
-        break;
     case 'prepare_order_export':
         PacketeryApi::prepareOrderExportAjax();
         break;
     case 'order_export':
         PacketeryApi::ordersExportAjax();
         break;
-    case 'export_order_csv':
-        Packeteryclass::exportOrdersCsv();
-        break;
     case 'download_pdf':
         PacketeryApi::downloadPdfAjax();
         break;
     /*END ORDERS*/
-    /*FRONT*/
-    case 'widgetgetcities':
-        PacketeryApi::widgetGetCitiesAjax();
-        break;
-    case 'widgetgetnames':
-        PacketeryApi::widgetGetNamesAjax();
-        break;
-    case 'widgetgetdetails':
-        PacketeryApi::widgetGetDetailsAjax();
-        break;
-    case 'widgetsaveorderbranch':
-        PacketeryApi::widgetSaveOrderBranch();
-        break;
     default:
         exit;
 }
