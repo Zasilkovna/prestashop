@@ -28,7 +28,7 @@
     <input type="hidden" id="customer_country" name="customer_country" value="{$customer_country|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="zpoint_carriers" name="zpoint_carriers" value="{$zpoint_carriers}">
     <input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
-    <input type="hidden" id="module_version" name="module_version" value="{$module_version}">
+    <input type="hidden" id="app_identity" name="app_identity" value="{$app_identity}">
     <!--Packetery widget-->
     <div id="packetery-widget">
         <div class="widget-left">
@@ -58,9 +58,8 @@
             </div>
         </div>
 
-        <div style="clear:both;"></div>
-        <div style="margin: 25px;"></div>
-    </div>
-
-    <div class="packetery-message-pickup-point-not-selected-error" data-content="{l s='Please select a pick up point before confirming your order' mod='packetery'}"></div>
+    <div style="clear:both;"></div>
+    <div style="margin: 25px;"></div>
 </div>
+
+<div class="packetery-message-pickup-point-not-selected-error" data-content="{l s='Please select a pick up point before confirming your order' mod='packetery'}"></div>

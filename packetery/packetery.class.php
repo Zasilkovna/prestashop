@@ -24,13 +24,13 @@
  */
 
 require_once(dirname(__FILE__) . '../../../config/config.inc.php');
-require_once(dirname(__FILE__) . '../../../init.php');
 require_once(dirname(__FILE__) . '../../../classes/Cookie.php');
 include_once(dirname(__file__) . '/packetery.api.php');
 require_once(dirname(__FILE__) . '/packetery.php');
 
 class Packeteryclass
 {
+    const APP_IDENTITY_PREFIX = 'prestashop-1.7-packeta-';
     // only for mixing with branch ids
     const ZPOINT = 'zpoint';
     const PP_ALL = 'pp_all';
@@ -845,4 +845,5 @@ class Packeteryclass
         return $res;
     }
     /*END COMMON FUNCTIONS*/
+
 }
