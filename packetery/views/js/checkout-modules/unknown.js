@@ -11,10 +11,6 @@ var PacketeryCheckoutModuleUnknown = {
         return $('.delivery_option input');
     },
 
-    getWidgetParent: function ($selectedInput) {
-        return $selectedInput.closest('.delivery_option').next();
-    },
-
     enableSubmitButton: function () {
         $('button[name="confirmDeliveryOption"]')
             .removeClass('disabled')
