@@ -8,7 +8,7 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_2_1_5($object)
 {
     $hookName = 'displayAdminOrderMain';
-    if (version_compare(_PS_VERSION_, '1.7.7', '<')) {
+    if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
         $hookName = 'displayAdminOrderLeft';
     }
     if (!$object->registerHook($hookName) ||

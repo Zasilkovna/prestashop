@@ -604,7 +604,7 @@ class Packetery extends CarrierModule
      */
     private function getAdminLink($orderId)
     {
-        if (version_compare(_PS_VERSION_, '1.7.5', '<')) {
+        if (Tools::version_compare(_PS_VERSION_, '1.7.5', '<')) {
             // Code compliant from PrestaShop 1.5 to 1.7.4
             return $this->context->link->getAdminLink('AdminOrders') . '&id_order=' . $orderId . '&vieworder#packetaPickupPointChange';
         }
@@ -664,7 +664,7 @@ class Packetery extends CarrierModule
             'actionCarrierUpdate',
             'actionAdminControllerSetMedia',
         ];
-        if (version_compare(_PS_VERSION_, '1.7.7', '<')) {
+        if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
         } else {
             $hooks[] = 'displayAdminOrderMain';
