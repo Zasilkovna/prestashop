@@ -46,5 +46,5 @@
       - Fixed: Upgrade script of version 2.1.3
       - Added: module version to static files
 2.1.6 - Fixed: front.js
-      - Added: information about branch or address delivery carrier into order administration
-        and possibility to change branch using widget
+      - Added: information about pickup point or address delivery carrier into order administration
+        and possibility to change pickup point using widget

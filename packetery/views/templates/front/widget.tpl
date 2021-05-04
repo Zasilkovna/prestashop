@@ -58,8 +58,9 @@
             </div>
         </div>
 
-    <div style="clear:both;"></div>
-    <div style="margin: 25px;"></div>
-</div>
+        <div style="clear:both;"></div>
+        <div style="margin: 25px;"></div>
+    </div>
 
-<div class="packetery-message-pickup-point-not-selected-error" data-content="{l s='Please select a pick up point before confirming your order' mod='packetery'}"></div>
+    <div class="packetery-message-pickup-point-not-selected-error" data-content="{l s='Please select a pick up point before confirming your order' mod='packetery'}"></div>
+</div>
