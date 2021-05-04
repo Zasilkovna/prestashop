@@ -5,11 +5,11 @@
         </h3>
     </div>
     <div class="card-body">
-        {if $isCarrier}
-            <p>{l s='Carrier' mod='packetery'}: <strong class="picked-delivery-place">{$branchName}</strong></p>
+        {if $isAddressDelivery}
+            <p>{l s='Carrier' mod='packetery'}: <strong class="picked-delivery-place">{$pickupPointOrAddressDeliveryName}</strong></p>
         {else}
             <form action="{$returnUrl}" method="post">
-                <p>{l s='Pickup point' mod='packetery'}: <strong class="picked-delivery-place">{$branchName}</strong>
+                <p>{l s='Pickup point' mod='packetery'}: <strong class="picked-delivery-place">{$pickupPointOrAddressDeliveryName}</strong>
                 </p>
                 <p>
                     <a href="" class="btn btn-outline-secondary btn-default open-packeta-widget"
@@ -19,14 +19,11 @@
                     <input type="hidden" name="pickup_point">
                 </p>
                 <div class="text-right">
-                    <button class="btn btn-primary">{l s='Save' mod='packetery'}</button>
+                    <button class="btn btn-primary" name="pickup_point_change">{l s='Save' mod='packetery'}</button>
                 </div>
             </form>
-            {if isset($messageSuccess)}
-                <div class="alert alert-success">{$messageSuccess}</div>
-            {/if}
-            {if isset($messageError)}
-                <div class="alert alert-danger">{$messageError}</div>
+            {if isset($message)}
+                <div class="alert alert-{$message.class}">{$message.text}</div>
             {/if}
         {/if}
     </div>

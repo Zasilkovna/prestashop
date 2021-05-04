@@ -7,7 +7,11 @@ if (!defined('_PS_VERSION_')) {
 /* @var $object Packetery */
 function upgrade_module_2_1_5($object)
 {
-    if (!$object->registerHooksWithVersionCheck() ||
+    $hookName = 'displayAdminOrderMain';
+    if (version_compare(_PS_VERSION_, '1.7.7', '<')) {
+        $hookName = 'displayAdminOrderLeft';
+    }
+    if (!$object->registerHook($hookName) ||
         !$object->registerHook('actionAdminControllerSetMedia')) {
         return false;
     }
