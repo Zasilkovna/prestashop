@@ -45,3 +45,4 @@
       - Fixed: Undefined index: customer_country in DEV mode
       - Fixed: Upgrade script of version 2.1.3
       - Added: module version to static files
+2.1.6 - Fixed: front.js

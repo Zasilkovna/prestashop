@@ -10,10 +10,6 @@ var PacketeryCheckoutModuleSupercheckout = {
         return $('#shipping-method input');
     },
 
-    getWidgetParent: function ($selectedInput) {
-        return $selectedInput.closest('li').find('.carrier-extra-content');
-    },
-
     // we're not able to enable/disable Supercheckout submit button, we register our own validator instead
     enableSubmitButton: function () {},
     disableSubmitButton: function () {},
@@ -28,10 +24,10 @@ $(function () {
         addSupercheckoutOrderValidator(function() {
 
             var $selectedInput = PacketeryCheckoutModuleSupercheckout.getSelectedInput(),
-                $extra = PacketeryCheckoutModuleSupercheckout.getWidgetParent($selectedInput),
+                $extra = packeteryModulesManager.getWidgetParent($selectedInput),
                 selectedBranchId = $extra.find('.packeta-branch-id').val();
 
-            if (!selectedBranchId) {
+            if ($extra.length === 1 && !selectedBranchId) {
                 var error_text = $('.packetery-message-pickup-point-not-selected-error').data('content');
                 throw { message: error_text };
             }
