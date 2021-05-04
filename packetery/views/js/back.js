@@ -709,20 +709,24 @@ $(document).ready(function () {
 				console.error('Unable to load Packeta Widget.');
 			});
 
-		var widgetOptions = $widgetButton.data('widget-options');
+		var widgetOptionsData = $widgetButton.data('widget-options');
+		var widgetOptions = {
+			appIdentity: widgetOptionsData['app_identity'],
+			country: widgetOptionsData['country'],
+			language: widgetOptionsData['lang']
+		};
+		if (widgetOptionsData['carriers']) {
+			widgetOptions.carriers = widgetOptionsData['carriers'];
+		}
 
 		$widgetButton.on('click', function (event) {
 			event.preventDefault();
-			Packeta.Widget.pick(widgetOptions['api_key'], function (pickupPoint) {
+			Packeta.Widget.pick(widgetOptionsData['api_key'], function (pickupPoint) {
 				if (pickupPoint !== null) {
 					$('.packetery form input[name="pickup_point"]').val(JSON.stringify(pickupPoint));
 					$('.picked-delivery-place').text(pickupPoint.name);
 				}
-			}, {
-				appIdentity: widgetOptions['app_identity'],
-				country: widgetOptions['country'],
-				language: widgetOptions['lang']
-			});
+			}, widgetOptions);
 		});
 	}
 });

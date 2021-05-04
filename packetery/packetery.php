@@ -103,13 +103,7 @@ class Packetery extends CarrierModule
         }
 
         return parent::install() &&
-            $this->registerHook('actionOrderHistoryAddAfter') &&
-            $this->registerHook('backOfficeHeader') &&
-            $this->registerHook('displayCarrierExtraContent') &&
-            $this->registerHook('displayHeader') &&
-            $this->registerHook('actionCarrierUpdate') &&
-            $this->registerHook('actionAdminControllerSetMedia') &&
-            $this->registerHooksWithVersionCheck() &&
+            $this->registerHook($this->getModuleHooksList()) &&
             Packeteryclass::insertTab();
     }
 
@@ -119,16 +113,10 @@ class Packetery extends CarrierModule
 
         include(dirname(__FILE__).'/sql/uninstall.php');
 
-        if (
-            !$this->unregisterHook('actionOrderHistoryAddAfter') ||
-            !$this->unregisterHook('backOfficeHeader') ||
-            !$this->unregisterHook('displayCarrierExtraContent') ||
-            !$this->unregisterHook('displayHeader') ||
-            !$this->unregisterHook('actionCarrierUpdate') ||
-            !$this->unregisterHook('actionAdminControllerSetMedia') ||
-            !$this->unregisterHooksWithVersionCheck()
-        ) {
-            return false;
+        foreach ($this->getModuleHooksList() as $hookName) {
+            if (!$this->unregisterHook($hookName)) {
+                return false;
+            }
         }
 
         return parent::uninstall();
@@ -539,104 +527,154 @@ class Packetery extends CarrierModule
     }
     /*END ORDERS*/
 
+    /**
+     * @param array $params parameters provided by PrestaShop
+     */
     public function packeteryHookDisplayAdminOrder($params)
     {
+        if (Tools::isSubmit('pickup_point_change')) {
+            $updateResult = $this->savePickupPointChange();
+            if ($updateResult) {
+                $message = [
+                    'text' => $this->l('Pickup point has been successfully changed.'),
+                    'class' => 'success',
+                ];
+            } else {
+                $message = [
+                    'text' => $this->l('Pickup point could not be changed.'),
+                    'class' => 'danger',
+                ];
+            }
+            $this->context->smarty->assign('message', $message);
+        }
+
         $apiKey = PacketeryApi::getApiKey();
         $packeteryOrder = Db::getInstance()->getRow(
-            'SELECT `po`.`is_carrier`, `po`.`name_branch`, `c`.`iso_code` AS `country`
+            'SELECT `po`.`name_branch`, `po`.`is_ad`, `pa`.`id_branch`, `pa`.`pickup_point_type`,
+                `c`.`iso_code` AS `country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
             JOIN `' . _DB_PREFIX_ . 'address` `a` ON `a`.`id_address` = `o`.`id_address_delivery` 
             JOIN `' . _DB_PREFIX_ . 'country` `c` ON `c`.`id_country` = `a`.`id_country`
+            JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pa` ON `pa`.`id_carrier` = `o`.`id_carrier`
             WHERE `po`.`id_order` = ' . ((int)$params['id_order'])
         );
         if (!$apiKey || !$packeteryOrder) {
             return;
         }
 
-        $isCarrier = (bool)$packeteryOrder['is_carrier'];
-        $this->context->smarty->assign('isCarrier', $isCarrier);
-        $this->context->smarty->assign('branchName', $packeteryOrder['name_branch']);
-        if (!$isCarrier) {
-            $employee = Context::getContext()->employee;
-            $widgetOptions = [
-                'api_key' => $apiKey,
-                'app_identity' => Packeteryclass::APP_IDENTITY_PREFIX . $this->version,
-                'country' => strtolower($packeteryOrder['country']),
-                'module_dir' => _MODULE_DIR_,
-                'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
-            ];
-            $this->context->smarty->assign('widgetOptions', $widgetOptions);
-            $this->context->smarty->assign('orderId', $params['id_order']);
-
-            // see https://devdocs.prestashop.com/1.7/modules/core-updates/1.7.5/
-            if (version_compare(_PS_VERSION_, '1.7.5', '<')) {
-                // Code compliant from PrestaShop 1.5 to 1.7.4
-                $returnUrl = $this->context->link->getAdminLink('AdminOrders') . '&id_order=' . $params['id_order'] . '&vieworder#packetaPickupPointChange';
-            } else {
-                // Recommended code from PrestaShop 1.7.5
-                $returnUrl = $this->context->link->getAdminLink('AdminOrders', true, [], ['id_order' => $params['id_order'], 'vieworder' => 1]) . '#packetaPickupPointChange';
-            }
-            $this->context->smarty->assign('returnUrl', $returnUrl);
-
-            if (Tools::getIsset('order_id') && Tools::getIsset('pickup_point')) {
-                $orderId = (int)Tools::getValue('order_id');
-                $pickupPoint = json_decode(Tools::getValue('pickup_point'));
-
-                $packeteryOrderFields = [
-                    'id_branch' => (int)$pickupPoint->id,
-                    'name_branch' => pSQL($pickupPoint->name),
-                    'currency_branch' => pSQL($pickupPoint->currency),
-                ];
-                if ($pickupPoint->pickupPointType == 'external') {
-                    $packeteryOrderFields['is_carrier'] = 1;
-                    $packeteryOrderFields['id_branch'] = (int)$pickupPoint->carrierId;
-                    $packeteryOrderFields['carrier_pickup_point'] = pSQL($pickupPoint->carrierPickupPointId);
-                }
-                $updateResult = Db::getInstance()->update('packetery_order', $packeteryOrderFields, '`id_order` = ' . $orderId);
-                if ($updateResult) {
-                    $this->context->smarty->assign('messageSuccess', $this->l('Pickup point has been successfully changed.'));
-                    // overwrite
-                    $this->context->smarty->assign('branchName', $pickupPoint->name);
-                } else {
-                    $this->context->smarty->assign('messageError', $this->l('Pickup point could not be changed.'));
-                }
-            }
+        $isAddressDelivery = (bool)$packeteryOrder['is_ad'];
+        $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
+        $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $packeteryOrder['name_branch']);
+        if (!$isAddressDelivery) {
+            $this->preparePickupPointChange($apiKey, $packeteryOrder, (int)$params['id_order']);
         }
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
-    // removed in 1.7.7 in favor of displayAdminOrderMain
+    /**
+     * @param string $apiKey
+     * @param array $packeteryOrder
+     * @param int $orderId
+     */
+    private function preparePickupPointChange($apiKey, $packeteryOrder, $orderId)
+    {
+        $employee = Context::getContext()->employee;
+        $widgetOptions = [
+            'api_key' => $apiKey,
+            'app_identity' => Packeteryclass::APP_IDENTITY_PREFIX . $this->version,
+            'country' => strtolower($packeteryOrder['country']),
+            'module_dir' => _MODULE_DIR_,
+            'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
+        ];
+        if ($packeteryOrder['pickup_point_type'] === 'external') {
+            $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
+        } else if ($packeteryOrder['pickup_point_type'] === 'internal') {
+            $widgetOptions['carriers'] = 'packeta';
+        }
+        $this->context->smarty->assign('widgetOptions', $widgetOptions);
+        $this->context->smarty->assign('orderId', $orderId);
+        $this->context->smarty->assign('returnUrl', $this->getAdminLink($orderId));
+    }
+
+    /**
+     * see https://devdocs.prestashop.com/1.7/modules/core-updates/1.7.5/
+     * @param int $orderId
+     * @return string
+     */
+    private function getAdminLink($orderId)
+    {
+        if (version_compare(_PS_VERSION_, '1.7.5', '<')) {
+            // Code compliant from PrestaShop 1.5 to 1.7.4
+            return $this->context->link->getAdminLink('AdminOrders') . '&id_order=' . $orderId . '&vieworder#packetaPickupPointChange';
+        }
+        // Recommended code from PrestaShop 1.7.5
+        return $this->context->link->getAdminLink('AdminOrders', true, [], ['id_order' => $orderId, 'vieworder' => 1]) . '#packetaPickupPointChange';
+    }
+
+    /**
+     * @return bool
+     */
+    private function savePickupPointChange()
+    {
+        $orderId = (int)Tools::getValue('order_id');
+        $pickupPoint = json_decode(Tools::getValue('pickup_point'));
+
+        $packeteryOrderFields = [
+            'id_branch' => (int)$pickupPoint->id,
+            'name_branch' => pSQL($pickupPoint->name),
+            'currency_branch' => pSQL($pickupPoint->currency),
+        ];
+        if ($pickupPoint->pickupPointType == 'external') {
+            $packeteryOrderFields['is_carrier'] = 1;
+            $packeteryOrderFields['id_branch'] = (int)$pickupPoint->carrierId;
+            $packeteryOrderFields['carrier_pickup_point'] = pSQL($pickupPoint->carrierPickupPointId);
+        }
+        return (bool)Db::getInstance()->update('packetery_order', $packeteryOrderFields, '`id_order` = ' . $orderId);
+    }
+
+    /**
+     * removed in 1.7.7 in favor of displayAdminOrderMain
+     * @param array $params parameters provided by PrestaShop
+     */
     public function hookDisplayAdminOrderLeft($params)
     {
         return $this->packeteryHookDisplayAdminOrder($params);
     }
 
-    // since 1.7.7
+    /**
+     * since 1.7.7
+     * @param array $params parameters provided by PrestaShop
+     */
     public function hookDisplayAdminOrderMain($params)
     {
         return $this->packeteryHookDisplayAdminOrder($params);
     }
 
-    public function registerHooksWithVersionCheck()
+    /**
+     * @return string[]
+     */
+    private function getModuleHooksList()
     {
-        $hookName = 'displayAdminOrderMain';
+        $hooks = [
+            'actionOrderHistoryAddAfter',
+            'backOfficeHeader',
+            'displayCarrierExtraContent',
+            'displayHeader',
+            'actionCarrierUpdate',
+            'actionAdminControllerSetMedia',
+        ];
         if (version_compare(_PS_VERSION_, '1.7.7', '<')) {
-            $hookName = 'displayAdminOrderLeft';
+            $hooks[] = 'displayAdminOrderLeft';
+        } else {
+            $hooks[] = 'displayAdminOrderMain';
         }
-        return $this->registerHook($hookName);
+        return $hooks;
     }
 
-    private function unregisterHooksWithVersionCheck()
-    {
-        $hookName = 'displayAdminOrderMain';
-        if (version_compare(_PS_VERSION_, '1.7.7', '<')) {
-            $hookName = 'displayAdminOrderLeft';
-        }
-        return $this->unregisterHook($hookName);
-    }
-
-    // hook used everywhere in administration
+    /**
+     * hook used everywhere in administration
+     */
     public function hookActionAdminControllerSetMedia()
     {
         $this->context->controller->addCSS($this->_path . 'views/css/back.css?v=' . $this->version, 'all', null, false);
