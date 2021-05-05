@@ -30,7 +30,7 @@
     <input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
     <input type="hidden" id="app_identity" name="app_identity" value="{$app_identity}">
     <!--Packetery widget-->
-    <div id="packetery-widget">
+    <div id="packetery-widget" class="clearfix">
         <div class="widget-left">
             <div class="col-md-12">
                 <div class="zas-box">
@@ -57,9 +57,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
-    <div style="clear:both;"></div>
-    <div style="margin: 25px;"></div>
+    <div class="packetery-message-pickup-point-not-selected-error" data-content="{l s='Please select a pick up point before confirming your order' mod='packetery'}"></div>
 </div>
-
-<div class="packetery-message-pickup-point-not-selected-error" data-content="{l s='Please select a pick up point before confirming your order' mod='packetery'}"></div>
