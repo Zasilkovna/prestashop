@@ -663,6 +663,9 @@ class Packetery extends CarrierModule
             'displayHeader',
             'actionCarrierUpdate',
             'actionAdminControllerSetMedia',
+            'displayOrderConfirmation',
+            'displayOrderDetail',
+            'sendMailAlterTemplateVars',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -679,6 +682,78 @@ class Packetery extends CarrierModule
     {
         $this->context->controller->addCSS($this->_path . 'views/css/back.css?v=' . $this->version, 'all', null, false);
         $this->context->controller->addJS($this->_path . 'views/js/back.js?v=' . $this->version);
+    }
+
+    /**
+     * Shows information about selected pickup point, right after information about sent mail
+     * @param array $params
+     * @return string|void
+     */
+    public function hookDisplayOrderConfirmation($params)
+    {
+        if (!isset($params['order'])) {
+            return;
+        }
+        $orderData = Db::getInstance()->getRow(
+            'SELECT `name_branch`, `is_ad` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . ((int)$params['order']->id_cart)
+        );
+        if (!$orderData || (int)$orderData['is_ad'] === 1) {
+            return;
+        }
+
+        $this->context->smarty->assign('title', $this->l('Selected Packeta pickup point'));
+        $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $orderData['name_branch']);
+        return $this->display(__FILE__, 'display_order_confirmation.tpl');
+    }
+
+    /**
+     * Show information about selected pickup point in frontend order detail, between address and products
+     * @param array $params
+     * @return string|void
+     */
+    public function hookDisplayOrderDetail($params)
+    {
+        if (!isset($params['order'])) {
+            return;
+        }
+        $orderData = Db::getInstance()->getRow(
+            'SELECT `name_branch`, `is_ad` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . ((int)$params['order']->id)
+        );
+        if (!$orderData || (int)$orderData['is_ad'] === 1) {
+            return;
+        }
+
+        $this->context->smarty->assign('title', $this->l('Selected Packeta pickup point'));
+        $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $orderData['name_branch']);
+        return $this->display(__FILE__, 'display_order_detail.tpl');
+    }
+
+    /**
+     * Alters variables of order e-mails
+     * inspiration: https://github.com/PrestaShop/ps_legalcompliance/blob/dev/ps_legalcompliance.php
+     * @param array $params
+     */
+    public function hookSendMailAlterTemplateVars($params)
+    {
+        if (
+            !isset($params['template'], $params['template_vars']['{id_order}'], $params['template_vars']['{carrier}']) ||
+            strpos((string)$params['template'], 'order') === false
+        ) {
+            return;
+        }
+
+        $orderData = Db::getInstance()->getRow(
+            'SELECT `name_branch`, `id_branch`, `is_carrier`, `is_ad`
+            FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . ((int)$params['template_vars']['{id_order}'])
+        );
+        if (!$orderData || (int)$orderData['is_ad'] === 1) {
+            return;
+        }
+
+        $params['template_vars']['{carrier}'] .= ' - ' . $orderData['name_branch'];
+        if ((int)$orderData['is_carrier'] === 0) {
+            $params['template_vars']['{carrier}'] .= sprintf(' (%s)', $orderData['id_branch']);
+        }
     }
 
 }

@@ -55,6 +55,7 @@ $_MODULE['<{packetery}prestashop>packetery_ade0fd28ba0f51f9d8ac0c0803b020d0'] = 
 $_MODULE['<{packetery}prestashop>packetery_43e4c4c34b72c8ee0421d21983d8d8a7'] = 'neexportované. Chyba:';
 $_MODULE['<{packetery}prestashop>packetery_b18ce70ed15a7a117141d6ee14f9138c'] = 'Výdejní místo bylo úspěšně změněno.';
 $_MODULE['<{packetery}prestashop>packetery_f1111e5bc2fc07a2985e5273341fbd7b'] = 'Výdejní místo se nepodařilo změnit.';
+$_MODULE['<{packetery}prestashop>packetery_6f95966a9adeb388ffaaa27ca7829365'] = 'Vybrané výdejní místo';
 $_MODULE['<{packetery}prestashop>packetery.class_ddd6dc80580e42e39480b99a2fd30e1e'] = 'Objednávky Zásielkovňa';
 $_MODULE['<{packetery}prestashop>packetery.class_9aa49c5a01dab7e49c73343b47e995a2'] = 'Prosím vyberte pobočku';
 $_MODULE['<{packetery}prestashop>packetery.class_029fb74a19c890683f2c2d8e33431d42'] = 'Chyba při uložení nastavení.';
