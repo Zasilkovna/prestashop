@@ -695,14 +695,15 @@ class Packetery extends CarrierModule
             return;
         }
         $orderData = Db::getInstance()->getRow(
-            'SELECT `name_branch`, `is_ad` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . ((int)$params['order']->id_cart)
+            sprintf('SELECT `name_branch` FROM `%spacketery_order` WHERE `id_cart` = %d AND `is_ad` = 0', _DB_PREFIX_, (int)$params['order']->id_cart)
         );
-        if (!$orderData || (int)$orderData['is_ad'] === 1) {
+        if (!$orderData) {
             return;
         }
 
-        $this->context->smarty->assign('title', $this->l('Selected Packeta pickup point'));
-        $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $orderData['name_branch']);
+        $this->context->smarty->assign('pickupPointLabel', $this->l('Selected Packeta pickup point'));
+        $this->context->smarty->assign('pickupPointName', $orderData['name_branch']);
+
         return $this->display(__FILE__, 'display_order_confirmation.tpl');
     }
 
@@ -717,14 +718,15 @@ class Packetery extends CarrierModule
             return;
         }
         $orderData = Db::getInstance()->getRow(
-            'SELECT `name_branch`, `is_ad` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . ((int)$params['order']->id)
+            sprintf('SELECT `name_branch` FROM `%spacketery_order` WHERE `id_order` = %d AND `is_ad` = 0', _DB_PREFIX_, (int)$params['order']->id)
         );
-        if (!$orderData || (int)$orderData['is_ad'] === 1) {
+        if (!$orderData) {
             return;
         }
 
-        $this->context->smarty->assign('title', $this->l('Selected Packeta pickup point'));
-        $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $orderData['name_branch']);
+        $this->context->smarty->assign('pickupPointLabel', $this->l('Selected Packeta pickup point'));
+        $this->context->smarty->assign('pickupPointName', $orderData['name_branch']);
+
         return $this->display(__FILE__, 'display_order_detail.tpl');
     }
 
@@ -733,7 +735,7 @@ class Packetery extends CarrierModule
      * inspiration: https://github.com/PrestaShop/ps_legalcompliance/blob/dev/ps_legalcompliance.php
      * @param array $params
      */
-    public function hookSendMailAlterTemplateVars($params)
+    public function hookSendMailAlterTemplateVars(&$params)
     {
         if (
             !isset($params['template'], $params['template_vars']['{id_order}'], $params['template_vars']['{carrier}']) ||
@@ -743,15 +745,15 @@ class Packetery extends CarrierModule
         }
 
         $orderData = Db::getInstance()->getRow(
-            'SELECT `name_branch`, `id_branch`, `is_carrier`, `is_ad`
-            FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . ((int)$params['template_vars']['{id_order}'])
+            sprintf('SELECT `name_branch`, `id_branch`, `is_carrier`
+            FROM `%spacketery_order` WHERE `id_order` = %d AND `is_ad` = 0', _DB_PREFIX_, (int)$params['template_vars']['{id_order}'])
         );
-        if (!$orderData || (int)$orderData['is_ad'] === 1) {
+        if (!$orderData) {
             return;
         }
 
         $params['template_vars']['{carrier}'] .= ' - ' . $orderData['name_branch'];
-        if ((int)$orderData['is_carrier'] === 0) {
+        if ((bool)$orderData['is_carrier'] === false) {
             $params['template_vars']['{carrier}'] .= sprintf(' (%s)', $orderData['id_branch']);
         }
     }

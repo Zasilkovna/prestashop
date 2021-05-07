@@ -1,1 +1,1 @@
-<p>{$title}: <strong>{$pickupPointOrAddressDeliveryName}</strong></p>
+<p>{$pickupPointLabel}: <strong>{$pickupPointName}</strong></p>
