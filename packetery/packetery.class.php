@@ -27,6 +27,7 @@ require_once(dirname(__FILE__) . '../../../config/config.inc.php');
 require_once(dirname(__FILE__) . '../../../classes/Cookie.php');
 include_once(dirname(__file__) . '/packetery.api.php');
 require_once(dirname(__FILE__) . '/packetery.php');
+require_once __DIR__ . '/SenderGetReturnRoutingException.php';
 
 class Packeteryclass
 {
@@ -793,11 +794,12 @@ class Packeteryclass
                 try {
                     PacketeryApi::senderGetReturnRouting($value);
                     return false;
-                } catch (SoapFault $e) {
-                    if (isset($e->detail->SenderNotExists)) {
+                } catch (SenderGetReturnRoutingException $e) {
+                    if ($e->senderNotExists === true) {
                         return $packetery->l('Provided sender indication does not exist.');
                     }
-                    return $packetery->l('Sender indication validation failed') . ': ' . $e->getMessage();
+                    PrestaShopLogger::addLog($e->getMessage(), 2, null, null, null, true);
+                    return $packetery->l('Sender indication validation failed');
                 }
                 break;
             default:
