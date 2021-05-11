@@ -29,10 +29,14 @@
 	<br>
 
 	<label class="control-label col-lg-3" for="eshop_id">
-		{l s='E-shop ID' mod='packetery'}
+		{l s='Sender indication' mod='packetery'}
 	</label>
 	<input name="eshop_id" class="setting_input" type="text" data-id="PACKETERY_ESHOP_ID" value="{$settings['PACKETERY_ESHOP_ID']|escape:'htmlall':'UTF-8'}" />
 	<br>
+
+	<label class="control-label col-lg-3"></label>
+	{assign 'clientSectionLink' 'https://client.packeta.com/senders/'}
+	<p>{l s='You can find the sender indication in the client section: [1]%s[/1] in the "indication" field.' mod='packetery' tags=['<a href="%s">'|sprintf:$clientSectionLink] sprintf=[$clientSectionLink]}</p>
 
 	{assign 'labels_format' $settings['PACKETERY_LABEL_FORMAT']}
 	<label class="control-label col-lg-3" for="labels_format">

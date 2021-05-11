@@ -27,6 +27,8 @@ include_once(dirname(__file__) . '/packetery.class.php');
 
 class PacketeryApi
 {
+    const API_WSDL_URL = 'https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl';
+
     /*LABELS*/
     public static function downloadPdfAjax()
     {
@@ -58,7 +60,7 @@ class PacketeryApi
 
     public static function packetLabelPdf($packet, $apiPassword)
     {
-        $client = new SoapClient('https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl');
+        $client = new SoapClient(self::API_WSDL_URL);
         $format = 'A7 on A4';
         $offset = 0;
         try
@@ -213,7 +215,7 @@ class PacketeryApi
 
     public static function createShipmentSoap($packets, $apiPassword)
     {
-        $client = new SoapClient('https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl');
+        $client = new SoapClient(self::API_WSDL_URL);
         try
         {
             $shipment = $client->createShipment($apiPassword, $packets);
@@ -384,7 +386,7 @@ class PacketeryApi
 
     public static function validatePacketSoap($packet_attributes, $apiPassword)
     {
-        $client = new SoapClient('https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl');
+        $client = new SoapClient(self::API_WSDL_URL);
 
         try
         {
@@ -426,7 +428,7 @@ class PacketeryApi
 
     public static function createPacketSoap($packet_attributes, $apiPassword)
     {
-        $client = new SoapClient('https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl');
+        $client = new SoapClient(self::API_WSDL_URL);
         try
         {
             $tracking_number = $client->createPacket($apiPassword, $packet_attributes);
@@ -463,6 +465,17 @@ class PacketeryApi
             }
             return array(0, "$error_msg\n");
         }
+    }
+
+    /**
+     * @param string $senderIndication
+     * @return stdClass with 2 return routing strings for a sender specified by $senderIndication.
+     */
+    public static function senderGetReturnRouting($senderIndication)
+    {
+        $client = new SoapClient(self::API_WSDL_URL);
+        $apiPassword = self::getApiPass();
+        return $client->senderGetReturnRouting($apiPassword, $senderIndication);
     }
 
     public static function getApiKey($apiKey = false)

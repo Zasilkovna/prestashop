@@ -762,6 +762,11 @@ class Packeteryclass
         }
     }
 
+    /**
+     * @param string $id from POST
+     * @param string $value from POST
+     * @return false|string false on success, error message on failure
+     */
     public static function validateOptions($id, $value)
     {
         $packetery = new Packetery();
@@ -785,13 +790,14 @@ class Packeteryclass
                 }
                 break;
             case 'PACKETERY_ESHOP_ID':
-                if (Validate::isString($value))
-                {
+                try {
+                    PacketeryApi::senderGetReturnRouting($value);
                     return false;
-                }
-                else
-                {
-                    return $packetery->l('E-shop ID must be a string');
+                } catch (SoapFault $e) {
+                    if (isset($e->detail->SenderNotExists)) {
+                        return $packetery->l('Provided sender indication does not exist.');
+                    }
+                    return $packetery->l('Sender indication validation failed') . ': ' . $e->getMessage();
                 }
                 break;
             default:
