@@ -51,7 +51,7 @@ class PacketeryApi
             return false;
         }
         $packets = Packeteryclass::getTrackingFromOrders($id_orders);
-        $apiPassword = Packeteryclass::getConfigValueByOption('Apipass');
+        $apiPassword = Configuration::get('PACKETERY_APIPASS');
         $pdf_result = self::packetsLabelsPdf($packets, $apiPassword);
         return $pdf_result;
     }
@@ -89,7 +89,7 @@ class PacketeryApi
     public static function packetsLabelsPdf($packets, $apiPassword)
     {
         $client = new SoapClient("https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl");
-        $format = Packeteryclass::getConfigValueByOption('LABEL_FORMAT');
+        $format = Configuration::get('PACKETERY_LABEL_FORMAT');
         $offset = 0;
         try
         {
@@ -301,7 +301,7 @@ class PacketeryApi
             $cod = 0;
         }
 
-        $shop_name = !empty(Packeteryclass::getConfigValueByOption('ESHOP_ID')) ? Packeteryclass::getConfigValueByOption('ESHOP_ID') : '';
+        $shop_name = Configuration::get('PACKETERY_ESHOP_ID') ?: '';
         $id_customer = $order->id_customer;
         $customer = new Customer($id_customer);
         $customer_fname = $customer->firstname;
@@ -469,7 +469,7 @@ class PacketeryApi
     {
         if (!$apiKey)
         {
-            $apiKey = Packeteryclass::getConfigValueByOption('APIPASS');
+            $apiKey = Configuration::get('PACKETERY_APIPASS');
         }
 
         return substr($apiKey, 0, 16);
@@ -479,7 +479,7 @@ class PacketeryApi
     {
         if (!$apiPassword)
         {
-            $apiPassword = Packeteryclass::getConfigValueByOption('APIPASS');
+            $apiPassword = Configuration::get('PACKETERY_APIPASS');
         }
         return $apiPassword;
     }
@@ -505,7 +505,7 @@ class PacketeryApi
         $branches = self::parseBranches($branch_new_url);
         if (($countBranches = self::countBranches()) && (!$branches))
         {
-            Packeteryclass::updateSetting(4, time());
+            Configuration::updateValue('PACKETERY_LAST_BRANCHES_UPDATE', time());
             return false;
         }
         else
@@ -569,7 +569,7 @@ class PacketeryApi
     {
         $cnt = self::countBranches();
         $lastBranchesUpdate = '';
-        $lastUpdateUnix = Packeteryclass::getConfigValueByOption('LAST_BRANCHES_UPDATE');
+        $lastUpdateUnix = Configuration::get('PACKETERY_LAST_BRANCHES_UPDATE');
         if ($lastUpdateUnix != '')
         {
             $date = new DateTime();

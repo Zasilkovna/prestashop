@@ -240,7 +240,7 @@ class Packeteryclass
             $total = $order->getTotalProductsWithTaxes() + $order->total_shipping_tax_incl + $order->total_wrapping_tax_incl - $order->total_discounts_tax_incl;
             $cod = $packeteryOrder['is_cod'] == 1 ? $total : 0;
 
-            $senderLabel = Packeteryclass::getConfigValueByOption('ESHOP_ID');
+            $senderLabel = Configuration::get('PACKETERY_ESHOP_ID');
 
             $currency = new Currency($order->id_currency);
 
@@ -736,42 +736,6 @@ class Packeteryclass
         return Tools::getAdminToken($tab . (int)Tab::getIdFromClassName($tab) . (int)$id_employee);
     }
 
-    public static function getConfigValueByOption($option)
-    {
-        $sql = 'SELECT value 
-                FROM ' . _DB_PREFIX_ . 'packetery_settings
-                WHERE `option`=\'' . pSQL($option) . '\'';
-        $result = Db::getInstance()->getValue($sql);
-        $value = $result;
-        return $value;
-    }
-
-    public static function getConfig()
-    {
-        $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'packetery_settings';
-        $result = Db::getInstance()->executeS($sql);
-        $settings = array();
-        foreach ($result as $r)
-        {
-            $settings[$r['id']] = array($r['option'], $r['value']);
-        }
-        return $settings;
-    }
-
-    public static function updateSetting($id, $value)
-    {
-        if ($value === "")
-        {
-            $value = NULL;
-        }
-
-        $sql = 'UPDATE ' . _DB_PREFIX_ . 'packetery_settings
-                SET value=\'' . pSQL($value) . '\'
-                WHERE id=' . (int)$id;
-        $result = Db::getInstance()->execute($sql);
-        return $result;
-    }
-
     public static function updateSettings()
     {
         $module = new Packetery;
@@ -780,7 +744,7 @@ class Packeteryclass
         $validation = self::validateOptions($id, $value);
         if (!$validation)
         {
-            $result = self::updateSetting($id, $value);
+            $result = Configuration::updateValue($id, $value);
             if ($result)
             {
                 echo 'true';
@@ -803,7 +767,7 @@ class Packeteryclass
         $packetery = new Packetery();
         switch ($id)
         {
-            case '1':
+            case 'PACKETERY_APIPASS':
                 if (Validate::isString($value))
                 {
                     if (Tools::strlen($value) !== 32)
@@ -820,7 +784,7 @@ class Packeteryclass
                     return $packetery->l('Api password must be string');
                 }
                 break;
-            case '2':
+            case 'PACKETERY_ESHOP_ID':
                 if (Validate::isString($value))
                 {
                     return false;

@@ -7,15 +7,6 @@ if (!defined('_PS_VERSION_')) {
 /* @var $object Packetery */
 function upgrade_module_2_1_5($object)
 {
-    $hookName = 'displayAdminOrderMain';
-    if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
-        $hookName = 'displayAdminOrderLeft';
-    }
-    if (!$object->registerHook($hookName) ||
-        !$object->registerHook('actionAdminControllerSetMedia')) {
-        return false;
-    }
-
     $result = Db::getInstance()->execute('
         DELETE FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
         WHERE `id_branch` = 0;
