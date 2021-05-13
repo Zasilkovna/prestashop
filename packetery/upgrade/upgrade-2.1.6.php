@@ -10,9 +10,42 @@ if (!defined('_PS_VERSION_')) {
  */
 function upgrade_module_2_1_6($object)
 {
-    return $object->registerHook([
+    $hookName = 'displayAdminOrderMain';
+    if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
+        $hookName = 'displayAdminOrderLeft';
+    }
+    $result =  $object->registerHook([
+        $hookName,
+        'actionAdminControllerSetMedia',
         'displayOrderConfirmation',
         'displayOrderDetail',
         'sendMailAlterTemplateVars',
     ]);
+    if ($result === false) {
+        return false;
+    }
+
+    $previousSettings = Db::getInstance()->executeS('SELECT `option`, `value` FROM `' . _DB_PREFIX_ . 'packetery_settings`');
+    if ($previousSettings) {
+        foreach ($previousSettings as $previousSetting) {
+            switch ($previousSetting['option']) {
+                case 'APIPASS':
+                    Configuration::updateValue('PACKETERY_APIPASS', $previousSetting['value']);
+                    break;
+                case 'ESHOP_ID':
+                    Configuration::updateValue('PACKETERY_ESHOP_ID', $previousSetting['value']);
+                    break;
+                case 'LABEL_FORMAT':
+                    Configuration::updateValue('PACKETERY_LABEL_FORMAT', $previousSetting['value']);
+                    break;
+                case 'LAST_BRANCHES_UPDATE':
+                    Configuration::updateValue('PACKETERY_LAST_BRANCHES_UPDATE', $previousSetting['value']);
+                    break;
+                default:
+                    return false;
+            }
+        }
+    }
+
+    return Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_settings`');
 }

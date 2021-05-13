@@ -37,7 +37,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.5';
+		$this->version = '2.1.6';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -78,6 +78,7 @@ class Packetery extends CarrierModule
             return false;
         }
         Configuration::updateValue('PACKETERY_LIVE_MODE', false);
+        Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4');
 
         // backup possible old order table
         if (count($db->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'packetery_order"')) > 0) {
@@ -196,15 +197,17 @@ class Packetery extends CarrierModule
         }
         $this->context->smarty->assign(array('soap_disabled'=> $soap_disabled));
 
-        $labels_format = Packeteryclass::getConfigValueByOption('LABEL_FORMAT');
-        $this->context->smarty->assign('labels_format', $labels_format);
-
         $langs = Language::getLanguages();
         $this->context->smarty->assign('langs', $langs);
 
         $this->context->smarty->assign('module_dir', $this->_path);
         $id_employee = $this->context->employee->id;
-        $settings = Packeteryclass::getConfig();
+        $settings = Configuration::getMultiple([
+            'PACKETERY_APIPASS',
+            'PACKETERY_ESHOP_ID',
+            'PACKETERY_LABEL_FORMAT',
+            'PACKETERY_LAST_BRANCHES_UPDATE',
+        ]);
 
         $this->context->smarty->assign(array('ps_version'=> _PS_VERSION_));
 
@@ -311,9 +314,9 @@ class Packetery extends CarrierModule
         /*BRANCHES*/
         $total_branches = PacketeryApi::countBranches();
         $last_branches_update = '';
-        if ($settings[4][1] != '') {
+        if ((string)$settings['PACKETERY_LAST_BRANCHES_UPDATE'] !== '') {
             $date = new DateTime();
-            $date->setTimestamp($settings[4][1]);
+            $date->setTimestamp($settings['PACKETERY_LAST_BRANCHES_UPDATE']);
             $last_branches_update = $date->format('d.m.Y H:i:s');
         }
         $this->context->smarty->assign(
