@@ -49,3 +49,4 @@
       - Added: information about pickup point or address delivery carrier into order administration
         and possibility to change pickup point using widget
       - Added: information about chosen pickup point to order confirmation, e-mail and history detail
+      - Updated: using native configuration storage
