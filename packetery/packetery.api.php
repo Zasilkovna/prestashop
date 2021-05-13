@@ -301,7 +301,7 @@ class PacketeryApi
             $cod = 0;
         }
 
-        $shop_name = Configuration::get('PACKETERY_ESHOP_ID') ?: '';
+        $shop_name = (Configuration::get('PACKETERY_ESHOP_ID') ?: '');
         $id_customer = $order->id_customer;
         $customer = new Customer($id_customer);
         $customer_fname = $customer->firstname;

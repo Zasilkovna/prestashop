@@ -314,7 +314,7 @@ class Packetery extends CarrierModule
         /*BRANCHES*/
         $total_branches = PacketeryApi::countBranches();
         $last_branches_update = '';
-        if ($settings['PACKETERY_LAST_BRANCHES_UPDATE'] != '') {
+        if ((string)$settings['PACKETERY_LAST_BRANCHES_UPDATE'] !== '') {
             $date = new DateTime();
             $date->setTimestamp($settings['PACKETERY_LAST_BRANCHES_UPDATE']);
             $last_branches_update = $date->format('d.m.Y H:i:s');
