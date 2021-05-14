@@ -53,6 +53,7 @@ $_MODULE['<{packetery}prestashop>packetery_ee90bdb5836984e4bb59875948544ad1'] = 
 $_MODULE['<{packetery}prestashop>packetery_04973e4f636a6a6403c889bdf7e8dd86'] = 'Vyberte prosím cílové výdejní místo jednotlivých objednávek';
 $_MODULE['<{packetery}prestashop>packetery_ade0fd28ba0f51f9d8ac0c0803b020d0'] = 'Nastala chyba při pokusu o aktualizaci výdejních míst, zkontrolujte, zda máte správně zadané heslo API a zkuste spustit aktualizaci znovu.';
 $_MODULE['<{packetery}prestashop>packetery_43e4c4c34b72c8ee0421d21983d8d8a7'] = 'Nevyexportováno! Chyba:';
+$_MODULE['<{packetery}prestashop>packetery_88a4478629eacd06dbbe1a47306a39b9'] = 'Výchozí jednotka hmotnosti pro Váš obchod je: %s. Při exportu zásilek modul nebude u zásilky uvádět její hmotnost. Pokud chcete exportovat hmotnost zásilky je potřeba nastavit výchozí jednotku na kg.';
 $_MODULE['<{packetery}prestashop>packetery_b18ce70ed15a7a117141d6ee14f9138c'] = 'Výdejní místo bylo úspěšně změněno.';
 $_MODULE['<{packetery}prestashop>packetery_f1111e5bc2fc07a2985e5273341fbd7b'] = 'Výdejní místo se nepodařilo změnit.';
 $_MODULE['<{packetery}prestashop>packetery_6f95966a9adeb388ffaaa27ca7829365'] = 'Vybrané výdejní místo';

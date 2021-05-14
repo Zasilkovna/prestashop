@@ -245,6 +245,11 @@ class Packeteryclass
 
             $currency = new Currency($order->id_currency);
 
+            $weight = '';
+            if (Configuration::get('PS_WEIGHT_UNIT') === 'kg') {
+                $weight = $order->getTotalWeight();
+            }
+
             $data[$order_id] = [
                 'Reserved' => "",
                 'OrderNumber' => $order->id,
@@ -256,7 +261,7 @@ class Packeteryclass
                 'COD' => $cod,
                 'Currency' => $currency->iso_code,
                 'Value' => $total,
-                'Weight' => $order->getTotalWeight(),
+                'Weight' => $weight,
                 'PickupPointOrCarrier' => $packeteryOrder['id_branch'],
                 'SenderLabel' => $senderLabel,
                 'AdultContent' => "",

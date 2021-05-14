@@ -324,6 +324,10 @@ class PacketeryApi
             'eshop' => $shop_name,
         );
 
+        if (Configuration::get('PS_WEIGHT_UNIT') === 'kg') {
+            $packet_attributes['weight'] = $order->getTotalWeight();
+        }
+
         if ($packetery_order['is_carrier']) {
             $packet_attributes['carrierPickupPoint'] = $packetery_order['carrier_pickup_point'];
         }

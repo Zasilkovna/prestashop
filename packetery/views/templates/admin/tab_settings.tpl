@@ -21,6 +21,15 @@
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
+
+{if $weightUnitInfo}
+	<div class="col-lg-12">
+		<div class="alert alert-info">
+			{$weightUnitInfo|sprintf:$weightUnit}
+		</div>
+	</div>
+{/if}
+
 <div class="settings-input">
 	<label class="control-label col-lg-3" for="apipass">
 		{l s='API password' mod='packetery'}
