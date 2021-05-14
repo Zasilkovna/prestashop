@@ -27,6 +27,7 @@ require_once(dirname(__FILE__) . '../../../config/config.inc.php');
 require_once(dirname(__FILE__) . '../../../classes/Cookie.php');
 include_once(dirname(__file__) . '/packetery.api.php');
 require_once(dirname(__FILE__) . '/packetery.php');
+require_once __DIR__ . '/SenderGetReturnRoutingException.php';
 
 class Packeteryclass
 {
@@ -762,6 +763,11 @@ class Packeteryclass
         }
     }
 
+    /**
+     * @param string $id from POST
+     * @param string $value from POST
+     * @return false|string false on success, error message on failure
+     */
     public static function validateOptions($id, $value)
     {
         $packetery = new Packetery();
@@ -785,13 +791,14 @@ class Packeteryclass
                 }
                 break;
             case 'PACKETERY_ESHOP_ID':
-                if (Validate::isString($value))
-                {
+                try {
+                    PacketeryApi::senderGetReturnRouting($value);
                     return false;
-                }
-                else
-                {
-                    return $packetery->l('E-shop ID must be a string');
+                } catch (SenderGetReturnRoutingException $e) {
+                    if ($e->senderNotExists === true) {
+                        return $packetery->l('Provided sender indication does not exist.');
+                    }
+                    return sprintf('%s: %s', $packetery->l('Sender indication validation failed'), $e->getMessage());
                 }
                 break;
             default:
