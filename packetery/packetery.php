@@ -120,6 +120,15 @@ class Packetery extends CarrierModule
             }
         }
 
+        if (
+            !Configuration::deleteByName('PACKETERY_APIPASS') ||
+            !Configuration::deleteByName('PACKETERY_ESHOP_ID') ||
+            !Configuration::deleteByName('PACKETERY_LABEL_FORMAT') ||
+            !Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE')
+        ) {
+            return false;
+        }
+
         return parent::uninstall();
     }
 
