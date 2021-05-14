@@ -63,8 +63,8 @@ $_MODULE['<{packetery}prestashop>packetery.class_8d826acd449cf54a4ddfd37819e728e
 $_MODULE['<{packetery}prestashop>packetery.class_1097d15ac9e833bc9ee47161243ebc93'] = 'Nie je možné aktualizovať nastavenie';
 $_MODULE['<{packetery}prestashop>packetery.class_8ea5600de48afe182f5edb18804e4afc'] = 'Api heslo je nesprávne. Pobočky nebudú aktualizované.';
 $_MODULE['<{packetery}prestashop>packetery.class_3a2f7eb090541a1fffae68f276e8d62e'] = 'Api heslo musí byť reťazec';
-$_MODULE['<{packetery}prestashop>packetery.class_d2cfd13754957b947b1fb129f7f00c4b'] = 'Zadané označení odesílatele neexistuje.';
-$_MODULE['<{packetery}prestashop>packetery.class_1e55c11920d6ebc07255263ae03d4974'] = 'Ověření označení odesílatele selhalo';
+$_MODULE['<{packetery}prestashop>packetery_d2cfd13754957b947b1fb129f7f00c4b'] = 'Zadané označení odesílatele neexistuje.';
+$_MODULE['<{packetery}prestashop>packetery_1e55c11920d6ebc07255263ae03d4974'] = 'Ověření označení odesílatele selhalo';
 $_MODULE['<{packetery}prestashop>display_order_main_4a93d9164aad959a6abc2de389170ac9'] = 'Zásilkovna';
 $_MODULE['<{packetery}prestashop>display_order_main_914419aa32f04011357d3b604a86d7eb'] = 'Dopravce';
 $_MODULE['<{packetery}prestashop>display_order_main_ee5c5839980b47f1893220655a3de0fb'] = 'Výdejní místo';
