@@ -469,7 +469,7 @@ class PacketeryApi
 
     /**
      * @param string $senderIndication
-     * @return stdClass with 2 return routing strings for a sender specified by $senderIndication.
+     * @return array with 2 return routing strings for a sender specified by $senderIndication.
      * @throws SenderGetReturnRoutingException
      */
     public static function senderGetReturnRouting($senderIndication)
@@ -477,10 +477,10 @@ class PacketeryApi
         $client = new SoapClient(self::API_WSDL_URL);
         $apiPassword = self::getApiPass();
         try {
-            return $client->senderGetReturnRouting($apiPassword, $senderIndication);
+            $response = $client->senderGetReturnRouting($apiPassword, $senderIndication);
+            return $response->routingSegment;
         } catch (SoapFault $e) {
-            throw new SenderGetReturnRoutingException('Sender indication validation failed',
-                isset($e->detail->SenderNotExists));
+            throw new SenderGetReturnRoutingException($e->getMessage(), isset($e->detail->SenderNotExists));
         }
     }
 

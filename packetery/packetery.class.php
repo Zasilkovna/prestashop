@@ -798,8 +798,7 @@ class Packeteryclass
                     if ($e->senderNotExists === true) {
                         return $packetery->l('Provided sender indication does not exist.');
                     }
-                    PrestaShopLogger::addLog($e->getMessage(), 2, null, null, null, true);
-                    return $packetery->l('Sender indication validation failed');
+                    return sprintf('%s: %s', $packetery->l('Sender indication validation failed'), $e->getMessage());
                 }
                 break;
             default:
