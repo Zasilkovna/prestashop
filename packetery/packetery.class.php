@@ -132,13 +132,11 @@ class Packeteryclass
      */
     public static function getPacketeryOrderRow($id_order)
     {
-        $sql = 'SELECT `id_branch`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point` 
+        $sql = 'SELECT `id_branch`, `id_carrier`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point` 
                     FROM `' . _DB_PREFIX_ . 'packetery_order` 
                     WHERE id_order = ' . (int)$id_order;
 
-        $orders = Db::getInstance()->getRow($sql);
-
-        return $orders;
+        return Db::getInstance()->getRow($sql);
     }
 
     /**
@@ -331,7 +329,24 @@ class Packeteryclass
             return;
         }
 
-        $orderData = [];
+        self::savePacketeryOrder($carrier, $orderId, $cartId, $module, $moduleName);
+    }
+
+    /**
+     * @param array $carrier
+     * @param int $orderId
+     * @param int $cartId
+     * @param Packetery $module
+     * @param string|null $moduleName does not update is_cod when null
+     * @param bool $overwritePickupPoint
+     */
+    public static function savePacketeryOrder(array $carrier, $orderId, $cartId, Packetery $module, $moduleName = null, $overwritePickupPoint = false)
+    {
+        $orderData = [
+            'id_cart' => $cartId,
+            'id_order' => $orderId,
+            'id_carrier' => $carrier['id_carrier'],
+        ];
         if ($carrier['pickup_point_type'] === null) {
             $orderData['id_branch'] = (int)$carrier['id_branch'];
             $orderData['name_branch'] = pSQL($carrier['name_branch']);
@@ -341,34 +356,29 @@ class Packeteryclass
             $isPacketeryOrder = Db::getInstance()->getValue(
                 'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId);
 
-            if (!$isPacketeryOrder) {
-                $orderData['id_branch'] = 0;
+            if (!$isPacketeryOrder || $overwritePickupPoint) {
+                $orderData['id_branch'] = null;
                 $orderData['name_branch'] = $module->l('Please select pickup point');
                 $orderData['currency_branch'] = '';
                 $orderData['is_ad'] = 0;
             }
         }
-
-        $db = Db::getInstance();
-        if (!empty($orderData)) {
-            $orderData['id_cart'] = $cartId;
-            $db->insert('packetery_order', $orderData, false, true, Db::ON_DUPLICATE_KEY);
+        if ($overwritePickupPoint) {
+            $orderData['is_carrier'] = 0;
+            $orderData['carrier_pickup_point'] = null;
         }
-
-        // Update cart order id in packetery_order
-        $fieldsToUpdate['id_order'] = $orderId;
 
         // Determine if is COD
-        $carrier_is_cod = ($carrier['is_cod'] == 1);
-        $payment_is_cod = ($db->getValue(
-                'SELECT `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_payment` 
+        if ($moduleName !== null) {
+            $carrierIsCod = ((int)$carrier['is_cod'] === 1);
+            $paymentIsCod = (Db::getInstance()->getValue(
+                    'SELECT `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_payment` 
                 WHERE module_name="' . pSQL($moduleName) . '"'
-            ) == 1);
-        if ($carrier_is_cod || $payment_is_cod) {
-            $fieldsToUpdate['is_cod'] = 1;
+                ) == 1);
+            $orderData['is_cod'] = ($carrierIsCod || $paymentIsCod);
         }
 
-        $db->update('packetery_order', $fieldsToUpdate, '`id_cart` = ' . $cartId);
+        Db::getInstance()->insert('packetery_order', $orderData, false, true, Db::ON_DUPLICATE_KEY);
     }
 
     /**
@@ -513,7 +523,7 @@ class Packeteryclass
     public static function getPacketeryCarrierById($id_carrier)
     {
         return Db::getInstance()->getRow('
-            SELECT `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`
+            SELECT `id_carrier`, `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`
             FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
             WHERE `id_carrier` = ' . $id_carrier);
     }

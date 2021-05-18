@@ -545,7 +545,10 @@ class Packetery extends CarrierModule
     public function packeteryHookDisplayAdminOrder($params)
     {
         if (Tools::isSubmit('pickup_point_change')) {
-            $updateResult = $this->savePickupPointChange();
+            $updateResult = false;
+            if (Tools::getIsset('pickup_point') && Tools::getValue('pickup_point') !== '') {
+                $updateResult = $this->savePickupPointChange();
+            }
             if ($updateResult) {
                 $message = [
                     'text' => $this->l('Pickup point has been successfully changed.'),
@@ -563,7 +566,7 @@ class Packetery extends CarrierModule
         $apiKey = PacketeryApi::getApiKey();
         $packeteryOrder = Db::getInstance()->getRow(
             'SELECT `po`.`name_branch`, `po`.`is_ad`, `pa`.`id_branch`, `pa`.`pickup_point_type`,
-                `c`.`iso_code` AS `country`
+                `c`.`iso_code` AS `country`, `po`.`id_branch` AS `id_branch_order`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
             JOIN `' . _DB_PREFIX_ . 'address` `a` ON `a`.`id_address` = `o`.`id_address_delivery` 
@@ -573,6 +576,17 @@ class Packetery extends CarrierModule
         );
         if (!$apiKey || !$packeteryOrder) {
             return;
+        }
+
+        if (
+            $packeteryOrder['pickup_point_type'] !== null &&
+            $packeteryOrder['id_branch_order'] === null &&
+            !Tools::isSubmit('pickup_point_change')
+        ) {
+            $this->context->smarty->assign('message', [
+                'text' => $this->l('No pickup point selected for the order. It will not be possible to export the order to Packeta.'),
+                'class' => 'danger',
+            ]);
         }
 
         $isAddressDelivery = (bool)$packeteryOrder['is_ad'];
@@ -678,6 +692,7 @@ class Packetery extends CarrierModule
             'displayOrderConfirmation',
             'displayOrderDetail',
             'sendMailAlterTemplateVars',
+            'actionObjectOrderUpdateBefore',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -767,6 +782,49 @@ class Packetery extends CarrierModule
         $params['template_vars']['{carrier}'] .= ' - ' . $orderData['name_branch'];
         if ((bool)$orderData['is_carrier'] === false) {
             $params['template_vars']['{carrier}'] .= sprintf(' (%s)', $orderData['id_branch']);
+        }
+    }
+
+    /**
+     * @param array $params
+     */
+    public function hookActionObjectOrderUpdateBefore($params) {
+        if (!isset($params['object'], $params['object']->id, $params['object']->id_carrier)) {
+
+            return;
+        }
+        $orderId = (int)$params['object']->id;
+        $cartId = (int)$params['object']->id_cart;
+        $idCarrier = (int)$params['object']->id_carrier;
+
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById($idCarrier);
+
+        $packeteryOrder = Packeteryclass::getPacketeryOrderRow($orderId);
+        if (!$packeteryOrder) {
+            if ($packeteryCarrier) {
+                Packeteryclass::savePacketeryOrder($packeteryCarrier, $orderId, $cartId, $this, $params['object']->module);
+            }
+
+            return;
+        }
+        if ((int)$packeteryOrder['id_carrier'] !== $idCarrier) {
+            if ($packeteryCarrier) {
+                Packeteryclass::savePacketeryOrder($packeteryCarrier, $orderId, $cartId, $this, null, true);
+            } else {
+                Db::getInstance()->execute('DELETE FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . $orderId);
+            }
+
+            return;
+        }
+
+        $addressId = (int)$params['object']->id_address_delivery;
+        $oldAddressId = (int)Db::getInstance()->getValue('SELECT `id_address_delivery` FROM `' . _DB_PREFIX_ . 'orders` WHERE `id_order` = ' . $orderId);
+        if ($oldAddressId !== $addressId) {
+            $oldAddress = new Address($oldAddressId);
+            $address = new Address($addressId);
+            if ($oldAddress->id_country !== $address->id_country) {
+                Packeteryclass::savePacketeryOrder($packeteryCarrier, $orderId, $cartId, $this, null, true);
+            }
         }
     }
 
