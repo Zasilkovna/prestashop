@@ -34,7 +34,7 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_order` (
             `id_cart` int,
             `id_branch` int NULL,
             `name_branch` varchar(255) NOT NULL,
-            `currency_branch` char(3) NOT NULL,
+            `currency_branch` char(3) NULL,
             `is_cod` tinyint(1) NOT NULL DEFAULT 0,
             `exported` tinyint(1) NOT NULL DEFAULT 0,
             `tracking_number` varchar(15) DEFAULT \'\',

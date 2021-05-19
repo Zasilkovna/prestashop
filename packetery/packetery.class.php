@@ -23,11 +23,12 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Exceptions\SenderGetReturnRoutingException;
+
 require_once(dirname(__FILE__) . '../../../config/config.inc.php');
 require_once(dirname(__FILE__) . '../../../classes/Cookie.php');
 include_once(dirname(__file__) . '/packetery.api.php');
 require_once(dirname(__FILE__) . '/packetery.php');
-require_once __DIR__ . '/SenderGetReturnRoutingException.php';
 
 class Packeteryclass
 {
@@ -308,77 +309,6 @@ class Packeteryclass
             $tab->update();
         }
         return true;
-    }
-
-    /**
-     * Save packetery order after order is created
-     * @param $params
-     */
-    public static function hookNewOrder($params)
-    {
-        // tested hookActionOrderHistoryAddAfter
-        $orderId = (int)$params['order_history']->id_order;
-        $cartId = (int)$params['cart']->id;
-        $carrierId = (int)$params['cart']->id_carrier;
-        $order = new Order($orderId);
-        $moduleName = $order->module;
-        $module = new Packetery;
-
-        $carrier = self::getPacketeryCarrierById($carrierId);
-        if (!$carrier) {
-            return;
-        }
-
-        self::savePacketeryOrder($carrier, $orderId, $cartId, $module, $moduleName);
-    }
-
-    /**
-     * @param array $carrier
-     * @param int $orderId
-     * @param int $cartId
-     * @param Packetery $module
-     * @param string|null $moduleName does not update is_cod when null
-     * @param bool $overwritePickupPoint
-     */
-    public static function savePacketeryOrder(array $carrier, $orderId, $cartId, Packetery $module, $moduleName = null, $overwritePickupPoint = false)
-    {
-        $orderData = [
-            'id_cart' => $cartId,
-            'id_order' => $orderId,
-            'id_carrier' => $carrier['id_carrier'],
-        ];
-        if ($carrier['pickup_point_type'] === null) {
-            $orderData['id_branch'] = (int)$carrier['id_branch'];
-            $orderData['name_branch'] = pSQL($carrier['name_branch']);
-            $orderData['currency_branch'] = pSQL($carrier['currency_branch']);
-            $orderData['is_ad'] = 1;
-        } else {
-            $isPacketeryOrder = Db::getInstance()->getValue(
-                'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId);
-
-            if (!$isPacketeryOrder || $overwritePickupPoint) {
-                $orderData['id_branch'] = null;
-                $orderData['name_branch'] = $module->l('Please select pickup point');
-                $orderData['currency_branch'] = '';
-                $orderData['is_ad'] = 0;
-            }
-        }
-        if ($overwritePickupPoint) {
-            $orderData['is_carrier'] = 0;
-            $orderData['carrier_pickup_point'] = null;
-        }
-
-        // Determine if is COD
-        if ($moduleName !== null) {
-            $carrierIsCod = ((int)$carrier['is_cod'] === 1);
-            $paymentIsCod = (Db::getInstance()->getValue(
-                    'SELECT `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_payment` 
-                WHERE module_name="' . pSQL($moduleName) . '"'
-                ) == 1);
-            $orderData['is_cod'] = ($carrierIsCod || $paymentIsCod);
-        }
-
-        Db::getInstance()->insert('packetery_order', $orderData, false, true, Db::ON_DUPLICATE_KEY);
     }
 
     /**

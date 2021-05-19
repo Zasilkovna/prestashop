@@ -23,6 +23,9 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Exceptions\SenderGetReturnRoutingException;
+use Packetery\Order\Order as PacketeryOrder;
+
 include_once(dirname(__file__) . '/packetery.class.php');
 
 class PacketeryApi
@@ -819,7 +822,7 @@ class PacketeryApi
         }
 
         $db = Db::getInstance();
-        $isOrderSaved = $db->getValue('SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . ((int)$id_cart));
+        $isOrderSaved = (new PacketeryOrder)->existsByCart($id_cart);
         if ($isOrderSaved) {
             $result = $db->update('packetery_order', $packeteryOrderFields, '`id_cart` = ' . ((int)$id_cart));
         } else {

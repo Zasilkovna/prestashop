@@ -1,6 +1,8 @@
 <?php
 
-class SenderGetReturnRoutingException extends Exception
+namespace Packetery\Exceptions;
+
+class SenderGetReturnRoutingException extends \Exception
 {
     public $senderNotExists = false;
 
