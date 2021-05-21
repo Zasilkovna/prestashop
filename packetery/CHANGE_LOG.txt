@@ -53,3 +53,4 @@
         and removal of packetery_settings table
       - Added: verifying that the sender indication exists using the senderGetReturnRouting API point
       - Fixed: corrected behavior when changing carrier or address in order administration
+      - Added: Packetery classes loaded using autoloader from libs folder

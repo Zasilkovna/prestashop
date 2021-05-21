@@ -26,7 +26,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery\Order\Order as PacketeryOrder;
+use Packetery\Order\OrderSaver;
+use Packetery\Order\OrderRepo;
+use Packetery\Payment\PaymentRepo;
 
 include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
@@ -35,6 +37,15 @@ require_once __DIR__ . '/autoload.php';
 class Packetery extends CarrierModule
 {
     protected $config_form = false;
+
+    /** @var PaymentRepo */
+    private $paymentRepo;
+
+    /** @var OrderRepo */
+    private $orderRepo;
+
+    /** @var OrderSaver */
+    private $orderSaver;
 
     public function __construct()
     {
@@ -59,6 +70,12 @@ class Packetery extends CarrierModule
         $this->bootstrap = true;
 
         parent::__construct();
+
+        $db = Db::getInstance();
+        $this->paymentRepo = new PaymentRepo($db);
+        $this->orderRepo = new OrderRepo($db);
+        $this->orderSaver = new OrderSaver($this->orderRepo, $this->paymentRepo);
+
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
         $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
         $desc .= $this->l('Export orders to Packeta system.');
@@ -538,7 +555,7 @@ class Packetery extends CarrierModule
      */
     public function hookActionOrderHistoryAddAfter($params)
     {
-        (new PacketeryOrder)->saveAfterActionOrderHistoryAdd($params);
+        $this->orderSaver->saveAfterActionOrderHistoryAdd($params);
     }
     /*END ORDERS*/
 
@@ -813,19 +830,18 @@ class Packetery extends CarrierModule
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById($idCarrier);
 
         $packeteryOrderData = Packeteryclass::getPacketeryOrderRow($orderId);
-        $packeteryOrder = new PacketeryOrder($this);
         if (!$packeteryOrderData) {
             if ($packeteryCarrier) {
-                $packeteryOrder->save($params['object'], $packeteryCarrier);
+                $this->orderSaver->save($params['object'], $packeteryCarrier);
             }
 
             return;
         }
         if ((int)$packeteryOrderData['id_carrier'] !== $idCarrier) {
             if ($packeteryCarrier) {
-                $packeteryOrder->save($params['object'], $packeteryCarrier, true);
+                $this->orderSaver->save($params['object'], $packeteryCarrier, true);
             } else {
-                Db::getInstance()->execute('DELETE FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . $orderId);
+                $this->orderRepo->delete($orderId);
             }
 
             return;
@@ -838,9 +854,9 @@ class Packetery extends CarrierModule
             $address = new Address($addressId);
             if ($oldAddress->id_country !== $address->id_country) {
                 if ($packeteryCarrier['pickup_point_type'] === null) {
-                    $packeteryOrder->clear($orderId);
+                    $this->orderRepo->clear($orderId);
                 } else {
-                    $packeteryOrder->save($params['object'], $packeteryCarrier, true);
+                    $this->orderSaver->save($params['object'], $packeteryCarrier, true);
                 }
             }
         }

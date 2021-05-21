@@ -24,7 +24,7 @@
  */
 
 use Packetery\Exceptions\SenderGetReturnRoutingException;
-use Packetery\Order\Order as PacketeryOrder;
+use Packetery\Order\OrderRepo;
 
 include_once(dirname(__file__) . '/packetery.class.php');
 
@@ -822,7 +822,7 @@ class PacketeryApi
         }
 
         $db = Db::getInstance();
-        $isOrderSaved = (new PacketeryOrder)->existsByCart($id_cart);
+        $isOrderSaved = (new OrderRepo($db))->existsByCart($id_cart);
         if ($isOrderSaved) {
             $result = $db->update('packetery_order', $packeteryOrderFields, '`id_cart` = ' . ((int)$id_cart));
         } else {

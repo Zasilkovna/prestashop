@@ -68,7 +68,9 @@ $_MODULE['<{packetery}prestashop>packetery_d2cfd13754957b947b1fb129f7f00c4b'] = 
 $_MODULE['<{packetery}prestashop>packetery_1e55c11920d6ebc07255263ae03d4974'] = 'Ověření označení odesílatele selhalo';
 $_MODULE['<{packetery}prestashop>display_order_main_4a93d9164aad959a6abc2de389170ac9'] = 'Zásilkovna';
 $_MODULE['<{packetery}prestashop>display_order_main_914419aa32f04011357d3b604a86d7eb'] = 'Dopravce';
+$_MODULE['<{packetery}prestashop>display_order_main_108b7b058f862ee055e273cd8ee3bfaa'] = 'Vyberte prosím znovu způsob přepravy';
 $_MODULE['<{packetery}prestashop>display_order_main_ee5c5839980b47f1893220655a3de0fb'] = 'Výdejní místo';
+$_MODULE['<{packetery}prestashop>display_order_main_9aa49c5a01dab7e49c73343b47e995a2'] = 'Vyberte prosím výdejní místo';
 $_MODULE['<{packetery}prestashop>display_order_main_128ca07a3ac6521356117915e983660d'] = 'Změnit výdejní místo';
 $_MODULE['<{packetery}prestashop>display_order_main_c9cc8cce247e49bae79f15173ce97354'] = 'Uložit';
 $_MODULE['<{packetery}prestashop>tab_orders_6a3a997a0c7df6c54747d82080367a33'] = 'Stránky:';
@@ -102,7 +104,5 @@ $_MODULE['<{packetery}prestashop>tab_settings_4be6bfa1b6a3582a32fcd1653dc24067']
 $_MODULE['<{packetery}prestashop>widget_422f03dbebc5e4e66d1d5b7e4564c355'] = 'Vybrat místo vyzvednutí:';
 $_MODULE['<{packetery}prestashop>widget_81bd9c17af94c31967cdb6870f154d83'] = 'Vybrané místo vyzvednutí:';
 $_MODULE['<{packetery}prestashop>widget_397164405b87202533b09fd47a137141'] = 'Vyberte prosím před potvrzením objednávky výdejní místo';
-$_MODULE['<{packetery}prestashop>packetery_9aa49c5a01dab7e49c73343b47e995a2'] = 'Vyberte prosím výdejní místo';
-$_MODULE['<{packetery}prestashop>packetery_108b7b058f862ee055e273cd8ee3bfaa'] = 'Vyberte prosím znovu způsob přepravy ';
 $_MODULE['<{packetery}prestashop>uninstall_e21a827831f90240feccbb1f8fd8c7e3'] = 'Při odinstalování modulu Zásilkovny nastala výjimka:';
 $_MODULE['<{packetery}prestashop>adminpacketerycontroller_4a93d9164aad959a6abc2de389170ac9'] = 'Zásilkovna';

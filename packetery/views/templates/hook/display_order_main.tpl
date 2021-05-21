@@ -6,9 +6,25 @@
     </div>
     <div class="card-body">
         {if $isAddressDelivery}
-            <p>{l s='Carrier' mod='packetery'}: <strong class="picked-delivery-place">{$pickupPointOrAddressDeliveryName}</strong></p>
+            <p>
+                {l s='Carrier' mod='packetery'}:
+                <strong class="picked-delivery-place">
+                    {if $pickupPointOrAddressDeliveryName}
+                        {$pickupPointOrAddressDeliveryName}
+                    {else}
+                        {l s='Please select shipment method again' mod='packetery'}
+                    {/if}
+                </strong>
+            </p>
         {else}
-            <p>{l s='Pickup point' mod='packetery'}: <strong class="picked-delivery-place">{$pickupPointOrAddressDeliveryName}</strong>
+            <p>{l s='Pickup point' mod='packetery'}:
+                <strong class="picked-delivery-place">
+                    {if $pickupPointOrAddressDeliveryName}
+                        {$pickupPointOrAddressDeliveryName}
+                    {else}
+                        {l s='Please select pickup point' mod='packetery'}
+                    {/if}
+                </strong>
             </p>
             {if $pickupPointChangeAllowed}
                 <form action="{$returnUrl}" method="post">

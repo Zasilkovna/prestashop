@@ -29,6 +29,7 @@ function upgrade_module_2_1_6($object)
     $result = Db::getInstance()->execute('
         ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
         CHANGE `id_branch` `id_branch` int(11) NULL,
+        CHANGE `name_branch` `name_branch` varchar(255) NULL,        
         CHANGE `currency_branch` `currency_branch` char(3) NULL;
     ');
     if ($result === false) {
