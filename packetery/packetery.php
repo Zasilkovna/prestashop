@@ -27,8 +27,8 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use Packetery\Order\OrderSaver;
-use Packetery\Order\OrderRepo;
-use Packetery\Payment\PaymentRepo;
+use Packetery\Order\OrderRepository;
+use Packetery\Payment\PaymentRepository;
 
 include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
@@ -38,11 +38,11 @@ class Packetery extends CarrierModule
 {
     protected $config_form = false;
 
-    /** @var PaymentRepo */
-    private $paymentRepo;
+    /** @var PaymentRepository */
+    private $paymentRepository;
 
-    /** @var OrderRepo */
-    private $orderRepo;
+    /** @var OrderRepository */
+    private $orderRepository;
 
     /** @var OrderSaver */
     private $orderSaver;
@@ -72,9 +72,9 @@ class Packetery extends CarrierModule
         parent::__construct();
 
         $db = Db::getInstance();
-        $this->paymentRepo = new PaymentRepo($db);
-        $this->orderRepo = new OrderRepo($db);
-        $this->orderSaver = new OrderSaver($this->orderRepo, $this->paymentRepo);
+        $this->paymentRepository = new PaymentRepository($db);
+        $this->orderRepository = new OrderRepository($db);
+        $this->orderSaver = new OrderSaver($this->orderRepository, $this->paymentRepository);
 
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
         $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
@@ -564,23 +564,23 @@ class Packetery extends CarrierModule
      */
     public function packeteryHookDisplayAdminOrder($params)
     {
+        $messages = [];
         if (Tools::isSubmit('pickup_point_change')) {
             $updateResult = false;
             if (Tools::getIsset('pickup_point') && Tools::getValue('pickup_point') !== '') {
                 $updateResult = $this->savePickupPointChange();
             }
             if ($updateResult) {
-                $message = [
+                $messages[] = [
                     'text' => $this->l('Pickup point has been successfully changed.'),
                     'class' => 'success',
                 ];
             } else {
-                $message = [
+                $messages[] = [
                     'text' => $this->l('Pickup point could not be changed.'),
                     'class' => 'danger',
                 ];
             }
-            $this->context->smarty->assign('message', $message);
         }
 
         $apiKey = PacketeryApi::getApiKey();
@@ -598,24 +598,20 @@ class Packetery extends CarrierModule
             return;
         }
 
-        if (
-            $packeteryOrder['pickup_point_type'] !== null &&
-            $packeteryOrder['id_branch_order'] === null &&
-            !Tools::isSubmit('pickup_point_change')
-        ) {
-            $this->context->smarty->assign('message', [
+        if ($packeteryOrder['pickup_point_type'] !== null && $packeteryOrder['id_branch_order'] === null) {
+            $messages[] = [
                 'text' => $this->l('No pickup point selected for the order. It will not be possible to export the order to Packeta.'),
                 'class' => 'danger',
-            ]);
+            ];
             // TODO try to open widget automatically
         }
-
         if ($packeteryOrder['pickup_point_type'] === null && (int)$packeteryOrder['id_carrier'] === 0) {
-            $this->context->smarty->assign('message', [
+            $messages[] = [
                 'text' => $this->l('Please select the shipping method so that you can export the order to Packeta.'),
                 'class' => 'danger',
-            ]);
+            ];
         }
+        $this->context->smarty->assign('messages', $messages);
 
         $isAddressDelivery = (bool)$packeteryOrder['is_ad'];
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
@@ -841,7 +837,7 @@ class Packetery extends CarrierModule
             if ($packeteryCarrier) {
                 $this->orderSaver->save($params['object'], $packeteryCarrier, true);
             } else {
-                $this->orderRepo->delete($orderId);
+                $this->orderRepository->delete($orderId);
             }
 
             return;
@@ -854,7 +850,7 @@ class Packetery extends CarrierModule
             $address = new Address($addressId);
             if ($oldAddress->id_country !== $address->id_country) {
                 if ($packeteryCarrier['pickup_point_type'] === null) {
-                    $this->orderRepo->clear($orderId);
+                    $this->orderRepository->clear($orderId);
                 } else {
                     $this->orderSaver->save($params['object'], $packeteryCarrier, true);
                 }

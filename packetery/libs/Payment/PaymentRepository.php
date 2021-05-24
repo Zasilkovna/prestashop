@@ -4,7 +4,7 @@ namespace Packetery\Payment;
 
 use \Db;
 
-class PaymentRepo
+class PaymentRepository
 {
     private $db;
 

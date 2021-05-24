@@ -40,8 +40,10 @@
                     </div>
                 </form>
             {/if}
-            {if isset($message)}
-                <div class="alert alert-{$message.class}">{$message.text}</div>
+            {if isset($messages)}
+                {foreach from=$messages item=message}
+                    <div class="alert alert-{$message.class}">{$message.text}</div>
+                {/foreach}
             {/if}
         {/if}
     </div>

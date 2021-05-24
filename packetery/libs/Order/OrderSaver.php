@@ -6,23 +6,23 @@ use \Packetery;
 use \Order as PrestaShopOrder;
 use \Db;
 use \Packeteryclass;
-use Packetery\Payment\PaymentRepo;
+use Packetery\Payment\PaymentRepository;
 
 class OrderSaver
 {
-    /** @var OrderRepo */
-    private $orderRepo;
+    /** @var OrderRepository */
+    private $orderRepository;
 
-    /** @var PaymentRepo */
-    private $paymentRepo;
+    /** @var PaymentRepository */
+    private $paymentRepository;
 
     /**
      * TODO: later inherit from some Base class
      */
-    public function __construct(OrderRepo $orderRepo, PaymentRepo $paymentRepo)
+    public function __construct(OrderRepository $orderRepository, PaymentRepository $paymentRepository)
     {
-        $this->orderRepo = $orderRepo;
-        $this->paymentRepo = $paymentRepo;
+        $this->orderRepository = $orderRepository;
+        $this->paymentRepository = $paymentRepository;
     }
 
     /**
@@ -61,7 +61,7 @@ class OrderSaver
             $data['currency_branch'] = $packeteryCarrier['currency_branch'];
             $data['is_ad'] = 1;
         } else {
-            $isPacketeryOrder = $this->orderRepo->existsByCart($data['id_cart']);
+            $isPacketeryOrder = $this->orderRepository->existsByCart($data['id_cart']);
             if (!$isPacketeryOrder || $overwritePickupPoint) {
                 $data['id_branch'] = null;
                 $data['name_branch'] = null;
@@ -77,10 +77,10 @@ class OrderSaver
         // Determine if is COD
         if ($order->module) {
             $carrierIsCod = ((int)$packeteryCarrier['is_cod'] === 1);
-            $paymentIsCod = $this->paymentRepo->isCod($order->module);
+            $paymentIsCod = $this->paymentRepository->isCod($order->module);
             $data['is_cod'] = ($carrierIsCod || $paymentIsCod);
         }
 
-        $this->orderRepo->save($data);
+        $this->orderRepository->save($data);
     }
 }

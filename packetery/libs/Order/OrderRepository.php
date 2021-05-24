@@ -4,7 +4,7 @@ namespace Packetery\Order;
 
 use \Db;
 
-class OrderRepo
+class OrderRepository
 {
     private $db;
 
@@ -59,8 +59,9 @@ class OrderRepo
     /**
      * @param int $orderId
      */
-    public function delete($orderId) {
-        $this->db->execute('DELETE FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . $orderId);
+    public function delete($orderId)
+    {
+        $this->db->delete('packetery_order', '`id_order` = ' . $orderId);
     }
 
 }
