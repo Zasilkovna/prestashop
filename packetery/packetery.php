@@ -29,6 +29,8 @@ if (!defined('_PS_VERSION_')) {
 use Packetery\Order\OrderSaver;
 use Packetery\Order\OrderRepository;
 use Packetery\Payment\PaymentRepository;
+use Packetery\Hooks\ActionObjectOrderUpdateBefore;
+use Packetery\Carrier\CarrierTools;
 
 include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
@@ -46,6 +48,12 @@ class Packetery extends CarrierModule
 
     /** @var OrderSaver */
     private $orderSaver;
+
+    /** @var ActionObjectOrderUpdateBefore */
+    private $actionObjectOrderUpdateBefore;
+
+    /** @var CarrierTools */
+    private $carrierTools;
 
     public function __construct()
     {
@@ -75,6 +83,8 @@ class Packetery extends CarrierModule
         $this->paymentRepository = new PaymentRepository($db);
         $this->orderRepository = new OrderRepository($db);
         $this->orderSaver = new OrderSaver($this->orderRepository, $this->paymentRepository);
+        $this->carrierTools = new CarrierTools();
+        $this->actionObjectOrderUpdateBefore = new ActionObjectOrderUpdateBefore($this->orderRepository, $this->orderSaver, $this->carrierTools);
 
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
         $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
@@ -283,17 +293,7 @@ class Packetery extends CarrierModule
         /*AD CARRIER LIST*/
         $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
         foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
-            $carrier = new Carrier($packeteryCarrier['id_carrier']);
-            $carrierZones = $carrier->getZones();
-            $carrierCountries = [];
-            foreach ($carrierZones as $carrierZone) {
-                $zoneCountries = Country::getCountriesByZoneId($carrierZone['id_zone'], Configuration::get('PS_LANG_DEFAULT'));
-                foreach ($zoneCountries as $zoneCountry) {
-                    if ($zoneCountry['active']) {
-                        $carrierCountries[] = $zoneCountry['name'];
-                    }
-                }
-            }
+            list($carrierZones, $carrierCountries) = $this->carrierTools->getZonesAndCountries($packeteryCarrier['id_carrier']);
             $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
             $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
             // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
@@ -815,47 +815,9 @@ class Packetery extends CarrierModule
     /**
      * @param array $params
      */
-    public function hookActionObjectOrderUpdateBefore($params) {
-        if (!isset($params['object'], $params['object']->id, $params['object']->id_carrier)) {
-
-            return;
-        }
-        $orderId = (int)$params['object']->id;
-        $idCarrier = (int)$params['object']->id_carrier;
-
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById($idCarrier);
-
-        $packeteryOrderData = Packeteryclass::getPacketeryOrderRow($orderId);
-        if (!$packeteryOrderData) {
-            if ($packeteryCarrier) {
-                $this->orderSaver->save($params['object'], $packeteryCarrier);
-            }
-
-            return;
-        }
-        if ((int)$packeteryOrderData['id_carrier'] !== $idCarrier) {
-            if ($packeteryCarrier) {
-                $this->orderSaver->save($params['object'], $packeteryCarrier, true);
-            } else {
-                $this->orderRepository->delete($orderId);
-            }
-
-            return;
-        }
-
-        $addressId = (int)$params['object']->id_address_delivery;
-        $oldAddressId = (int)Db::getInstance()->getValue('SELECT `id_address_delivery` FROM `' . _DB_PREFIX_ . 'orders` WHERE `id_order` = ' . $orderId);
-        if ($oldAddressId !== $addressId) {
-            $oldAddress = new Address($oldAddressId);
-            $address = new Address($addressId);
-            if ($oldAddress->id_country !== $address->id_country) {
-                if ($packeteryCarrier['pickup_point_type'] === null) {
-                    $this->orderRepository->clear($orderId);
-                } else {
-                    $this->orderSaver->save($params['object'], $packeteryCarrier, true);
-                }
-            }
-        }
+    public function hookActionObjectOrderUpdateBefore($params)
+    {
+        $this->actionObjectOrderUpdateBefore->execute($params);
     }
 
 }
