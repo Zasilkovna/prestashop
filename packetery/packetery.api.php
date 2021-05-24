@@ -28,6 +28,7 @@ include_once(dirname(__file__) . '/packetery.class.php');
 class PacketeryApi
 {
     const API_WSDL_URL = 'https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl';
+    const PACKET_WEIGHT_UNIT = 'kg';
 
     /*LABELS*/
     public static function downloadPdfAjax()
@@ -324,7 +325,7 @@ class PacketeryApi
             'eshop' => $shop_name,
         );
 
-        if (Configuration::get('PS_WEIGHT_UNIT') === 'kg') {
+        if (Configuration::get('PS_WEIGHT_UNIT') === self::PACKET_WEIGHT_UNIT) {
             $packet_attributes['weight'] = $order->getTotalWeight();
         }
 

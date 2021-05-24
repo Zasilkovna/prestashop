@@ -22,11 +22,11 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 
-{if $weightUnitInfo}
+{if isset($messages)}
 	<div class="col-lg-12">
-		<div class="alert alert-info">
-			{$weightUnitInfo|sprintf:$weightUnit}
-		</div>
+		{foreach from=$messages item=message}
+			<div class="alert alert-{$message.class}">{$message.text}</div>
+		{/foreach}
 	</div>
 {/if}
 

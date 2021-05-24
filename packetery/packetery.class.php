@@ -246,7 +246,7 @@ class Packeteryclass
             $currency = new Currency($order->id_currency);
 
             $weight = '';
-            if (Configuration::get('PS_WEIGHT_UNIT') === 'kg') {
+            if (Configuration::get('PS_WEIGHT_UNIT') === PacketeryApi::PACKET_WEIGHT_UNIT) {
                 $weight = $order->getTotalWeight();
             }
 
