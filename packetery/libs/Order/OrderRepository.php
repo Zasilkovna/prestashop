@@ -40,23 +40,6 @@ class OrderRepository
     }
 
     /**
-     * Sets default values to clear selected shipment method
-     * @param int $orderId
-     */
-    public function clear($orderId)
-    {
-        $this->db->update('packetery_order', [
-            'id_carrier' => 0,
-            'id_branch' => null,
-            'name_branch' => null,
-            'currency_branch' => '',
-            'is_ad' => 0,
-            'is_carrier' => 0,
-            'carrier_pickup_point' => null,
-        ], '`id_order` = ' . $orderId, 0, true);
-    }
-
-    /**
      * @param int $orderId
      */
     public function delete($orderId)
