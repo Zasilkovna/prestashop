@@ -585,31 +585,24 @@ class Packetery extends CarrierModule
 
         $apiKey = PacketeryApi::getApiKey();
         $packeteryOrder = Db::getInstance()->getRow(
-            'SELECT `po`.`name_branch`, `po`.`is_ad`, `pa`.`id_branch`, `pa`.`pickup_point_type`,
-                `c`.`iso_code` AS `country`, `po`.`id_branch` AS `id_branch_order`, `po`.`id_carrier`
+            'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`, `po`.`is_carrier`, 
+                `c`.`iso_code` AS `country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
             JOIN `' . _DB_PREFIX_ . 'address` `a` ON `a`.`id_address` = `o`.`id_address_delivery` 
             JOIN `' . _DB_PREFIX_ . 'country` `c` ON `c`.`id_country` = `a`.`id_country`
-            JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pa` ON `pa`.`id_carrier` = `o`.`id_carrier`
             WHERE `po`.`id_order` = ' . ((int)$params['id_order'])
         );
         if (!$apiKey || !$packeteryOrder) {
             return;
         }
 
-        if ($packeteryOrder['pickup_point_type'] !== null && $packeteryOrder['id_branch_order'] === null) {
+        if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
             $messages[] = [
                 'text' => $this->l('No pickup point selected for the order. It will not be possible to export the order to Packeta.'),
                 'class' => 'danger',
             ];
             // TODO try to open widget automatically
-        }
-        if ($packeteryOrder['pickup_point_type'] === null && (int)$packeteryOrder['id_carrier'] === 0) {
-            $messages[] = [
-                'text' => $this->l('Please select the shipping method so that you can export the order to Packeta.'),
-                'class' => 'danger',
-            ];
         }
         $this->context->smarty->assign('messages', $messages);
 
@@ -640,9 +633,9 @@ class Packetery extends CarrierModule
             'module_dir' => _MODULE_DIR_,
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
         ];
-        if ($packeteryOrder['pickup_point_type'] === 'external') {
+        if ((bool)$packeteryOrder['is_carrier'] === true) {
             $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
-        } else if ($packeteryOrder['pickup_point_type'] === 'internal') {
+        } else if ((bool)$packeteryOrder['is_ad'] === false) {
             $widgetOptions['carriers'] = 'packeta';
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
