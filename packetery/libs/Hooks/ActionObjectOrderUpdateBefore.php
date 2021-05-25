@@ -7,6 +7,7 @@ use Packetery\Order\OrderSaver;
 use Packetery\Order\OrderRepository;
 use \Db;
 use \Address;
+use \Order;
 use \Packeteryclass;
 
 class ActionObjectOrderUpdateBefore
@@ -57,20 +58,29 @@ class ActionObjectOrderUpdateBefore
         }
 
         $addressId = (int)$params['object']->id_address_delivery;
-        $oldAddressId = (int)Db::getInstance()->getValue('SELECT `id_address_delivery` FROM `' . _DB_PREFIX_ . 'orders` WHERE `id_order` = ' . $orderId);
-        if ($oldAddressId !== $addressId) {
-            $oldAddress = new Address($oldAddressId);
-            $address = new Address($addressId);
-            if ($oldAddress->id_country !== $address->id_country) {
-                if ($packeteryCarrier['pickup_point_type'] === null) {
-                    list($carrierZones, $carrierCountries) = $this->carrierTools->getZonesAndCountries($idCarrier, 'id_country');
-                    if (!in_array($address->id_country, $carrierCountries)) {
-                        $this->orderRepository->delete($orderId);
-                    }
-                } else {
-                    $this->orderSaver->save($params['object'], $packeteryCarrier, true);
-                }
-            }
+        $orderOldVersion = new Order($orderId);
+        $oldAddressId = (int)$orderOldVersion->id_address_delivery;
+        if ($oldAddressId === $addressId) {
+
+            return;
+        }
+
+        $address = new Address($addressId);
+        $oldAddress = new Address($oldAddressId);
+        if ($oldAddress->id_country === $address->id_country) {
+
+            return;
+        }
+
+        if ($packeteryCarrier['pickup_point_type'] !== null) {
+            $this->orderSaver->save($params['object'], $packeteryCarrier, true);
+
+            return;
+        }
+
+        list($carrierZones, $carrierCountries) = $this->carrierTools->getZonesAndCountries($idCarrier, 'id_country');
+        if (!in_array($address->id_country, $carrierCountries)) {
+            $this->orderRepository->delete($orderId);
         }
     }
 }

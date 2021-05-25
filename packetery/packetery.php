@@ -585,8 +585,7 @@ class Packetery extends CarrierModule
 
         $apiKey = PacketeryApi::getApiKey();
         $packeteryOrder = Db::getInstance()->getRow(
-            'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`, `po`.`is_carrier`, 
-                `c`.`iso_code` AS `country`
+            'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`, `c`.`iso_code` AS `country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
             JOIN `' . _DB_PREFIX_ . 'address` `a` ON `a`.`id_address` = `o`.`id_address_delivery` 
@@ -633,9 +632,10 @@ class Packetery extends CarrierModule
             'module_dir' => _MODULE_DIR_,
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
         ];
-        if ((bool)$packeteryOrder['is_carrier'] === true) {
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
+        if ($packeteryCarrier['pickup_point_type'] === 'external') {
             $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
-        } else if ((bool)$packeteryOrder['is_ad'] === false) {
+        } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
             $widgetOptions['carriers'] = 'packeta';
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
