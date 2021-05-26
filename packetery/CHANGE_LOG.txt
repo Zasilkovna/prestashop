@@ -52,3 +52,4 @@
       - Updated: using native configuration storage (https://devdocs.prestashop.com/1.7/modules/creation/#the-configuration-object )
         and removal of packetery_settings table
       - Added: verifying that the sender indication exists using the senderGetReturnRouting API point
+      - Added: export of packet weight to API and CSV when using the kg unit, information for user when using another unit
