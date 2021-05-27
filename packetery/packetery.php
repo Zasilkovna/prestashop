@@ -396,6 +396,20 @@ class Packetery extends CarrierModule
         $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
         $this->context->smarty->assign('baseuri', $base_uri);
 
+        $usedWeightUnit = Configuration::get('PS_WEIGHT_UNIT');
+        if ($usedWeightUnit !== PacketeryApi::PACKET_WEIGHT_UNIT) {
+            $messages = [
+                [
+                    'text' => sprintf(
+                        $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to kg.'),
+                        $usedWeightUnit
+                    ),
+                    'class' => 'info',
+                ],
+            ];
+            $this->context->smarty->assign('messages', $messages);
+        }
+
         $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
         $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/prestui/ps-tags.tpl');
         return $output;

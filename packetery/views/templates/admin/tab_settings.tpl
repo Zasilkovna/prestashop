@@ -21,6 +21,15 @@
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
+
+{if isset($messages)}
+	<div class="col-lg-12">
+		{foreach from=$messages item=message}
+			<div class="alert alert-{$message.class}">{$message.text}</div>
+		{/foreach}
+	</div>
+{/if}
+
 <div class="settings-input">
 	<label class="control-label col-lg-3" for="apipass">
 		{l s='API password' mod='packetery'}
