@@ -15,7 +15,7 @@
 	},
 	"scripts": {
 		"phpstan": [
-			"vendor/bin/phpstan analyse src -c phpstan.neon --level 8 --no-progress"
+			"vendor/bin/phpstan analyse packetery -c phpstan.neon --level 8 --no-progress"
 		]
 	},
 	"minimum-stability": "stable"
