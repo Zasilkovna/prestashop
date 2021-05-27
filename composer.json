@@ -1,7 +1,7 @@
 {
 	"name": "zasilkovna/prestashop",
 	"require": {
-		"php": "^5.6 >=<7.3"
+		"php": "^5.6 <=7.3"
 	},
 	"require-dev": {
 		"phpstan/phpstan": "^0.12.74",
