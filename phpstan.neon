@@ -1,4 +1,6 @@
 includes:
+	- vendor/phpstan/phpstan-nette/extension.neon
+	- vendor/phpstan/phpstan-nette/rules.neon
 	- vendor/spaze/phpstan-disallowed-calls/extension.neon
 	- vendor/spaze/phpstan-disallowed-calls/disallowed-dangerous-calls.neon
 	- vendor/spaze/phpstan-disallowed-calls/disallowed-execution-calls.neon
