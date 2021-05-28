@@ -72,15 +72,15 @@ class ActionObjectOrderUpdateBefore
             return;
         }
 
-        if ($packeteryCarrier['pickup_point_type'] !== null) {
-            $this->orderSaver->save($params['object'], $packeteryCarrier, true);
+        list($carrierZones, $carrierCountries) = $this->carrierTools->getZonesAndCountries($idCarrier, 'id_country');
+        if (!in_array($address->id_country, $carrierCountries)) {
+            $this->orderRepository->delete($orderId);
 
             return;
         }
 
-        list($carrierZones, $carrierCountries) = $this->carrierTools->getZonesAndCountries($idCarrier, 'id_country');
-        if (!in_array($address->id_country, $carrierCountries)) {
-            $this->orderRepository->delete($orderId);
+        if ($packeteryCarrier['pickup_point_type'] !== null) {
+            $this->orderSaver->save($params['object'], $packeteryCarrier, true);
         }
     }
 }
