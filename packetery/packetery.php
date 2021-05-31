@@ -579,11 +579,12 @@ class Packetery extends CarrierModule
     public function packeteryHookDisplayAdminOrder($params)
     {
         $messages = [];
-        if (Tools::isSubmit('pickup_point_change')) {
-            $updateResult = false;
-            if (Tools::getIsset('pickup_point') && Tools::getValue('pickup_point') !== '') {
-                $updateResult = $this->savePickupPointChange();
-            }
+        if (
+            Tools::isSubmit('pickup_point_change') &&
+            Tools::getIsset('pickup_point') &&
+            Tools::getValue('pickup_point') !== ''
+        ) {
+            $updateResult = $this->savePickupPointChange();
             if ($updateResult) {
                 $messages[] = [
                     'text' => $this->l('Pickup point has been successfully changed.'),
