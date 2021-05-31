@@ -36,12 +36,13 @@ class ActionObjectOrderUpdateBefore
         }
         $orderId = (int)$params['object']->id;
         $idCarrier = (int)$params['object']->id_carrier;
+        $orderOldVersion = new Order($orderId);
 
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById($idCarrier);
 
         $packeteryOrderData = Packeteryclass::getPacketeryOrderRow($orderId);
         if (!$packeteryOrderData) {
-            if ($packeteryCarrier) {
+            if ($packeteryCarrier && $idCarrier !== (int)$orderOldVersion->id_carrier) {
                 $this->orderSaver->save($params['object'], $packeteryCarrier);
             }
 
@@ -58,7 +59,6 @@ class ActionObjectOrderUpdateBefore
         }
 
         $addressId = (int)$params['object']->id_address_delivery;
-        $orderOldVersion = new Order($orderId);
         $oldAddressId = (int)$orderOldVersion->id_address_delivery;
         if ($oldAddressId === $addressId) {
 
