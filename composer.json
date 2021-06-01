@@ -8,7 +8,7 @@
 		"phpstan/phpstan-nette": "^0.12.14",
 		"spaze/phpstan-disallowed-calls": "^1.1",
 		"roave/security-advisories": "dev-master",
-	  	"prestashop/prestashop": "1.7.7.4"
+	  	"prestashop/prestashop": "1.7.6.9"
 	},
 	"scripts": {
 		"phpstan": [
