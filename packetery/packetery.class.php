@@ -23,11 +23,12 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Exceptions\SenderGetReturnRoutingException;
+
 require_once(dirname(__FILE__) . '../../../config/config.inc.php');
 require_once(dirname(__FILE__) . '../../../classes/Cookie.php');
 include_once(dirname(__file__) . '/packetery.api.php');
 require_once(dirname(__FILE__) . '/packetery.php');
-require_once __DIR__ . '/SenderGetReturnRoutingException.php';
 
 class Packeteryclass
 {
@@ -132,13 +133,11 @@ class Packeteryclass
      */
     public static function getPacketeryOrderRow($id_order)
     {
-        $sql = 'SELECT `id_branch`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point` 
+        $sql = 'SELECT `id_branch`, `id_carrier`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point` 
                     FROM `' . _DB_PREFIX_ . 'packetery_order` 
                     WHERE id_order = ' . (int)$id_order;
 
-        $orders = Db::getInstance()->getRow($sql);
-
-        return $orders;
+        return Db::getInstance()->getRow($sql);
     }
 
     /**
@@ -318,65 +317,6 @@ class Packeteryclass
     }
 
     /**
-     * Save packetery order after order is created
-     * @param $params
-     */
-    public static function hookNewOrder($params)
-    {
-        // tested hookActionOrderHistoryAddAfter
-        $orderId = (int)$params['order_history']->id_order;
-        $cartId = (int)$params['cart']->id;
-        $carrierId = (int)$params['cart']->id_carrier;
-        $order = new Order($orderId);
-        $moduleName = $order->module;
-        $module = new Packetery;
-
-        $carrier = self::getPacketeryCarrierById($carrierId);
-        if (!$carrier) {
-            return;
-        }
-
-        $orderData = [];
-        if ($carrier['pickup_point_type'] === null) {
-            $orderData['id_branch'] = (int)$carrier['id_branch'];
-            $orderData['name_branch'] = pSQL($carrier['name_branch']);
-            $orderData['currency_branch'] = pSQL($carrier['currency_branch']);
-            $orderData['is_ad'] = 1;
-        } else {
-            $isPacketeryOrder = Db::getInstance()->getValue(
-                'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId);
-
-            if (!$isPacketeryOrder) {
-                $orderData['id_branch'] = 0;
-                $orderData['name_branch'] = $module->l('Please select pickup point');
-                $orderData['currency_branch'] = '';
-                $orderData['is_ad'] = 0;
-            }
-        }
-
-        $db = Db::getInstance();
-        if (!empty($orderData)) {
-            $orderData['id_cart'] = $cartId;
-            $db->insert('packetery_order', $orderData, false, true, Db::ON_DUPLICATE_KEY);
-        }
-
-        // Update cart order id in packetery_order
-        $fieldsToUpdate['id_order'] = $orderId;
-
-        // Determine if is COD
-        $carrier_is_cod = ($carrier['is_cod'] == 1);
-        $payment_is_cod = ($db->getValue(
-                'SELECT `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_payment` 
-                WHERE module_name="' . pSQL($moduleName) . '"'
-            ) == 1);
-        if ($carrier_is_cod || $payment_is_cod) {
-            $fieldsToUpdate['is_cod'] = 1;
-        }
-
-        $db->update('packetery_order', $fieldsToUpdate, '`id_cart` = ' . $cartId);
-    }
-
-    /**
      * Set order exported
      * @param $id_order
      * @param $set
@@ -518,7 +458,7 @@ class Packeteryclass
     public static function getPacketeryCarrierById($id_carrier)
     {
         return Db::getInstance()->getRow('
-            SELECT `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`
+            SELECT `id_carrier`, `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`
             FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
             WHERE `id_carrier` = ' . $id_carrier);
     }

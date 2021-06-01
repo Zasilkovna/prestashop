@@ -26,12 +26,34 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use Packetery\Order\OrderSaver;
+use Packetery\Order\OrderRepository;
+use Packetery\Payment\PaymentRepository;
+use Packetery\Hooks\ActionObjectOrderUpdateBefore;
+use Packetery\Carrier\CarrierTools;
+
 include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
+require_once __DIR__ . '/autoload.php';
 
 class Packetery extends CarrierModule
 {
     protected $config_form = false;
+
+    /** @var PaymentRepository */
+    private $paymentRepository;
+
+    /** @var OrderRepository */
+    private $orderRepository;
+
+    /** @var OrderSaver */
+    private $orderSaver;
+
+    /** @var ActionObjectOrderUpdateBefore */
+    private $actionObjectOrderUpdateBefore;
+
+    /** @var CarrierTools */
+    private $carrierTools;
 
     public function __construct()
     {
@@ -56,6 +78,14 @@ class Packetery extends CarrierModule
         $this->bootstrap = true;
 
         parent::__construct();
+
+        $db = Db::getInstance();
+        $this->paymentRepository = new PaymentRepository($db);
+        $this->orderRepository = new OrderRepository($db);
+        $this->orderSaver = new OrderSaver($this->orderRepository, $this->paymentRepository);
+        $this->carrierTools = new CarrierTools();
+        $this->actionObjectOrderUpdateBefore = new ActionObjectOrderUpdateBefore($this->orderRepository, $this->orderSaver, $this->carrierTools);
+
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
         $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
         $desc .= $this->l('Export orders to Packeta system.');
@@ -263,17 +293,7 @@ class Packetery extends CarrierModule
         /*AD CARRIER LIST*/
         $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
         foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
-            $carrier = new Carrier($packeteryCarrier['id_carrier']);
-            $carrierZones = $carrier->getZones();
-            $carrierCountries = [];
-            foreach ($carrierZones as $carrierZone) {
-                $zoneCountries = Country::getCountriesByZoneId($carrierZone['id_zone'], Configuration::get('PS_LANG_DEFAULT'));
-                foreach ($zoneCountries as $zoneCountry) {
-                    if ($zoneCountry['active']) {
-                        $carrierCountries[] = $zoneCountry['name'];
-                    }
-                }
-            }
+            list($carrierZones, $carrierCountries) = $this->carrierTools->getZonesAndCountries($packeteryCarrier['id_carrier']);
             $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
             $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
             // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
@@ -549,7 +569,7 @@ class Packetery extends CarrierModule
      */
     public function hookActionOrderHistoryAddAfter($params)
     {
-        Packeteryclass::hookNewOrder($params);
+        $this->orderSaver->saveAfterActionOrderHistoryAdd($params);
     }
     /*END ORDERS*/
 
@@ -558,43 +578,57 @@ class Packetery extends CarrierModule
      */
     public function packeteryHookDisplayAdminOrder($params)
     {
-        if (Tools::isSubmit('pickup_point_change')) {
+        $messages = [];
+        if (
+            Tools::isSubmit('pickup_point_change') &&
+            Tools::getIsset('pickup_point') &&
+            Tools::getValue('pickup_point') !== ''
+        ) {
             $updateResult = $this->savePickupPointChange();
             if ($updateResult) {
-                $message = [
+                $messages[] = [
                     'text' => $this->l('Pickup point has been successfully changed.'),
                     'class' => 'success',
                 ];
             } else {
-                $message = [
+                $messages[] = [
                     'text' => $this->l('Pickup point could not be changed.'),
                     'class' => 'danger',
                 ];
             }
-            $this->context->smarty->assign('message', $message);
         }
 
         $apiKey = PacketeryApi::getApiKey();
         $packeteryOrder = Db::getInstance()->getRow(
-            'SELECT `po`.`name_branch`, `po`.`is_ad`, `pa`.`id_branch`, `pa`.`pickup_point_type`,
-                `c`.`iso_code` AS `country`
+            'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`, `c`.`iso_code` AS `country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
             JOIN `' . _DB_PREFIX_ . 'address` `a` ON `a`.`id_address` = `o`.`id_address_delivery` 
             JOIN `' . _DB_PREFIX_ . 'country` `c` ON `c`.`id_country` = `a`.`id_country`
-            JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pa` ON `pa`.`id_carrier` = `o`.`id_carrier`
             WHERE `po`.`id_order` = ' . ((int)$params['id_order'])
         );
         if (!$apiKey || !$packeteryOrder) {
             return;
         }
 
+        if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
+            $messages[] = [
+                'text' => $this->l('No pickup point selected for the order. It will not be possible to export the order to Packeta.'),
+                'class' => 'danger',
+            ];
+            // TODO try to open widget automatically
+        }
+        $this->context->smarty->assign('messages', $messages);
+
         $isAddressDelivery = (bool)$packeteryOrder['is_ad'];
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
         $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $packeteryOrder['name_branch']);
-        if (!$isAddressDelivery) {
+        $pickupPointChangeAllowed = false;
+        if (!$isAddressDelivery && (int)$packeteryOrder['id_carrier'] !== 0) {
             $this->preparePickupPointChange($apiKey, $packeteryOrder, (int)$params['id_order']);
+            $pickupPointChangeAllowed = true;
         }
+        $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
@@ -613,9 +647,10 @@ class Packetery extends CarrierModule
             'module_dir' => _MODULE_DIR_,
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
         ];
-        if ($packeteryOrder['pickup_point_type'] === 'external') {
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
+        if ($packeteryCarrier['pickup_point_type'] === 'external') {
             $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
-        } else if ($packeteryOrder['pickup_point_type'] === 'internal') {
+        } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
             $widgetOptions['carriers'] = 'packeta';
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
@@ -692,6 +727,7 @@ class Packetery extends CarrierModule
             'displayOrderConfirmation',
             'displayOrderDetail',
             'sendMailAlterTemplateVars',
+            'actionObjectOrderUpdateBefore',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -782,6 +818,14 @@ class Packetery extends CarrierModule
         if ((bool)$orderData['is_carrier'] === false) {
             $params['template_vars']['{carrier}'] .= sprintf(' (%s)', $orderData['id_branch']);
         }
+    }
+
+    /**
+     * @param array $params
+     */
+    public function hookActionObjectOrderUpdateBefore($params)
+    {
+        $this->actionObjectOrderUpdateBefore->execute($params);
     }
 
 }
