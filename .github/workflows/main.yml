@@ -23,7 +23,7 @@ jobs:
     - name: Install composer deps
       run: |
         # Install app deps
-        composer install --no-interaction --prefer-dist
+        composer install --no-interaction --ignore-platform-reqs
 
     - name: The PHP Security Checker
       uses: symfonycorp/security-checker-action@v2
