@@ -9,11 +9,6 @@
 		"spaze/phpstan-disallowed-calls": "^1.1",
 		"roave/security-advisories": "dev-master"
 	},
-	"autoload": {
-		"classmap": [
-			"packetery/"
-		]
-	},
 	"scripts": {
 		"phpstan": [
 			"vendor/bin/phpstan analyse packetery -c phpstan.neon --level 8"
