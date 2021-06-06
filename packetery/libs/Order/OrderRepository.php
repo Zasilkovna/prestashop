@@ -3,6 +3,8 @@
 namespace Packetery\Order;
 
 use \Db;
+use \PrestaShopDatabaseException;
+use \PrestaShopLogger;
 
 class OrderRepository
 {
@@ -28,15 +30,19 @@ class OrderRepository
 
     /**
      * @param array $data
-     * @throws \PrestaShopDatabaseException
      */
-    public function save($data) {
+    public function save($data)
+    {
         foreach ($data as $key => $value) {
             if (is_string($value)) {
                 $data[$key] = $this->db->escape($value);
             }
         }
-        $this->db->insert('packetery_order', $data, true, true, Db::ON_DUPLICATE_KEY);
+        try {
+            $this->db->insert('packetery_order', $data, true, true, Db::ON_DUPLICATE_KEY);
+        } catch (PrestaShopDatabaseException $exception) {
+            PrestaShopLogger::addLog($exception->getMessage(), 3, null, null, null, true);
+        }
     }
 
     /**
