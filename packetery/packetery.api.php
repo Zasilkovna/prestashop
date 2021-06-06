@@ -23,10 +23,16 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Exceptions\SenderGetReturnRoutingException;
+use Packetery\Order\OrderRepository;
+
 include_once(dirname(__file__) . '/packetery.class.php');
 
 class PacketeryApi
 {
+    const API_WSDL_URL = 'https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl';
+    const PACKET_WEIGHT_UNIT = 'kg';
+
     /*LABELS*/
     public static function downloadPdfAjax()
     {
@@ -51,14 +57,14 @@ class PacketeryApi
             return false;
         }
         $packets = Packeteryclass::getTrackingFromOrders($id_orders);
-        $apiPassword = Packeteryclass::getConfigValueByOption('Apipass');
+        $apiPassword = Configuration::get('PACKETERY_APIPASS');
         $pdf_result = self::packetsLabelsPdf($packets, $apiPassword);
         return $pdf_result;
     }
 
     public static function packetLabelPdf($packet, $apiPassword)
     {
-        $client = new SoapClient('https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl');
+        $client = new SoapClient(self::API_WSDL_URL);
         $format = 'A7 on A4';
         $offset = 0;
         try
@@ -89,7 +95,7 @@ class PacketeryApi
     public static function packetsLabelsPdf($packets, $apiPassword)
     {
         $client = new SoapClient("https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl");
-        $format = Packeteryclass::getConfigValueByOption('LABEL_FORMAT');
+        $format = Configuration::get('PACKETERY_LABEL_FORMAT');
         $offset = 0;
         try
         {
@@ -213,7 +219,7 @@ class PacketeryApi
 
     public static function createShipmentSoap($packets, $apiPassword)
     {
-        $client = new SoapClient('https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl');
+        $client = new SoapClient(self::API_WSDL_URL);
         try
         {
             $shipment = $client->createShipment($apiPassword, $packets);
@@ -301,7 +307,7 @@ class PacketeryApi
             $cod = 0;
         }
 
-        $shop_name = !empty(Packeteryclass::getConfigValueByOption('ESHOP_ID')) ? Packeteryclass::getConfigValueByOption('ESHOP_ID') : '';
+        $shop_name = (Configuration::get('PACKETERY_ESHOP_ID') ?: '');
         $id_customer = $order->id_customer;
         $customer = new Customer($id_customer);
         $customer_fname = $customer->firstname;
@@ -321,6 +327,10 @@ class PacketeryApi
             'value' => $total,
             'eshop' => $shop_name,
         );
+
+        if (Configuration::get('PS_WEIGHT_UNIT') === self::PACKET_WEIGHT_UNIT) {
+            $packet_attributes['weight'] = $order->getTotalWeight();
+        }
 
         if ($packetery_order['is_carrier']) {
             $packet_attributes['carrierPickupPoint'] = $packetery_order['carrier_pickup_point'];
@@ -384,7 +394,7 @@ class PacketeryApi
 
     public static function validatePacketSoap($packet_attributes, $apiPassword)
     {
-        $client = new SoapClient('https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl');
+        $client = new SoapClient(self::API_WSDL_URL);
 
         try
         {
@@ -426,7 +436,7 @@ class PacketeryApi
 
     public static function createPacketSoap($packet_attributes, $apiPassword)
     {
-        $client = new SoapClient('https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl');
+        $client = new SoapClient(self::API_WSDL_URL);
         try
         {
             $tracking_number = $client->createPacket($apiPassword, $packet_attributes);
@@ -465,11 +475,28 @@ class PacketeryApi
         }
     }
 
+    /**
+     * @param string $senderIndication
+     * @return array with 2 return routing strings for a sender specified by $senderIndication.
+     * @throws SenderGetReturnRoutingException
+     */
+    public static function senderGetReturnRouting($senderIndication)
+    {
+        $client = new SoapClient(self::API_WSDL_URL);
+        $apiPassword = self::getApiPass();
+        try {
+            $response = $client->senderGetReturnRouting($apiPassword, $senderIndication);
+            return $response->routingSegment;
+        } catch (SoapFault $e) {
+            throw new SenderGetReturnRoutingException($e->getMessage(), isset($e->detail->SenderNotExists));
+        }
+    }
+
     public static function getApiKey($apiKey = false)
     {
         if (!$apiKey)
         {
-            $apiKey = Packeteryclass::getConfigValueByOption('APIPASS');
+            $apiKey = Configuration::get('PACKETERY_APIPASS');
         }
 
         return substr($apiKey, 0, 16);
@@ -479,7 +506,7 @@ class PacketeryApi
     {
         if (!$apiPassword)
         {
-            $apiPassword = Packeteryclass::getConfigValueByOption('APIPASS');
+            $apiPassword = Configuration::get('PACKETERY_APIPASS');
         }
         return $apiPassword;
     }
@@ -505,7 +532,7 @@ class PacketeryApi
         $branches = self::parseBranches($branch_new_url);
         if (($countBranches = self::countBranches()) && (!$branches))
         {
-            Packeteryclass::updateSetting(4, time());
+            Configuration::updateValue('PACKETERY_LAST_BRANCHES_UPDATE', time());
             return false;
         }
         else
@@ -569,7 +596,7 @@ class PacketeryApi
     {
         $cnt = self::countBranches();
         $lastBranchesUpdate = '';
-        $lastUpdateUnix = Packeteryclass::getConfigValueByOption('LAST_BRANCHES_UPDATE');
+        $lastUpdateUnix = Configuration::get('PACKETERY_LAST_BRANCHES_UPDATE');
         if ($lastUpdateUnix != '')
         {
             $date = new DateTime();
@@ -800,7 +827,7 @@ class PacketeryApi
         }
 
         $db = Db::getInstance();
-        $isOrderSaved = $db->getValue('SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . ((int)$id_cart));
+        $isOrderSaved = (new OrderRepository($db))->existsByCart($id_cart);
         if ($isOrderSaved) {
             $result = $db->update('packetery_order', $packeteryOrderFields, '`id_cart` = ' . ((int)$id_cart));
         } else {

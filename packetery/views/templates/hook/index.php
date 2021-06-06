@@ -1,6 +1,6 @@
 <?php
 /**
- * 2017 Zlab Solutions
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -18,27 +18,17 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
- *  @copyright 2017 Zlab Solutions
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2017 PrestaShop SA
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  International Registered Trademark & Property of PrestaShop SA
  */
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 
-include_once(dirname(__file__).'/packetery.class.php');
-include_once(dirname(__file__).'/packetery.api.php');
-require_once(dirname(__FILE__) . '../../../init.php');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
 
-// TODO: use Context::getContext()->customer->isLogged() instead?
-$token = Tools::getValue('token');
-$real_token = Tools::getToken(false);
-if ($token !== $real_token) {
-    exit;
-}
-
-switch (Tools::getValue('action')) {
-    /*FRONT*/
-    case 'widgetsaveorderbranch':
-        PacketeryApi::widgetSaveOrderBranch();
-        break;
-    default:
-        exit;
-}
+header('Location: ../');
+exit;

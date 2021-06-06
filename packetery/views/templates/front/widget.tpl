@@ -21,44 +21,43 @@
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
-<input type="hidden" name="carrier_id" id="carrier_id" value="{$carrier_id|escape:'htmlall':'UTF-8'}">
-<input type="hidden" id="shop-language" name="shop-language" value="{$language['iso_code']|escape:'htmlall':'UTF-8'}">
-<input type="hidden" id="customer_country" name="customer_country" value="{$customer_country|escape:'htmlall':'UTF-8'}">
-<input type="hidden" id="zpoint_carriers" name="zpoint_carriers" value="{$zpoint_carriers}">
-<input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
-<input type="hidden" id="module_version" name="module_version" value="{$module_version}">
-<!--Packetery widget-->
-<div id="packetery-widget">
-    <div class="widget-left">
-        <div class="col-md-12">
-            <div class="zas-box">
-                <button class="btn btn-sm btn-success pull-left open-packeta-widget"
-                        id="open-packeta-widget">{l s='Select pick-up point:' mod='packetery'}</button>
-                <br>
-                <ul id="selected-branch">
-                    <li>{l s='Selected pick-up point:' mod='packetery'}
-                        <span id="picked-delivery-place" class="picked-delivery-place">{$name_branch}</span>
-                    </li>
-                </ul>
-                <input type="hidden" id="packeta-branch-id" class="packeta-branch-id" name="packeta-branch-id"
-                       value="{$id_branch}">
-                <input type="hidden" id="packeta-api-key" class="packeta-api-key" name="packeta-api-key"
-                       value="{$packeta_api_key}">
-                <input type="hidden" id="packeta-branch-name" class="packeta-branch-name" name="packeta-branch-name"
-                       value="{$name_branch}">
-                <input type="hidden" id="packeta-pickup-point-type" class="packeta-pickup-point-type" name="packeta-pickup-point-type"
-                       value="{$pickup_point_type}">
-                <input type="hidden" id="packeta-carrier-id" class="packeta-carrier-id" name="packeta-carrier-id"
-                       value="{$packeta_carrier_id}">
-                <input type="hidden" id="packeta-carrier-pickup-point-id" class="packeta-carrier-pickup-point-id" name="packeta-carrier-pickup-point-id"
-                       value="{$carrier_pickup_point_id}">
+<div id="packetery-carrier-{$carrier_id|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" name="carrier_id" id="carrier_id" value="{$carrier_id|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="shop-language" name="shop-language" value="{$language['iso_code']|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="customer_country" name="customer_country" value="{$customer_country|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="zpoint_carriers" name="zpoint_carriers" value="{$zpoint_carriers}">
+    <input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
+    <input type="hidden" id="app_identity" name="app_identity" value="{$app_identity}">
+    <!--Packetery widget-->
+    <div id="packetery-widget" class="clearfix">
+        <div class="widget-left">
+            <div class="col-md-12">
+                <div class="zas-box">
+                    <button class="btn btn-sm btn-success pull-left open-packeta-widget"
+                            id="open-packeta-widget">{l s='Select pick-up point:' mod='packetery'}</button>
+                    <br>
+                    <ul id="selected-branch">
+                        <li>{l s='Selected pick-up point:' mod='packetery'}
+                            <span id="picked-delivery-place" class="picked-delivery-place">{$name_branch}</span>
+                        </li>
+                    </ul>
+                    <input type="hidden" id="packeta-branch-id" class="packeta-branch-id" name="packeta-branch-id"
+                           value="{$id_branch}">
+                    <input type="hidden" id="packeta-api-key" class="packeta-api-key" name="packeta-api-key"
+                           value="{$packeta_api_key}">
+                    <input type="hidden" id="packeta-branch-name" class="packeta-branch-name" name="packeta-branch-name"
+                           value="{$name_branch}">
+                    <input type="hidden" id="packeta-pickup-point-type" class="packeta-pickup-point-type" name="packeta-pickup-point-type"
+                           value="{$pickup_point_type}">
+                    <input type="hidden" id="packeta-carrier-id" class="packeta-carrier-id" name="packeta-carrier-id"
+                           value="{$packeta_carrier_id}">
+                    <input type="hidden" id="packeta-carrier-pickup-point-id" class="packeta-carrier-pickup-point-id" name="packeta-carrier-pickup-point-id"
+                           value="{$carrier_pickup_point_id}">
+                </div>
             </div>
         </div>
     </div>
 
-    <div style="clear:both;"></div>
-    <div style="margin: 25px;"></div>
+    <div class="packetery-message-pickup-point-not-selected-error" data-content="{l s='Please select a pick up point before confirming your order' mod='packetery'}"></div>
 </div>
-
-<div class="packetery-message-pickup-point-not-selected-error" data-content="{l s='Please select a pick up point before confirming your order' mod='packetery'}"></div>

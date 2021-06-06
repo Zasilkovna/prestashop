@@ -26,6 +26,12 @@
 
 /* TODO: review all - compare with front/widget.tpl */
 
+.clearfix::after {
+	content: "";
+	clear: both;
+	display: table;
+}
+
 /*WIDGET POPUP*/
 .packetery-widget-status{
 	width: 100%;
@@ -43,6 +49,9 @@
 .packetery_widget_wrapper img {
 	max-height: 250px !important;
 	height: auto;
+}
+#packetery-widget {
+	margin-bottom: 25px;
 }
 #packetery-widget h3{
 	padding-left: 15px;

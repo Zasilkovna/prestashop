@@ -4,6 +4,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/* @var $object Packetery */
 function upgrade_module_2_1_5($object)
 {
     $result = Db::getInstance()->execute('

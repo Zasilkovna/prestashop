@@ -32,9 +32,9 @@ $sql = array();
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_order` (
             `id_order` int,
             `id_cart` int,
-            `id_branch` int NOT NULL,
-            `name_branch` varchar(255) NOT NULL,
-            `currency_branch` char(3) NOT NULL,
+            `id_branch` int NULL,
+            `name_branch` varchar(255) NULL,
+            `currency_branch` char(3) NULL,
             `is_cod` tinyint(1) NOT NULL DEFAULT 0,
             `exported` tinyint(1) NOT NULL DEFAULT 0,
             `tracking_number` varchar(15) DEFAULT \'\',
@@ -59,20 +59,6 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_address_deliv
             `is_cod` tinyint(1) NOT NULL DEFAULT 0,
             `pickup_point_type` varchar(40) NULL
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
-
-$sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'packetery_settings`';
-$sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'packetery_settings` (
-			`id` int(11) NOT NULL AUTO_INCREMENT,
-			`option` varchar(50) NOT NULL,
-			`value` varchar(50) NOT NULL,
-			PRIMARY KEY (`id`)
-		) ENGINE='._MYSQL_ENGINE_.'  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;';
-
-$sql[] = 'INSERT INTO `'._DB_PREFIX_."packetery_settings` (`id`, `option`, `value`) VALUES		  
-			(1, 'APIPASS', ''),
-			(2, 'ESHOP_ID', ''),
-            (3, 'LABEL_FORMAT', 'A7 on A4'),
-            (4, 'LAST_BRANCHES_UPDATE', '');";
 
 $sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'packetery_branch`';
 $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_branch` (

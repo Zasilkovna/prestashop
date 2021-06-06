@@ -21,23 +21,36 @@
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
+
+{if isset($messages)}
+	<div class="col-lg-12">
+		{foreach from=$messages item=message}
+			<div class="alert alert-{$message.class}">{$message.text}</div>
+		{/foreach}
+	</div>
+{/if}
+
 <div class="settings-input">
 	<label class="control-label col-lg-3" for="apipass">
 		{l s='API password' mod='packetery'}
 	</label>
-	<input name="apipass" class="setting_input" type="text" data-id="1" value="{$settings[1][1]|escape:'htmlall':'UTF-8'}"></input>
+	<input name="apipass" class="setting_input" type="text" data-id="PACKETERY_APIPASS" value="{$settings['PACKETERY_APIPASS']|escape:'htmlall':'UTF-8'}" />
 	<br>
 
 	<label class="control-label col-lg-3" for="eshop_id">
-		{l s='E-shop ID' mod='packetery'}
+		{l s='Sender indication' mod='packetery'}
 	</label>
-	<input name="eshop_id" class="setting_input" type="text" data-id="2" value="{$settings[2][1]|escape:'htmlall':'UTF-8'}" />
-	<br>
+	<input name="eshop_id" class="setting_input" type="text" data-id="PACKETERY_ESHOP_ID" value="{$settings['PACKETERY_ESHOP_ID']|escape:'htmlall':'UTF-8'}" />
 
+	<label class="control-label col-lg-3"></label>
+	{assign 'clientSectionLink' 'https://client.packeta.com/senders/'}
+	<div class="help-block">{l s='You can find the sender indication in the client section: [1]%s[/1] in the "indication" field.' mod='packetery' tags=['<a href="%s">'|sprintf:$clientSectionLink] sprintf=[$clientSectionLink]}</div>
+
+	{assign 'labels_format' $settings['PACKETERY_LABEL_FORMAT']}
 	<label class="control-label col-lg-3" for="labels_format">
 		{l s='Labels format' mod='packetery'}
 	</label>
-	<select name="labels_format" class="setting_input labels_format" data-id="3" >
+	<select name="labels_format" class="setting_input labels_format" data-id="PACKETERY_LABEL_FORMAT" >
 		<option value="A7 on A4" {if $labels_format eq 'A7 on A4'}selected{/if}>
 			{l s='1/8 of A4, printed on A4, 8 labels per page' mod='packetery'}
 		</option>

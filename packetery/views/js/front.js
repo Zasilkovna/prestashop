@@ -51,9 +51,13 @@ function PacketeryCheckoutModulesManager() {
     this.getCarrierId = function ($selectedInput) {
         return $selectedInput.val().replace(',', '');
     }
+
+    this.getWidgetParent = function ($selectedInput) {
+        return $('#packetery-carrier-' + this.getCarrierId($selectedInput));
+    }
 }
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
-
+var widgetCarriers;
 
 $(document).ready(function ()
 {
@@ -87,25 +91,24 @@ window.initializePacketaWidget = function ()
     }
 
     var module = packeteryModulesManager.detectModule();
-    window.widgetCarriers = module.getWidgetParent(module.getSelectedInput()).find('#widget_carriers').val();
+    var $widgetParent = packeteryModulesManager.getWidgetParent(module.getSelectedInput());
+    widgetCarriers = $widgetParent.find('#widget_carriers').val();
 
     $('.open-packeta-widget').click(function (e) {
         e.preventDefault();
-        var module_version = $('#module_version').val(); // Get module version for widget
+        var app_identity = $('#app_identity').val(); // Get module version for widget
         var widgetOptions = {
-            appIdentity: 'prestashop-1.7-packeta-' + module_version,
+            appIdentity: app_identity,
             country: country,
             language: language,
         };
-        if (window.widgetCarriers !== '') {
-            widgetOptions.carriers = window.widgetCarriers;
+        if (widgetCarriers !== '') {
+            widgetOptions.carriers = widgetCarriers;
         }
         Packeta.Widget.pick(packetaApiKey, function (pickupPoint)
         {
-            var
-                module = packeteryModulesManager.detectModule(),
-                $selectedDeliveryOption = module.getSelectedInput(),
-                $widgetParent = module.getWidgetParent($selectedDeliveryOption);
+            var $selectedDeliveryOption = module.getSelectedInput();
+            $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
 
             if (pickupPoint != null)
             {
@@ -191,15 +194,15 @@ tools = {
             var
                 $this = $(this),
                 prestashop_carrier_id = packeteryModulesManager.getCarrierId($this),
-                $extra = module.getWidgetParent($this);
-
+                $extra = packeteryModulesManager.getWidgetParent($this);
+          
             // if selected carrier is not Packetery then enable Continue button and we're done here
             if (! $extra.find('#packetery-widget').length) {
                 module.enableSubmitButton();
                 return;
             }
 
-            window.widgetCarriers = $extra.find("#widget_carriers").val();
+            widgetCarriers = $extra.find("#widget_carriers").val();
 
             var id_branch = $extra.find(".packeta-branch-id").val();
             if (id_branch !== '') {

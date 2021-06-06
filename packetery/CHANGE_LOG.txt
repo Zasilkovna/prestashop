@@ -45,3 +45,13 @@
       - Fixed: Undefined index: customer_country in DEV mode
       - Fixed: Upgrade script of version 2.1.3
       - Added: module version to static files
+2.1.6 - Fixed: front.js
+      - Added: information about pickup point or address delivery carrier into order administration
+        and possibility to change pickup point using widget
+      - Added: information about chosen pickup point to order confirmation, e-mail and history detail
+      - Updated: using native configuration storage (https://devdocs.prestashop.com/1.7/modules/creation/#the-configuration-object )
+        and removal of packetery_settings table
+      - Added: verifying that the sender indication exists using the senderGetReturnRouting API point
+      - Fixed: corrected behavior when changing carrier or address in order administration
+      - Added: Packetery classes loaded using autoloader from libs folder
+      - Added: export of packet weight to API and CSV when using the kg unit, information for user when using another unit
