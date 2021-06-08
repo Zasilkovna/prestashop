@@ -343,31 +343,9 @@ class PacketeryApi
 
         if ($is_packetery_ad)
         {
-            $packetery_ad_city = $address_delivery->city;
-            $packetery_ad_zip = str_replace(' ', '', $address_delivery->postcode);
-            $address1 = $address_delivery->address1;
-            $address2 = $address_delivery->address2;
-            $address = $address1 . ' ' . $address2;
-
-            $streetName = $houseNo = '';
-            // Separate street and house no.
-            if (preg_match('/([^\d]+)\s?(.+)/i', $address1, $result))
-            {
-                // $result[1] will have the street name
-                $streetName = $result[1];
-                // and $result[2] is the number part.
-                $houseNo = $result[2];
-            }
-
-            if (empty($houseNo) && !empty($address2))
-            {
-                $houseNo = $address2;
-            }
-
-            $packet_attributes['city'] = $packetery_ad_city;
-            $packet_attributes['zip'] = $packetery_ad_zip;
-            $packet_attributes['street'] = $streetName;
-            $packet_attributes['houseNumber'] = $houseNo;
+            $packet_attributes['city'] = $address_delivery->city;
+            $packet_attributes['zip'] = str_replace(' ', '', $address_delivery->postcode);
+            $packet_attributes['street'] = $address_delivery->address1;
         }
         $customer_company ? $packet_attributes['company'] = "$customer_company" : false;
         $apiPassword = self::getApiPass();

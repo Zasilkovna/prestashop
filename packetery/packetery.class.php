@@ -222,22 +222,6 @@ class Packeteryclass
                 continue;
             }
 
-            /* Try to split address1 to street and house number */
-            $streetName = $houseNo = '';
-            if (preg_match('/([^\d]+)\s?(.+)/i', $address['address1'], $result))
-            {
-                // $result[1] will have the street name
-                $streetName = $result[1];
-                // and $result[2] is the number part.
-                $houseNo = $result[2];
-            }
-
-            /* if house number doesn't exist, use address2 */
-            if (empty($houseNo) && !empty($address['address2']))
-            {
-                $houseNo = $address['address2'];
-            }
-
             $total = $order->getTotalProductsWithTaxes() + $order->total_shipping_tax_incl + $order->total_wrapping_tax_incl - $order->total_discounts_tax_incl;
             $cod = $packeteryOrder['is_cod'] == 1 ? $total : 0;
 
@@ -266,8 +250,8 @@ class Packeteryclass
                 'SenderLabel' => $senderLabel,
                 'AdultContent' => "",
                 'DelayedDelivery' => "",
-                'Street' => $streetName,
-                'House Number' => $houseNo,
+                'Street' => $address['address1'],
+                'House Number' => '',
                 'City' => $address['city'],
                 'ZIP' => $address['postcode'],
                 'CarrierPickupPoint' => $packeteryOrder['carrier_pickup_point'],
