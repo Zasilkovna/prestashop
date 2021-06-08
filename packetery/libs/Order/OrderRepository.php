@@ -53,4 +53,13 @@ class OrderRepository
         $this->db->delete('packetery_order', '`id_order` = ' . $orderId);
     }
 
+    /**
+     * @param $orderId
+     * @param $carrierId
+     */
+    public function updateCarrierId($orderId, $carrierId)
+    {
+        $this->db->update('packetery_order', ['id_carrier' => $carrierId], '`id_order` = ' . $orderId);
+    }
+
 }

@@ -600,7 +600,7 @@ class Packetery extends CarrierModule
 
         $apiKey = PacketeryApi::getApiKey();
         $packeteryOrder = Db::getInstance()->getRow(
-            'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`,
+            'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`, `po`.`is_carrier`,
                     `o`.`id_carrier` AS `id_carrier_ps`, `c`.`iso_code` AS `country` 
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
@@ -631,6 +631,7 @@ class Packetery extends CarrierModule
             $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$packeteryOrder['id_carrier_ps']);
             if ($packeteryCarrier) {
                 $packeteryOrder['id_carrier'] = $packeteryOrder['id_carrier_ps'];
+                $this->orderRepository->updateCarrierId((int)$params['id_order'], (int)$packeteryOrder['id_carrier_ps']);
             }
         }
 
@@ -658,7 +659,11 @@ class Packetery extends CarrierModule
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
         ];
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
-        if ($packeteryCarrier['pickup_point_type'] === 'external' && (int)$packeteryOrder['id_branch'] !== 0) {
+        if (
+            $packeteryCarrier['pickup_point_type'] === 'external' &&
+            (int)$packeteryOrder['id_branch'] !== 0 &&
+            (int)$packeteryOrder['is_carrier'] === 1
+        ) {
             $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
         } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
             $widgetOptions['carriers'] = 'packeta';
