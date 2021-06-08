@@ -600,7 +600,8 @@ class Packetery extends CarrierModule
 
         $apiKey = PacketeryApi::getApiKey();
         $packeteryOrder = Db::getInstance()->getRow(
-            'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`, `c`.`iso_code` AS `country`
+            'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`,
+                    `o`.`id_carrier` AS `id_carrier_ps`, `c`.`iso_code` AS `country` 
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
             JOIN `' . _DB_PREFIX_ . 'address` `a` ON `a`.`id_address` = `o`.`id_address_delivery` 
@@ -611,7 +612,7 @@ class Packetery extends CarrierModule
             return;
         }
 
-        if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
+        if ((bool)$packeteryOrder['is_ad'] === false && (int)$packeteryOrder['id_branch'] === 0) {
             $messages[] = [
                 'text' => $this->l('No pickup point selected for the order. It will not be possible to export the order to Packeta.'),
                 'class' => 'danger',
@@ -624,6 +625,15 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
         $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $packeteryOrder['name_branch']);
         $pickupPointChangeAllowed = false;
+
+        // fix broken orders from version <= 2.1.5
+        if ((int)$packeteryOrder['id_carrier'] === 0) {
+            $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$packeteryOrder['id_carrier_ps']);
+            if ($packeteryCarrier) {
+                $packeteryOrder['id_carrier'] = $packeteryOrder['id_carrier_ps'];
+            }
+        }
+
         if (!$isAddressDelivery && (int)$packeteryOrder['id_carrier'] !== 0) {
             $this->preparePickupPointChange($apiKey, $packeteryOrder, (int)$params['id_order']);
             $pickupPointChangeAllowed = true;
@@ -648,7 +658,7 @@ class Packetery extends CarrierModule
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
         ];
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
-        if ($packeteryCarrier['pickup_point_type'] === 'external') {
+        if ($packeteryCarrier['pickup_point_type'] === 'external' && (int)$packeteryOrder['id_branch'] !== 0) {
             $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
         } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
             $widgetOptions['carriers'] = 'packeta';
