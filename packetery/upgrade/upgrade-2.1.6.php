@@ -53,7 +53,7 @@ function upgrade_module_2_1_6($object)
                     Configuration::updateValue('PACKETERY_LAST_BRANCHES_UPDATE', $previousSetting['value']);
                     break;
                 default:
-                    return false;
+                    break;
             }
         }
     }
