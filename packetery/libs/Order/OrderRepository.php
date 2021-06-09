@@ -56,27 +56,10 @@ class OrderRepository
     /**
      * @param int $orderId
      * @param int $carrierId
+     * @return bool
      */
     public function updateCarrierId($orderId, $carrierId)
     {
-        $this->db->update('packetery_order', ['id_carrier' => $carrierId], '`id_order` = ' . $orderId);
-    }
-
-    public function setIdBranchNull()
-    {
-        $this->db->update('packetery_order', ['id_branch' => null], '`id_branch` = 0', 0, true);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getWithoutIdCarrier()
-    {
-        return $this->db->executeS(
-            'SELECT `po`.`id_order`, `o`.`id_carrier`, `pa`.`id_carrier` AS `id_carrier_pa` 
-            FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
-            JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
-            LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pa` ON `pa`.`id_carrier` = `o`.`id_carrier`
-            WHERE `po`.`id_carrier` = 0');
+        return $this->db->update('packetery_order', ['id_carrier' => $carrierId], '`id_order` = ' . $orderId);
     }
 }

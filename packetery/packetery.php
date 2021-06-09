@@ -652,8 +652,8 @@ class Packetery extends CarrierModule
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
         if (
             $packeteryCarrier['pickup_point_type'] === 'external' &&
-            (int)$packeteryOrder['id_branch'] !== 0 &&
-            (int)$packeteryOrder['is_carrier'] === 1
+            $packeteryOrder['id_branch'] !== null &&
+            (bool)$packeteryOrder['is_carrier'] === true
         ) {
             $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
         } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
