@@ -1,0 +1,169 @@
+<?php
+
+namespace Packetery\Module;
+
+use Packetery;
+use Configuration;
+use Language;
+use PrestaShopException;
+use Tab;
+
+class Installer
+{
+    /** @var Packetery */
+    private $module;
+
+    /**
+     * @param Packetery $module
+     */
+    public function __construct(Packetery $module)
+    {
+        $this->module = $module;
+    }
+
+    /**
+     * @return bool
+     */
+    public function run()
+    {
+        return (
+            $this->updateConfiguration() &&
+            $this->installDatabase() &&
+            $this->module->registerHook($this->module->getModuleHooksList()) &&
+            $this->insertTab()
+        );
+    }
+
+    /**
+     * Creates packetery orders tab
+     * @return bool
+     */
+    private function insertTab()
+    {
+        $tab = new Tab;
+        $id_parent = Tab::getIdFromClassName('AdminParentOrders');
+        $tab->id_parent = $id_parent;
+        $tab->module = 'packetery';
+        $tab->class_name = 'Adminpacketery';
+        $tab->name = $this->createMultiLangField($this->module->l('Packeta Orders'));
+        $tab->position = Tab::getNewLastPosition($id_parent);
+
+        return $tab->add();
+    }
+
+    /**
+     * @param string $field
+     * @return array
+     */
+    private function createMultiLangField($field)
+    {
+        $res = array();
+        foreach (Language::getIDs(true) as $id_lang) {
+            $res[$id_lang] = $field;
+        }
+
+        return $res;
+    }
+
+    /**
+     * @return bool
+     */
+    private function installDatabase()
+    {
+        if (!defined('_MYSQL_ENGINE_')) {
+            define('_MYSQL_ENGINE_', 'MyISAM');
+        }
+
+        $sql = array();
+
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_order` (
+            `id_order` int,
+            `id_cart` int,
+            `id_branch` int NULL,
+            `name_branch` varchar(255) NULL,
+            `currency_branch` char(3) NULL,
+            `is_cod` tinyint(1) NOT NULL DEFAULT 0,
+            `exported` tinyint(1) NOT NULL DEFAULT 0,
+            `tracking_number` varchar(15) DEFAULT \'\',
+            `id_carrier` int DEFAULT 0,
+            `is_ad` int DEFAULT 0,
+            `is_carrier` tinyint(1) NOT NULL DEFAULT 0,
+            `carrier_pickup_point` varchar(40) NULL,      
+            UNIQUE(`id_order`),
+            UNIQUE(`id_cart`)
+        ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_payment` (
+            `module_name` varchar(255) not null primary key,
+            `is_cod` tinyint(1) not null default 0
+        ) engine=' . _MYSQL_ENGINE_ . ' default charset=utf8;';
+
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery` (
+            `id_carrier` int NOT NULL PRIMARY KEY,
+            `id_branch` int NULL,
+            `name_branch` varchar(255) NULL,
+            `currency_branch` char(3) NULL,
+            `is_cod` tinyint(1) NOT NULL DEFAULT 0,
+            `pickup_point_type` varchar(40) NULL
+        ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+
+        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_branch`';
+        $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_branch` (
+            `id_branch` int NOT NULL PRIMARY KEY,
+            `name` varchar(255) NOT NULL,
+            `name_street` varchar(255) NOT NULL,
+            `place` varchar(255) NOT NULL,
+            `street` varchar(255) NOT NULL,
+            `city` varchar(255) NOT NULL,
+            `zip` varchar(255) NOT NULL,
+            `country` varchar(255) NOT NULL,
+            `currency` varchar(255) NOT NULL,
+            `wheelchair_accessible` varchar(255) NOT NULL,
+            `latitude` varchar(255) NOT NULL,
+            `longitude` varchar(255) NOT NULL,
+            `url` varchar(255) NOT NULL,
+            `dressing_room` integer NOT NULL,
+            `claim_assistant` integer NOT NULL,
+            `packet_consignment` integer NOT NULL,
+            `max_weight` integer NOT NULL,
+            `region` varchar(255) NOT NULL,
+            `district` varchar(255) NOT NULL,
+            `label_routing` varchar(255) NOT NULL,
+            `label_name` varchar(255) NOT NULL,
+            `opening_hours` text NOT NULL,
+            `img` text NOT NULL,
+            `opening_hours_short` text NOT NULL,
+            `opening_hours_long` text NOT NULL,
+            `opening_hours_regular` text NOT NULL,
+            `is_ad` int NOT NULL,
+            `is_pickup_point` tinyint(1) NOT NULL DEFAULT 0
+        ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+
+        foreach ($sql as $query) {
+            try {
+                $result = $this->module->db->execute($query);
+                if ($result === false) {
+                    return false;
+                }
+            } catch (PrestaShopException $exception) {
+                PrestaShopLogger::addLog($this->module->l('Exception raised during Packetery module install:') . ' ' .
+                    $exception->getMessage(), 3, null, null, null, true);
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    private function updateConfiguration()
+    {
+        return (
+            Configuration::updateValue('PACKETERY_LIVE_MODE', false) &&
+            Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4')
+        );
+    }
+}

@@ -26,6 +26,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use Packetery\Module\Installer;
+use Packetery\Module\Uninstaller;
 use Packetery\Order\OrderSaver;
 use Packetery\Order\OrderRepository;
 use Packetery\Payment\PaymentRepository;
@@ -39,6 +41,9 @@ require_once __DIR__ . '/autoload.php';
 class Packetery extends CarrierModule
 {
     protected $config_form = false;
+
+    /** @var Db */
+    public $db;
 
     /** @var PaymentRepository */
     private $paymentRepository;
@@ -54,6 +59,12 @@ class Packetery extends CarrierModule
 
     /** @var CarrierTools */
     private $carrierTools;
+
+    /** @var Installer */
+    private $installer;
+
+    /** @var Uninstaller */
+    private $uninstaller;
 
     public function __construct()
     {
@@ -79,12 +90,14 @@ class Packetery extends CarrierModule
 
         parent::__construct();
 
-        $db = Db::getInstance();
-        $this->paymentRepository = new PaymentRepository($db);
-        $this->orderRepository = new OrderRepository($db);
+        $this->db = Db::getInstance();
+        $this->paymentRepository = new PaymentRepository($this->db);
+        $this->orderRepository = new OrderRepository($this->db);
         $this->orderSaver = new OrderSaver($this->orderRepository, $this->paymentRepository);
         $this->carrierTools = new CarrierTools();
         $this->actionObjectOrderUpdateBefore = new ActionObjectOrderUpdateBefore($this->orderRepository, $this->orderSaver, $this->carrierTools);
+        $this->installer = new Installer($this);
+        $this->uninstaller = new Uninstaller($this);
 
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
         $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
@@ -97,65 +110,30 @@ class Packetery extends CarrierModule
     }
 
     /**
-     * Don't forget to create update methods if needed:
-     * http://doc.prestashop.com/display/PS16/Enabling+the+Auto-Update
+     * Don't forget to create upgrade methods if needed:
+     * https://devdocs.prestashop.com/1.7/modules/creation/enabling-auto-update/
+     * @return bool
      */
     public function install()
     {
-        $db = Db::getInstance();
-        if (extension_loaded('curl') == false) {
+        if (extension_loaded('curl') === false) {
             $this->_errors[] = $this->l('You have to enable the cURL extension on your server to install this module');
             return false;
         }
-        Configuration::updateValue('PACKETERY_LIVE_MODE', false);
-        Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4');
 
-        // backup possible old order table
-        if (count($db->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'packetery_order"')) > 0) {
-            $db->execute('RENAME TABLE `' . _DB_PREFIX_ . 'packetery_order` TO `'. _DB_PREFIX_ .'packetery_order_old`');
-            $have_old_table = true;
-        } else {
-            $have_old_table = false;
+        if (!parent::install()) {
+            return false;
         }
 
-        include(dirname(__FILE__).'/sql/install.php');
-
-        // copy data from old order table
-        if ($have_old_table) {
-            $fields = array();
-            foreach ($db->executeS('SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'packetery_order_old`') as $field) {
-                $fields[] = $field['Field'];
-            }
-            $db->execute(
-                'INSERT INTO `' . _DB_PREFIX_ . 'packetery_order`(`' . pSQL(implode('`, `', $fields)) . '`)
-                SELECT * FROM `' . _DB_PREFIX_ . 'packetery_order_old`'
-            );
-            $db->execute('DROP TABLE `' . _DB_PREFIX_ . 'packetery_order_old`');
-        }
-
-        return parent::install() &&
-            $this->registerHook($this->getModuleHooksList()) &&
-            Packeteryclass::insertTab();
+        return $this->installer->run();
     }
 
+    /**
+     * @return bool
+     */
     public function uninstall()
     {
-        Packeteryclass::deleteTab();
-
-        include(dirname(__FILE__).'/sql/uninstall.php');
-
-        foreach ($this->getModuleHooksList() as $hookName) {
-            if (!$this->unregisterHook($hookName)) {
-                return false;
-            }
-        }
-
-        if (
-            !Configuration::deleteByName('PACKETERY_APIPASS') ||
-            !Configuration::deleteByName('PACKETERY_ESHOP_ID') ||
-            !Configuration::deleteByName('PACKETERY_LABEL_FORMAT') ||
-            !Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE')
-        ) {
+        if ($this->uninstaller->run() === false) {
             return false;
         }
 
@@ -715,7 +693,7 @@ class Packetery extends CarrierModule
     /**
      * @return string[]
      */
-    private function getModuleHooksList()
+    public function getModuleHooksList()
     {
         $hooks = [
             'actionOrderHistoryAddAfter',

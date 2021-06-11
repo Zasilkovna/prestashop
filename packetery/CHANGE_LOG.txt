@@ -56,3 +56,5 @@
       - Added: Packetery classes loaded using autoloader from libs folder
       - Added: export of packet weight to API and CSV when using the kg unit, information for user when using another unit
 2.1.7 - Removed: imperfect splitting of address to street and house number
+      - Fixed: handling install and uninstall errors correctly
+      - Updated: packetery orders table is backed up and deleted upon uninstall
