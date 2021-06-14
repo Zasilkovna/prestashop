@@ -31,6 +31,7 @@ use Packetery\Order\OrderRepository;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Hooks\ActionObjectOrderUpdateBefore;
 use Packetery\Carrier\CarrierTools;
+use Packetery\Tools\Logger;
 
 include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
@@ -54,6 +55,9 @@ class Packetery extends CarrierModule
 
     /** @var CarrierTools */
     private $carrierTools;
+
+    /** @var Logger */
+    private $logger;
 
     public function __construct()
     {
@@ -82,7 +86,8 @@ class Packetery extends CarrierModule
         $db = Db::getInstance();
         $this->paymentRepository = new PaymentRepository($db);
         $this->orderRepository = new OrderRepository($db);
-        $this->orderSaver = new OrderSaver($this->orderRepository, $this->paymentRepository);
+        $this->logger = new Logger();
+        $this->orderSaver = new OrderSaver($this->orderRepository, $this->paymentRepository, $this->logger);
         $this->carrierTools = new CarrierTools();
         $this->actionObjectOrderUpdateBefore = new ActionObjectOrderUpdateBefore($this->orderRepository, $this->orderSaver, $this->carrierTools);
 
@@ -828,4 +833,12 @@ class Packetery extends CarrierModule
         $this->actionObjectOrderUpdateBefore->execute($params);
     }
 
+    /**
+     * Process widget response in cart.
+     * @return false|string JSON
+     */
+    public function widgetSaveOrderBranch()
+    {
+        return $this->orderSaver->saveFromWidgetInCart();
+    }
 }

@@ -236,8 +236,13 @@ packetery = {
             beforeSend: function () {
                 $("body").toggleClass("wait");
             },
-            success: function (msg) {
-                return true;
+            success: function (jsonResponse) {
+                if (jsonResponse.result === true) {
+                    return true;
+                } else {
+                    console.error(jsonResponse.message);
+                    return false;
+                }
             },
             complete: function () {
                 $("body").toggleClass("wait");
