@@ -343,31 +343,9 @@ class PacketeryApi
 
         if ($is_packetery_ad)
         {
-            $packetery_ad_city = $address_delivery->city;
-            $packetery_ad_zip = str_replace(' ', '', $address_delivery->postcode);
-            $address1 = $address_delivery->address1;
-            $address2 = $address_delivery->address2;
-            $address = $address1 . ' ' . $address2;
-
-            $streetName = $houseNo = '';
-            // Separate street and house no.
-            if (preg_match('/([^\d]+)\s?(.+)/i', $address1, $result))
-            {
-                // $result[1] will have the street name
-                $streetName = $result[1];
-                // and $result[2] is the number part.
-                $houseNo = $result[2];
-            }
-
-            if (empty($houseNo) && !empty($address2))
-            {
-                $houseNo = $address2;
-            }
-
-            $packet_attributes['city'] = $packetery_ad_city;
-            $packet_attributes['zip'] = $packetery_ad_zip;
-            $packet_attributes['street'] = $streetName;
-            $packet_attributes['houseNumber'] = $houseNo;
+            $packet_attributes['city'] = $address_delivery->city;
+            $packet_attributes['zip'] = str_replace(' ', '', $address_delivery->postcode);
+            $packet_attributes['street'] = $address_delivery->address1;
         }
         $customer_company ? $packet_attributes['company'] = "$customer_company" : false;
         $apiPassword = self::getApiPass();
@@ -787,8 +765,7 @@ class PacketeryApi
         if (!isset($id_cart) ||
             !Tools::getIsset('id_branch') ||
             !Tools::getIsset('name_branch') ||
-            !Tools::getIsset('prestashop_carrier_id') ||
-            !Tools::getIsset('pickup_point_type')
+            !Tools::getIsset('prestashop_carrier_id')
         ) {
             return false;
         }
@@ -796,7 +773,7 @@ class PacketeryApi
         $id_branch = Tools::getValue('id_branch');
         $name_branch = Tools::getValue('name_branch');
         $prestashopCarrierId = Tools::getValue('prestashop_carrier_id');
-        $pickupPointType = Tools::getValue('pickup_point_type');
+        $pickupPointType = (Tools::getIsset('pickup_point_type') ? Tools::getValue('pickup_point_type') : 'internal');
         $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
         $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
 
