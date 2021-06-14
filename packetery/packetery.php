@@ -59,7 +59,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.7';
+		$this->version = '2.1.8';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -109,6 +109,7 @@ class Packetery extends CarrierModule
         }
         Configuration::updateValue('PACKETERY_LIVE_MODE', false);
         Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4');
+        Configuration::updateValue('PACKETERY_WIDGET_OPENING', 'onClick');
 
         // backup possible old order table
         if (count($db->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'packetery_order"')) > 0) {
@@ -154,7 +155,8 @@ class Packetery extends CarrierModule
             !Configuration::deleteByName('PACKETERY_APIPASS') ||
             !Configuration::deleteByName('PACKETERY_ESHOP_ID') ||
             !Configuration::deleteByName('PACKETERY_LABEL_FORMAT') ||
-            !Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE')
+            !Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') ||
+            !Configuration::deleteByName('PACKETERY_WIDGET_OPENING')
         ) {
             return false;
         }
@@ -533,6 +535,7 @@ class Packetery extends CarrierModule
 		$this->context->smarty->assign('baseuri', $base_uri);
 		$this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
 		$this->context->smarty->assign('language', (array)$language);
+        $this->context->smarty->assign('widgetOpening', Configuration::get('PACKETERY_WIDGET_OPENING'));
 		/*END FIELDS FOR AJAX*/
 
 		$output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget.tpl');
