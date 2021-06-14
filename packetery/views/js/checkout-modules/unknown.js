@@ -3,12 +3,14 @@
 // this unknown module support already existed in front.js
 var PacketeryCheckoutModuleUnknown = {
 
+    deliveryInputSelector: '.delivery_option input',
+
     getSelectedInput: function () {
         return $('.delivery_option.selected input');
     },
 
     findDeliveryOptions: function () {
-        return $('.delivery_option input');
+        return $(this.deliveryInputSelector);
     },
 
     enableSubmitButton: function () {

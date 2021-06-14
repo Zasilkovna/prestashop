@@ -55,9 +55,25 @@ function PacketeryCheckoutModulesManager() {
     this.getWidgetParent = function ($selectedInput) {
         return $('#packetery-carrier-' + this.getCarrierId($selectedInput));
     }
+
+    this.openSelectedDeliveryWidget = function ($selectedDeliveryOption) {
+        if ($selectedDeliveryOption.length !== 1) {
+            return;
+        }
+        var $widgetParent = this.getWidgetParent($selectedDeliveryOption);
+        var $widgetButton = $widgetParent.find('.open-packeta-widget');
+        if (
+            $widgetButton.length === 1 &&
+            $widgetParent.find('.packeta-branch-id').val() === '' &&
+            $('iframe #packeta-widget').length === 0
+        ) {
+            $widgetButton.click();
+        }
+    };
+
 }
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
-var widgetCarriers;
+var module;
 
 $(document).ready(function ()
 {
@@ -90,9 +106,13 @@ window.initializePacketaWidget = function ()
         language = shopLanguage;
     }
 
-    var module = packeteryModulesManager.detectModule();
-    var $widgetParent = packeteryModulesManager.getWidgetParent(module.getSelectedInput());
-    widgetCarriers = $widgetParent.find('#widget_carriers').val();
+    module = packeteryModulesManager.detectModule();
+
+    if ($('#widgetOpening').val() === 'rightAway') {
+        $(module.deliveryInputSelector).on('click', function () {
+            packeteryModulesManager.openSelectedDeliveryWidget($(this));
+        });
+    }
 
     $('.open-packeta-widget').click(function (e) {
         e.preventDefault();
@@ -102,14 +122,18 @@ window.initializePacketaWidget = function ()
             country: country,
             language: language,
         };
+        var $selectedDeliveryOption = module.getSelectedInput();
+        if ($selectedDeliveryOption.length === 0) {
+            // in supercheckout after switching country and no delivery is selected
+            return;
+        }
+        var $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
+        var widgetCarriers = $widgetParent.find('#widget_carriers').val();
         if (widgetCarriers !== '') {
             widgetOptions.carriers = widgetCarriers;
         }
         Packeta.Widget.pick(packetaApiKey, function (pickupPoint)
         {
-            var $selectedDeliveryOption = module.getSelectedInput();
-            $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
-
             if (pickupPoint != null)
             {
                 /* Save needed pickup point attributes to inputs */
@@ -155,8 +179,6 @@ window.initializePacketaWidget = function ()
 tools = {
     fixextracontent: function ()
     {
-        var module = packeteryModulesManager.detectModule();
-
         if (module === null) {
             return;
         }
@@ -195,14 +217,12 @@ tools = {
                 $this = $(this),
                 prestashop_carrier_id = packeteryModulesManager.getCarrierId($this),
                 $extra = packeteryModulesManager.getWidgetParent($this);
-          
+
             // if selected carrier is not Packetery then enable Continue button and we're done here
             if (! $extra.find('#packetery-widget').length) {
                 module.enableSubmitButton();
                 return;
             }
-
-            widgetCarriers = $extra.find("#widget_carriers").val();
 
             var id_branch = $extra.find(".packeta-branch-id").val();
             if (id_branch !== '') {
@@ -260,5 +280,10 @@ ajaxs = {
 
 function onShippingLoadedCallback() {
     initializePacketaWidget();
+
+    if ($('#widgetOpening').val() === 'rightAway') {
+        packeteryModulesManager.openSelectedDeliveryWidget(module.getSelectedInput());
+    }
+
     tools.fixextracontent();
 }
