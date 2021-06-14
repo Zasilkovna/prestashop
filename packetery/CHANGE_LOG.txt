@@ -68,3 +68,4 @@
 2.2.0 - Added: compatibility with PrestaShop 1.6
         Added: ability to open widget right after choosing delivery method without the need to click on button
       - Updated: packetery orders table is backed up and deleted upon uninstall
+      - Updated: refactored saving pickup point information in cart

@@ -899,4 +899,14 @@ class Packetery extends CarrierModule
         $actionObjectOrderUpdateBefore = $this->diContainer->get(\Packetery\Hooks\ActionObjectOrderUpdateBefore::class);
         $actionObjectOrderUpdateBefore->execute($params);
     }
+
+    /**
+     * Process widget response in cart.
+     * @return false|string JSON
+     */
+    public function widgetSaveOrderBranch()
+    {
+        $orderSaver = $this->diContainer->get(\Packetery\Order\OrderSaver::class);
+        return $orderSaver->saveFromWidgetInCart();
+    }
 }

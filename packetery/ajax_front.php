@@ -37,7 +37,9 @@ if ($token !== $real_token) {
 switch (Tools::getValue('action')) {
     /*FRONT*/
     case 'saveSelectedBranch':
-        PacketeryApi::widgetSaveOrderBranch();
+        $module = new Packetery();
+        header('Content-Type: application/json');
+        echo $module->widgetSaveOrderBranch();
         break;
     case 'fetchExtraContent':
         echo PacketeryApi::packeteryCreateExtraContent();

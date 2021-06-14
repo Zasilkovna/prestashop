@@ -341,9 +341,13 @@ PacketaModule.ajax = {
                 // todo: To which checkout module does this css class belong? Not Supercheckout PS 1.7, not PS 1.7, not PS 1.6 5-step nor OPC
                 $("body").toggleClass("wait");
             },
-            success: function () {
-                if (typeof onSuccess !== 'undefined') {
-                    onSuccess();
+            success: function (jsonResponse) {
+                if (jsonResponse.result === true) {
+                    if (typeof onSuccess !== 'undefined') {
+                        onSuccess();
+                    }
+                } else {
+                    console.error(jsonResponse.message);
                 }
             },
             complete: function () {
