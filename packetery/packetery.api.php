@@ -765,8 +765,7 @@ class PacketeryApi
         if (!isset($id_cart) ||
             !Tools::getIsset('id_branch') ||
             !Tools::getIsset('name_branch') ||
-            !Tools::getIsset('prestashop_carrier_id') ||
-            !Tools::getIsset('pickup_point_type')
+            !Tools::getIsset('prestashop_carrier_id')
         ) {
             return false;
         }
@@ -774,7 +773,7 @@ class PacketeryApi
         $id_branch = Tools::getValue('id_branch');
         $name_branch = Tools::getValue('name_branch');
         $prestashopCarrierId = Tools::getValue('prestashop_carrier_id');
-        $pickupPointType = Tools::getValue('pickup_point_type');
+        $pickupPointType = (Tools::getIsset('pickup_point_type') ? Tools::getValue('pickup_point_type') : 'internal');
         $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
         $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
 

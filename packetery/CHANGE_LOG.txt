@@ -56,3 +56,4 @@
       - Added: Packetery classes loaded using autoloader from libs folder
       - Added: export of packet weight to API and CSV when using the kg unit, information for user when using another unit
 2.1.7 - Removed: imperfect splitting of address to street and house number
+      - Added: order is processed correctly when using legacy widget v5
