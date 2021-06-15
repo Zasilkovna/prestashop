@@ -152,7 +152,7 @@ window.initializePacketaWidget = function ()
         }, widgetOptions);
     });
 
-    if ($('#widgetAutoopen').val() === '1') {
+    if ($('#widgetAutoOpen').val() === '1') {
         var openWidget = function () {
             tools.openSelectedDeliveryWidget(module.getSelectedInput());
         };

@@ -29,7 +29,7 @@
     <input type="hidden" id="zpoint_carriers" name="zpoint_carriers" value="{$zpoint_carriers}">
     <input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
     <input type="hidden" id="app_identity" name="app_identity" value="{$app_identity}">
-    <input type="hidden" id="widgetAutoopen" name="widgetAutoopen" value="{$widgetAutoopen}">
+    <input type="hidden" id="widgetAutoOpen" name="widgetAutoOpen" value="{$widgetAutoOpen}">
     <!--Packetery widget-->
     <div id="packetery-widget" class="clearfix">
         <div class="widget-left">

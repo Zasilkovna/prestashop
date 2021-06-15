@@ -57,22 +57,22 @@ class Packetery extends CarrierModule
 
     public function __construct()
     {
-		$this->name = 'packetery';
-		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.8';
-		$this->author = 'Packeta s.r.o.';
-		$this->need_instance = 0;
-    	$this->is_configurable = 1;
+        $this->name = 'packetery';
+        $this->tab = 'shipping_logistics';
+        $this->version = '2.1.8';
+        $this->author = 'Packeta s.r.o.';
+        $this->need_instance = 0;
+        $this->is_configurable = 1;
 
-		if(Module::isInstalled($this->name)) {
-			$errors = [];
-			$this->configurationErrors($errors);
-			foreach ($errors as $error) {
-				$this->warning .= $error;
-			}
-		}
+        if (Module::isInstalled($this->name)) {
+            $errors = [];
+            $this->configurationErrors($errors);
+            foreach ($errors as $error) {
+                $this->warning .= $error;
+            }
+        }
 
-		/**
+        /**
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
          */
         $this->bootstrap = true;
@@ -469,7 +469,7 @@ class Packetery extends CarrierModule
     {
         global $language;
 
-		$id_carrier = $params['carrier']['id'];
+        $id_carrier = $params['carrier']['id'];
 
         $zPointCarriers = Db::getInstance()->executeS(
             'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
@@ -478,16 +478,15 @@ class Packetery extends CarrierModule
         );
         $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
 
-		$this->context->smarty->assign('carrier_id', $id_carrier);
+        $this->context->smarty->assign('carrier_id', $id_carrier);
 
-		$name_branch = '';
-		$currency_branch = '';
-		$id_branch = '';
+        $name_branch = '';
+        $currency_branch = '';
+        $id_branch = '';
         $pickupPointType = 'internal';
         $carrierId = '';
         $carrierPickupPointId = '';
-		if(!empty($params['cart']))
-		{
+        if (!empty($params['cart'])) {
             $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
 
             $name_branch = $row['name_branch'];
@@ -521,25 +520,25 @@ class Packetery extends CarrierModule
             $widgetCarriers = 'packeta';
         }
 
-    $this->context->smarty->assign('app_identity', Packeteryclass::APP_IDENTITY_PREFIX . $this->version);
-		$this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
+        $this->context->smarty->assign('app_identity', Packeteryclass::APP_IDENTITY_PREFIX . $this->version);
+        $this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
         $this->context->smarty->assign('widget_carriers', $widgetCarriers);
-		$this->context->smarty->assign('id_branch', $id_branch);
-		$this->context->smarty->assign('name_branch', $name_branch);
-		$this->context->smarty->assign('currency_branch', $currency_branch);
-		$this->context->smarty->assign('pickup_point_type', $pickupPointType);
-		$this->context->smarty->assign('packeta_carrier_id', $carrierId);
-		$this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
+        $this->context->smarty->assign('id_branch', $id_branch);
+        $this->context->smarty->assign('name_branch', $name_branch);
+        $this->context->smarty->assign('currency_branch', $currency_branch);
+        $this->context->smarty->assign('pickup_point_type', $pickupPointType);
+        $this->context->smarty->assign('packeta_carrier_id', $carrierId);
+        $this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
 
-		$base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-		$this->context->smarty->assign('baseuri', $base_uri);
-		$this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
-		$this->context->smarty->assign('language', (array)$language);
-        $this->context->smarty->assign('widgetAutoopen', Configuration::get('PACKETERY_WIDGET_AUTOOPEN'));
-		/*END FIELDS FOR AJAX*/
+        $base_uri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+        $this->context->smarty->assign('baseuri', $base_uri);
+        $this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
+        $this->context->smarty->assign('language', (array)$language);
+        $this->context->smarty->assign('widgetAutoOpen', Configuration::get('PACKETERY_WIDGET_AUTOOPEN'));
+        /*END FIELDS FOR AJAX*/
 
-		$output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget.tpl');
-		return $output;
+        $output = $this->context->smarty->fetch($this->local_path . 'views/templates/front/widget.tpl');
+        return $output;
     }
 
     /**
