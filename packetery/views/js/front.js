@@ -128,7 +128,7 @@ window.initializePacketaWidget = function ()
                 var prestashopCarrierId = packeteryModulesManager.getCarrierId($selectedDeliveryOption);
 
                 /* Save packetery order without order ID - just cart id so we can access carrier data later */
-                packetery.widgetSaveOrderBranch(
+                packetery.savePickupPointInCart(
                     prestashopCarrierId,
                     pickupPoint.id,
                     pickupPoint.name,
@@ -211,7 +211,7 @@ tools = {
                 var widget_carrier_id = $extra.find(".packeta-carrier-id").val();
                 var carrier_pickup_point_id = $extra.find(".packeta-carrier-pickup-point-id").val();
                 module.enableSubmitButton();
-                packetery.widgetSaveOrderBranch(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id);
+                packetery.savePickupPointInCart(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id);
             } else {
                 module.disableSubmitButton();
             }
@@ -220,11 +220,11 @@ tools = {
 }
 
 packetery = {
-    widgetSaveOrderBranch: function (prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id)
+    savePickupPointInCart: function (prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id)
     {
         $.ajax({
             type: 'POST',
-            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=widgetsaveorderbranch' + ajaxs.checkToken(),
+            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=savePickupPointInCart' + ajaxs.checkToken(),
             data: {
                 'prestashop_carrier_id': prestashop_carrier_id,
                 'id_branch': id_branch,

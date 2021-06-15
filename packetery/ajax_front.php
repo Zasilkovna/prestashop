@@ -36,10 +36,10 @@ if ($token !== $real_token) {
 
 switch (Tools::getValue('action')) {
     /*FRONT*/
-    case 'widgetsaveorderbranch':
+    case 'savePickupPointInCart':
         $module = new Packetery();
         header('Content-Type: application/json');
-        echo $module->widgetSaveOrderBranch();
+        echo $module->savePickupPointInCartAjax();
         break;
     default:
         exit;

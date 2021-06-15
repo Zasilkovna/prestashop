@@ -97,7 +97,7 @@ class OrderSaver
      * @return array with result and message
      * @throws PrestaShopException
      */
-    private function saveFromWidgetInCartRun() {
+    private function savePickupPointInCart() {
         $cartId = Context::getContext()->cart->id;
 
         if (!isset($cartId) ||
@@ -107,7 +107,10 @@ class OrderSaver
         ) {
             return [
                 'result' => false,
-                'message' => 'Cart id, carrier id or pickup point details are not set.',
+                'message' => 'Cart id, carrier id or pickup point details are not set: ' . serialize([
+                        'cartId' => $cartId,
+                        'POST' => $_POST,
+                    ]),
             ];
         }
 
@@ -127,7 +130,10 @@ class OrderSaver
         if (!isset($branchCurrency, $isCod)) {
             return [
                 'result' => false,
-                'message' => 'Currency or COD setting could not be obtained.',
+                'message' => 'Currency or COD setting could not be obtained: ' . serialize([
+                        'branchCurrency' => $branchCurrency,
+                        'isCod' => $isCod,
+                    ]),
             ];
         }
 
@@ -166,9 +172,9 @@ class OrderSaver
     /**
      * @return false|string JSON
      */
-    public function saveFromWidgetInCart() {
+    public function savePickupPointInCartGetJson() {
         try {
-            $result = $this->saveFromWidgetInCartRun();
+            $result = $this->savePickupPointInCart();
         } catch (PrestaShopException $exception) {
             $result = [
                 'result' => false,
