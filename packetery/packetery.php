@@ -904,9 +904,9 @@ class Packetery extends CarrierModule
      * Process widget response in cart.
      * @return false|string JSON
      */
-    public function widgetSaveOrderBranch()
+    public function savePickupPointInCartAjax()
     {
         $orderSaver = $this->diContainer->get(\Packetery\Order\OrderSaver::class);
-        return $orderSaver->saveFromWidgetInCart();
+        return $orderSaver->savePickupPointInCartGetJson();
     }
 }

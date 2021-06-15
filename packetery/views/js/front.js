@@ -97,13 +97,14 @@ PacketaModule.runner = {
             var widgetCarrierId = $extra.find(".packeta-carrier-id").val();
             var carrierPickupPointId = $extra.find(".packeta-carrier-pickup-point-id").val();
 
-            PacketaModule.ajax.saveSelectedBranch(
+            PacketaModule.ajax.savePickupPointInCart(
                 prestashopCarrierId,
                 branchId,
                 branchName,
                 pickupPointType,
                 widgetCarrierId,
                 carrierPickupPointId,
+                // todo 197 anonymni fce + zpracovani json
                 PacketaModule.ui.toggleSubmit
             );
         } else {
@@ -284,7 +285,7 @@ PacketaModule.ui = {
                 var prestashopCarrierId = packeteryModulesManager.getCarrierId(selectedInput);
 
                 /* Save packetery order without order ID - just cart id so we can access carrier data later */
-                PacketaModule.ajax.saveSelectedBranch(
+                PacketaModule.ajax.savePickupPointInCart(
                     prestashopCarrierId,
                     pickupPoint.id,
                     pickupPoint.name,
@@ -356,8 +357,8 @@ PacketaModule.ajax = {
         });
     },
 
-    saveSelectedBranch: function (prestashopCarrierId, branchId, branchName, pickupPointType, widgetCarrierId, carrierPickupPointId, onSuccess) {
-        return PacketaModule.ajax.post('saveSelectedBranch', {
+    savePickupPointInCart: function (prestashopCarrierId, branchId, branchName, pickupPointType, widgetCarrierId, carrierPickupPointId, onSuccess) {
+        return PacketaModule.ajax.post('savePickupPointInCart', {
             'prestashop_carrier_id': prestashopCarrierId,
             'id_branch': branchId,
             'name_branch': branchName,
