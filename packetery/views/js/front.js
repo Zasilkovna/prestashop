@@ -55,25 +55,8 @@ function PacketeryCheckoutModulesManager() {
     this.getWidgetParent = function ($selectedInput) {
         return $('#packetery-carrier-' + this.getCarrierId($selectedInput));
     }
-
-    this.openSelectedDeliveryWidget = function ($selectedDeliveryOption) {
-        if ($selectedDeliveryOption.length !== 1) {
-            return;
-        }
-        var $widgetParent = this.getWidgetParent($selectedDeliveryOption);
-        var $widgetButton = $widgetParent.find('.open-packeta-widget');
-        if (
-            $widgetButton.length === 1 &&
-            $widgetParent.find('.packeta-branch-id').val() === '' &&
-            $('iframe #packeta-widget').length === 0
-        ) {
-            $widgetButton.click();
-        }
-    };
-
 }
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
-var module;
 
 $(document).ready(function ()
 {
@@ -106,13 +89,7 @@ window.initializePacketaWidget = function ()
         language = shopLanguage;
     }
 
-    module = packeteryModulesManager.detectModule();
-
-    if ($('#widgetOpening').val() === 'rightAway') {
-        $(module.deliveryInputSelector).on('click', function () {
-            packeteryModulesManager.openSelectedDeliveryWidget($(this));
-        });
-    }
+    var module = packeteryModulesManager.detectModule();
 
     $('.open-packeta-widget').click(function (e) {
         e.preventDefault();
@@ -174,11 +151,20 @@ window.initializePacketaWidget = function ()
             }
         }, widgetOptions);
     });
+
+    if ($('#widgetAutoopen').val() === '1') {
+        var openWidget = function () {
+            tools.openSelectedDeliveryWidget(module.getSelectedInput());
+        };
+        module.findDeliveryOptions().on('change', openWidget);
+        openWidget();
+    }
 };
 
 tools = {
     fixextracontent: function ()
     {
+        var module = packeteryModulesManager.detectModule();
         if (module === null) {
             return;
         }
@@ -236,7 +222,22 @@ tools = {
                 module.disableSubmitButton();
             }
         });
-    }
+    },
+
+    openSelectedDeliveryWidget: function ($selectedDeliveryOption) {
+        if ($selectedDeliveryOption.length !== 1) {
+            return;
+        }
+        var $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
+        var $widgetButton = $widgetParent.find('.open-packeta-widget');
+        if (
+            $widgetButton.length === 1 &&
+            $widgetParent.find('.packeta-branch-id').val() === '' &&
+            $('iframe #packeta-widget').length === 0
+        ) {
+            $widgetButton.click();
+        }
+    },
 }
 
 packetery = {
@@ -280,10 +281,5 @@ ajaxs = {
 
 function onShippingLoadedCallback() {
     initializePacketaWidget();
-
-    if ($('#widgetOpening').val() === 'rightAway') {
-        packeteryModulesManager.openSelectedDeliveryWidget(module.getSelectedInput());
-    }
-
     tools.fixextracontent();
 }

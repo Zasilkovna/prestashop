@@ -10,5 +10,5 @@ if (!defined('_PS_VERSION_')) {
  */
 function upgrade_module_2_1_8($module)
 {
-    return Configuration::updateValue('PACKETERY_WIDGET_OPENING', 'onClick');
+    return Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', false);
 }

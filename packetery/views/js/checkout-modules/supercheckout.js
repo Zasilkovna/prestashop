@@ -2,14 +2,12 @@
 
 var PacketeryCheckoutModuleSupercheckout = {
 
-    deliveryInputSelector: '#shipping-method input',
-
     getSelectedInput: function () {
         return $('#shipping-method input:checked');
     },
 
     findDeliveryOptions: function () {
-        return $(this.deliveryInputSelector);
+        return $('#shipping-method input');
     },
 
     // we're not able to enable/disable Supercheckout submit button, we register our own validator instead
