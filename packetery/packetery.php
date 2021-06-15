@@ -107,7 +107,6 @@ class Packetery extends CarrierModule
             $this->_errors[] = $this->l('You have to enable the cURL extension on your server to install this module');
             return false;
         }
-        Configuration::updateValue('PACKETERY_LIVE_MODE', false);
         Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4');
 
         // backup possible old order table
@@ -427,23 +426,8 @@ class Packetery extends CarrierModule
         }
     }
 
-    /**
-     * Set values for the inputs.
-     */
-    protected function getConfigFormValues()
-    {
-        return array(
-            'PACKETERY_LIVE_MODE' => Configuration::get('PACKETERY_LIVE_MODE', true),
-            'PACKETERY_ACCOUNT_EMAIL' => Configuration::get('PACKETERY_ACCOUNT_EMAIL', 'contact@prestashop.com'),
-            'PACKETERY_ACCOUNT_PASSWORD' => Configuration::get('PACKETERY_ACCOUNT_PASSWORD', null),
-        );
-    }
-
     public function getOrderShippingCost($params, $shipping_cost)
     {
-        if (Context::getContext()->customer->logged == true) {
-            return 10;
-        }
         return $shipping_cost;
     }
 
