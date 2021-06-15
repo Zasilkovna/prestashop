@@ -3,6 +3,7 @@
 namespace Packetery\Module;
 
 use Packetery;
+use Packetery\Tools\DbTools;
 use PrestaShopException;
 use PrestaShopLogger;
 use Configuration;
@@ -10,15 +11,22 @@ use Tab;
 
 class Uninstaller
 {
+    const TEXT_EXCEPTION_RAISED_UNINSTALL = 'Exception raised during Packetery module uninstall:';
+
     /** @var Packetery */
     private $module;
 
+    /** @var DbTools */
+    private $dbTools;
+
     /**
      * @param Packetery $module
+     * @param DbTools $dbTools
      */
-    public function __construct(Packetery $module)
+    public function __construct(Packetery $module, DbTools $dbTools)
     {
         $this->module = $module;
+        $this->dbTools = $dbTools;
     }
 
     /**
@@ -39,12 +47,12 @@ class Uninstaller
      */
     private function deleteTab()
     {
-        $id_tab = Tab::getIdFromClassName('Adminpacketery');
-        if ($id_tab) {
+        $tabId = Tab::getIdFromClassName('Adminpacketery');
+        if ($tabId) {
             try {
-                $tab = new Tab($id_tab);
+                $tab = new Tab($tabId);
             } catch (PrestaShopException $exception) {
-                PrestaShopLogger::addLog($this->module->l('Exception raised during Packetery module uninstall:') . ' ' .
+                PrestaShopLogger::addLog($this->module->l(self::TEXT_EXCEPTION_RAISED_UNINSTALL) . ' ' .
                     $exception->getMessage(), 3, null, null, null, true);
 
                 return false;
@@ -76,16 +84,8 @@ class Uninstaller
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_order_backup`';
         $sql[] = 'RENAME TABLE `' . _DB_PREFIX_ . 'packetery_order` TO `' . _DB_PREFIX_ . 'packetery_order_backup`';
 
-        foreach ($sql as $query) {
-            try {
-                $result = $this->module->db->execute($query);
-                if ($result === false) {
-                    return false;
-                }
-            } catch (PrestaShopException $exception) {
-                PrestaShopLogger::addLog($this->module->l('Exception raised during Packetery module uninstall:') . ' ' .
-                    $exception->getMessage(), 3, null, null, null, true);
-            }
+        if (!$this->dbTools->executeQueries($sql, $this->module->l(self::TEXT_EXCEPTION_RAISED_UNINSTALL))) {
+            return false;
         }
 
         return true;

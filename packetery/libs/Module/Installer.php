@@ -3,9 +3,9 @@
 namespace Packetery\Module;
 
 use Packetery;
+use Packetery\Tools\DbTools;
 use Configuration;
 use Language;
-use PrestaShopException;
 use Tab;
 
 class Installer
@@ -13,12 +13,17 @@ class Installer
     /** @var Packetery */
     private $module;
 
+    /** @var DbTools */
+    private $dbTools;
+
     /**
      * @param Packetery $module
+     * @param DbTools $dbTools
      */
-    public function __construct(Packetery $module)
+    public function __construct(Packetery $module, DbTools $dbTools)
     {
         $this->module = $module;
+        $this->dbTools = $dbTools;
     }
 
     /**
@@ -41,12 +46,12 @@ class Installer
     private function insertTab()
     {
         $tab = new Tab;
-        $id_parent = Tab::getIdFromClassName('AdminParentOrders');
-        $tab->id_parent = $id_parent;
+        $parentId = Tab::getIdFromClassName('AdminParentOrders');
+        $tab->id_parent = $parentId;
         $tab->module = 'packetery';
         $tab->class_name = 'Adminpacketery';
         $tab->name = $this->createMultiLangField($this->module->l('Packeta Orders'));
-        $tab->position = Tab::getNewLastPosition($id_parent);
+        $tab->position = Tab::getNewLastPosition($parentId);
 
         return $tab->add();
     }
@@ -57,12 +62,12 @@ class Installer
      */
     private function createMultiLangField($field)
     {
-        $res = array();
-        foreach (Language::getIDs(true) as $id_lang) {
-            $res[$id_lang] = $field;
+        $multiLangField = [];
+        foreach (Language::getIDs(true) as $langId) {
+            $multiLangField[$langId] = $field;
         }
 
-        return $res;
+        return $multiLangField;
     }
 
     /**
@@ -74,7 +79,7 @@ class Installer
             define('_MYSQL_ENGINE_', 'MyISAM');
         }
 
-        $sql = array();
+        $sql = [];
 
         $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_order` (
             `id_order` int,
@@ -139,18 +144,8 @@ class Installer
             `is_pickup_point` tinyint(1) NOT NULL DEFAULT 0
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
-        foreach ($sql as $query) {
-            try {
-                $result = $this->module->db->execute($query);
-                if ($result === false) {
-                    return false;
-                }
-            } catch (PrestaShopException $exception) {
-                PrestaShopLogger::addLog($this->module->l('Exception raised during Packetery module install:') . ' ' .
-                    $exception->getMessage(), 3, null, null, null, true);
-
-                return false;
-            }
+        if (!$this->dbTools->executeQueries($sql, $this->module->l('Exception raised during Packetery module install:'), true)) {
+            return false;
         }
 
         return true;

@@ -33,6 +33,7 @@ use Packetery\Order\OrderRepository;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Hooks\ActionObjectOrderUpdateBefore;
 use Packetery\Carrier\CarrierTools;
+use Packetery\Tools\DbTools;
 
 include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
@@ -41,9 +42,6 @@ require_once __DIR__ . '/autoload.php';
 class Packetery extends CarrierModule
 {
     protected $config_form = false;
-
-    /** @var Db */
-    public $db;
 
     /** @var PaymentRepository */
     private $paymentRepository;
@@ -65,6 +63,9 @@ class Packetery extends CarrierModule
 
     /** @var Uninstaller */
     private $uninstaller;
+
+    /** @var DbTools */
+    private $dbTools;
 
     public function __construct()
     {
@@ -90,14 +91,15 @@ class Packetery extends CarrierModule
 
         parent::__construct();
 
-        $this->db = Db::getInstance();
-        $this->paymentRepository = new PaymentRepository($this->db);
-        $this->orderRepository = new OrderRepository($this->db);
+        $db = Db::getInstance();
+        $this->paymentRepository = new PaymentRepository($db);
+        $this->orderRepository = new OrderRepository($db);
         $this->orderSaver = new OrderSaver($this->orderRepository, $this->paymentRepository);
         $this->carrierTools = new CarrierTools();
         $this->actionObjectOrderUpdateBefore = new ActionObjectOrderUpdateBefore($this->orderRepository, $this->orderSaver, $this->carrierTools);
-        $this->installer = new Installer($this);
-        $this->uninstaller = new Uninstaller($this);
+        $this->dbTools = new DbTools($db);
+        $this->installer = new Installer($this, $this->dbTools);
+        $this->uninstaller = new Uninstaller($this, $this->dbTools);
 
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
         $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
