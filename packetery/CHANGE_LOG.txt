@@ -59,3 +59,4 @@
       - Removed: imperfect splitting of address to street and house number
       - Added: order is processed correctly when using legacy widget v5
       - Removed: unused fragments of code
+      - Fixed: notice during order state update
