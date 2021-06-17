@@ -593,18 +593,13 @@ class Packetery extends CarrierModule
 
     /*ORDERS*/
     /**
-     * Save packetery order after order is created
-     * @param array $params
+     * Save packetery order after order is created. Called both in FE and admin, once. Not called during order update.
+     * @param array $params contains objects: order, cookie, cart, customer, currency, orderStatus
      */
-    public function hookActionOrderHistoryAddAfter($params)
+    public function hookActionValidateOrder($params)
     {
-        if (isset($params['cart'], $params['order_history']) &&
-            ($params['cart'] instanceof Cart) &&
-            ($params['order_history'] instanceof OrderHistory)
-        ) {
-            $orderSaver = $this->diContainer->get(\Packetery\Order\OrderSaver::class);
-            $orderSaver->saveAfterActionOrderHistoryAdd($params['cart'], $params['order_history']);
-        }
+        $orderSaver = $this->diContainer->get(\Packetery\Order\OrderSaver::class);
+        $orderSaver->saveNewOrder($params);
     }
     /*END ORDERS*/
 
@@ -773,7 +768,7 @@ class Packetery extends CarrierModule
     {
         $hooks = [
             'displayBeforeCarrier',
-            'actionOrderHistoryAddAfter',
+            'actionValidateOrder',
             'backOfficeHeader',
             'displayCarrierExtraContent',
             'displayHeader',

@@ -10,9 +10,9 @@ use CurrencyCore;
 use CartCore as Cart;
 use Db;
 use OrderCore as PrestaShopOrder;
-use OrderHistoryCore as OrderHistory;
 use PrestaShopException;
 use Tools;
+use PrestaShopLogger;
 
 class OrderSaver
 {
@@ -37,16 +37,25 @@ class OrderSaver
 
     /**
      * Save packetery order after order is created
-     * @param Cart $cart
-     * @param OrderHistory $orderHistory
+     * @param array $params from calling hook
      */
-    public function saveAfterActionOrderHistoryAdd(Cart $cart, OrderHistory $orderHistory)
+    public function saveNewOrder($params)
     {
-        $order = new PrestaShopOrder((int)$orderHistory->id_order);
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$cart->id_carrier);
-        if ($packeteryCarrier) {
-            $this->save($order, $packeteryCarrier);
+        if (!($params['cart'] instanceof Cart) || !($params['order'] instanceof PrestaShopOrder)) {
+            PrestaShopLogger::addLog('Packetery: Unable to save new order with parameters cart (' .
+                gettype($params['cart']) . ') and order (' . gettype($params['order']) . ').',
+                3, null, null, null, true);
+            return;
         }
+
+        $carrierId = (int)$params['cart']->id_carrier;
+
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById($carrierId);
+        if (!$packeteryCarrier) {
+            return;
+        }
+
+        $this->save($params['order'], $packeteryCarrier);
     }
 
     /**
