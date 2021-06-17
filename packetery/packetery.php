@@ -59,7 +59,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.7';
+		$this->version = '2.1.8';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -548,12 +548,12 @@ class Packetery extends CarrierModule
 
     /*ORDERS*/
     /**
-     * Save packetery order after order is created
-     * @param $params
+     * Save packetery order after order is created. Called both in FE and admin, once. Not called during order update.
+     * @param array $params contains objects: order, cookie, cart, customer, currency, orderStatus
      */
-    public function hookActionOrderHistoryAddAfter($params)
+    public function hookActionValidateOrder($params)
     {
-        $this->orderSaver->saveAfterActionOrderHistoryAdd($params);
+        $this->orderSaver->saveNewOrder($params);
     }
     /*END ORDERS*/
 
@@ -708,7 +708,7 @@ class Packetery extends CarrierModule
     private function getModuleHooksList()
     {
         $hooks = [
-            'actionOrderHistoryAddAfter',
+            'actionValidateOrder',
             'backOfficeHeader',
             'displayCarrierExtraContent',
             'displayHeader',

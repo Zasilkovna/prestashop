@@ -59,3 +59,4 @@
       - Removed: imperfect splitting of address to street and house number
       - Added: order is processed correctly when using legacy widget v5
       - Removed: unused fragments of code
+2.1.8 - Updated: hook for new orders changed from actionOrderHistoryAddAfter to actionValidateOrder
