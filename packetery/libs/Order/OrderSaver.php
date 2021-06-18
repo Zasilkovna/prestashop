@@ -28,19 +28,13 @@ class OrderSaver
 
     /**
      * Save packetery order after order is created
-     * @param array $params from calling hook
+     * @param Cart $cart
+     * @param OrderHistory $orderHistory
      */
-    public function saveAfterActionOrderHistoryAdd($params)
+    public function saveAfterActionOrderHistoryAdd(Cart $cart, OrderHistory $orderHistory)
     {
-        if (
-            !isset($params['cart'], $params['order_history']) ||
-            !($params['cart'] instanceof Cart) || !($params['order_history'] instanceof OrderHistory)
-        ) {
-            // no need to update when changing order state
-            return;
-        }
-        $orderId = (int)$params['order_history']->id_order;
-        $carrierId = (int)$params['cart']->id_carrier;
+        $orderId = (int)$orderHistory->id_order;
+        $carrierId = (int)$cart->id_carrier;
         $order = new PrestaShopOrder($orderId);
 
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById($carrierId);
