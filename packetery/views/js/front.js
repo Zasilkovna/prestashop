@@ -196,16 +196,19 @@ tools = {
                 prestashop_carrier_id = packeteryModulesManager.getCarrierId($this),
                 $extra = packeteryModulesManager.getWidgetParent($this);
 
-            setTimeout(function () {
-                if ($this.is(':checked') && $extra.length === 1 && !$extra.is(':visible')) {
-                    $extra.parent().slideDown();
-                }
-            }, 500);
-
             // if selected carrier is not Packetery then enable Continue button and we're done here
             if (! $extra.find('#packetery-widget').length) {
                 module.enableSubmitButton();
                 return;
+            }
+
+            if ($this.is(':checked')) {
+                var $wrapper = $extra.closest('.carrier-extra-content');
+                setTimeout(function () {
+                    if ($wrapper.is(':hidden')) {
+                        $wrapper.show();
+                    }
+                }, 500);
             }
 
             widgetCarriers = $extra.find("#widget_carriers").val();
