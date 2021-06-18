@@ -553,7 +553,14 @@ class Packetery extends CarrierModule
      */
     public function hookActionValidateOrder($params)
     {
-        $this->orderSaver->saveNewOrder($params);
+        if (!($params['cart'] instanceof Cart) || !($params['order'] instanceof Order)) {
+            PrestaShopLogger::addLog('Packetery: Unable to save new order with parameters cart (' .
+                gettype($params['cart']) . ') and order (' . gettype($params['order']) . ').',
+                3, null, null, null, true);
+            return;
+        }
+
+        $this->orderSaver->saveNewOrder($params['cart'], $params['order']);
     }
     /*END ORDERS*/
 
