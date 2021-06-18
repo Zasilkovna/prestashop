@@ -554,14 +554,12 @@ class Packetery extends CarrierModule
     public function hookActionOrderHistoryAddAfter($params)
     {
         if (
-            !isset($params['cart'], $params['order_history']) ||
-            !($params['cart'] instanceof Cart) || !($params['order_history'] instanceof OrderHistory)
+            isset($params['cart'], $params['order_history']) &&
+            ($params['cart'] instanceof Cart) &&
+            ($params['order_history'] instanceof OrderHistory)
         ) {
-            // no need to update when changing order state
-            return;
+            $this->orderSaver->saveAfterActionOrderHistoryAdd($params['cart'], $params['order_history']);
         }
-
-        $this->orderSaver->saveAfterActionOrderHistoryAdd($params['cart'], $params['order_history']);
     }
     /*END ORDERS*/
 
