@@ -40,14 +40,10 @@ class OrderSaver
      */
     public function saveNewOrder(Cart $cart, PrestaShopOrder $order)
     {
-        $carrierId = (int)$cart->id_carrier;
-
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById($carrierId);
-        if (!$packeteryCarrier) {
-            return;
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$cart->id_carrier);
+        if ($packeteryCarrier) {
+            $this->save($order, $packeteryCarrier);
         }
-
-        $this->save($order, $packeteryCarrier);
     }
 
     /**
