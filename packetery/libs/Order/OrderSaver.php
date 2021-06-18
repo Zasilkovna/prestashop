@@ -33,16 +33,11 @@ class OrderSaver
      */
     public function saveAfterActionOrderHistoryAdd(Cart $cart, OrderHistory $orderHistory)
     {
-        $orderId = (int)$orderHistory->id_order;
-        $carrierId = (int)$cart->id_carrier;
-        $order = new PrestaShopOrder($orderId);
-
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById($carrierId);
-        if (!$packeteryCarrier) {
-            return;
+        $order = new PrestaShopOrder((int)$orderHistory->id_order);
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$cart->id_carrier);
+        if ($packeteryCarrier) {
+            $this->save($order, $packeteryCarrier);
         }
-
-        $this->save($order, $packeteryCarrier);
     }
 
     /**
