@@ -32,7 +32,10 @@ class OrderSaver
      */
     public function saveAfterActionOrderHistoryAdd($params)
     {
-        if (!($params['cart'] instanceof Cart) || !($params['order_history'] instanceof OrderHistory)) {
+        if (
+            !isset($params['cart'], $params['order_history']) ||
+            !($params['cart'] instanceof Cart) || !($params['order_history'] instanceof OrderHistory)
+        ) {
             // no need to update when changing order state
             return;
         }
