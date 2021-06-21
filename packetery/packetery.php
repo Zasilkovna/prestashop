@@ -555,11 +555,17 @@ class Packetery extends CarrierModule
     /*ORDERS*/
     /**
      * Save packetery order after order is created
-     * @param $params
+     * @param array $params
      */
     public function hookActionOrderHistoryAddAfter($params)
     {
-        $this->orderSaver->saveAfterActionOrderHistoryAdd($params);
+        if (
+            isset($params['cart'], $params['order_history']) &&
+            ($params['cart'] instanceof Cart) &&
+            ($params['order_history'] instanceof OrderHistory)
+        ) {
+            $this->orderSaver->saveAfterActionOrderHistoryAdd($params['cart'], $params['order_history']);
+        }
     }
     /*END ORDERS*/
 

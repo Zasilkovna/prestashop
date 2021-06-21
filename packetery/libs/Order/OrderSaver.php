@@ -2,11 +2,12 @@
 
 namespace Packetery\Order;
 
-use \Packetery;
-use \Order as PrestaShopOrder;
-use \Db;
-use \Packeteryclass;
+use Packeteryclass;
 use Packetery\Payment\PaymentRepository;
+use Cart;
+use Db;
+use Order as PrestaShopOrder;
+use OrderHistory;
 
 class OrderSaver
 {
@@ -27,20 +28,16 @@ class OrderSaver
 
     /**
      * Save packetery order after order is created
-     * @param array $params from calling hook
+     * @param Cart $cart
+     * @param OrderHistory $orderHistory
      */
-    public function saveAfterActionOrderHistoryAdd($params)
+    public function saveAfterActionOrderHistoryAdd(Cart $cart, OrderHistory $orderHistory)
     {
-        $orderId = (int)$params['order_history']->id_order;
-        $carrierId = (int)$params['cart']->id_carrier;
-        $order = new PrestaShopOrder($orderId);
-
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById($carrierId);
-        if (!$packeteryCarrier) {
-            return;
+        $order = new PrestaShopOrder((int)$orderHistory->id_order);
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$cart->id_carrier);
+        if ($packeteryCarrier) {
+            $this->save($order, $packeteryCarrier);
         }
-
-        $this->save($order, $packeteryCarrier);
     }
 
     /**

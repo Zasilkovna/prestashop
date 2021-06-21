@@ -60,3 +60,6 @@
       - Added: order is processed correctly when using legacy widget v5
       - Removed: unused fragments of code
       - Fixed: proper processing of database query return values during installation and uninstallation
+      - Fixed: notice during order state update
+      - Added: showing carrier extra content for (probably broken) third party templates
+      
