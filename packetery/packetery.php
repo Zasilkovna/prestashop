@@ -117,7 +117,10 @@ class Packetery extends CarrierModule
             $have_old_table = false;
         }
 
-        include(dirname(__FILE__).'/sql/install.php');
+        $dbResult = include(__DIR__ . '/sql/install.php');
+        if (!$dbResult) {
+            return false;
+        }
 
         // copy data from old order table
         if ($have_old_table) {
@@ -141,7 +144,10 @@ class Packetery extends CarrierModule
     {
         Packeteryclass::deleteTab();
 
-        include(dirname(__FILE__).'/sql/uninstall.php');
+        $dbResult = include(__DIR__ . '/sql/uninstall.php');
+        if (!$dbResult) {
+            return false;
+        }
 
         foreach ($this->getModuleHooksList() as $hookName) {
             if (!$this->unregisterHook($hookName)) {

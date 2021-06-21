@@ -93,7 +93,8 @@ $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_branch` (
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
 foreach ($sql as $query) {
-    if (Db::getInstance()->execute($query) == false) {
+    if (Db::getInstance()->execute($query) === false) {
         return false;
     }
 }
+return true;
