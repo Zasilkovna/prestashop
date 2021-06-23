@@ -279,7 +279,7 @@ class Packeteryclass
         $tab->id_parent = $id_parent;
         $tab->module = 'packetery';
         $tab->class_name = 'Adminpacketery';
-        $tab->name = self::createMultiLangField($module->l('Packeta Orders'));
+        $tab->name = self::createMultiLangField($module->l('Packeta Orders', 'packetery.class'));
         $tab->position = $tab->getNewLastPosition($id_parent);
         $tab->add();
         return true;
@@ -399,7 +399,7 @@ class Packeteryclass
         else
         {
             $module = new Packetery();
-            echo $module->l('Error while trying to save the settings.');
+            echo $module->l('Error while trying to save the settings.', 'packetery.class');
         }
     }
 
@@ -477,7 +477,7 @@ class Packeteryclass
         }
         else
         {
-            echo $module->l('Please set carrier association first.');
+            echo $module->l('Please set carrier association first.', 'packetery.class');
         }
     }
 
@@ -682,7 +682,7 @@ class Packeteryclass
             }
             else
             {
-                echo json_encode(array(9, $module->l('Can\'t update setting')));
+                echo json_encode(array(9, $module->l('Can\'t update setting', 'packetery.class')));
             }
         }
         else
@@ -708,7 +708,7 @@ class Packeteryclass
                 {
                     if (Tools::strlen($value) !== 32)
                     {
-                        return $packetery->l('Api password is wrong. Pickup points will not be updated.');
+                        return $packetery->l('Api password is wrong. Pickup points will not be updated.', 'packetery.class');
                     }
                     else
                     {
@@ -717,7 +717,7 @@ class Packeteryclass
                 }
                 else
                 {
-                    return $packetery->l('Api password must be string');
+                    return $packetery->l('Api password must be string', 'packetery.class');
                 }
                 break;
             case 'PACKETERY_ESHOP_ID':
@@ -726,9 +726,9 @@ class Packeteryclass
                     return false;
                 } catch (SenderGetReturnRoutingException $e) {
                     if ($e->senderNotExists === true) {
-                        return $packetery->l('Provided sender indication does not exist.');
+                        return $packetery->l('Provided sender indication does not exist.', 'packetery.class');
                     }
-                    return sprintf('%s: %s', $packetery->l('Sender indication validation failed'), $e->getMessage());
+                    return sprintf('%s: %s', $packetery->l('Sender indication validation failed', 'packetery.class'), $e->getMessage());
                 }
                 break;
             default:

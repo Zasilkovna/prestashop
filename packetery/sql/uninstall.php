@@ -49,7 +49,7 @@ foreach ($sql as $query) {
             $result = false;
         }
     } catch (PrestaShopDatabaseException $exception) {
-        PrestaShopLogger::addLog($this->l('Exception raised during Packetery module uninstall:') . ' ' .
+        PrestaShopLogger::addLog($this->l('Exception raised during Packetery module uninstall:', 'uninstall') . ' ' .
             $exception->getMessage(), 3, null, null, null, true);
     }
 }

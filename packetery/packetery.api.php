@@ -53,7 +53,7 @@ class PacketeryApi
         if ($id_orders == '')
         {
             $module = new Packetery;
-            echo $module->l('Please choose orders first.');
+            echo $module->l('Please choose orders first.', 'packetery.api');
             return false;
         }
         $packets = Packeteryclass::getTrackingFromOrders($id_orders);
@@ -174,7 +174,7 @@ class PacketeryApi
         if ($id_orders == '')
         {
             $module = new Packetery;
-            echo $module->l('Please choose orders first.');
+            echo $module->l('Please choose orders first.', 'packetery.api');
             return false;
         }
         $id_orders = explode(',', $id_orders);
@@ -265,7 +265,7 @@ class PacketeryApi
             {
                 return array(
                     0,
-                    $module->l('Can\'t find order currency rate between order and pickup point, order') . ' - ' . $id_order,
+                    $module->l('Can\'t find order currency rate between order and pickup point, order', 'packetery.api') . ' - ' . $id_order,
                 );
             }
         }
@@ -338,7 +338,7 @@ class PacketeryApi
 
         if (!(Tools::strlen($customer_email) > 1))
         {
-            return array(0, $module->l('No email assigned to customer.'));
+            return array(0, $module->l('No email assigned to customer.', 'packetery.api'));
         }
 
         if ($is_packetery_ad)
@@ -534,11 +534,11 @@ class PacketeryApi
 		}
 
         if (! $response) {
-			return $module->l('Can\'t download list of pickup points. Network error.');
+			return $module->l('Can\'t download list of pickup points. Network error.', 'packetery.api');
 		}
 
 		if (Tools::strpos($response, 'invalid API key') !== false) {
-			return $module->l('Invalid API key');
+			return $module->l('Invalid API key', 'packetery.api');
 		}
 
 		self::dropBranchList();
