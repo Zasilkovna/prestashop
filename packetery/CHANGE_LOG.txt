@@ -62,4 +62,4 @@
       - Fixed: proper processing of database query return values during installation and uninstallation
       - Fixed: notice during order state update
       - Added: showing carrier extra content for (probably broken) third party templates
-      
+      - Fixed: proper generation and use of translations called outside the module's main class file
