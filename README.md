@@ -121,9 +121,8 @@ V případě, že nemáte uživatelský účet na stránkách Zásilkovny, je mo
 - V nastavení modulu vyberete, zda jde o *Výdejní místo Zásilkovny* nebo doručení na adresu.
 - Pokud zvolíte u dopravce ve sloupci "Je dobírka" ANO (fajfka), budou objednávky s použitím
   tohoto dopravce vždy na dobírku.
-- Pokud chcete, aby se dobírka řídila podle platební metody, a ne podle dopravce, nechte
-  u dopravce ve sloupci "Je dobírka" NE (křížek), a nastavte dobírku ve sloupci "Je dobírka"
-  u způsobu platby.
+- Pokud chcete, aby se dobírka řídila podle platební metody (viz. způsoby platby), a ne podle dopravce, nechte
+  u dopravce ve sloupci "Je dobírka" NE (křížek).
 - U dopravců, jejichž zásilky nebudou přepravované Zásilkovnou, zvolíte "--".
 
 #### Nastavení omezení na zemi
@@ -133,7 +132,7 @@ V případě, že nemáte uživatelský účet na stránkách Zásilkovny, je mo
 - Dále je potřeba povolit vybrané platební moduly v menu *Platba* - *Konfigurace* v nabídce *Omezení pro země*.
 
 ### Způsoby platby
-- U každého způsobu platby můžete nastavit zda se jedná o platbu.
+- U každého způsobu platby můžete nastavit zda se jedná o platbu na dobírku.
 - Pokud se jedná o platební metodu na dobírku ve sloupci **Je na dobírku** klikněte na červený křížek,
   který se automaticky změní na zelené zatržítko.
 
@@ -142,7 +141,7 @@ V záložce výdejní místa naleznete informace o poslední aktualizaci seznamu
 - celkový počet výdejních míst
 - datum a čas poslední aktualizace
 
-Výdejní místa se aktualizují automaticky. Pro ruční aktualizaci seznamu výdejních míst klikněte na tlačítko **Aktualizace výdejních míst**.
+Výdejní místa v košíku se aktualizují automaticky. Pro ruční aktualizaci seznamu výdejních míst klikněte na tlačítko **Aktualizace výdejních míst**.
 
 ### Objednávky
 V záložce **objednávky** naleznete seznam všech objednávek u kterých byla vybrán způsob dopravy přes Zásilkovnu.
@@ -171,7 +170,22 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - Automatický export zásilek do systému Zásilkovny.
 - Export zásilek do csv souboru, který lze importovat v [klientské sekci](https://client.packeta.com/).
 
-### Omezení
-- Modul v současné době nepodporuje multistore.
-- Modul je určen pouze pro výchozí košíky PrestaShopu.  Pokud používáte nějaký one page checkout modul košíku třetí
-  strany,  modul nemusí správně fungovat.
+#### Poskytované funkce
+- Integrace [widgetu v6](https://widget.packeta.com/v6) pro výběr výdejních míst v košíku eshopu.
+- Podpora výdejních míst externích dopravců.
+- Doručení na adresu přes externí dopravce Zásilkovny.
+- Informace o vybraném výdejním místě/dopravci v detailu objednávky PrestaShopu.
+- V detailu objednávky PrestaShopu je možné změnit vybrané výdejní místo pomocí widgetu v6.
+- Zobrazení informace o vybraném výdejní místě v posledním kroku objednávky, v emailu "potvrzení objednávky"
+  a v detailu objednávky registrovaného uživatele.
+- Automatický export zásilek do systému Zásilkovny.
+
+### Podpora pro OPC
+- One Page Supercheckout od [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout)
+
+Pokud používáte nějaký jiný modul košíku třetí strany napište nám [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
+Modul Zásilkovny nemusí být s jiným OPC modulem funkční.
+
+### Další omezení modulu
+- Modul v současné době nepodporuje multistore. 
+  
