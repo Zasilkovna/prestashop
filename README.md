@@ -25,16 +25,16 @@ After successful installation, click on the **Orders** -> **Packeta Orders** tab
 All settings are saved automatically whenever you leave the edited data. If you do not have a user account
 on the Packeta site, it is possible to request a test account at the Customer Service email [info@zasilkovna.cz](mailto:info@zasilkovna.cz):
 - **API key** – you can find your key in the client section of Packeta in the *Client support* tab
-- **Sender name** - the sender name you have set in the client section of the senders list
+- **Sender name** - the sender name you have set in the client section of the list of senders
 
 ### Carrier settings
 - To add a carrier enter the menu *Shipping* - *Carriers*.
 - In the module settings, you select whether it is a *Packeta pickup point* or delivery to the address.
-- If you select YES (check mark) for the carrier in the "Is COD" column, the orders of this carrier
-  will be always cash on delivery.
-- If you want cash on delivery to be controlled by the payment method and not the carrier, set NO (cross)
-  in the "Is cash on delivery" column for the carrier, and set cash on delivery in the "Is COD" column for
-  the payment method.
+- If you select YES (checkmark) for the carrier in the "Is COD" column,
+  the orders of this carrier will always be cash on delivery.
+- If you want cash on delivery to be controlled by the payment method (see "Payment methods") and not the carrier,
+  set NO (cross) in the "Is cash on delivery" column for the carrier and set cash on delivery in the "Is COD" column 
+  for the payment method.
 - For carriers whose shipments will not be transported by Packetery, select "--".
 
 #### Set country restrictions
@@ -47,21 +47,26 @@ on the Packeta site, it is possible to request a test account at the Customer Se
 ### Payment methods
 - For each form of payment, you can set whether the payment is cash on delivery.
 - If the payment method is cash on delivery in the **Is cash on delivery** column, click on the red cross that will
-  automatically change to a green check mark.
+  automatically change to a green checkmark.
 
 ### Pickup points
-You can find information about the last update of the list of pickup points in the tab **pickup points**.
+You can find information about the last update of the list of pickup points in the tab **pickup points**:
+- sum of pickup points
+- date and time of the last update
+
+The pickup points in the basket are updated automatically. Click on the button **Update pickup points**
+to manually update the list of pickup points.
 
 ### Orders
 In the **Orders** tab you will find a list of all orders for which the Packeta shipping method has been selected.
-- For each packet you can set / cancel cash on delivery in the "Cash on delivery" column.
-- Marked orders can be saved to csv file by clicking on the **CSV export** button which you will upload then to
-  the client section in » Shipments import.
+- For each packet, you can set/cancel cash on delivery in the "Cash on delivery" column.
+- Marked orders can be saved to the CSV file by clicking on the **CSV export** button, which you will upload
+  to the client section in » "Shipments import" afterward.
 - The module also supports automatic sending of data to shipments. Send marked orders automatically by clicking on
   the button "Submit selected shipments." After successful shipment, the tracking number of the shipment will
   be automatically added. By clicking the tracking number you will open the tracking page.
 - For shipments that have been submitted via automatic dispatch and have a tracking number filled in, you can
-  print labels in pdf format. Mark orders and click on **Download labels in .PDF format**.
+  print labels in PDF format. Mark orders and click on **Download pdf labels**.
 
 ## Information about the module
 
@@ -73,16 +78,25 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 - PrestaShop version 1.7.x.
 - If you have problems using the module, please contact us at [support@packeta.com](mailto:support@packeta.com).
 
-### Supported functions
-- Integration of widget for pickup points selections in the eshop cart.
+### Provided functions
+- Integration of [widget v6](https://widget.packeta.com/v6) for selection of pickup points in the e-shop cart.
+- Support for pickup points of external carriers.
 - Address delivery via Packeta external carriers.
-- Automatical export of orders to the Packeta system.
+- Information about the selected pickup point/carrier in the PrestaShop order detail.
+- In the PrestaShop order detail, it is possible to change the selected pickup point using the v6 widget.
+- Display of information about the selected pickup point in the last step of the order,
+  in the "order confirmation" email, and the order detail view of the registered user.
+- Automatic export of orders to the Packeta system.
 - Export orders to the CSV file, which can be imported in the [client section](https://client.packeta.com/).
 
-### Limitations
+### OPC support
+- One Page Supercheckout from [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout)
+
+In case you are using another third-party cart module, please write to [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
+Packeta module may not work with another OPC module.
+
+### Further module limitations
 - Module does not currently support multistore.
-- The module is intended only for PrestaShop cart. If you use a one-page checkout module for a third-party cart,
-  the module may not work properly.
 
 # Modul pro PrestaShop 1.7
 
@@ -121,7 +135,7 @@ V případě, že nemáte uživatelský účet na stránkách Zásilkovny, je mo
 - V nastavení modulu vyberete, zda jde o *Výdejní místo Zásilkovny* nebo doručení na adresu.
 - Pokud zvolíte u dopravce ve sloupci "Je dobírka" ANO (fajfka), budou objednávky s použitím
   tohoto dopravce vždy na dobírku.
-- Pokud chcete, aby se dobírka řídila podle platební metody (viz. způsoby platby), a ne podle dopravce, nechte
+- Pokud chcete, aby se dobírka řídila podle platební metody (viz "Způsoby platby"), a ne podle dopravce, nechte
   u dopravce ve sloupci "Je dobírka" NE (křížek).
 - U dopravců, jejichž zásilky nebudou přepravované Zásilkovnou, zvolíte "--".
 
@@ -141,7 +155,8 @@ V záložce výdejní místa naleznete informace o poslední aktualizaci seznamu
 - celkový počet výdejních míst
 - datum a čas poslední aktualizace
 
-Výdejní místa v košíku se aktualizují automaticky. Pro ruční aktualizaci seznamu výdejních míst klikněte na tlačítko **Aktualizace výdejních míst**.
+Výdejní místa v košíku se aktualizují automaticky. Pro ruční aktualizaci seznamu výdejních míst klikněte na tlačítko
+**Aktualizace výdejních míst**.
 
 ### Objednávky
 V záložce **objednávky** naleznete seznam všech objednávek u kterých byla vybrán způsob dopravy přes Zásilkovnu.
@@ -183,7 +198,7 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 ### Podpora pro OPC
 - One Page Supercheckout od [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout)
 
-Pokud používáte nějaký jiný modul košíku třetí strany napište nám [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
+Pokud používáte nějaký jiný modul košíku třetí strany, napište nám [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
 Modul Zásilkovny nemusí být s jiným OPC modulem funkční.
 
 ### Další omezení modulu
