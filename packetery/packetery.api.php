@@ -62,36 +62,6 @@ class PacketeryApi
         return $pdf_result;
     }
 
-    public static function packetLabelPdf($packet, $apiPassword)
-    {
-        $client = new SoapClient(self::API_WSDL_URL);
-        $format = 'A7 on A4';
-        $offset = 0;
-        try
-        {
-            $pdf = $client->packetLabelPdf($apiPassword, $packet, $format, $offset);
-            if ($pdf)
-            {
-                file_put_contents('packetery_labels.pdf', $pdf);
-                return true;
-            }
-            else
-            {
-                echo "\n error \n";
-                exit;
-            }
-        }
-        catch (SoapFault $e)
-        {
-            if (isset($e->faultstring))
-            {
-                $error_msg = $e->faultstring;
-                echo "\n$error_msg\n";
-            }
-            exit;
-        }
-    }
-
     public static function packetsLabelsPdf($packets, $apiPassword)
     {
         $client = new SoapClient("https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl");
@@ -558,18 +528,6 @@ class PacketeryApi
 		return false;
     }
 
-    public static function getBranches($is_full = false)
-    {
-        if ($is_full)
-        {
-            return self::getFullBranchesList();
-        }
-        else
-        {
-            return true;
-        }
-    }
-
     public static function countBranchesAjax()
     {
         $cnt = self::countBranches();
@@ -609,13 +567,6 @@ class PacketeryApi
     public static function dropBranchList()
     {
         $sql = 'DELETE FROM ' . _DB_PREFIX_ . 'packetery_branch';
-        $result = Db::getInstance()->execute($sql);
-        return $result;
-    }
-
-    public static function dropBranches()
-    {
-        $sql = 'TRUNCATE TABLE ' . _DB_PREFIX_ . 'packetery_branch';
         $result = Db::getInstance()->execute($sql);
         return $result;
     }
@@ -724,15 +675,6 @@ class PacketeryApi
                     );';
 
         $result = Db::getInstance()->execute($sql);
-        return $result;
-    }
-
-    public static function getFullBranchesList()
-    {
-        $sql = 'SELECT id_branch, name, country, city, street, zip, url, max_weight
-                FROM ' . _DB_PREFIX_ . 'packetery_branch
-                ORDER BY country, city';
-        $result = Db::getInstance()->executeS($sql);
         return $result;
     }
 

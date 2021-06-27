@@ -656,17 +656,6 @@ class Packeteryclass
     /*END CARRIERS*/
 
     /*COMMON FUNCTIONS*/
-    public static function moduleDir()
-    {
-        return _PS_MODULE_DIR_ . 'packetery/';
-    }
-
-    public static function getAdminToken($id_employee)
-    {
-        $tab = 'AdminModules';
-        return Tools::getAdminToken($tab . (int)Tab::getIdFromClassName($tab) . (int)$id_employee);
-    }
-
     public static function updateSettings()
     {
         $module = new Packetery;
