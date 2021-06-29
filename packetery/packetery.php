@@ -31,6 +31,7 @@ use Packetery\Order\OrderRepository;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Hooks\ActionObjectOrderUpdateBefore;
 use Packetery\Carrier\CarrierTools;
+use Packetery\Tools\ToolsFork;
 
 include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
@@ -59,7 +60,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.7';
+		$this->version = '2.1.8';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -681,14 +682,17 @@ class Packetery extends CarrierModule
     private function savePickupPointChange()
     {
         $orderId = (int)Tools::getValue('order_id');
-        $pickupPoint = json_decode(Tools::getValue('pickup_point'));
+        $pickupPoint = json_decode(ToolsFork::getValue('pickup_point'));
+        if (!$pickupPoint) {
+            return false;
+        }
 
         $packeteryOrderFields = [
             'id_branch' => (int)$pickupPoint->id,
             'name_branch' => pSQL($pickupPoint->name),
             'currency_branch' => pSQL($pickupPoint->currency),
         ];
-        if ($pickupPoint->pickupPointType == 'external') {
+        if ($pickupPoint->pickupPointType === 'external') {
             $packeteryOrderFields['is_carrier'] = 1;
             $packeteryOrderFields['id_branch'] = (int)$pickupPoint->carrierId;
             $packeteryOrderFields['carrier_pickup_point'] = pSQL($pickupPoint->carrierPickupPointId);
