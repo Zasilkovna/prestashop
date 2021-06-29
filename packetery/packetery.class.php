@@ -325,15 +325,16 @@ class Packeteryclass
      */
     public static function getTrackingFromOrders($id_orders)
     {
+        $tracking = [];
         $sql = 'SELECT tracking_number
                 FROM `' . _DB_PREFIX_ . 'packetery_order` 
                 WHERE id_order IN(' . pSQL($id_orders) . ') 
                     AND tracking_number!=\'\';';
         $result = Db::getInstance()->executeS($sql);
-        $tracking = array();
-        foreach ($result as $tn)
-        {
-            $tracking[] = "{$tn['tracking_number']}";
+        if ($result) {
+            foreach ($result as $tn) {
+                $tracking[] = "{$tn['tracking_number']}";
+            }
         }
         return $tracking;
     }
@@ -588,20 +589,23 @@ class Packeteryclass
      */
     public static function getListPayments()
     {
-    	$installedPaymentModules = PaymentModule::getInstalledPaymentModules();
-		$sql = 'SELECT DISTINCT `module_name`, `is_cod`
+        $installedPaymentModules = PaymentModule::getInstalledPaymentModules();
+        $sql = 'SELECT DISTINCT `module_name`, `is_cod`
             FROM `' . _DB_PREFIX_ . 'packetery_payment`';
 
-		$results = Db::getInstance()->executeS($sql);
-		$paymentModules = array_column($results, 'is_cod', 'module_name');
+        $paymentModules = [];
+        $results = Db::getInstance()->executeS($sql);
+        if ($results) {
+            $paymentModules = array_column($results, 'is_cod', 'module_name');
+        }
 
-		$payments = [];
-		foreach ($installedPaymentModules as $installedPaymentModule) {
-			$instance = Module::getInstanceByName($installedPaymentModule['name']);
-			$is_cod = (array_key_exists($installedPaymentModule['name'], $paymentModules) ? (int)$paymentModules[$installedPaymentModule['name']] : 0);
-			$payments[] = ['name' => $instance->displayName , 'is_cod' => $is_cod, 'module_name' => $installedPaymentModule['name']];
-		}
-		return $payments;
+        $payments = [];
+        foreach ($installedPaymentModules as $installedPaymentModule) {
+            $instance = Module::getInstanceByName($installedPaymentModule['name']);
+            $is_cod = (array_key_exists($installedPaymentModule['name'], $paymentModules) ? (int)$paymentModules[$installedPaymentModule['name']] : 0);
+            $payments[] = ['name' => $instance->displayName, 'is_cod' => $is_cod, 'module_name' => $installedPaymentModule['name']];
+        }
+        return $payments;
     }
 
     /**
