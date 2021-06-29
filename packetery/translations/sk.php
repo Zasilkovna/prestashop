@@ -3,6 +3,7 @@
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{packetery}prestashop>packetery.api_5552dc553d496d4b06866ca45b890b4a'] = 'Najprv vyberte objednávky.';
+$_MODULE['<{packetery}prestashop>packetery.api_ffea7a72647ef53ba8cb26537a4bc2c0'] = 'Nepodařilo se načíst objednávku za účelem přípravy balíku.';
 $_MODULE['<{packetery}prestashop>packetery.api_40580ead2944ee1f216ef9be35c18eb4'] = 'Nepodařilo se nalézt směnný kurz mezi objednávkou a pobočkou, objednávka';
 $_MODULE['<{packetery}prestashop>packetery.api_3593dc2dea08cf4567f70933c079f6a9'] = 'Žiaden e-mail nie je pridelený zákazníkovi.';
 $_MODULE['<{packetery}prestashop>packetery.api_bfa381d3c91d890e0d80558816f4c7e8'] = 'Nedá sa stiahnuť zoznam pobočiek. Chyba siete';

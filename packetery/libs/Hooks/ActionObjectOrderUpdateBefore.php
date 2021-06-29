@@ -79,7 +79,7 @@ class ActionObjectOrderUpdateBefore
             return;
         }
 
-        if ($packeteryCarrier['pickup_point_type'] !== null) {
+        if ($packeteryCarrier && $packeteryCarrier['pickup_point_type'] !== null) {
             $this->orderSaver->save($params['object'], $packeteryCarrier, true);
         }
     }
