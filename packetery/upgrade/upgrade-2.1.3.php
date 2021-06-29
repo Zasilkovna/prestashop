@@ -28,34 +28,36 @@ if (!defined('_PS_VERSION_')) {
 }
 function upgrade_module_2_1_3($object)
 {
-    $oldSettings = Db::getInstance()->executeS('SELECT * FROM `' . _DB_PREFIX_ . 'packetery_settings`');
     $insertData = [];
-    foreach ($oldSettings as $oldSetting) {
-        switch (strtoupper($oldSetting['option'])) {
-            case 'APIKEY':
-                // no longer needed
-                break;
-            case 'APIPASS':
-                $insertData[] = ['id' => 1, 'option' => 'APIPASS', 'value' => $oldSetting['value']];
-                break;
-            case 'ESHOPDOMAIN':
-                $insertData[] = ['id' => 2, 'option' => 'ESHOP_ID', 'value' => $oldSetting['value']];
-                break;
-            case 'LABEL_FORMAT':
-                $insertData[] = ['id' => 3, 'option' => 'LABEL_FORMAT', 'value' => $oldSetting['value']];
-                break;
-            case 'LAST_BRANCHES_UPDATE':
-                $insertData[] = ['id' => 4, 'option' => 'LAST_BRANCHES_UPDATE', 'value' => $oldSetting['value']];
-                break;
-            case 'WIDGET_TYPE':
-                $insertData[] = ['id' => 5, 'option' => 'WIDGET_TYPE', 'value' => $oldSetting['value']];
-                break;
-            case 'FORCE_COUNTRY':
-                $insertData[] = ['id' => 6, 'option' => 'FORCE_COUNTRY', 'value' => $oldSetting['value']];
-                break;
-            case 'FORCE_LANG':
-                $insertData[] = ['id' => 7, 'option' => 'FORCE_LANGUAGE', 'value' => $oldSetting['value']];
-                break;
+    $oldSettings = Db::getInstance()->executeS('SELECT * FROM `' . _DB_PREFIX_ . 'packetery_settings`');
+    if ($oldSettings) {
+        foreach ($oldSettings as $oldSetting) {
+            switch (strtoupper($oldSetting['option'])) {
+                case 'APIKEY':
+                    // no longer needed
+                    break;
+                case 'APIPASS':
+                    $insertData[] = ['id' => 1, 'option' => 'APIPASS', 'value' => $oldSetting['value']];
+                    break;
+                case 'ESHOPDOMAIN':
+                    $insertData[] = ['id' => 2, 'option' => 'ESHOP_ID', 'value' => $oldSetting['value']];
+                    break;
+                case 'LABEL_FORMAT':
+                    $insertData[] = ['id' => 3, 'option' => 'LABEL_FORMAT', 'value' => $oldSetting['value']];
+                    break;
+                case 'LAST_BRANCHES_UPDATE':
+                    $insertData[] = ['id' => 4, 'option' => 'LAST_BRANCHES_UPDATE', 'value' => $oldSetting['value']];
+                    break;
+                case 'WIDGET_TYPE':
+                    $insertData[] = ['id' => 5, 'option' => 'WIDGET_TYPE', 'value' => $oldSetting['value']];
+                    break;
+                case 'FORCE_COUNTRY':
+                    $insertData[] = ['id' => 6, 'option' => 'FORCE_COUNTRY', 'value' => $oldSetting['value']];
+                    break;
+                case 'FORCE_LANG':
+                    $insertData[] = ['id' => 7, 'option' => 'FORCE_LANGUAGE', 'value' => $oldSetting['value']];
+                    break;
+            }
         }
     }
 

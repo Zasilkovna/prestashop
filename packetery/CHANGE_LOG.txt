@@ -68,3 +68,4 @@
 2.2.0 - Added: compatibility with PrestaShop 1.6
         Added: ability to open widget right after choosing delivery method without the need to click on button
       - Updated: packetery orders table is backed up and deleted upon uninstall
+      - Updated: improved compatibility with PHP versions 7.2,7.4

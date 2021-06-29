@@ -251,16 +251,18 @@ class Packetery extends CarrierModule
 
         /*AD CARRIER LIST*/
         $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
-        $carrierTools = $this->diContainer->get(\Packetery\Carrier\CarrierTools::class);
-        foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
-            list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
-                $packeteryCarrier['id_carrier']
-            );
-            $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
-            $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
-            // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
-            $packeteryListAdCarriers[$index]['name'] =
-                ($packeteryCarrier['name'] === '0' ? Carrier::getCarrierNameFromShopName() : $packeteryCarrier['name']);
+        if ($packeteryListAdCarriers) {
+            $carrierTools = $this->diContainer->get(\Packetery\Carrier\CarrierTools::class);
+            foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
+                list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
+                    $packeteryCarrier['id_carrier']
+                );
+                $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
+                $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
+                // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
+                $packeteryListAdCarriers[$index]['name'] =
+                    ($packeteryCarrier['name'] === '0' ? Carrier::getCarrierNameFromShopName() : $packeteryCarrier['name']);
+            }
         }
 
         $this->context->smarty->assign(array(
@@ -290,7 +292,6 @@ class Packetery extends CarrierModule
         /*END AD CARRIER LIST*/
 
         /*PAYMENT LIST*/
-        $payment_list = array();
         $payment_list = Packeteryclass::getListPayments();
         $this->context->smarty->assign(array(
             'payment_list' => Tools::jsonEncode(array(
@@ -444,28 +445,31 @@ class Packetery extends CarrierModule
                 (int)$params['cart']->id .
                 ' AND id_carrier = ' . (int)$id_carrier
             );
+            if ($row) {
+                $name_branch = $row['name_branch'];
+                $currency_branch = $row['currency_branch'];
+                $carrierPickupPointId = $row['carrier_pickup_point'];
 
-            $name_branch = $row['name_branch'];
-            $currency_branch = $row['currency_branch'];
-            $carrierPickupPointId = $row['carrier_pickup_point'];
+                if ($row['is_carrier'] == 1) {
+                    // to be consistent with widget behavior
+                    $id_branch = $row['carrier_pickup_point'];
 
-            if ($row['is_carrier'] == 1) {
-                // to be consistent with widget behavior
-                $id_branch = $row['carrier_pickup_point'];
-
-                $pickupPointType = 'external';
-                $carrierId = $row['id_branch'];
-            } else {
-                $id_branch = $row['id_branch'];
+                    $pickupPointType = 'external';
+                    $carrierId = $row['id_branch'];
+                } else {
+                    $id_branch = $row['id_branch'];
+                }
             }
         }
 
         $widgetCarriers = '';
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
-        if ($packeteryCarrier['pickup_point_type'] === 'external' && $packeteryCarrier['id_branch']) {
-            $widgetCarriers = $packeteryCarrier['id_branch'];
-        } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
-            $widgetCarriers = 'packeta';
+        if ($packeteryCarrier) {
+            if ($packeteryCarrier['pickup_point_type'] === 'external' && $packeteryCarrier['id_branch']) {
+                $widgetCarriers = $packeteryCarrier['id_branch'];
+            } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
+                $widgetCarriers = 'packeta';
+            }
         }
 
         $this->context->smarty->assign('widget_carriers', $widgetCarriers);
@@ -682,13 +686,16 @@ class Packetery extends CarrierModule
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
         ];
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
-        if ($packeteryCarrier['pickup_point_type'] === 'external' &&
-            $packeteryOrder['id_branch'] !== null &&
-            (bool)$packeteryOrder['is_carrier'] === true
-        ) {
-            $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
-        } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
-            $widgetOptions['carriers'] = 'packeta';
+        if ($packeteryCarrier) {
+            if (
+                $packeteryCarrier['pickup_point_type'] === 'external' &&
+                $packeteryOrder['id_branch'] !== null &&
+                (bool)$packeteryOrder['is_carrier'] === true
+            ) {
+                $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
+            } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
+                $widgetOptions['carriers'] = 'packeta';
+            }
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
         $this->context->smarty->assign('orderId', $orderId);
