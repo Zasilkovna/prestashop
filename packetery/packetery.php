@@ -31,7 +31,6 @@ use Packetery\Order\OrderRepository;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Hooks\ActionObjectOrderUpdateBefore;
 use Packetery\Carrier\CarrierTools;
-use Packetery\Tools\ToolsFork;
 
 include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
@@ -682,7 +681,7 @@ class Packetery extends CarrierModule
     private function savePickupPointChange()
     {
         $orderId = (int)Tools::getValue('order_id');
-        $pickupPoint = json_decode(ToolsFork::getValue('pickup_point'));
+        $pickupPoint = json_decode(Packetery\Tools\Tools::getValue('pickup_point'));
         if (!$pickupPoint) {
             return false;
         }

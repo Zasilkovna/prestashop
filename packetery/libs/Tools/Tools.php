@@ -4,9 +4,9 @@ namespace Packetery\Tools;
 
 use Symfony\Component\HttpFoundation\Request;
 use ToolsCore;
-use Tools;
+use Tools as PrestaShopTools;
 
-class ToolsFork extends ToolsCore
+class Tools extends ToolsCore
 {
     /**
      * Get a value from $_POST / $_GET
@@ -19,7 +19,9 @@ class ToolsFork extends ToolsCore
      */
     public static function getValue($key, $default_value = false)
     {
-        if (Tools::version_compare(_PS_VERSION_, '1.7.6', '<')) {
+        // we need to get rid of stripslashes in case of PrestaShop version < 1.7.6
+        // otherwise, it's sometimes not possible to decode JSON got in POST
+        if (PrestaShopTools::version_compare(_PS_VERSION_, '1.7.6', '<')) {
             // version from PrestaShop 1.7.6
             if (empty($key) || !is_string($key)) {
                 return false;
@@ -38,6 +40,6 @@ class ToolsFork extends ToolsCore
             return $value;
         }
 
-        return Tools::getValue($key, $default_value);
+        return PrestaShopTools::getValue($key, $default_value);
     }
 }
