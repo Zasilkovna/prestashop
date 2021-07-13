@@ -1,5 +1,7 @@
 <?php
 
+use Packetery\Order\OrderRepository;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -26,8 +28,9 @@ function upgrade_module_2_1_7($module)
     if (!$ordersWithoutIdCarrier) {
         return true;
     }
+    $orderRepository = $module->diContainer->get(OrderRepository::class);
     foreach ($ordersWithoutIdCarrier as $orderWithoutIdCarrier) {
-        $result = $module->orderRepository->updateCarrierId(
+        $result = $orderRepository->updateCarrierId(
             (int)$orderWithoutIdCarrier['id_order'],
             (int)$orderWithoutIdCarrier['id_carrier_pad']
         );
