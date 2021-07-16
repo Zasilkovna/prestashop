@@ -29,7 +29,7 @@ require_once(dirname(__FILE__) . '../../../init.php');
 
 // TODO: use Context::getContext()->customer->isLogged() instead?
 $token = Tools::getValue('token');
-$real_token = Tools::getToken(false);
+$real_token = Tools::getToken('ajax_front');
 if ($token !== $real_token) {
     exit;
 }

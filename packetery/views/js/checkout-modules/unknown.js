@@ -3,6 +3,10 @@
 // this unknown module support already existed in front.js
 var PacketeryCheckoutModuleUnknown = {
 
+    isActive: function() {
+        return this.findDeliveryOptions().length > 0;
+    },
+
     getSelectedInput: function () {
         return $('.delivery_option.selected input');
     },

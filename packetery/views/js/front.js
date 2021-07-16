@@ -9,7 +9,7 @@ var country = 'cz,sk'; /* Default countries */
 
 function PacketeryCheckoutModulesManager() {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
-    this.supportedModules = ['Standard', 'Unknown', 'Supercheckout'];
+    this.supportedModules = ['Ps16', 'Standard', 'Unknown', 'Supercheckout'];
     this.loadedModules = [];
     this.detectedModule = null;
 
@@ -39,7 +39,7 @@ function PacketeryCheckoutModulesManager() {
 
         var manager = this;
         this.loadedModules.forEach(function (module) {
-            if ((manager.detectedModule === null) && module.findDeliveryOptions().length) {
+            if ((manager.detectedModule === null) && module.isActive()) {
                 manager.detectedModule = module;
             }
         });
@@ -49,6 +49,10 @@ function PacketeryCheckoutModulesManager() {
 
     // in case we need to change this in the future
     this.getCarrierId = function ($selectedInput) {
+        if($selectedInput.length === 0) {
+            return null;
+        }
+
         return $selectedInput.val().replace(',', '');
     }
 
@@ -59,11 +63,32 @@ function PacketeryCheckoutModulesManager() {
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 var widgetCarriers;
 
-$(document).ready(function ()
-{
+var packeteryCheckBoxAndLoad = function() {
+    if($(".zas-box").length === 0 && $('#zpoint_carriers').length === 0) {
+        return; // incorrect context
+    }
+
     if ($(".zas-box").length) {
         onShippingLoadedCallback();
+    } else {
+        var zpointCarriers = $('#zpoint_carriers').val();
+        var zpoint_carriers = JSON.parse(zpointCarriers);
+        var data = JSON.parse($('#all-carriers-data').val());
+
+        var module = packeteryModulesManager.detectModule();
+        if(typeof module.createZasBoxes === 'undefined') {
+            console.error('Module does not implement createZasBoxes and backend did not pre-create zas-boxes.');
+            return;
+        }
+        module.createZasBoxes(zpoint_carriers, packetery_select_text, packetery_selected_text, data);
+
+        onShippingLoadedCallback();
     }
+};
+
+$(document).ready(function ()
+{
+    packeteryCheckBoxAndLoad();
 });
 
 window.initializePacketaWidget = function ()
@@ -161,6 +186,8 @@ tools = {
             return;
         }
 
+        var selectedCarrierId = packeteryModulesManager.getCarrierId(module.getSelectedInput());
+
         $('.carrier-extra-content').each(function ()
         {
             var $extra = $(this);
@@ -169,11 +196,14 @@ tools = {
             }
 
             var carrierId = String($extra.find('#carrier_id').val());
-            var zpointCarriers = $extra.find('#zpoint_carriers').val();
+            var zpointCarriers = $('#zpoint_carriers').val(); // todo move to global?? what about 1.7
             zpointCarriers = JSON.parse(zpointCarriers);
-            if (!zpointCarriers.includes(carrierId)) {
+            if (selectedCarrierId === null || selectedCarrierId !== carrierId || !zpointCarriers.includes(carrierId)) {
                 $extra.find('#open-packeta-widget').hide();
                 $extra.find('#selected-branch').hide();
+            } else {
+                $extra.find('#open-packeta-widget').show();
+                $extra.find('#selected-branch').show();
             }
 
             /* Only displayed extra content */
@@ -262,7 +292,7 @@ ajaxs = {
     },
     checkToken: function ()
     {
-        return '&token=' + prestashop.static_token;
+        return '&token=' + window.packetery_ajax_front_token;
     },
 }
 

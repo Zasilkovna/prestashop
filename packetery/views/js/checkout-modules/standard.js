@@ -2,6 +2,10 @@
 
 var PacketeryCheckoutModuleStandard = {
 
+    isActive: function() {
+        return this.findDeliveryOptions().length > 0;
+    },
+
     getSelectedInput: function () {
         return $('.delivery-option input:checked');
     },
