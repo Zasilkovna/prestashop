@@ -79,10 +79,15 @@ var packeteryCreateZasBoxes = function ($delivery_options, getExtraContentContai
             /* Display button and inputs */
             // todo redo id attr to class attr ?
             c = getExtraContentContainer($(e))
+
+            if (c.find(".zas-box").length !== 0) {
+                return; // continue to next option
+            }
+
             c.append(
                 '<div class="carrier-extra-content">' +
-                    '<div id="packetery-widget">' +
-                        '<div id="packetery-carrier-' + carrierId + '">' +
+                    '<div id="packetery-carrier-' + carrierId + '">' +
+                        '<div id="packetery-widget">' +
                             '<div class="zas-box">' +
                                 '<button class="btn btn-success btn-md open-packeta-widget" id="open-packeta-widget">' + packetery_select_text + '</button>' +
                                 '<br>' +
@@ -111,9 +116,8 @@ var packeteryCheckBoxAndLoad = function() {
         return; // incorrect context
     }
 
-    if ($(".zas-box").length) {
-        onShippingLoadedCallback();
-    } else {
+    var is16version = window.prestashop_version && window.prestashop_version.indexOf('1.6') === 0;
+    if(is16version) {
         var zpointCarriers = $('#zpoint_carriers').val();
         var zpoint_carriers = JSON.parse(zpointCarriers);
         var data = JSON.parse($('#all-carriers-data').val());
@@ -123,9 +127,9 @@ var packeteryCheckBoxAndLoad = function() {
         packeteryCreateZasBoxes(module.findDeliveryOptions(), function ($input) {
             return module.getExtraContentContainer($input);
         }, zpoint_carriers, packetery_select_text, packetery_selected_text, data);
-
-        onShippingLoadedCallback();
     }
+
+    onShippingLoadedCallback();
 };
 
 $(document).ready(function ()
@@ -263,7 +267,7 @@ tools = {
         /* Enable / Disable continue buttons after carrier change */
 
         var $deliveryInputs = module.findDeliveryOptions();
-        $deliveryInputs.change(function ()
+        $deliveryInputs.off('change.packeteryFix').on('change.packeteryFix', function ()
         {
             module.disableSubmitButton();
 
