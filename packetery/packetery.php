@@ -453,8 +453,18 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayCarrierExtraContent($params)
     {
-		$id_carrier = $params['carrier']['id'];
-		$this->context->smarty->assign('carrier_id', $id_carrier);
+        global $language;
+
+        $id_carrier = $params['carrier']['id'];
+
+        $zPointCarriers = Db::getInstance()->executeS(
+            'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
+            JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`)
+            WHERE `c`.`deleted` = 0 AND `pad`.`pickup_point_type` IS NOT NULL'
+        );
+        $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
+
+        $this->context->smarty->assign('carrier_id', $id_carrier);
 
 		$name_branch = '';
 		$currency_branch = '';
@@ -497,6 +507,13 @@ class Packetery extends CarrierModule
             $widgetCarriers = 'packeta';
         }
 
+        $psVersion = _PS_VERSION_; // todo do it for 1.7 as well?
+        $token = Tools::getToken('ajax_front');
+
+        $this->context->smarty->assign('psVersion', $psVersion);
+        $this->context->smarty->assign('token', $token);
+        $this->context->smarty->assign('app_identity', Packeteryclass::APP_IDENTITY_PREFIX . $this->version);
+        $this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
         $this->context->smarty->assign('widget_carriers', $widgetCarriers);
 		$this->context->smarty->assign('id_branch', $id_branch);
 		$this->context->smarty->assign('name_branch', $name_branch);
@@ -504,7 +521,14 @@ class Packetery extends CarrierModule
 		$this->context->smarty->assign('pickup_point_type', $pickupPointType);
 		$this->context->smarty->assign('packeta_carrier_id', $carrierId);
 		$this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
-		$output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget.tpl');
+
+        $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+        $this->context->smarty->assign('baseuri', $base_uri);
+        $this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
+        $this->context->smarty->assign('language', (array)$language);
+        /*END FIELDS FOR AJAX*/
+
+        $output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget.tpl');
 		return $output;
     }
 
@@ -541,9 +565,9 @@ class Packetery extends CarrierModule
         $language = new LanguageCore($this->context->cart->id_lang); // todo 1.7 uses     global $language;
         $lang = ($language->iso_code ?: 'en');
 
-        $must_select_point_text = $this->l('You must select a pickup point before continuing');
-        $select_point_text = $this->l('Please select a pickup point');
-        $selected_point_text = $this->l('Selected pickup point');
+        $must_select_point_text = $this->l('Please select pickup point');
+        $select_point_text = $this->l('Select pick-up point:');
+        $selected_point_text = $this->l('Selected pick-up point:');
         $appIdentity = Packeteryclass::APP_IDENTITY_PREFIX . $this->version;
         $base_uri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
 
@@ -634,7 +658,7 @@ END;
 
         $iterator = new GlobIterator(__DIR__ . '/views/js/checkout-modules/*.js', FilesystemIterator::CURRENT_AS_FILEINFO);
         foreach($iterator as $entry) {
-            $js[] = 'checkout-modules/' . $entry->getBasename();
+            $js[] = 'checkout-modules/' . $entry->getBasename() . '?v=' . $this->version;
         }
 
         foreach ($js as $file) {
@@ -817,7 +841,6 @@ END;
     private function getModuleHooksList()
     {
         $hooks = [
-            'displayCarrierList',
             'actionOrderHistoryAddAfter',
             'backOfficeHeader',
             'displayCarrierExtraContent',
@@ -834,6 +857,11 @@ END;
         } else {
             $hooks[] = 'displayAdminOrderMain';
         }
+
+        if (Tools::version_compare(_PS_VERSION_, '1.7.0', '<')) {
+            $hooks[] = 'displayCarrierList'; // does not work in 1.7
+        }
+
         return $hooks;
     }
 

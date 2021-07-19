@@ -18,7 +18,7 @@ class ControllerWrapper
      */
     public function addJavascript($name, $uri, array $params) {
         if (Tools::version_compare(_PS_VERSION_, '1.7.0.0', '<')) {
-            $this->controller->addJS($uri . '?' . http_build_query($params));
+            $this->controller->addJS($uri);
         } else {
             $this->controller->registerJavascript($name, $uri, $params);
         }
@@ -31,7 +31,7 @@ class ControllerWrapper
      */
     public function registerStylesheet($name, $uri, array $params) {
         if (Tools::version_compare(_PS_VERSION_, '1.7.0.0', '<')) {
-            $this->controller->addCSS($uri . '?' . http_build_query($params));
+            $this->controller->addCSS($uri);
         } else {
             $this->controller->registerStylesheet($name, $uri, $params);
         }

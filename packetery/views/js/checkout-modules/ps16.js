@@ -31,8 +31,6 @@ var PacketeryCheckoutModulePs16 = {
     },
 
     disableSubmitButton: function () {
-        console.log('disableSubmitButton');
-
         var processCarrier = $('button[name=processCarrier]');
         if (processCarrier.length > 0) {
             $('button[name=processCarrier]')
@@ -55,39 +53,8 @@ var PacketeryCheckoutModulePs16 = {
     hideValidationErrors: function () {
     },
 
-    createZasBoxes: function (zpoint_carriers, packetery_select_text, packetery_selected_text, data) {
-        data = data || {};
-
-        $("input.delivery_option_radio:checked").each(function (i, e) {
-            // trim commas
-            var carrierId = $(e).val().replace(/(^\,+)|(\,+$)/g, '');
-            var carrierData = data[carrierId];
-
-            if (zpoint_carriers.includes(carrierId)) {
-                /* Display button and inputs */
-                // todo redo id attr to class attr ?
-                c = $(e).closest('tr').find('td:nth-child(3)');
-                c.append(
-                    '<div class="carrier-extra-content">' +
-                        '<div id="packetery-widget">' +
-                            '<div id="packetery-carrier-' + carrierId + '">' +
-                                '<div class="zas-box"><h3><button class="btn btn-success btn-md open-packeta-widget" id="open-packeta-widget">' + packetery_select_text + '</h3>' +
-                                    '<div id="selected-branch">' +
-                                        '<b>' + packetery_selected_text + '</b>: <span class="picked-delivery-place">' + (carrierData.name_branch ? carrierData.name_branch : '') + '</span>' +
-                                    '</div>' +
-                                    '<input type="hidden" id="carrier_id" class="carrier_id" name="carrier_id" value="' + carrierId + '">' +
-                                    '<input type="hidden" id="packeta-branch-id" class="packeta-branch-id" name="packeta-branch-id" value="' + (carrierData.id_branch ? carrierData.id_branch : '') + '">' +
-                                    '<input type="hidden" id="widget_carriers" class="widget_carriers" name="widget_carriers" value="' + (carrierData.widget_carriers ? carrierData.widget_carriers : '') + '">' +
-                                    '<input type="hidden" id="packeta-branch-name" class="packeta-branch-name" name="packeta-branch-name" value="' + (carrierData.name_branch ? carrierData.name_branch : '') + '">' +
-                                    '<input type="hidden" id="packeta-pickup-point-type" class="packeta-pickup-point-type" name="packeta-pickup-point-type" value="' + (carrierData.pickup_point_type ? carrierData.pickup_point_type : '') + '">' +
-                                    '<input type="hidden" id="packeta-carrier-id" class="packeta-carrier-id" name="packeta-carrier-id" value="' + (carrierData.carrier_id ? carrierData.carrier_id : '') + '">' +
-                                    '<input type="hidden" id="packeta-carrier-pickup-point-id" class="packeta-carrier-pickup-point-id" name="packeta-carrier-pickup-point-id" value="' + (carrierData.carrier_pickup_point_id ? carrierData.carrier_pickup_point_id : '') + '">' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>');
-            }
-        });
-    }
+    getExtraContentContainer: function ($selectedInput) {
+        return $selectedInput.closest('tr').find('td:nth-child(3)');
+    },
 
 };
