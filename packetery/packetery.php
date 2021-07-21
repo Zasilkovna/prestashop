@@ -512,7 +512,7 @@ class Packetery extends CarrierModule
 
         $this->context->smarty->assign('psVersion', $psVersion);
         $this->context->smarty->assign('token', $token);
-        $this->context->smarty->assign('app_identity', Packeteryclass::APP_IDENTITY_PREFIX . $this->version);
+        $this->context->smarty->assign('app_identity', Packeteryclass::getAppIdentity($this->version));
         $this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
         $this->context->smarty->assign('widget_carriers', $widgetCarriers);
 		$this->context->smarty->assign('id_branch', $id_branch);
@@ -526,9 +526,15 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('baseuri', $base_uri);
         $this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
         $this->context->smarty->assign('language', (array)$language);
+        $this->context->smarty->assign('local_path', $this->local_path);
         /*END FIELDS FOR AJAX*/
 
-        $output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget.tpl');
+        $template = 'views/templates/front/widget.tpl';
+        if (isset($params['packetery']['template'])) {
+            $template = $params['packetery']['template'];
+        }
+
+        $output = $this->context->smarty->fetch($this->local_path.$template);
 		return $output;
     }
 
@@ -557,8 +563,6 @@ class Packetery extends CarrierModule
         );
 
         $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
-        $zPointCarriersIdsJSON = htmlentities($zPointCarriersIdsJSON);
-
         $api_key = PacketeryApi::getApiKey();
 
         /* Get language from cart, global $language updates weirdly */
@@ -566,85 +570,25 @@ class Packetery extends CarrierModule
         $lang = ($language->iso_code ?: 'en');
 
         $must_select_point_text = $this->l('Please select pickup point');
-        $select_point_text = $this->l('Select pick-up point:');
-        $selected_point_text = $this->l('Selected pick-up point:');
-        $appIdentity = Packeteryclass::APP_IDENTITY_PREFIX . $this->version;
+        $appIdentity = Packeteryclass::getAppIdentity($this->version);
         $base_uri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
 
         $lang = strtolower($lang);
 
-        $allCarriersData = [];
-        $allCarriers = Packeteryclass::getPacketeryCarriersList();
-        foreach ($allCarriers as $carrier) {
-            $id_carrier = $carrier['id_carrier'];
-            $name_branch = '';
-            $currency_branch = '';
-            $id_branch = '';
-            $pickupPointType = 'internal';
-            $carrierId = '';
-            $carrierPickupPointId = '';
-            if (!empty($params['cart'])) {
-                $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
-
-                $name_branch = $row['name_branch'];
-                $currency_branch = $row['currency_branch'];
-                $carrierPickupPointId = $row['carrier_pickup_point'];
-
-                if ($row['is_carrier'] == 1) {
-                    // to be consistent with widget behavior
-                    $id_branch = $row['carrier_pickup_point'];
-
-                    $pickupPointType = 'external';
-                    $carrierId = $row['id_branch'];
-                } else {
-                    $id_branch = $row['id_branch'];
-                }
-            }
-
-            $widgetCarriers = '';
-            $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
-            if ($packeteryCarrier['pickup_point_type'] === 'external' && $packeteryCarrier['id_branch']) {
-                $widgetCarriers = $packeteryCarrier['id_branch'];
-            } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
-                $widgetCarriers = 'packeta';
-            }
-
-            $allCarriersData[$carrier['id_carrier']] = [
-                'id_carrier' => $carrier['id_carrier'],
-                'name_branch' => $name_branch,
-                'id_branch' => $id_branch,
-                'pickup_point_type' => $pickupPointType,
-                'carrier_id' => $carrierId,
-                'carrier_pickup_point_id' => $carrierPickupPointId,
-                'widget_carriers' => $widgetCarriers,
-            ];
-        }
-        $allCarriersDataJson = Tools::jsonEncode($allCarriersData);
-        $allCarriersDataJson = htmlentities($allCarriersDataJson);
         $psVersion = _PS_VERSION_; // todo do it for 1.7 as well?
         $token = Tools::getToken('ajax_front');
 
-        /* Define some JS variables and inicialize widget */
-        return <<< END
-	    <input type="hidden" name="all-carriers-data" id="all-carriers-data" value="{$allCarriersDataJson}">
-	    <input type="hidden" name="baseuri" id="baseuri" value="{$base_uri}">
-	    <input type="hidden" id="shop-language" name="shop-language" value="{$lang}">
-	    <input type="hidden" id="customer_country" name="customer_country" value="{$country}">
-	    <input type="hidden" id="zpoint_carriers" name="zpoint_carriers" value="{$zPointCarriersIdsJSON}">
-	    <input type="hidden" id="app_identity" name="app_identity" value="{$appIdentity}">
-		<input type="hidden" id="packeta-api-key" name="packeta-api-key" value="{$api_key}">
-        <script type="text/javascript">
-            var packetery_ajax_front_token = "{$token}"; 
-            var prestashop_version = "{$psVersion}"; 
-            var packetery_selected_text = "{$selected_point_text}"; 
-            var packetery_select_text = "{$select_point_text}";
-            var packetery_must_select_text = "{$must_select_point_text}";
-            
-            $(function(){
-                packeteryCheckBoxAndLoad();
-            });
-        </script>
-END;
+        $this->context->smarty->assign('base_uri', $base_uri);
+        $this->context->smarty->assign('lang', $lang);
+        $this->context->smarty->assign('country', $country);
+        $this->context->smarty->assign('zPointCarriersIdsJSON', $zPointCarriersIdsJSON);
+        $this->context->smarty->assign('appIdentity', $appIdentity);
+        $this->context->smarty->assign('api_key', $api_key);
+        $this->context->smarty->assign('token', $token);
+        $this->context->smarty->assign('psVersion', $psVersion);
+        $this->context->smarty->assign('must_select_point_text', $must_select_point_text);
+
+        return $this->context->smarty->fetch($this->local_path.'views/templates/front/carrier-list-header.tpl');
     }
 
     /**
@@ -664,7 +608,7 @@ END;
         foreach ($js as $file) {
 //            $this->context->controller->addJS($this->_path . 'views/js/' . $file);
             $uri = $this->_path . 'views/js/' . $file;
-            $this->controllerWrapper->addJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
+            $this->controllerWrapper->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
         }
 
         $this->controllerWrapper->registerStylesheet('packetery-front', $this->_path . 'views/css/front.css?v=' . $this->version, ['server' => 'remote']);
@@ -758,7 +702,7 @@ END;
         $employee = Context::getContext()->employee;
         $widgetOptions = [
             'api_key' => $apiKey,
-            'app_identity' => Packeteryclass::APP_IDENTITY_PREFIX . $this->version,
+            'app_identity' => Packeteryclass::getAppIdentity($this->version),
             'country' => strtolower($packeteryOrder['country']),
             'module_dir' => _MODULE_DIR_,
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),

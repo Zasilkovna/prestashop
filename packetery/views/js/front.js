@@ -63,9 +63,58 @@ function PacketeryCheckoutModulesManager() {
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 var widgetCarriers;
 
-var packeteryCreateZasBoxes = function ($delivery_options, getExtraContentContainer, zpoint_carriers, packetery_select_text, packetery_selected_text, data) {
-    data = data || {};
+var PacketeryAjaxCallWaiter = function(onCompleted) {
+    var promises = [];
+    var start = false;
+    var completedCalled = false;
 
+    var promisesDone = function() {
+        for(var key in promises) {
+            if(promises.hasOwnProperty(key)) {
+                if(promises[key].done !== true) {
+                    return false
+                }
+            }
+        }
+
+        return true;
+    };
+
+    var checkCompleted = function() {
+        if(start && promisesDone()) {
+            if(completedCalled === false) {
+                completedCalled = true;
+                onCompleted(promises);
+            }
+        }
+    };
+
+    return {
+        start: function() {
+            start = true;
+            checkCompleted();
+        },
+        addPromise: function(name, promise) {
+            var wrapper = {
+                name: name,
+                done: null,
+                response: null,
+                promise: promise
+            };
+
+            promise.done(function(response) {
+                wrapper.done = true;
+                wrapper.response = response;
+                checkCompleted();
+            });
+
+            promises.push(wrapper);
+        }
+    };
+};
+
+var packeteryCreateZasBoxes = function ($delivery_options, getExtraContentContainer, zpoint_carriers, onSuccess) {
+    var waiter = PacketeryAjaxCallWaiter(onSuccess);
     $delivery_options.each(function (i, e) {
         if($(e).is(':checked') === false) {
             return;
@@ -73,42 +122,27 @@ var packeteryCreateZasBoxes = function ($delivery_options, getExtraContentContai
 
         // trim commas
         var carrierId = $(e).val().replace(/(^\,+)|(\,+$)/g, '');
-        var carrierData = data[carrierId];
 
         if (zpoint_carriers.includes(carrierId)) {
             /* Display button and inputs */
             // todo redo id attr to class attr ?
-            c = getExtraContentContainer($(e))
+            var c = getExtraContentContainer($(e));
 
             if (c.find(".zas-box").length !== 0) {
                 return; // continue to next option
             }
 
-            c.append(
-                '<div class="carrier-extra-content">' +
-                    '<div id="packetery-carrier-' + carrierId + '">' +
-                        '<div id="packetery-widget">' +
-                            '<div class="zas-box">' +
-                                '<button class="btn btn-success btn-md open-packeta-widget" id="open-packeta-widget">' + packetery_select_text + '</button>' +
-                                '<br>' +
-                                '<ul id="selected-branch">' +
-                                    '<li>' + packetery_selected_text +
-                                        '<span id="picked-delivery-place" class="picked-delivery-place"> ' + (carrierData.name_branch ? carrierData.name_branch : '')  + '</span>' +
-                                    '</li>' +
-                                '</ul>' +
-                                '<input type="hidden" id="carrier_id" class="carrier_id" name="carrier_id" value="' + carrierId + '">' +
-                                '<input type="hidden" id="packeta-branch-id" class="packeta-branch-id" name="packeta-branch-id" value="' + (carrierData.id_branch ? carrierData.id_branch : '') + '">' +
-                                '<input type="hidden" id="widget_carriers" class="widget_carriers" name="widget_carriers" value="' + (carrierData.widget_carriers ? carrierData.widget_carriers : '') + '">' +
-                                '<input type="hidden" id="packeta-branch-name" class="packeta-branch-name" name="packeta-branch-name" value="' + (carrierData.name_branch ? carrierData.name_branch : '') + '">' +
-                                '<input type="hidden" id="packeta-pickup-point-type" class="packeta-pickup-point-type" name="packeta-pickup-point-type" value="' + (carrierData.pickup_point_type ? carrierData.pickup_point_type : '') + '">' +
-                                '<input type="hidden" id="packeta-carrier-id" class="packeta-carrier-id" name="packeta-carrier-id" value="' + (carrierData.carrier_id ? carrierData.carrier_id : '') + '">' +
-                                '<input type="hidden" id="packeta-carrier-pickup-point-id" class="packeta-carrier-pickup-point-id" name="packeta-carrier-pickup-point-id" value="' + (carrierData.carrier_pickup_point_id ? carrierData.carrier_pickup_point_id : '') + '">' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>');
+            var carrierPromise = packetery.createZasBoxHtml(carrierId).done(function(result) {
+                c.find('.carrier-extra-content').remove();
+                c.append(result);
+            });
+
+            waiter.addPromise(carrierId, carrierPromise);
         }
+
     });
+
+    waiter.start();
 }
 
 var packeteryCheckBoxAndLoad = function() {
@@ -120,16 +154,16 @@ var packeteryCheckBoxAndLoad = function() {
     if(is16version) {
         var zpointCarriers = $('#zpoint_carriers').val();
         var zpoint_carriers = JSON.parse(zpointCarriers);
-        var data = JSON.parse($('#all-carriers-data').val());
-
         var module = packeteryModulesManager.detectModule();
 
-        packeteryCreateZasBoxes(module.findDeliveryOptions(), function ($input) {
+        packeteryCreateZasBoxes(module.findDeliveryOptions(), function($input) {
             return module.getExtraContentContainer($input);
-        }, zpoint_carriers, packetery_select_text, packetery_selected_text, data);
+        }, zpoint_carriers, function() {
+            onShippingLoadedCallback();
+        });
+    } else {
+        onShippingLoadedCallback();
     }
-
-    onShippingLoadedCallback();
 };
 
 $(document).ready(function ()
@@ -323,6 +357,24 @@ packetery = {
                 'pickup_point_type': pickup_point_type,
                 'widget_carrier_id': widget_carrier_id,
                 'carrier_pickup_point_id': carrier_pickup_point_id
+            },
+            beforeSend: function () {
+                $("body").toggleClass("wait");
+            },
+            success: function (msg) {
+                return true;
+            },
+            complete: function () {
+                $("body").toggleClass("wait");
+            },
+        });
+    },
+    createZasBoxHtml: function(prestashop_carrier_id) {
+        return $.ajax({
+            type: 'POST',
+            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=createZasBoxHtml' + ajaxs.checkToken(),
+            data: {
+                'prestashop_carrier_id': prestashop_carrier_id,
             },
             beforeSend: function () {
                 $("body").toggleClass("wait");

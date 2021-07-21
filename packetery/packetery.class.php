@@ -33,10 +33,18 @@ require_once(dirname(__FILE__) . '/packetery.php');
 class Packeteryclass
 {
 
-    const APP_IDENTITY_PREFIX = 'prestashop-1.x-packeta-';
     // only for mixing with branch ids
     const ZPOINT = 'zpoint';
     const PP_ALL = 'pp_all';
+
+    /**
+     * @param string $version
+     * @return string
+     */
+    public static function getAppIdentity($version) {
+        $psVersion = _PS_VERSION_;
+        return sprintf('prestashop-%s-packeta-%s', $psVersion, $version);
+    }
 
     /**
      * Converts price from order currency to branch currency

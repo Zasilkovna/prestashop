@@ -757,4 +757,21 @@ class PacketeryApi
         return $result;
     }
     /*END WIDGET*/
+
+    public static function createZasBoxHtml() {
+        $carrierId = Tools::getValue('prestashop_carrier_id');
+
+        $packetery = new Packetery();
+        $params = [
+            'packetery' => [
+                'template' => 'views/templates/front/widget-wrapped.tpl'
+            ],
+            'carrier' => [
+                'id' => $carrierId
+            ],
+            'cart' => Context::getContext()->cart
+        ];
+
+        return $packetery->hookDisplayCarrierExtraContent($params);
+    }
 }

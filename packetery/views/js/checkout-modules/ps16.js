@@ -20,7 +20,7 @@ var PacketeryCheckoutModulePs16 = {
         /* Reenable disabled elements if carrier is not packetery */
         $('#cgv').attr('disabled', false);
         $('#cgv').parent().parent().removeClass('disabled');
-        $('p.payment_module a').unbind('click.packeteryButtonDisabled');
+        $('p.payment_module a').off('click.packeteryButtonDisabled');
 
         if (processCarrier.length > 0) {
             $('button[name=processCarrier]')
@@ -43,7 +43,7 @@ var PacketeryCheckoutModulePs16 = {
         $('#cgv').attr('disabled', true);
 
         /* unbind click events from payment links and disable them - cannot continue without selecting a branch */
-        $('p.payment_module a').on('click.packeteryButtonDisabled', function (e) {
+        $('p.payment_module a').off('click.packeteryButtonDisabled').on('click.packeteryButtonDisabled', function (e) {
             alert(packetery_must_select_text);
             e.preventDefault();
             return false;
