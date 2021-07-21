@@ -2,6 +2,10 @@
 
 var PacketeryCheckoutModuleSupercheckout = {
 
+    isActive: function() {
+        return this.findDeliveryOptions().length > 0;
+    },
+
     getSelectedInput: function () {
         return $('#shipping-method input:checked');
     },

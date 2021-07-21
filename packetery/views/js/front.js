@@ -9,7 +9,7 @@ var country = 'cz,sk'; /* Default countries */
 
 function PacketeryCheckoutModulesManager() {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
-    this.supportedModules = ['Standard', 'Unknown', 'Supercheckout'];
+    this.supportedModules = ['Ps16', 'Standard', 'Unknown', 'Supercheckout'];
     this.loadedModules = [];
     this.detectedModule = null;
 
@@ -39,7 +39,7 @@ function PacketeryCheckoutModulesManager() {
 
         var manager = this;
         this.loadedModules.forEach(function (module) {
-            if ((manager.detectedModule === null) && module.findDeliveryOptions().length) {
+            if ((manager.detectedModule === null) && module.isActive()) {
                 manager.detectedModule = module;
             }
         });
@@ -49,6 +49,10 @@ function PacketeryCheckoutModulesManager() {
 
     // in case we need to change this in the future
     this.getCarrierId = function ($selectedInput) {
+        if($selectedInput.length === 0) {
+            return null;
+        }
+
         return $selectedInput.val().replace(',', '');
     }
 
@@ -59,11 +63,112 @@ function PacketeryCheckoutModulesManager() {
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 var widgetCarriers;
 
-$(document).ready(function ()
-{
-    if ($(".zas-box").length) {
+var PacketeryAjaxCallWaiter = function(onCompleted) {
+    var promises = [];
+    var start = false;
+    var completedCalled = false;
+
+    var promisesDone = function() {
+        for(var key in promises) {
+            if(promises.hasOwnProperty(key)) {
+                if(promises[key].done !== true) {
+                    return false
+                }
+            }
+        }
+
+        return true;
+    };
+
+    var checkCompleted = function() {
+        if(start && promisesDone()) {
+            if(completedCalled === false) {
+                completedCalled = true;
+                onCompleted(promises);
+            }
+        }
+    };
+
+    return {
+        start: function() {
+            start = true;
+            checkCompleted();
+        },
+        addPromise: function(name, promise) {
+            var wrapper = {
+                name: name,
+                done: null,
+                response: null,
+                promise: promise
+            };
+
+            promise.done(function(response) {
+                wrapper.done = true;
+                wrapper.response = response;
+                checkCompleted();
+            });
+
+            promises.push(wrapper);
+        }
+    };
+};
+
+var packeteryCreateZasBoxes = function ($delivery_options, getExtraContentContainer, zpoint_carriers, onSuccess) {
+    var waiter = PacketeryAjaxCallWaiter(onSuccess);
+    $delivery_options.each(function (i, e) {
+        if($(e).is(':checked') === false) {
+            return;
+        }
+
+        // trim commas
+        var carrierId = $(e).val().replace(/(^\,+)|(\,+$)/g, '');
+
+        if (zpoint_carriers.includes(carrierId)) {
+            /* Display button and inputs */
+            // todo redo id attr to class attr ?
+            var c = getExtraContentContainer($(e));
+
+            if (c.find(".zas-box").length !== 0) {
+                return; // continue to next option
+            }
+
+            var carrierPromise = packetery.createZasBoxHtml(carrierId).done(function(result) {
+                c.find('.carrier-extra-content').remove();
+                c.append(result);
+            });
+
+            waiter.addPromise(carrierId, carrierPromise);
+        }
+
+    });
+
+    waiter.start();
+}
+
+var packeteryCheckBoxAndLoad = function() {
+    if($(".zas-box").length === 0 && $('#zpoint_carriers').length === 0) {
+        return; // incorrect context
+    }
+
+    var is16version = window.prestashop_version && window.prestashop_version.indexOf('1.6') === 0;
+    if(is16version) {
+        var zpointCarriers = $('#zpoint_carriers').val();
+        var zpoint_carriers = JSON.parse(zpointCarriers);
+        var module = packeteryModulesManager.detectModule();
+
+        packeteryCreateZasBoxes(module.findDeliveryOptions(), function($input) {
+            return module.getExtraContentContainer($input);
+        }, zpoint_carriers, function() {
+            onShippingLoadedCallback();
+        });
+    } else {
         onShippingLoadedCallback();
     }
+};
+
+$(document).ready(function ()
+{
+    packeteryCheckBoxAndLoad();
 });
 
 window.initializePacketaWidget = function ()
@@ -161,6 +266,8 @@ tools = {
             return;
         }
 
+        var selectedCarrierId = packeteryModulesManager.getCarrierId(module.getSelectedInput());
+
         $('.carrier-extra-content').each(function ()
         {
             var $extra = $(this);
@@ -169,15 +276,20 @@ tools = {
             }
 
             var carrierId = String($extra.find('#carrier_id').val());
-            var zpointCarriers = $extra.find('#zpoint_carriers').val();
+            var zpointCarriers = $('#zpoint_carriers').val(); // todo move to global?? what about 1.7
             zpointCarriers = JSON.parse(zpointCarriers);
-            if (!zpointCarriers.includes(carrierId)) {
+            if (selectedCarrierId === null || selectedCarrierId !== carrierId || !zpointCarriers.includes(carrierId)) {
                 $extra.find('#open-packeta-widget').hide();
                 $extra.find('#selected-branch').hide();
+                $extra.find('#packetery-widget').hide();
+            } else {
+                $extra.find('#open-packeta-widget').show();
+                $extra.find('#selected-branch').show();
+                $extra.find('#packetery-widget').show();
             }
 
             /* Only displayed extra content */
-            if ($extra.css('display') === 'block') {
+            if ($extra.find('#packetery-widget').is(':hidden') === false) {
                 /* And branch is not set, disable */
                 var id_branch = $extra.find(".packeta-branch-id").val();
                 if (id_branch <= 0) {
@@ -189,8 +301,10 @@ tools = {
         /* Enable / Disable continue buttons after carrier change */
 
         var $deliveryInputs = module.findDeliveryOptions();
-        $deliveryInputs.change(function ()
+        $deliveryInputs.off('change.packeteryFix').on('change.packeteryFix', function ()
         {
+            module.disableSubmitButton();
+
             var
                 $this = $(this),
                 prestashop_carrier_id = packeteryModulesManager.getCarrierId($this),
@@ -224,6 +338,8 @@ tools = {
             } else {
                 module.disableSubmitButton();
             }
+
+            packeteryCheckBoxAndLoad();
         });
     }
 }
@@ -252,6 +368,24 @@ packetery = {
                 $("body").toggleClass("wait");
             },
         });
+    },
+    createZasBoxHtml: function(prestashop_carrier_id) {
+        return $.ajax({
+            type: 'POST',
+            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=createZasBoxHtml' + ajaxs.checkToken(),
+            data: {
+                'prestashop_carrier_id': prestashop_carrier_id,
+            },
+            beforeSend: function () {
+                $("body").toggleClass("wait");
+            },
+            success: function (msg) {
+                return true;
+            },
+            complete: function () {
+                $("body").toggleClass("wait");
+            },
+        });
     }
 }
 
@@ -262,7 +396,7 @@ ajaxs = {
     },
     checkToken: function ()
     {
-        return '&token=' + prestashop.static_token;
+        return '&token=' + window.packetery_ajax_front_token;
     },
 }
 

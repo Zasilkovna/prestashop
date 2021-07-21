@@ -6,8 +6,8 @@ use Packetery\Carrier\CarrierTools;
 use Packetery\Order\OrderSaver;
 use Packetery\Order\OrderRepository;
 use \Db;
-use \Address;
-use \Order;
+use \AddressCore as Address;
+use \OrderCore as Order;
 use \Packeteryclass;
 
 class ActionObjectOrderUpdateBefore

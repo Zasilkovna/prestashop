@@ -4,8 +4,8 @@
 namespace Packetery\Carrier;
 
 use \Carrier;
-use \Country;
-use \Configuration;
+use \CountryCore as Country;
+use \ConfigurationCore as Configuration;
 
 class CarrierTools
 {
