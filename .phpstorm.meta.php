@@ -1,5 +1,5 @@
 <?php
 
 namespace PHPSTORM_META {
-    override(\Packetery\Tools\DiContainer::get(0), map(['' => '@']));
+    override(\Packetery\DI\Container::get(0), map(['' => '@']));
 }

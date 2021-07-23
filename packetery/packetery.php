@@ -38,7 +38,7 @@ class Packetery extends CarrierModule
 {
     protected $config_form = false;
 
-    /** @var DiContainer */
+    /** @var Container */
     public $diContainer;
 
     /** @var \Packetery\Tools\ControllerWrapper */
@@ -68,10 +68,7 @@ class Packetery extends CarrierModule
 
         parent::__construct();
 
-        $this->diContainer = new DiContainer();
-        $this->diContainer->register(Db::class, function () {
-            return Db::getInstance();
-        });
+        $this->diContainer = ContainerFactory::create();
         $this->controllerWrapper = $this->context->controller ? new \Packetery\Tools\ControllerWrapper($this->context->controller) : null;
 
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';

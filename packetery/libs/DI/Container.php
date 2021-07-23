@@ -1,15 +1,17 @@
 <?php
 
-namespace Packetery\Tools;
+namespace Packetery\DI;
 
 use Closure;
 use Exception;
 use ReflectionClass;
 use ReflectionException;
 
-class DiContainer
+class Container
 {
+    /** @var array */
     private $factories;
+    /** @var array */
     private $services;
 
     /**
