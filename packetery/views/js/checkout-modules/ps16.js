@@ -3,7 +3,7 @@
 var PacketeryCheckoutModulePs16 = {
 
     isActive: function() {
-        var isCorrectVersion = window.prestashop_version && window.prestashop_version.indexOf('1.6') === 0;
+        var isCorrectVersion = tools.isPS16();
         return isCorrectVersion && this.findDeliveryOptions().length > 0;
     },
 

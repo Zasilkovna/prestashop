@@ -34,9 +34,9 @@
         <div class="widget-left">
             <div class="col-md-12">
                 <div class="zas-box">
-                    <button class="btn btn-sm btn-success pull-left open-packeta-widget"
-                            id="open-packeta-widget">{l s='Select pick-up point:' mod='packetery'}</button>
-                    <br style="clear: both;">
+                    <div class="clearfix">
+                        <button class="btn btn-sm btn-success pull-left open-packeta-widget" id="open-packeta-widget">{l s='Select pick-up point:' mod='packetery'}</button>
+                    </div>
                     <ul id="selected-branch">
                         <li>{l s='Selected pick-up point:' mod='packetery'}
                             <span id="picked-delivery-place" class="picked-delivery-place">{$name_branch}</span>

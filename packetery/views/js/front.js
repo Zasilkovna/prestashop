@@ -63,58 +63,8 @@ function PacketeryCheckoutModulesManager() {
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 var widgetCarriers;
 
-var PacketeryAjaxCallWaiter = function(onCompleted) {
-    var promises = [];
-    var start = false;
-    var completedCalled = false;
-
-    var promisesDone = function() {
-        for(var key in promises) {
-            if(promises.hasOwnProperty(key)) {
-                if(promises[key].done !== true) {
-                    return false
-                }
-            }
-        }
-
-        return true;
-    };
-
-    var checkCompleted = function() {
-        if(start && promisesDone()) {
-            if(completedCalled === false) {
-                completedCalled = true;
-                onCompleted(promises);
-            }
-        }
-    };
-
-    return {
-        start: function() {
-            start = true;
-            checkCompleted();
-        },
-        addPromise: function(name, promise) {
-            var wrapper = {
-                name: name,
-                done: null,
-                response: null,
-                promise: promise
-            };
-
-            promise.done(function(response) {
-                wrapper.done = true;
-                wrapper.response = response;
-                checkCompleted();
-            });
-
-            promises.push(wrapper);
-        }
-    };
-};
-
 var packeteryCreateZasBoxes = function ($delivery_options, getExtraContentContainer, zpoint_carriers, onSuccess) {
-    var waiter = PacketeryAjaxCallWaiter(onSuccess);
+    var deferreds = [];
     $delivery_options.each(function (i, e) {
         if($(e).is(':checked') === false) {
             return;
@@ -132,26 +82,25 @@ var packeteryCreateZasBoxes = function ($delivery_options, getExtraContentContai
                 return; // continue to next option
             }
 
-            var carrierPromise = packetery.createZasBoxHtml(carrierId).done(function(result) {
+            var carrierDeferred = packetery.createZasBoxHtml(carrierId).done(function(result) {
                 c.find('.carrier-extra-content').remove();
                 c.append(result);
             });
 
-            waiter.addPromise(carrierId, carrierPromise);
+            deferreds.push(carrierDeferred);
         }
 
     });
 
-    waiter.start();
+    $.when.apply(null, deferreds).then(onSuccess);
 }
 
-var packeteryCheckBoxAndLoad = function() {
+var packeteryCheckZasBoxAndLoad = function() {
     if($(".zas-box").length === 0 && $('#zpoint_carriers').length === 0) {
         return; // incorrect context
     }
 
-    var is16version = window.prestashop_version && window.prestashop_version.indexOf('1.6') === 0;
-    if(is16version) {
+    if(tools.isPS16()) {
         var zpointCarriers = $('#zpoint_carriers').val();
         var zpoint_carriers = JSON.parse(zpointCarriers);
         var module = packeteryModulesManager.detectModule();
@@ -168,7 +117,7 @@ var packeteryCheckBoxAndLoad = function() {
 
 $(document).ready(function ()
 {
-    packeteryCheckBoxAndLoad();
+    packeteryCheckZasBoxAndLoad();
 });
 
 window.initializePacketaWidget = function ()
@@ -258,6 +207,9 @@ window.initializePacketaWidget = function ()
 };
 
 tools = {
+    isPS16: function () {
+        return window.prestashop_version && window.prestashop_version.indexOf('1.6') === 0;
+    },
     fixextracontent: function ()
     {
         var module = packeteryModulesManager.detectModule();
@@ -304,6 +256,7 @@ tools = {
         $deliveryInputs.off('change.packeteryFix').on('change.packeteryFix', function ()
         {
             module.disableSubmitButton();
+            packeteryCheckZasBoxAndLoad();
 
             var
                 $this = $(this),
@@ -338,8 +291,6 @@ tools = {
             } else {
                 module.disableSubmitButton();
             }
-
-            packeteryCheckBoxAndLoad();
         });
     }
 }

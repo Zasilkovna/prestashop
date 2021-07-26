@@ -10,6 +10,6 @@
     var packetery_must_select_text = "{$must_select_point_text}";
 
     $(function(){
-        packeteryCheckBoxAndLoad();
+        packeteryCheckZasBoxAndLoad();
     });
 </script>

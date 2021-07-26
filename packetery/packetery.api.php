@@ -758,6 +758,10 @@ class PacketeryApi
     }
     /*END WIDGET*/
 
+    /** Endpoint is called in PS 1.6 only. PS 1.6 does not have hook for carrier extra content.
+     * @return string
+     * @throws \SmartyException
+     */
     public static function createZasBoxHtml() {
         $carrierId = Tools::getValue('prestashop_carrier_id');
 
