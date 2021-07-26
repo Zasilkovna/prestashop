@@ -228,7 +228,7 @@ tools = {
             }
 
             var carrierId = String($extra.find('#carrier_id').val());
-            var zpointCarriers = $('#zpoint_carriers').val(); // todo move to global?? what about 1.7
+            var zpointCarriers = $('#zpoint_carriers').val();
             zpointCarriers = JSON.parse(zpointCarriers);
             if (selectedCarrierId === null || selectedCarrierId !== carrierId || !zpointCarriers.includes(carrierId)) {
                 $extra.find('#open-packeta-widget').hide();

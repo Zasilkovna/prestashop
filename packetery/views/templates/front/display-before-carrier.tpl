@@ -8,8 +8,4 @@
     var packetery_ajax_front_token = "{$token}";
     var prestashop_version = "{$psVersion}";
     var packetery_must_select_text = "{$must_select_point_text}";
-
-    $(function(){
-        packeteryCheckZasBoxAndLoad();
-    });
 </script>
