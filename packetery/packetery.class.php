@@ -42,8 +42,7 @@ class Packeteryclass
      * @return string
      */
     public static function getAppIdentity($version) {
-        $psVersion = _PS_VERSION_;
-        return sprintf('prestashop-%s-packeta-%s', $psVersion, $version);
+        return sprintf('prestashop-%s-packeta-%s', _PS_VERSION_, $version);
     }
 
     /**

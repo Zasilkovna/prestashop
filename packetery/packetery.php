@@ -30,6 +30,10 @@ include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
 require_once __DIR__ . '/autoload.php';
 
+/*
+ * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
+ */
+
 class Packetery extends CarrierModule
 {
     protected $config_form = false;
@@ -505,7 +509,7 @@ class Packetery extends CarrierModule
             $template = $params['packetery']['template'];
         }
 
-        $output = $this->context->smarty->fetch($this->local_path.$template);
+        $output = $this->context->smarty->fetch($this->local_path . $template);
 		return $output;
     }
 
@@ -517,8 +521,8 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayBeforeCarrier($params) {
         $address = new AddressCore($params['cart']->id_address_delivery);
-        $country_iso = CountryCore::getIsoById($address->id_country);
-        $country = strtolower($country_iso);
+        $countryIso = CountryCore::getIsoById($address->id_country);
+        $country = strtolower($countryIso);
 
         $zPointCarriers = Db::getInstance()->executeS(
             'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
@@ -527,30 +531,28 @@ class Packetery extends CarrierModule
         );
 
         $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
-        $api_key = PacketeryApi::getApiKey();
+        $apiKey = PacketeryApi::getApiKey();
 
         /* Get language from cart, global $language updates weirdly */
         $language = new LanguageCore($this->context->cart->id_lang); // todo 1.7 uses     global $language;
         $lang = ($language->iso_code ?: 'en');
-
-        $must_select_point_text = $this->l('Please select pickup point');
-        $appIdentity = Packeteryclass::getAppIdentity($this->version);
-        $base_uri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-
         $lang = strtolower($lang);
 
-        $psVersion = _PS_VERSION_;
+        $mustSelectPointText = $this->l('Please select pickup point');
+        $appIdentity = Packeteryclass::getAppIdentity($this->version);
+        $baseUri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+
         $token = Tools::getToken('ajax_front');
 
-        $this->context->smarty->assign('base_uri', $base_uri);
+        $this->context->smarty->assign('baseUri', $baseUri);
         $this->context->smarty->assign('lang', $lang);
         $this->context->smarty->assign('country', $country);
         $this->context->smarty->assign('zPointCarriersIdsJSON', $zPointCarriersIdsJSON);
         $this->context->smarty->assign('appIdentity', $appIdentity);
-        $this->context->smarty->assign('api_key', $api_key);
+        $this->context->smarty->assign('apiKey', $apiKey);
         $this->context->smarty->assign('token', $token);
-        $this->context->smarty->assign('psVersion', $psVersion);
-        $this->context->smarty->assign('must_select_point_text', $must_select_point_text);
+        $this->context->smarty->assign('psVersion', _PS_VERSION_);
+        $this->context->smarty->assign('mustSelectPointText', $mustSelectPointText);
 
         return $this->context->smarty->fetch($this->local_path.'views/templates/front/display-before-carrier.tpl');
     }
@@ -753,8 +755,8 @@ class Packetery extends CarrierModule
             'actionOrderHistoryAddAfter',
             'backOfficeHeader',
             'displayCarrierExtraContent',
-            'displayHeader', // its "header". register style sheet is done differrently  ->addCss in 1.6
-            'actionCarrierUpdate', // updateCarrier
+            'displayHeader',
+            'actionCarrierUpdate',
             'actionAdminControllerSetMedia',
             'displayOrderConfirmation',
             'displayOrderDetail',
@@ -762,7 +764,7 @@ class Packetery extends CarrierModule
             'actionObjectOrderUpdateBefore',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
-            $hooks[] = 'displayAdminOrderLeft'; // in 1.6 uplne stejny
+            $hooks[] = 'displayAdminOrderLeft';
         } else {
             $hooks[] = 'displayAdminOrderMain';
         }
