@@ -5,9 +5,9 @@
 <input type="hidden" id="app_identity" name="app_identity" value="{$appIdentity}">
 <input type="hidden" id="packeta-api-key" name="packeta-api-key" value="{$apiKey}">
 <script type="text/javascript">
-    var packetery_ajax_front_token = "{$token}";
-    var prestashop_version = "{$psVersion}";
-    var packetery_must_select_text = "{$mustSelectPointText}";
+    var packeteryAjaxFrontToken = "{$token}";
+    var prestashopVersion = "{$psVersion}";
+    var packeteryMustSelectText = "{$mustSelectPointText}";
 
     {if Tools::version_compare($psVersion, '1.7.0', '<')}
     // In PS 1.7 $ is not defined at some moment.

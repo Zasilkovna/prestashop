@@ -501,7 +501,7 @@ class Packetery extends CarrierModule
 		$this->context->smarty->assign('packeta_carrier_id', $carrierId);
 		$this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
 
-        $this->context->smarty->assign('local_path', $this->local_path);
+        $this->context->smarty->assign('localPath', $this->local_path);
         /*END FIELDS FOR AJAX*/
 
         $template = 'views/templates/front/widget.tpl';

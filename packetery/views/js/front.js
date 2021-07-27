@@ -102,12 +102,12 @@ var packeteryCheckZasBoxAndLoad = function() {
 
     if (tools.isPS16()) {
         var zpointCarriers = $('#zpoint_carriers').val();
-        var zpoint_carriers = JSON.parse(zpointCarriers);
+        zpointCarriers = JSON.parse(zpointCarriers);
         var module = packeteryModulesManager.detectModule();
 
         packeteryCreateZasBoxes(module.findDeliveryOptions(), function($input) {
             return module.getExtraContentContainer($input);
-        }, zpoint_carriers, function() {
+        }, zpointCarriers, function() {
             onShippingLoadedCallback();
         });
     } else {
@@ -202,7 +202,7 @@ window.initializePacketaWidget = function() {
 
 tools = {
     isPS16: function() {
-        return window.prestashop_version && window.prestashop_version.indexOf('1.6') === 0;
+        return window.prestashopVersion && window.prestashopVersion.indexOf('1.6') === 0;
     },
     fixextracontent: function() {
         var module = packeteryModulesManager.detectModule();
@@ -335,7 +335,7 @@ ajaxs = {
         return $('#baseuri').val();
     },
     checkToken: function() {
-        return '&token=' + window.packetery_ajax_front_token;
+        return '&token=' + window.packeteryAjaxFrontToken;
     },
 }
 

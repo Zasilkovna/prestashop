@@ -44,7 +44,7 @@ var PacketeryCheckoutModulePs16 = {
 
         /* unbind click events from payment links and disable them - cannot continue without selecting a pickup point */
         $('p.payment_module a').off('click.packeteryButtonDisabled').on('click.packeteryButtonDisabled', function (e) {
-            alert(packetery_must_select_text);
+            alert(packeteryMustSelectText);
             e.preventDefault();
             return false;
         });
