@@ -8,4 +8,11 @@
     var packetery_ajax_front_token = "{$token}";
     var prestashop_version = "{$psVersion}";
     var packetery_must_select_text = "{$mustSelectPointText}";
+
+    {if Tools::version_compare($psVersion, '1.7.0', '<')}
+    // In PS 1.7 $ is not defined at some moment.
+    $(function() {
+        packeteryCheckZasBoxAndLoad(); // To make PS 1.6 OPC work
+    });
+    {/if}
 </script>

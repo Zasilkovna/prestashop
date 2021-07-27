@@ -520,9 +520,12 @@ class Packetery extends CarrierModule
      * @return string
      */
     public function hookDisplayBeforeCarrier($params) {
-        $address = new AddressCore($params['cart']->id_address_delivery);
-        $countryIso = CountryCore::getIsoById($address->id_country);
-        $country = strtolower($countryIso);
+        $country = '';
+        if (isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery)) {
+            $address = new AddressCore($params['cart']->id_address_delivery);
+            $countryIso = CountryCore::getIsoById($address->id_country);
+            $country = strtolower($countryIso);
+        }
 
         $zPointCarriers = Db::getInstance()->executeS(
             'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
