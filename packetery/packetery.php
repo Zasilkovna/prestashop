@@ -38,11 +38,8 @@ class Packetery extends CarrierModule
 {
     protected $config_form = false;
 
-    /** @var Container */
+    /** @var \Packetery\DI\Container */
     public $diContainer;
-
-    /** @var \Packetery\Tools\ControllerWrapper */
-    private $controllerWrapper;
 
     public function __construct()
     {
@@ -68,8 +65,7 @@ class Packetery extends CarrierModule
 
         parent::__construct();
 
-        $this->diContainer = ContainerFactory::create();
-        $this->controllerWrapper = $this->context->controller ? new \Packetery\Tools\ControllerWrapper($this->context->controller) : null;
+        $this->diContainer = \Packetery\DI\ContainerFactory::create();
 
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
         $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
@@ -282,7 +278,7 @@ class Packetery extends CarrierModule
 
         /*AD CARRIER LIST*/
         $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
-        $carrierTools = $this->diContainer->get(CarrierTools::class);
+        $carrierTools = $this->diContainer->get(\Packetery\Carrier\CarrierTools::class);
         foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
             list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries($packeteryCarrier['id_carrier']);
             $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
@@ -558,13 +554,14 @@ class Packetery extends CarrierModule
             $js[] = 'checkout-modules/' . $entry->getBasename() . '?v=' . $this->version;
         }
 
+        $controllerWrapper = $this->diContainer->get(\Packetery\Tools\ControllerWrapper::class);
         foreach ($js as $file) {
 //            $this->context->controller->addJS($this->_path . 'views/js/' . $file);
             $uri = $this->_path . 'views/js/' . $file;
-            $this->controllerWrapper->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
+            $controllerWrapper->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
         }
 
-        $this->controllerWrapper->registerStylesheet('packetery-front', $this->_path . 'views/css/front.css?v=' . $this->version, ['server' => 'remote']);
+        $controllerWrapper->registerStylesheet('packetery-front', $this->_path . 'views/css/front.css?v=' . $this->version, ['server' => 'remote']);
     }
 
     /*ORDERS*/
@@ -579,7 +576,7 @@ class Packetery extends CarrierModule
             ($params['cart'] instanceof Cart) &&
             ($params['order_history'] instanceof OrderHistory)
         ) {
-            $orderSaver = $this->diContainer->get(OrderSaver::class);
+            $orderSaver = $this->diContainer->get(\Packetery\Order\OrderSaver::class);
             $orderSaver->saveAfterActionOrderHistoryAdd($params['cart'], $params['order_history']);
         }
     }
@@ -855,7 +852,7 @@ class Packetery extends CarrierModule
      */
     public function hookActionObjectOrderUpdateBefore($params)
     {
-        $actionObjectOrderUpdateBefore = $this->diContainer->get(ActionObjectOrderUpdateBefore::class);
+        $actionObjectOrderUpdateBefore = $this->diContainer->get(\Packetery\Hooks\ActionObjectOrderUpdateBefore::class);
         $actionObjectOrderUpdateBefore->execute($params);
     }
 
