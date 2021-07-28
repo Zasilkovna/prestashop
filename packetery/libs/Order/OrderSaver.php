@@ -4,10 +4,10 @@ namespace Packetery\Order;
 
 use Packeteryclass;
 use Packetery\Payment\PaymentRepository;
-use Cart;
+use CartCore as Cart;
 use Db;
-use Order as PrestaShopOrder;
-use OrderHistory;
+use OrderCore as PrestaShopOrder;
+use OrderHistoryCore as OrderHistory;
 
 class OrderSaver
 {

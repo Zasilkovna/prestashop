@@ -3,8 +3,8 @@
 namespace Packetery\Order;
 
 use \Db;
-use \PrestaShopDatabaseException;
-use \PrestaShopLogger;
+use \PrestaShopDatabaseExceptionCore as PrestaShopDatabaseException;
+use \PrestaShopLoggerCore as PrestaShopLogger;
 
 class OrderRepository
 {

@@ -6,10 +6,9 @@ $.getScript("https://widget.packeta.com/v6/www/js/library.js")
 
 var country = 'cz,sk'; /* Default countries */
 
-
 function PacketeryCheckoutModulesManager() {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
-    this.supportedModules = ['Standard', 'Unknown', 'Supercheckout'];
+    this.supportedModules = ['Ps16', 'Standard', 'Unknown', 'Supercheckout'];
     this.loadedModules = [];
     this.detectedModule = null;
 
@@ -17,7 +16,7 @@ function PacketeryCheckoutModulesManager() {
         this.loadedModules = [];
         var manager = this;
 
-        this.supportedModules.forEach(function (moduleId) {
+        this.supportedModules.forEach(function(moduleId) {
             // moduleId = 'Standard' => className = 'PacketeryCheckoutModuleStandard'
             var className = 'PacketeryCheckoutModule' + moduleId;
 
@@ -28,7 +27,7 @@ function PacketeryCheckoutModulesManager() {
         });
     };
 
-    this.detectModule = function () {
+    this.detectModule = function() {
         if (this.detectedModule !== null) {
             return this.detectedModule;
         }
@@ -38,8 +37,8 @@ function PacketeryCheckoutModulesManager() {
         }
 
         var manager = this;
-        this.loadedModules.forEach(function (module) {
-            if ((manager.detectedModule === null) && module.findDeliveryOptions().length) {
+        this.loadedModules.forEach(function(module) {
+            if ((manager.detectedModule === null) && module.isActive()) {
                 manager.detectedModule = module;
             }
         });
@@ -48,26 +47,79 @@ function PacketeryCheckoutModulesManager() {
     };
 
     // in case we need to change this in the future
-    this.getCarrierId = function ($selectedInput) {
+    this.getCarrierId = function($selectedInput) {
+        if ($selectedInput.length === 0) {
+            return null;
+        }
+
         return $selectedInput.val().replace(',', '');
     }
 
-    this.getWidgetParent = function ($selectedInput) {
+    this.getWidgetParent = function($selectedInput) {
         return $('#packetery-carrier-' + this.getCarrierId($selectedInput));
     }
 }
+
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 var widgetCarriers;
 
-$(document).ready(function ()
-{
-    if ($(".zas-box").length) {
+var packeteryCreateZasBoxes = function($delivery_options, getExtraContentContainer, zpoint_carriers, onSuccess) {
+    var deferreds = [];
+    $delivery_options.each(function(i, e) {
+        if ($(e).is(':checked') === false) {
+            return;
+        }
+
+        // trim commas
+        var carrierId = $(e).val().replace(/(^\,+)|(\,+$)/g, '');
+
+        if (zpoint_carriers.includes(carrierId)) {
+            /* Display button and inputs */
+            // todo redo id attr to class attr ?
+            var c = getExtraContentContainer($(e));
+
+            if (c.find(".zas-box").length !== 0) {
+                return; // continue to next option
+            }
+
+            var carrierDeferred = packetery.createZasBoxHtml(carrierId).done(function(result) {
+                c.find('.carrier-extra-content').remove();
+                c.append(result);
+            });
+
+            deferreds.push(carrierDeferred);
+        }
+
+    });
+
+    $.when.apply(null, deferreds).then(onSuccess);
+}
+
+var packeteryCheckZasBoxAndLoad = function() {
+    if ($(".zas-box").length === 0 && $('#zpoint_carriers').length === 0) {
+        return; // incorrect context
+    }
+
+    if (tools.isPS16()) {
+        var zpointCarriers = $('#zpoint_carriers').val();
+        zpointCarriers = JSON.parse(zpointCarriers);
+        var module = packeteryModulesManager.detectModule();
+
+        packeteryCreateZasBoxes(module.findDeliveryOptions(), function($input) {
+            return module.getExtraContentContainer($input);
+        }, zpointCarriers, function() {
+            onShippingLoadedCallback();
+        });
+    } else {
         onShippingLoadedCallback();
     }
+};
+
+$(document).ready(function() {
+    packeteryCheckZasBoxAndLoad();
 });
 
-window.initializePacketaWidget = function ()
-{
+window.initializePacketaWidget = function() {
     // set YOUR Packeta API key
     var packetaApiKey = $("#packeta-api-key").val();
 
@@ -94,7 +146,7 @@ window.initializePacketaWidget = function ()
     var $widgetParent = packeteryModulesManager.getWidgetParent(module.getSelectedInput());
     widgetCarriers = $widgetParent.find('#widget_carriers').val();
 
-    $('.open-packeta-widget').click(function (e) {
+    $('.open-packeta-widget').click(function(e) {
         e.preventDefault();
         var app_identity = $('#app_identity').val(); // Get module version for widget
         var widgetOptions = {
@@ -105,13 +157,11 @@ window.initializePacketaWidget = function ()
         if (widgetCarriers !== '') {
             widgetOptions.carriers = widgetCarriers;
         }
-        Packeta.Widget.pick(packetaApiKey, function (pickupPoint)
-        {
+        Packeta.Widget.pick(packetaApiKey, function(pickupPoint) {
             var $selectedDeliveryOption = module.getSelectedInput();
             $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
 
-            if (pickupPoint != null)
-            {
+            if (pickupPoint != null) {
                 /* Save needed pickup point attributes to inputs */
                 $widgetParent.find('.packeta-branch-id').val(pickupPoint.id);
                 $widgetParent.find('.packeta-branch-name').val(pickupPoint.name);
@@ -140,11 +190,9 @@ window.initializePacketaWidget = function ()
                 if (module !== null) {
                     module.hideValidationErrors();
                 }
-            }
-            else
-            {
+            } else {
                 /* If point isn't selected - disable */
-                if($widgetParent.find('.packeta-branch-id').val() === "") {
+                if ($widgetParent.find('.packeta-branch-id').val() === "") {
                     module.disableSubmitButton();
                 }
             }
@@ -153,31 +201,39 @@ window.initializePacketaWidget = function ()
 };
 
 tools = {
-    fixextracontent: function ()
-    {
+    isPS16: function() {
+        return window.prestashopVersion && window.prestashopVersion.indexOf('1.6') === 0;
+    },
+    fixextracontent: function() {
         var module = packeteryModulesManager.detectModule();
 
         if (module === null) {
             return;
         }
 
-        $('.carrier-extra-content').each(function ()
-        {
+        var selectedCarrierId = packeteryModulesManager.getCarrierId(module.getSelectedInput());
+
+        $('.carrier-extra-content').each(function() {
             var $extra = $(this);
-            if (! $extra.find('#packetery-widget').length) {
+            if (!$extra.find('#packetery-widget').length) {
                 return;
             }
 
             var carrierId = String($extra.find('#carrier_id').val());
-            var zpointCarriers = $extra.find('#zpoint_carriers').val();
+            var zpointCarriers = $('#zpoint_carriers').val();
             zpointCarriers = JSON.parse(zpointCarriers);
-            if (!zpointCarriers.includes(carrierId)) {
+            if (selectedCarrierId === null || selectedCarrierId !== carrierId || !zpointCarriers.includes(carrierId)) {
                 $extra.find('#open-packeta-widget').hide();
                 $extra.find('#selected-branch').hide();
+                $extra.find('#packetery-widget').hide();
+            } else {
+                $extra.find('#open-packeta-widget').show();
+                $extra.find('#selected-branch').show();
+                $extra.find('#packetery-widget').show();
             }
 
             /* Only displayed extra content */
-            if ($extra.css('display') === 'block') {
+            if ($extra.find('#packetery-widget').is(':hidden') === false) {
                 /* And branch is not set, disable */
                 var id_branch = $extra.find(".packeta-branch-id").val();
                 if (id_branch <= 0) {
@@ -189,22 +245,24 @@ tools = {
         /* Enable / Disable continue buttons after carrier change */
 
         var $deliveryInputs = module.findDeliveryOptions();
-        $deliveryInputs.change(function ()
-        {
+        $deliveryInputs.off('change.packeteryFix').on('change.packeteryFix', function() {
+            module.disableSubmitButton();
+            packeteryCheckZasBoxAndLoad();
+
             var
                 $this = $(this),
                 prestashop_carrier_id = packeteryModulesManager.getCarrierId($this),
                 $extra = packeteryModulesManager.getWidgetParent($this);
 
             // if selected carrier is not Packetery then enable Continue button and we're done here
-            if (! $extra.find('#packetery-widget').length) {
+            if (!$extra.find('#packetery-widget').length) {
                 module.enableSubmitButton();
                 return;
             }
 
             if ($this.is(':checked')) {
                 var $wrapper = $extra.closest('.carrier-extra-content');
-                setTimeout(function () {
+                setTimeout(function() {
                     if ($wrapper.is(':hidden')) {
                         $wrapper.show();
                     }
@@ -229,8 +287,7 @@ tools = {
 }
 
 packetery = {
-    widgetSaveOrderBranch: function (prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id)
-    {
+    widgetSaveOrderBranch: function(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id) {
         $.ajax({
             type: 'POST',
             url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=widgetsaveorderbranch' + ajaxs.checkToken(),
@@ -242,13 +299,31 @@ packetery = {
                 'widget_carrier_id': widget_carrier_id,
                 'carrier_pickup_point_id': carrier_pickup_point_id
             },
-            beforeSend: function () {
+            beforeSend: function() {
                 $("body").toggleClass("wait");
             },
-            success: function (msg) {
+            success: function(msg) {
                 return true;
             },
-            complete: function () {
+            complete: function() {
+                $("body").toggleClass("wait");
+            },
+        });
+    },
+    createZasBoxHtml: function(prestashop_carrier_id) {
+        return $.ajax({
+            type: 'POST',
+            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=createZasBoxHtml' + ajaxs.checkToken(),
+            data: {
+                'prestashop_carrier_id': prestashop_carrier_id,
+            },
+            beforeSend: function() {
+                $("body").toggleClass("wait");
+            },
+            success: function(msg) {
+                return true;
+            },
+            complete: function() {
                 $("body").toggleClass("wait");
             },
         });
@@ -256,13 +331,11 @@ packetery = {
 }
 
 ajaxs = {
-    baseuri: function ()
-    {
+    baseuri: function() {
         return $('#baseuri').val();
     },
-    checkToken: function ()
-    {
-        return '&token=' + prestashop.static_token;
+    checkToken: function() {
+        return '&token=' + window.packeteryAjaxFrontToken;
     },
 }
 
