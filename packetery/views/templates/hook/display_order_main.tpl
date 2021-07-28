@@ -16,7 +16,7 @@
                     {/if}
                 </strong>
             </p>
-            {if isset($validatedAddress)}
+            {if $isAddressValidated && isset($validatedAddress)}
                 <p class="validatedAddress">
                     {l s='Delivery address verified for order' mod='packetery'}:<br>
                     {l s='Street' mod='packetery'}: <strong class="packetery-street">{$validatedAddress['street']} {$validatedAddress['houseNumber']}</strong><br>
@@ -32,9 +32,9 @@
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-hd-widget"
                            data-widget-options="{$widgetOptions|@json_encode|escape}">
                             {if isset($validatedAddress) && $validatedAddress['zip']}
-                                {l s='Change validated delivery address' mod='packetery'}
+                            {l s='Change validated delivery address' mod='packetery'}
                             {else}
-                                {l s='Set validated delivery address' mod='packetery'}
+                            {l s='Set validated delivery address' mod='packetery'}
                             {/if}
                         </a>
 
@@ -61,7 +61,6 @@
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-widget"
                            data-widget-options="{$widgetOptions|@json_encode|escape}">{l s='Change pickup point' mod='packetery'}</a>
-
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="pickup_point">
                     </p>
@@ -71,10 +70,32 @@
                 </form>
             {/if}
         {/if}
+        {* There will be more buttons aka more actions in future. If there is no button hide the divider *}
+        {if $showActionButtonsDivider}
+            <hr />
+        {/if}
+        {if $postParcelButtonAllowed}
+            <form action="{$returnUrl}" method="post">
+                <p>
+                    <button class="btn btn-outline-secondary btn-default"
+                            type="submit"
+                            name="process_post_parcel"
+                            id="process_post_parcel"
+                    >
+                        <i class="material-icons" aria-hidden="true">send</i>
+                        {l s='Post parcel' mod='packetery'}
+                    </button>
+                    <input type="hidden" name="order_id" value="{$orderId|intval}">
+                </p>
+            </form>
+        {/if}
         {if isset($messages)}
             {foreach from=$messages item=message}
-                <div class="alert alert-{$message.class}">{$message.text}</div>
+                <div class="alert alert-{$message.class}">{$message.text|nl2br}</div>
             {/foreach}
         {/if}
     </div>
 </div>
+<script type="application/javascript">
+    var process_post_parcel_confirmation = "{l s='Do you really wish to post the parcel?' mod='packetery'}";
+</script>

@@ -2,6 +2,10 @@
 
 var PacketeryCheckoutModuleSupercheckout = {
 
+    isActive: function () {
+        return this.findDeliveryOptions().length > 0;
+    },
+
     getSelectedInput: function () {
         return $('#shipping-method input:checked');
     },
@@ -18,14 +22,22 @@ var PacketeryCheckoutModuleSupercheckout = {
         hideGeneralError();
     },
 
+    // used in PS 1.6 version
+    getExtraContentContainer: function ($selectedInput) {
+        return $selectedInput.closest('li');
+    },
+
     getExtraContentSelector: function () {
         return '.kbshippingparceloption';
-    }
+    },
+
+    toggleExtracContent: true
 };
 
 $(function () {
     if (typeof addSupercheckoutOrderValidator !== 'undefined') {
         addSupercheckoutOrderValidator(function () {
+
             var $selectedInput = PacketeryCheckoutModuleSupercheckout.getSelectedInput(),
                 $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
 
@@ -33,8 +45,8 @@ $(function () {
                 if (PacketaModule.ui.isPickupPointInvalid($widgetParent)) {
                     throw {message: $('.packetery-message-pickup-point-not-selected-error').data('content')};
                 }
-                if (PacketaModule.ui.isAddressValidationUnsatisfied($widgetParent)) {
-                    throw {message: $('.packetery-address-not-validated-message').data('content')};
+                if (PacketaModule.ui.isAddressValidationUnsatisfied($widgetParent, $selectedInput)) {
+                    throw {message: PacketaModule.config.addressNotValidatedMessage};
                 }
             }
         });

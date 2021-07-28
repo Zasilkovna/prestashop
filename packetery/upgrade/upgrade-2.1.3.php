@@ -26,10 +26,16 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-function upgrade_module_2_1_3($object)
+
+/**
+ * @param $module
+ * @return bool
+ */
+function upgrade_module_2_1_3($module)
 {
     $insertData = [];
-    $oldSettings = Db::getInstance()->executeS('SELECT * FROM `' . _DB_PREFIX_ . 'packetery_settings`');
+    $dbTools = $module->diContainer->get(\Packetery\Tools\DbTools::class);
+    $oldSettings = $dbTools->getRows('SELECT * FROM `' . _DB_PREFIX_ . 'packetery_settings`');
     if ($oldSettings) {
         foreach ($oldSettings as $oldSetting) {
             switch (strtoupper($oldSetting['option'])) {
@@ -61,9 +67,9 @@ function upgrade_module_2_1_3($object)
         }
     }
 
-    $result = Db::getInstance()->execute('TRUNCATE TABLE `' . _DB_PREFIX_ . 'packetery_settings`');
+    $result = $dbTools->execute('TRUNCATE TABLE `' . _DB_PREFIX_ . 'packetery_settings`');
     if ($result === false) {
         return false;
     }
-    return Db::getInstance()->insert('packetery_settings', $insertData);
+    return $dbTools->insert('packetery_settings', $insertData);
 }

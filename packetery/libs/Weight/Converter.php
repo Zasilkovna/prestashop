@@ -4,53 +4,35 @@ namespace Packetery\Weight;
 
 class Converter
 {
-    /** @var string */
-    const UNIT_KILOGRAMS = 'kg';
-
-    /** @var string */
-    const UNIT_GRAMS = 'g';
-
-    /** @var array[] */
-    private static $mapping = [
-        self::UNIT_KILOGRAMS => [ // to kilos
-            self::UNIT_KILOGRAMS => 1,
-            self::UNIT_GRAMS => 0.001, // from grams
-        ]
+    /** @var array */
+    public static $mapping = [
+        'kg' => 1,
+        'g' => 0.001,
+        'lb' => 0.45359237,
+        'oz' => 0.0283495231,
     ];
 
     /**
-     * @param mixed $value
+     * @param float $value
      * @return float|null
      */
     public static function getKilograms($value)
     {
-        return self::convert($value, \Configuration::get('PS_WEIGHT_UNIT'), self::UNIT_KILOGRAMS);
-    }
+        $unit = strtolower(\Configuration::get('PS_WEIGHT_UNIT'));
 
-    /**
-     * @param mixed $value
-     * @param string $unit
-     * @param string $targetUnit
-     * @return float|int
-     */
-    private static function convert($value, $unit, $targetUnit)
-    {
-        $unit = strtolower($unit);
-        $value = (float)$value;
-
-        if (!isset(self::$mapping[$targetUnit][$unit])) {
+        if (!isset(self::$mapping[$unit])) {
             return null;
         }
 
-        return $value * self::$mapping[$targetUnit][$unit];
+        return $value * self::$mapping[$unit];
     }
 
     /**
      * @return bool
      */
-    public static function isKgConvertionSupported()
+    public static function isKgConversionSupported()
     {
-        $value = self::getKilograms(1.0);
-        return $value !== null;
+        $unit = strtolower(\Configuration::get('PS_WEIGHT_UNIT'));
+        return isset(self::$mapping[$unit]);
     }
 }
