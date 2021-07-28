@@ -38,23 +38,8 @@ class Packetery extends CarrierModule
 {
     protected $config_form = false;
 
-    /** @var \Packetery\Payment\PaymentRepository */
-    private $paymentRepository;
-
-    /** @var \Packetery\Order\OrderRepository */
-    public $orderRepository;
-
-    /** @var \Packetery\Order\OrderSaver */
-    private $orderSaver;
-
-    /** @var \Packetery\Hooks\ActionObjectOrderUpdateBefore */
-    private $actionObjectOrderUpdateBefore;
-
-    /** @var \Packetery\Carrier\CarrierTools */
-    private $carrierTools;
-
-    /** @var \Packetery\Tools\ControllerWrapper */
-    private $controllerWrapper;
+    /** @var \Packetery\DI\Container */
+    public $diContainer;
 
     public function __construct()
     {
@@ -80,13 +65,7 @@ class Packetery extends CarrierModule
 
         parent::__construct();
 
-        $db = Db::getInstance();
-        $this->paymentRepository = new \Packetery\Payment\PaymentRepository($db);
-        $this->orderRepository = new \Packetery\Order\OrderRepository($db);
-        $this->orderSaver = new \Packetery\Order\OrderSaver($this->orderRepository, $this->paymentRepository);
-        $this->carrierTools = new \Packetery\Carrier\CarrierTools();
-        $this->actionObjectOrderUpdateBefore = new \Packetery\Hooks\ActionObjectOrderUpdateBefore($this->orderRepository, $this->orderSaver, $this->carrierTools);
-        $this->controllerWrapper = $this->context->controller ? new \Packetery\Tools\ControllerWrapper($this->context->controller) : null;
+        $this->diContainer = \Packetery\DI\ContainerFactory::create();
 
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
         $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
@@ -299,8 +278,9 @@ class Packetery extends CarrierModule
 
         /*AD CARRIER LIST*/
         $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
+        $carrierTools = $this->diContainer->get(\Packetery\Carrier\CarrierTools::class);
         foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
-            list($carrierZones, $carrierCountries) = $this->carrierTools->getZonesAndCountries($packeteryCarrier['id_carrier']);
+            list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries($packeteryCarrier['id_carrier']);
             $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
             $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
             // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
@@ -574,13 +554,14 @@ class Packetery extends CarrierModule
             $js[] = 'checkout-modules/' . $entry->getBasename() . '?v=' . $this->version;
         }
 
+        $controllerWrapper = $this->diContainer->get(\Packetery\Tools\ControllerWrapper::class);
         foreach ($js as $file) {
 //            $this->context->controller->addJS($this->_path . 'views/js/' . $file);
             $uri = $this->_path . 'views/js/' . $file;
-            $this->controllerWrapper->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
+            $controllerWrapper->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
         }
 
-        $this->controllerWrapper->registerStylesheet('packetery-front', $this->_path . 'views/css/front.css?v=' . $this->version, ['server' => 'remote']);
+        $controllerWrapper->registerStylesheet('packetery-front', $this->_path . 'views/css/front.css?v=' . $this->version, ['server' => 'remote']);
     }
 
     /*ORDERS*/
@@ -595,7 +576,8 @@ class Packetery extends CarrierModule
             ($params['cart'] instanceof Cart) &&
             ($params['order_history'] instanceof OrderHistory)
         ) {
-            $this->orderSaver->saveAfterActionOrderHistoryAdd($params['cart'], $params['order_history']);
+            $orderSaver = $this->diContainer->get(\Packetery\Order\OrderSaver::class);
+            $orderSaver->saveAfterActionOrderHistoryAdd($params['cart'], $params['order_history']);
         }
     }
     /*END ORDERS*/
@@ -870,7 +852,8 @@ class Packetery extends CarrierModule
      */
     public function hookActionObjectOrderUpdateBefore($params)
     {
-        $this->actionObjectOrderUpdateBefore->execute($params);
+        $actionObjectOrderUpdateBefore = $this->diContainer->get(\Packetery\Hooks\ActionObjectOrderUpdateBefore::class);
+        $actionObjectOrderUpdateBefore->execute($params);
     }
 
 }
