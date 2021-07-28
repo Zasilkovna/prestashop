@@ -23,27 +23,34 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-include_once(dirname(__file__).'/packetery.class.php');
-include_once(dirname(__file__).'/packetery.api.php');
-require_once(dirname(__FILE__) . '../../../init.php');
+require_once dirname(__FILE__) . '/../../config/config.inc.php';
+require_once dirname(__FILE__) . '/../../init.php';
+require_once dirname(__FILE__) . '/packetery.php';
 
 // TODO: use Context::getContext()->customer->isLogged() instead?
 $token = Tools::getValue('token');
-$real_token = Tools::getToken(false);
+$real_token = Tools::getToken('ajax_front');
 if ($token !== $real_token) {
     exit;
 }
 
 switch (Tools::getValue('action')) {
     /*FRONT*/
-    case 'widgetsaveorderbranch':
-        PacketeryApi::widgetSaveOrderBranch();
-        break;
-    case 'widgetSaveOrderAddress':
-        $orderRepository = new \Packetery\Order\OrderRepository(Db::getInstance());
+    case 'savePickupPointInCart':
         $module = new Packetery();
-        $orderAjax = new \Packetery\Order\Ajax($module, $orderRepository);
-        $orderAjax->widgetSaveOrderAddress();
+        $orderSaver = $module->diContainer->get(\Packetery\Order\OrderSaver::class);
+        header('Content-Type: application/json');
+        echo $orderSaver->savePickupPointInCartGetJson();
+        break;
+    case 'fetchExtraContent':
+        $module = new Packetery();
+        $packeteryCart = $module->diContainer->get(\Packetery\Module\Cart::class);
+        echo $packeteryCart->packeteryCreateExtraContent();
+        break;
+    case 'saveAddressInCart':
+        $module = new Packetery();
+        $orderAjax = $module->diContainer->get(\Packetery\Order\Ajax::class);
+        $orderAjax->saveAddressInCart();
         break;
     default:
         exit;

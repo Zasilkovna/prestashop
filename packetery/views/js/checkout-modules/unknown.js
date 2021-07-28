@@ -1,7 +1,12 @@
 // naming convention: PacketerCheckoutModule + moduleId (first letter in upper case)
 
+// todo remove? Untestable.
 // this unknown module support already existed in front.js
 var PacketeryCheckoutModuleUnknown = {
+
+    isActive: function () {
+        return this.findDeliveryOptions().length > 0;
+    },
 
     getSelectedInput: function () {
         return $('.delivery_option.selected input');
@@ -24,6 +29,10 @@ var PacketeryCheckoutModuleUnknown = {
     },
 
     hideValidationErrors: function () {},
+
+    getExtraContentContainer: function () {
+        return $('.delivery_option');
+    },
 
     getExtraContentSelector: function () {
         return '.carrier-extra-content';

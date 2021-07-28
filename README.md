@@ -26,6 +26,7 @@ All settings are saved automatically whenever you leave the edited data. If you 
 on the Packeta site, it is possible to request a test account at the Customer Service email [info@zasilkovna.cz](mailto:info@zasilkovna.cz):
 - **API key** – you can find your key in the client section of Packeta in the *Client support* tab
 - **Sender name** - the sender name you have set in the client section of the list of senders
+- **As the order ID, use** - select whether to use ID or Reference as order ID in export
 
 ### Carrier settings
 - To add a carrier enter the menu *Shipping* - *Carriers*.
@@ -90,15 +91,13 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 - Export orders to the CSV file, which can be imported in the [client section](https://client.packeta.com/).
 - It is now possible to set the weight of the shipment in the list of Packeta orders, before sending it to Packeta
   (since version 2.1.9).
+- Optional or mandatory validation of the delivery address using a widget when delivering to the Czech Republic or Slovakia.
 
 ### OPC support
 - One Page Supercheckout from [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout) (since version 6.0.9)
 
 In case you are using another third-party cart module, please write to [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
 Packeta module may not work with another OPC module.
-
-### Further module limitations
-- Module does not currently support multistore.
 
 # Modul pro PrestaShop 1.7
 
@@ -131,6 +130,7 @@ V případě, že nemáte uživatelský účet na stránkách Zásilkovny, je mo
 
 - **Klíč API**  - váš klíč API naleznete v [klientské sekci Zásilkovny](https://client.packeta.com/cs/support/) v části **Klientská podpora**
 - **Označení odesílatele** - označení odesílatele které máte nastaveno v [klientské sekci](https://client.packeta.com/cs/senders/) v seznamu odesílatelů
+- **Jako číslo objednávky u zásilek uvádět** - vyberte, zda se má při exportu použít id nebo kód jako číslo objednávky
 
 ### Nastavení dopravců
 - Dopravce vytvoříte v menu *Doručení* - *Dopravci*.
@@ -192,13 +192,10 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - Automatický export zásilek do systému Zásilkovny.
 - Export zásilek do csv souboru, který lze importovat v [klientské sekci](https://client.packeta.com/).
 - V seznamu objednávek Zásilkovny je nyní možné upravit hmotnost zásilky, před odesláním do Zásilkovny (od verze 2.1.9).
+- Volitelná nebo povinná validace doručovací adresy pomocí widgetu při doručení do Česka nebo na Slovensko.
 
 ### Podpora pro OPC
 - One Page Supercheckout od [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout) (od verze 6.0.9)
 
 Pokud používáte nějaký jiný modul košíku třetí strany, napište nám [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
 Modul Zásilkovny nemusí být s jiným OPC modulem funkční.
-
-### Další omezení modulu
-- Modul v současné době nepodporuje multistore. 
-  

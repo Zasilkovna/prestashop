@@ -22,21 +22,15 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <div id="packetery-carrier-{$carrier_id|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" name="carrier_id" id="carrier_id" value="{$carrier_id|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" id="shop-language" name="shop-language" value="{$language['iso_code']|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" id="customerCountry" name="customerCountry" value="{$customerCountry|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" id="zpoint_carriers" name="zpoint_carriers" value="{$zpoint_carriers}">
-    <input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
-    <input type="hidden" id="app_identity" name="app_identity" value="{$app_identity}">
+    <input type="hidden" id="widget_vendors" name="widget_vendors" value='{$widget_vendors|@json_encode|escape}'>
     <!--Packetery widget-->
     <div id="packetery-widget" class="clearfix">
         <div class="widget-left">
             <div class="col-md-12">
                 <div class="zas-box">
-                    <button class="btn btn-sm btn-success pull-left open-packeta-widget"
-                            id="open-packeta-widget">{l s='Select pick-up point:' mod='packetery'}</button>
-                    <br>
+                    <div class="clearfix">
+                        <button class="btn btn-sm btn-success pull-left open-packeta-widget" id="open-packeta-widget">{l s='Select pick-up point:' mod='packetery'}</button>
+                    </div>
                     <ul id="selected-branch">
                         <li>{l s='Selected pick-up point:' mod='packetery'}
                             <span id="picked-delivery-place" class="picked-delivery-place">{$name_branch}</span>
@@ -44,8 +38,6 @@
                     </ul>
                     <input type="hidden" id="packeta-branch-id" class="packeta-branch-id" name="packeta-branch-id"
                            value="{$id_branch}">
-                    <input type="hidden" id="packeta-api-key" class="packeta-api-key" name="packeta-api-key"
-                           value="{$packeta_api_key}">
                     <input type="hidden" id="packeta-branch-name" class="packeta-branch-name" name="packeta-branch-name"
                            value="{$name_branch}">
                     <input type="hidden" id="packeta-branch-currency" class="packeta-branch-currency" name="packeta-branch-currency"
