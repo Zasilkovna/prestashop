@@ -1,5 +1,6 @@
 // naming convention: PacketerCheckoutModule + moduleId (first letter in upper case)
 
+// todo remove? Untestable.
 // this unknown module support already existed in front.js
 var PacketeryCheckoutModuleUnknown = {
 
@@ -27,5 +28,9 @@ var PacketeryCheckoutModuleUnknown = {
             .css("pointer-events", "none");
     },
 
-    hideValidationErrors: function () {}
+    hideValidationErrors: function () {},
+
+    getExtraContentContainer: function () {
+        return $('.delivery_option');
+    }
 };

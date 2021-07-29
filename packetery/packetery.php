@@ -501,8 +501,11 @@ class Packetery extends CarrierModule
      * @return string
      */
     public function hookDisplayBeforeCarrier($params) {
+        /** @var \CartCore $cart */
+        $cart = $params['cart'];
+
         $country = '';
-        if (isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery)) {
+        if (isset($cart->id_address_delivery) && !empty($params['cart']->id_address_delivery)) {
             $address = new AddressCore($params['cart']->id_address_delivery);
             $countryIso = CountryCore::getIsoById($address->id_country);
             $country = strtolower($countryIso);
@@ -518,7 +521,7 @@ class Packetery extends CarrierModule
         $apiKey = PacketeryApi::getApiKey();
 
         /* Get language from cart, global $language updates weirdly */
-        $language = new LanguageCore($this->context->cart->id_lang); // todo 1.7 uses     global $language;
+        $language = new LanguageCore($cart->id_lang);
         $lang = ($language->iso_code ?: 'en');
         $lang = strtolower($lang);
 

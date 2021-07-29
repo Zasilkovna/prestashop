@@ -13,7 +13,11 @@
     {if Tools::version_compare($psVersion, '1.7.0', '<')}
     // In PS 1.7 $ is not defined at some moment.
     $(function() {
-        packeteryCheckZasBoxAndLoad(); // To make PS 1.6 OPC work
+		// To make PS 1.6 OPC work
+        packeteryCreateZasBoxes(function() {
+            initializePacketaWidget();
+            tools.checkExtraContentVisibility();
+        });
     });
     {/if}
 </script>
