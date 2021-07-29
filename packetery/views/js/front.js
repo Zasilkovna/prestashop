@@ -277,8 +277,6 @@ tools = {
                 }, 500);
             }
 
-            widgetCarriers = $extra.find("#widget_carriers").val();
-
             var id_branch = $extra.find(".packeta-branch-id").val();
             if (id_branch !== '') {
                 var name_branch = $extra.find(".packeta-branch-name").val();

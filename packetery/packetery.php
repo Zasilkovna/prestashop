@@ -43,15 +43,9 @@ class Packetery extends CarrierModule
 
     public function __construct()
     {
-		$this->name = 'packetery';
-		$this->tab = 'shipping_logistics';
-		$this->version = '2.2.0';
-		$this->author = 'Packeta s.r.o.';
-		$this->need_instance = 0;
-    	$this->is_configurable = 1;
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.1.8';
+        $this->version = '2.2.0';
         $this->author = 'Packeta s.r.o.';
         $this->need_instance = 0;
         $this->is_configurable = 1;
@@ -489,7 +483,6 @@ class Packetery extends CarrierModule
 		$this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
 
         $this->context->smarty->assign('localPath', $this->local_path);
-        $this->context->smarty->assign('widgetAutoOpen', Configuration::get('PACKETERY_WIDGET_AUTOOPEN'));
         /*END FIELDS FOR AJAX*/
 
         $template = 'views/templates/front/widget.tpl';
@@ -545,7 +538,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('psVersion', _PS_VERSION_);
         $this->context->smarty->assign('mustSelectPointText', $mustSelectPointText);
 
-        return $this->context->smarty->fetch($this->local_path.'views/templates/front/display-before-carrier.tpl');
+        return $this->context->smarty->fetch($this->local_path . 'views/templates/front/display-before-carrier.tpl');
     }
 
     /**

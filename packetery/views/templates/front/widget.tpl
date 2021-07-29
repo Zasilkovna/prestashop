@@ -24,7 +24,6 @@
 <div id="packetery-carrier-{$carrier_id|escape:'htmlall':'UTF-8'}">
     <input type="hidden" name="carrier_id" id="carrier_id" value="{$carrier_id|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
-    <input type="hidden" id="widgetAutoOpen" name="widgetAutoOpen" value="{$widgetAutoOpen}">
     <!--Packetery widget-->
     <div id="packetery-widget" class="clearfix">
         <div class="widget-left">

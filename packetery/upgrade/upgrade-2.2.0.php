@@ -10,6 +10,8 @@ if (!defined('_PS_VERSION_')) {
  */
 function upgrade_module_2_2_0($module)
 {
-    $module->registerHook('displayBeforeCarrier');
-    return true;
+    return (
+        $module->registerHook('displayBeforeCarrier') &&
+        Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', false)
+    );
 }
