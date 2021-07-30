@@ -43,22 +43,22 @@ class Packetery extends CarrierModule
 
     public function __construct()
     {
-		$this->name = 'packetery';
-		$this->tab = 'shipping_logistics';
-		$this->version = '2.2.0';
-		$this->author = 'Packeta s.r.o.';
-		$this->need_instance = 0;
-    	$this->is_configurable = 1;
+        $this->name = 'packetery';
+        $this->tab = 'shipping_logistics';
+        $this->version = '2.2.0';
+        $this->author = 'Packeta s.r.o.';
+        $this->need_instance = 0;
+        $this->is_configurable = 1;
 
-		if(Module::isInstalled($this->name)) {
-			$errors = [];
-			$this->configurationErrors($errors);
-			foreach ($errors as $error) {
-				$this->warning .= $error;
-			}
-		}
+        if (Module::isInstalled($this->name)) {
+            $errors = [];
+            $this->configurationErrors($errors);
+            foreach ($errors as $error) {
+                $this->warning .= $error;
+            }
+        }
 
-		/**
+        /**
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
          */
         $this->bootstrap = true;
@@ -89,6 +89,7 @@ class Packetery extends CarrierModule
             return false;
         }
         Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4');
+        Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', false);
 
         // backup possible old order table
         if (count($db->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'packetery_order"')) > 0) {
@@ -140,7 +141,8 @@ class Packetery extends CarrierModule
             !Configuration::deleteByName('PACKETERY_APIPASS') ||
             !Configuration::deleteByName('PACKETERY_ESHOP_ID') ||
             !Configuration::deleteByName('PACKETERY_LABEL_FORMAT') ||
-            !Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE')
+            !Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') ||
+            !Configuration::deleteByName('PACKETERY_WIDGET_AUTOOPEN')
         ) {
             return false;
         }
@@ -440,14 +442,13 @@ class Packetery extends CarrierModule
         $id_carrier = $params['carrier']['id'];
         $this->context->smarty->assign('carrier_id', $id_carrier);
 
-		$name_branch = '';
-		$currency_branch = '';
-		$id_branch = '';
+        $name_branch = '';
+        $currency_branch = '';
+        $id_branch = '';
         $pickupPointType = 'internal';
         $carrierId = '';
         $carrierPickupPointId = '';
-		if(!empty($params['cart']))
-		{
+        if (!empty($params['cart'])) {
             $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
 
             $name_branch = $row['name_branch'];
@@ -537,7 +538,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('psVersion', _PS_VERSION_);
         $this->context->smarty->assign('mustSelectPointText', $mustSelectPointText);
 
-        return $this->context->smarty->fetch($this->local_path.'views/templates/front/display-before-carrier.tpl');
+        return $this->context->smarty->fetch($this->local_path . 'views/templates/front/display-before-carrier.tpl');
     }
 
     /**
