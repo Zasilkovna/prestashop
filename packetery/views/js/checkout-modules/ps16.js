@@ -16,12 +16,11 @@ var PacketeryCheckoutModulePs16 = {
     },
 
     enableSubmitButton: function () {
-        var processCarrier = $('button[name=processCarrier]');
         /* Reenable disabled elements if carrier is not packetery */
         $('#cgv').attr('disabled', false); // terms of service checkbox
-        $('#cgv').parent().parent().removeClass('disabled');
         $('p.payment_module a').off('click.packeteryButtonDisabled');
 
+        var processCarrier = $('button[name=processCarrier]');
         if (processCarrier.length > 0) {
             $('button[name=processCarrier]')
                 .attr('disabled', false)
@@ -44,7 +43,8 @@ var PacketeryCheckoutModulePs16 = {
 
         /* unbind click events from payment links and disable them - cannot continue without selecting a pickup point */
         $('p.payment_module a').off('click.packeteryButtonDisabled').on('click.packeteryButtonDisabled', function (e) {
-            alert(packeteryMustSelectText);
+            var errorText = $('.packetery-message-pickup-point-not-selected-error').data('content');
+            alert(errorText);
             e.preventDefault();
             return false;
         });

@@ -8,7 +8,7 @@ var country = 'cz,sk'; /* Default countries */
 
 function PacketeryCheckoutModulesManager() {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
-    this.supportedModules = ['Ps16', 'Standard', 'Unknown', 'Supercheckout'];
+    this.supportedModules = ['Ps16', 'Ps17', 'Unknown', 'Supercheckout'];
     this.loadedModules = [];
     this.detectedModule = null;
 
@@ -58,7 +58,7 @@ function PacketeryCheckoutModulesManager() {
 
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 
-var packeteryCreateZasBoxes = function(onSuccess) {
+var packeteryCreateExtraContent = function(onSuccess) {
     var zpointCarriers = $('#zpoint_carriers').val();
     zpointCarriers = JSON.parse(zpointCarriers);
     var module = packeteryModulesManager.detectModule();
@@ -76,7 +76,7 @@ var packeteryCreateZasBoxes = function(onSuccess) {
             /* Display button and inputs */
             // todo redo id attr to class attr ?
             var c = module.getExtraContentContainer($(e));
-            var carrierDeferred = packetery.createZasBoxHtml(carrierId).done(function(result) {
+            var carrierDeferred = packetery.packeteryCreateExtraContent(carrierId).done(function(result) {
                 c.find('.carrier-extra-content').remove();
                 c.append(result);
                 tools.checkExtraContentVisibility();
@@ -208,21 +208,8 @@ tools = {
             var carrierId = String($extra.find('#carrier_id').val());
             if (selectedCarrierId !== carrierId) {
                 $extra.find('#open-packeta-widget').hide();
-                $extra.find('#selected-branch').hide();
-                $extra.find('#packetery-widget').hide();
             } else {
                 $extra.find('#open-packeta-widget').show();
-                $extra.find('#selected-branch').show();
-                $extra.find('#packetery-widget').show();
-            }
-
-            /* Only displayed extra content */
-            if ($extra.find('#packetery-widget').is(':hidden') === false) {
-                /* And branch is not set, disable */
-                var id_branch = $extra.find(".packeta-branch-id").val();
-                if (id_branch <= 0) {
-                    module.disableSubmitButton();
-                }
             }
         });
     },
@@ -232,7 +219,7 @@ tools = {
             return;
         }
 
-        this.checkExtraContentVisibility();
+        tools.checkExtraContentVisibility();
 
         /* Enable / Disable continue buttons after carrier change */
 
@@ -315,10 +302,10 @@ packetery = {
             },
         });
     },
-    createZasBoxHtml: function(prestashop_carrier_id) {
+    packeteryCreateExtraContent: function(prestashop_carrier_id) {
         return $.ajax({
             type: 'POST',
-            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=createZasBoxHtml' + ajaxs.checkToken(),
+            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=packeteryCreateExtraContent' + ajaxs.checkToken(),
             data: {
                 'prestashop_carrier_id': prestashop_carrier_id,
             },
@@ -353,7 +340,7 @@ function onShippingLoadedCallback() {
     }
 
     if (tools.isPS16()) {
-        packeteryCreateZasBoxes(function() {
+        packeteryCreateExtraContent(function() {
             initializePacketaWidget();
             tools.fixextracontent();
         });

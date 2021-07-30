@@ -8,16 +8,10 @@
 <script type="text/javascript">
     var packeteryAjaxFrontToken = "{$token}";
     var prestashopVersion = "{$psVersion}";
-    var packeteryMustSelectText = "{$mustSelectPointText}";
 
-    {if Tools::version_compare($psVersion, '1.7.0', '<')}
-    // In PS 1.7 $ is not defined at some moment.
-    $(function() {
+    // In PS 1.7 $ is not defined at this point
+    if (typeof $ !== 'undefined') {
 		// To make PS 1.6 OPC work
-        packeteryCreateZasBoxes(function() {
-            initializePacketaWidget();
-            tools.checkExtraContentVisibility();
-        });
-    });
-    {/if}
+        onShippingLoadedCallback();
+    }
 </script>
