@@ -210,6 +210,11 @@ tools = {
                 $extra.find('#open-packeta-widget').hide();
             } else {
                 $extra.find('#open-packeta-widget').show();
+
+                var id_branch = $extra.find(".packeta-branch-id").val();
+                if (id_branch <= 0) {
+                    module.disableSubmitButton();
+                }
             }
         });
     },
