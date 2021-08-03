@@ -89,7 +89,7 @@ class Packetery extends CarrierModule
             return false;
         }
         Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4');
-        Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', false);
+        Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', 0);
 
         // backup possible old order table
         if (count($db->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'packetery_order"')) > 0) {
@@ -537,6 +537,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('token', $token);
         $this->context->smarty->assign('psVersion', _PS_VERSION_);
         $this->context->smarty->assign('mustSelectPointText', $mustSelectPointText);
+        $this->context->smarty->assign('widgetAutoOpen', Configuration::get('PACKETERY_WIDGET_AUTOOPEN'));
 
         return $this->context->smarty->fetch($this->local_path . 'views/templates/front/display-before-carrier.tpl');
     }
