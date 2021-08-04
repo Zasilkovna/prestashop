@@ -762,13 +762,13 @@ class PacketeryApi
      * @return string
      * @throws \SmartyException
      */
-    public static function createZasBoxHtml() {
+    public static function packeteryCreateExtraContent() {
         $carrierId = Tools::getValue('prestashop_carrier_id');
 
         $packetery = new Packetery();
         $params = [
             'packetery' => [
-                'template' => 'views/templates/front/widget-wrapped.tpl'
+                'template' => 'views/templates/front/carrier-extra-content.tpl'
             ],
             'carrier' => [
                 'id' => $carrierId

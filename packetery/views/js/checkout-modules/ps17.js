@@ -1,6 +1,6 @@
 // naming convention: PacketerCheckoutModule + moduleId (first letter in upper case)
 
-var PacketeryCheckoutModuleStandard = {
+var PacketeryCheckoutModulePs17 = {
 
     isActive: function() {
         return this.findDeliveryOptions().length > 0;
