@@ -12,6 +12,6 @@ function upgrade_module_2_2_0($module)
 {
     return (
         $module->registerHook('displayBeforeCarrier') &&
-        Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', false)
+        Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', 0)
     );
 }
