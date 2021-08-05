@@ -529,18 +529,19 @@ class Packetery extends CarrierModule
         $appIdentity = Packeteryclass::getAppIdentity($this->version);
         $baseUri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
 
-        $token = Tools::getToken('ajax_front');
-
-        $this->context->smarty->assign('baseUri', $baseUri);
+      $this->context->smarty->assign('baseUri', $baseUri);
         $this->context->smarty->assign('lang', $lang);
         $this->context->smarty->assign('country', $country);
         $this->context->smarty->assign('zPointCarriersIdsJSON', $zPointCarriersIdsJSON);
         $this->context->smarty->assign('appIdentity', $appIdentity);
         $this->context->smarty->assign('apiKey', $apiKey);
-        $this->context->smarty->assign('token', $token);
-        $this->context->smarty->assign('psVersion', _PS_VERSION_);
         $this->context->smarty->assign('mustSelectPointText', $mustSelectPointText);
-        $this->context->smarty->assign('widgetAutoOpen', Configuration::get('PACKETERY_WIDGET_AUTOOPEN'));
+
+        $this->context->smarty->assign('packeteryConfig', [
+          'frontAjaxToken' => Tools::getToken('ajax_front'),
+          'prestashopVersion' => _PS_VERSION_,
+          'widgetAutoOpen' => Configuration::get('PACKETERY_WIDGET_AUTOOPEN'),
+        ]);
 
         return $this->context->smarty->fetch($this->local_path . 'views/templates/front/display-before-carrier.tpl');
     }

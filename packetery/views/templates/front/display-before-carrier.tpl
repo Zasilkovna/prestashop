@@ -4,10 +4,11 @@
 <input type="hidden" id="zpoint_carriers" name="zpoint_carriers" value='{$zPointCarriersIdsJSON}'>
 <input type="hidden" id="app_identity" name="app_identity" value="{$appIdentity}">
 <input type="hidden" id="packeta-api-key" name="packeta-api-key" value="{$apiKey}">
-<input type="hidden" id="widgetAutoOpen" name="widgetAutoOpen" value="{$widgetAutoOpen}">
 <script type="text/javascript">
-    var packeteryAjaxFrontToken = "{$token}";
-    var prestashopVersion = "{$psVersion}";
+    PacketaModule = window.PacketaModule || { };
+
+    {* json_encode writes PHP array to JS object, nofilter prevents " to be turned to &quot; in PS 1.7 *}
+    PacketaModule.config = {$packeteryConfig|json_encode nofilter};
 
     // In PS 1.7 $ is not defined at this point
     if (typeof $ !== 'undefined') {

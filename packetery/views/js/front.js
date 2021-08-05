@@ -1,8 +1,22 @@
-// non-blocking AJAX loading, speeds up page load
-$.getScript("https://widget.packeta.com/v6/www/js/library.js")
-    .fail(function() {
-        console.error('Unable to load Packeta Widget.');
-    });
+PacketaModule = window.PacketaModule || {};
+
+PacketaModule.runner = {
+    onThisScriptLoad: function() {
+        // non-blocking AJAX loading, speeds up page load
+        $.getScript("https://widget.packeta.com/v6/www/js/library.js")
+            .success(PacketaModule.runner.onWidgetLoad)
+            .fail(function() {
+                console.error('Unable to load Packeta Widget.');
+            });
+    },
+
+    onWidgetLoad: function() {
+        $(function() {
+            onShippingLoadedCallback();
+        });
+    },
+}
+
 
 var country = 'cz,sk'; /* Default countries */
 
@@ -90,9 +104,6 @@ var packeteryCreateExtraContent = function(onSuccess) {
     $.when.apply(null, deferreds).then(onSuccess);
 }
 
-$(document).ready(function() {
-    onShippingLoadedCallback();
-});
 
 window.initializePacketaWidget = function() {
     // set YOUR Packeta API key
@@ -179,7 +190,7 @@ window.initializePacketaWidget = function() {
         }, widgetOptions);
     });
 
-    if ($('#widgetAutoOpen').val() === '1') {
+    if (PacketaModule.config.widgetAutoOpen) {
         var openWidget = function () {
             tools.openSelectedDeliveryWidget(module.getSelectedInput());
         };
@@ -190,7 +201,7 @@ window.initializePacketaWidget = function() {
 
 tools = {
     isPS16: function() {
-        return window.prestashopVersion && window.prestashopVersion.indexOf('1.6') === 0;
+        return PacketaModule.config.prestashopVersion && PacketaModule.config.prestashopVersion.indexOf('1.6') === 0;
     },
     checkExtraContentVisibility: function() {
         var module = packeteryModulesManager.detectModule();
@@ -332,7 +343,7 @@ ajaxs = {
         return $('#baseuri').val();
     },
     checkToken: function() {
-        return '&token=' + window.packeteryAjaxFrontToken;
+        return '&token=' + PacketaModule.config.frontAjaxToken;
     },
 }
 
@@ -354,3 +365,5 @@ function onShippingLoadedCallback() {
         tools.fixextracontent();
     }
 }
+
+PacketaModule.runner.onThisScriptLoad();
