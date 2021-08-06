@@ -540,7 +540,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('packeteryConfig', [
           'frontAjaxToken' => Tools::getToken('ajax_front'),
           'prestashopVersion' => _PS_VERSION_,
-          'widgetAutoOpen' => Configuration::get('PACKETERY_WIDGET_AUTOOPEN'),
+          'widgetAutoOpen' => (bool) Configuration::get('PACKETERY_WIDGET_AUTOOPEN'),
         ]);
 
         return $this->context->smarty->fetch($this->local_path . 'views/templates/front/display-before-carrier.tpl');
