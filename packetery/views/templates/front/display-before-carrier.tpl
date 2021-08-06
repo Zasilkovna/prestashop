@@ -10,6 +10,11 @@
     {* json_encode writes PHP array to JS object, nofilter prevents " to be turned to &quot; in PS 1.7 *}
     PacketaModule.config = {$packeteryConfig|json_encode nofilter};
 
+    // PS 1.6 OPC re-creates the list of shipping methods, throwing out extra content in the process.
+    // PS 1.6 5-steps checkout doesn't do that
+
+    // todo: distinguish 5-steps to toggle visibility here, for OPC toggle in display-before-carrier via onShippingLoaded...
+
     // In PS 1.7 $ is not defined at this point
     if (typeof $ !== 'undefined') {
 		// To make PS 1.6 OPC work

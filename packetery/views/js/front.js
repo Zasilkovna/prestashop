@@ -17,6 +17,25 @@ PacketaModule.runner = {
     },
 }
 
+PacketaModule.ui = {
+    toggleExtraContent: function () {
+        // if template doesn't handle showing carrier-extra-content then we have to
+        if ((! PacketaModule.config.toggleExtraContent) && (! tools.isPS16())) {
+            return;
+        }
+
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        // hide it for all carriers, even for those that are not Packeta (emulate PS 1.7 behaviour)
+        $('.carrier-extra-content').hide();
+        packeteryModulesManager.getWidgetParent(module.getSelectedInput())
+            .closest('.carrier-extra-content')
+            .show();
+    }
+};
 
 var country = 'cz,sk'; /* Default countries */
 
@@ -93,7 +112,6 @@ var packeteryCreateExtraContent = function(onSuccess) {
             var carrierDeferred = packetery.packeteryCreateExtraContent(carrierId).done(function(result) {
                 c.find('.carrier-extra-content').remove();
                 c.append(result);
-                tools.checkExtraContentVisibility();
             });
 
             deferreds.push(carrierDeferred);
@@ -209,6 +227,8 @@ tools = {
             return;
         }
 
+        PacketaModule.ui.toggleExtraContent();
+
         var selectedCarrierId = packeteryModulesManager.getCarrierId(module.getSelectedInput());
         $('.carrier-extra-content').each(function() {
             var $extra = $(this);
@@ -217,11 +237,7 @@ tools = {
             }
 
             var carrierId = String($extra.find('#carrier_id').val());
-            if (selectedCarrierId !== carrierId) {
-                $extra.find('#open-packeta-widget').hide();
-            } else {
-                $extra.find('#open-packeta-widget').show();
-
+            if (selectedCarrierId === carrierId) {
                 var id_branch = $extra.find(".packeta-branch-id").val();
                 if (id_branch <= 0) {
                     module.disableSubmitButton();
@@ -242,6 +258,12 @@ tools = {
         var $deliveryInputs = module.findDeliveryOptions();
         $deliveryInputs.off('change.packeteryFix').on('change.packeteryFix', function() {
             module.disableSubmitButton();
+
+            // PS 1.6 OPC re-creates the list of shipping methods, throwing out extra content in the process.
+            // PS 1.6 5-steps checkout doesn't do that
+
+            // todo: distinguish 5-steps to toggle visibility here, for OPC toggle in display-before-carrier via onShippingLoaded...
+
             tools.checkExtraContentVisibility();
 
             var
@@ -253,15 +275,6 @@ tools = {
             if (!$extra.find('#packetery-widget').length) {
                 module.enableSubmitButton();
                 return;
-            }
-
-            if ($this.is(':checked')) {
-                var $wrapper = $extra.closest('.carrier-extra-content');
-                setTimeout(function() {
-                    if ($wrapper.is(':hidden')) {
-                        $wrapper.show();
-                    }
-                }, 500);
             }
 
             var id_branch = $extra.find(".packeta-branch-id").val();
