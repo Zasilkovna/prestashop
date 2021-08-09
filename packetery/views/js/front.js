@@ -2,7 +2,7 @@ PacketaModule = window.PacketaModule || {};
 
 PacketaModule.tools = {
     isPS16: function() {
-        return PacketaModule.config.prestashopVersion && PacketaModule.config.prestashopVersion.indexOf('1.6') === 0;
+        return PacketaModule.config.prestashopVersion.indexOf('1.6') === 0;
     },
 };
 
@@ -39,7 +39,7 @@ PacketaModule.runner = {
     },
 
     /**
-     * May be called more than once in a lifetime of this script
+     * May be called more than once in a lifetime of this script, when shipping methods are updated via AJAX
      */
     onShippingLoad: function () {
         if (PacketaModule.tools.isPS16()) {
@@ -56,7 +56,7 @@ PacketaModule.runner = {
         }
 
         PacketaModule.ui.initializeWidget();
-        PacketaModule.ui.handleAutoOpenWidget();
+        PacketaModule.ui.autoOpenWidget();
 
         PacketaModule.ui.toggleSubmit();
         PacketaModule.ui.toggleExtraContent();
@@ -65,7 +65,6 @@ PacketaModule.runner = {
         $deliveryInputs.off('change.packetery').on('change.packetery', function() {
             PacketaModule.runner.onShippingChange($(this));
         });
-
     },
 
     onShippingChange($selectedInput) {
@@ -74,15 +73,13 @@ PacketaModule.runner = {
             return;
         }
 
-        // just in case this script dies or an AJAX round trip delay would allow customer to continue without selecting a branch first
+        // just in case this script dies, or an AJAX round trip delay would allow customer to continue without selecting a branch first
         module.disableSubmitButton();
 
-        // PS 1.6 OPC re-creates the list of shipping methods, throwing out extra content in the process.
-        // PS 1.6 5-steps checkout doesn't do that
-
-        // todo: distinguish 5-steps to toggle visibility here, for OPC toggle in display-before-carrier via onShippingLoaded...
-
-        PacketaModule.ui.toggleExtraContent();
+        if (PacketaModule.config.toggleExtraContentOnShippingChange) {
+            PacketaModule.ui.autoOpenWidget();
+            PacketaModule.ui.toggleExtraContent();
+        }
 
         var $extra = packeteryModulesManager.getWidgetParent($selectedInput);
 
@@ -114,8 +111,20 @@ PacketaModule.runner = {
         }
     },
 
+    /**
+     * Called in two scenarios:
+     * - during initial load - at this point, delivery methods have not been downloaded yet and module detection probably fails
+     * - on AJAX update of delivery methods
+     */
     onBeforeCarrierLoad() {
-        PacketaModule.runner.onShippingLoad(); // stub, tohle je právě potřeba vyřešit
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        if (module.findDeliveryOptions().length !== 0) {
+            PacketaModule.runner.onShippingLoad();
+        }
     }
 }
 
@@ -145,7 +154,6 @@ PacketaModule.ui = {
     /**
      * May be called multiple times, even in a very short time
      * @see display-before-carrier.tpl
-     * @param onExtraContentLoad
      */
     addExtraContent: function (onExtraContentLoad) {
         var module = packeteryModulesManager.detectModule();
@@ -267,7 +275,7 @@ PacketaModule.ui = {
         });
     },
 
-    handleAutoOpenWidget: function () {
+    autoOpenWidget: function () {
         if (!PacketaModule.config.widgetAutoOpen) {
             return;
         }
@@ -277,26 +285,22 @@ PacketaModule.ui = {
             return;
         }
 
-        var openWidget = function () {
-            var $selectedDeliveryOption = module.getSelectedInput();
-            if ($selectedDeliveryOption.length !== 1) {
-                return;
-            }
+        var $selectedDeliveryOption = module.getSelectedInput();
+        if ($selectedDeliveryOption.length !== 1) {
+            return;
+        }
 
-            var $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
-            var $widgetButton = $widgetParent.find('.open-packeta-widget');
-            if (
-                $widgetButton.length === 1 &&
-                $widgetParent.find('.packeta-branch-id').val() === ''
-                // todo PePa: how could we reach this point with widget already open?
-                // &&
-                // $('iframe #packeta-widget').length === 0
-            ) {
-                $widgetButton.click();
-            }
-        };
-        module.findDeliveryOptions().on('change', openWidget);
-        openWidget();
+        var $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
+        var $widgetButton = $widgetParent.find('.open-packeta-widget');
+        if (
+            $widgetButton.length === 1 &&
+            $widgetParent.find('.packeta-branch-id').val() === ''
+            // todo PePa: how could we reach this point with widget already open?
+            // &&
+            // $('iframe #packeta-widget').length === 0
+        ) {
+            $widgetButton.click();
+        }
     }
 };
 

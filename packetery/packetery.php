@@ -506,7 +506,7 @@ class Packetery extends CarrierModule
         $cart = $params['cart'];
 
         $customerCountry = '';
-        if (isset($cart->id_address_delivery) && !empty($cart->id_address_delivery)) {
+        if (!empty($cart->id_address_delivery)) {
             $address = new AddressCore($cart->id_address_delivery);
             $countryIso = CountryCore::getIsoById($address->id_country);
             $customerCountry = strtolower($countryIso);
@@ -517,26 +517,39 @@ class Packetery extends CarrierModule
             JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`)
             WHERE `c`.`deleted` = 0 AND `pad`.`pickup_point_type` IS NOT NULL'
         );
-
         $deliveryPointCarrierIds = array_column($deliveryPointCarriers, 'id_carrier');
-      /* Get language from cart, global $language updates weirdly */
+
+        /* Get language from cart, global $language updates weirdly */
         $language = new LanguageCore($cart->id_lang);
-        $shopLanguage = ($language->iso_code ?: 'en');
+        $shopLanguage = $language->iso_code ?: 'en';
         $shopLanguage = strtolower($shopLanguage);
 
-        $baseUri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+        $baseUri = __PS_BASE_URI__ === '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
 
-        $this->context->smarty->assign('packeteryConfig', [
-          'baseUri' => $baseUri,
-          'apiKey' => PacketeryApi::getApiKey(),
-          'frontAjaxToken' => Tools::getToken('ajax_front'),
-          'appIdentity' => Packeteryclass::getAppIdentity($this->version),
-          'prestashopVersion' => _PS_VERSION_,
-          'shopLanguage' => $shopLanguage,
-          'customerCountry' => $customerCountry,
-          'deliveryPointCarrierIds' => $deliveryPointCarrierIds,
-          'widgetAutoOpen' => (bool) Configuration::get('PACKETERY_WIDGET_AUTOOPEN'),
-          'toggleExtraContent' => false, // (bool) Configuration::get('PACKETERY_TOGGLE_EXTRA_CONTENT'),
+        $isPS16 = strpos(_PS_VERSION_, '1.6') === 0;
+        $isOpcEnabled = (bool) Configuration::get('PS_ORDER_PROCESS_TYPE');
+
+        $this->context->smarty->assign('packetaModuleConfig', [
+            'baseUri' => $baseUri,
+            'apiKey' => PacketeryApi::getApiKey(),
+            'frontAjaxToken' => Tools::getToken('ajax_front'),
+            'appIdentity' => Packeteryclass::getAppIdentity($this->version),
+            'prestashopVersion' => _PS_VERSION_,
+            'shopLanguage' => $shopLanguage,
+            'customerCountry' => $customerCountry,
+            'deliveryPointCarrierIds' => $deliveryPointCarrierIds,
+
+            /*
+             * PS 1.6 OPC re-creates the list of shipping methods, throwing out extra content in the process.
+             *   When extra content is toggled in on(change) it is immediately removed and then shown again,
+             *   after having been re-fetched from the server.
+             *   Option 'toggleExtraContentOnShippingChange' is a workaround for this issue.
+             * PS 1.6 5-steps checkout doesn't do that
+             */
+            'toggleExtraContentOnShippingChange' => ! ($isPS16 && $isOpcEnabled),
+
+            'widgetAutoOpen' => (bool) Configuration::get('PACKETERY_WIDGET_AUTOOPEN'),
+            'toggleExtraContent' => false, // (bool) Configuration::get('PACKETERY_TOGGLE_EXTRA_CONTENT'),
         ]);
 
         $this->context->smarty->assign('mustSelectPointText', $this->l('Please select pickup point'));
