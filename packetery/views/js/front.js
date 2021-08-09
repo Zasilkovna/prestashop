@@ -43,7 +43,7 @@ PacketaModule.runner = {
      */
     onShippingLoad: function () {
         if (PacketaModule.tools.isPS16()) {
-            PacketaModule.ui.addExtraContent(PacketaModule.runner.onExtraContentLoad);
+            PacketaModule.ui.addAllExtraContents(PacketaModule.runner.onExtraContentLoad);
         } else {
             PacketaModule.runner.onExtraContentLoad();
         }
@@ -149,21 +149,22 @@ PacketaModule.ui = {
             .show();
     },
 
-    extraContentThrottling: {},
+    extraContentCache: {},
 
     /**
-     * May be called multiple times, even in a very short time
+     * May be called multiple times, even in a very short time, especially in Supercheckout PS 1.6
      * @see display-before-carrier.tpl
      */
-    addExtraContent: function (onExtraContentLoad) {
+    addAllExtraContents: function (onExtraContentLoad) {
         var module = packeteryModulesManager.detectModule();
         if (module === null) {
             return;
         }
 
         var $deliveryOptions = module.findDeliveryOptions();
+        var ajaxCalls = [],
+            loadedFromCache = false;
 
-        var ajaxCalls = [];
         $deliveryOptions.each(function(i, e) {
             var $deliveryInput = $(e);
             var carrierId = packeteryModulesManager.getCarrierId($deliveryInput);
@@ -173,16 +174,19 @@ PacketaModule.ui = {
                 return;
             }
 
-            if (typeof PacketaModule.ui.extraContentThrottling[carrierId] !== 'undefined') {
+            if (typeof PacketaModule.ui.extraContentCache[carrierId] !== 'undefined') {
+                if (PacketaModule.ui.extraContentCache[carrierId] !== 'pending') {
+                    PacketaModule.ui.addOneExtraContent($deliveryInput, PacketaModule.ui.extraContentCache[carrierId]);
+                    loadedFromCache = true;
+                }
                 return;
             }
-            PacketaModule.ui.extraContentThrottling[carrierId] = true;
 
-            var $extraContentContainer = module.getExtraContentContainer($deliveryInput);
+            PacketaModule.ui.extraContentCache[carrierId] = 'pending';
 
             var ajaxCall = PacketaModule.ajax.fetchExtraContent(carrierId).done(function(result) {
-                $extraContentContainer.append(result);
-                delete PacketaModule.ui.extraContentThrottling[carrierId];
+                PacketaModule.ui.addOneExtraContent($deliveryInput, result);
+                PacketaModule.ui.extraContentCache[carrierId] = result;
             });
             ajaxCalls.push(ajaxCall);
         });
@@ -190,6 +194,24 @@ PacketaModule.ui = {
         if (ajaxCalls.length > 0) {
             $.when.apply(null, ajaxCalls).then(onExtraContentLoad);
         }
+
+        if (loadedFromCache) {
+            onExtraContentLoad();
+        }
+    },
+
+    addOneExtraContent: function($deliveryInput, html) {
+        var isAlreadyThere = packeteryModulesManager.getWidgetParent($deliveryInput).length > 0;
+        if (isAlreadyThere) {
+            return;
+        }
+
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        module.getExtraContentContainer($deliveryInput).append(html);
     },
 
     toggleSubmit() {
