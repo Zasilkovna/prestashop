@@ -168,15 +168,15 @@ PacketaModule.ui = {
             var $deliveryInput = $(e);
             var carrierId = packeteryModulesManager.getCarrierId($deliveryInput);
 
-            if (typeof PacketaModule.ui.extraContentThrottling[carrierId] !== 'undefined') {
-                return;
-            }
-            PacketaModule.ui.extraContentThrottling[carrierId] = true;
-
             var isCarrierWithDeliveryPoints = PacketaModule.config.deliveryPointCarrierIds.indexOf(carrierId) >= 0;
             if (!isCarrierWithDeliveryPoints) {
                 return;
             }
+
+            if (typeof PacketaModule.ui.extraContentThrottling[carrierId] !== 'undefined') {
+                return;
+            }
+            PacketaModule.ui.extraContentThrottling[carrierId] = true;
 
             var $extraContentContainer = module.getExtraContentContainer($deliveryInput);
 
