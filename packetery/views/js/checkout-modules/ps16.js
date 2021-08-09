@@ -3,7 +3,7 @@
 var PacketeryCheckoutModulePs16 = {
 
     isActive: function() {
-        var isCorrectVersion = tools.isPS16();
+        var isCorrectVersion = PacketaModule.tools.isPS16();
         return isCorrectVersion && this.findDeliveryOptions().length > 0;
     },
 

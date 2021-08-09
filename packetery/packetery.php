@@ -495,54 +495,51 @@ class Packetery extends CarrierModule
     }
 
     /**
-     * hook to display Packetery extra data to each Packetery carrier
+     * Output is inserted before the list of shipping methods
+     * Compatibility: PS 1.6, PS 1.7
      *
      * @param array $params
      * @return string
      */
-    public function hookDisplayBeforeCarrier($params) {
+    public function hookDisplayBeforeCarrier(array $params) {
         /** @var \CartCore $cart */
         $cart = $params['cart'];
 
-        $country = '';
-        if (isset($cart->id_address_delivery) && !empty($params['cart']->id_address_delivery)) {
-            $address = new AddressCore($params['cart']->id_address_delivery);
+        $customerCountry = '';
+        if (isset($cart->id_address_delivery) && !empty($cart->id_address_delivery)) {
+            $address = new AddressCore($cart->id_address_delivery);
             $countryIso = CountryCore::getIsoById($address->id_country);
-            $country = strtolower($countryIso);
+            $customerCountry = strtolower($countryIso);
         }
 
-        $zPointCarriers = Db::getInstance()->executeS(
+        $deliveryPointCarriers = Db::getInstance()->executeS(
             'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
             JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`)
             WHERE `c`.`deleted` = 0 AND `pad`.`pickup_point_type` IS NOT NULL'
         );
 
-        $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
-        $apiKey = PacketeryApi::getApiKey();
-
-        /* Get language from cart, global $language updates weirdly */
+        $deliveryPointCarrierIds = array_column($deliveryPointCarriers, 'id_carrier');
+      /* Get language from cart, global $language updates weirdly */
         $language = new LanguageCore($cart->id_lang);
-        $lang = ($language->iso_code ?: 'en');
-        $lang = strtolower($lang);
+        $shopLanguage = ($language->iso_code ?: 'en');
+        $shopLanguage = strtolower($shopLanguage);
 
-        $mustSelectPointText = $this->l('Please select pickup point');
-        $appIdentity = Packeteryclass::getAppIdentity($this->version);
         $baseUri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
 
-      $this->context->smarty->assign('baseUri', $baseUri);
-        $this->context->smarty->assign('lang', $lang);
-        $this->context->smarty->assign('country', $country);
-        $this->context->smarty->assign('zPointCarriersIdsJSON', $zPointCarriersIdsJSON);
-        $this->context->smarty->assign('appIdentity', $appIdentity);
-        $this->context->smarty->assign('apiKey', $apiKey);
-        $this->context->smarty->assign('mustSelectPointText', $mustSelectPointText);
-
         $this->context->smarty->assign('packeteryConfig', [
+          'baseUri' => $baseUri,
+          'apiKey' => PacketeryApi::getApiKey(),
           'frontAjaxToken' => Tools::getToken('ajax_front'),
+          'appIdentity' => Packeteryclass::getAppIdentity($this->version),
           'prestashopVersion' => _PS_VERSION_,
+          'shopLanguage' => $shopLanguage,
+          'customerCountry' => $customerCountry,
+          'deliveryPointCarrierIds' => $deliveryPointCarrierIds,
           'widgetAutoOpen' => (bool) Configuration::get('PACKETERY_WIDGET_AUTOOPEN'),
           'toggleExtraContent' => false, // (bool) Configuration::get('PACKETERY_TOGGLE_EXTRA_CONTENT'),
         ]);
+
+        $this->context->smarty->assign('mustSelectPointText', $this->l('Please select pickup point'));
 
         return $this->context->smarty->fetch($this->local_path . 'views/templates/front/display-before-carrier.tpl');
     }
