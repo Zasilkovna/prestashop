@@ -275,40 +275,6 @@ class Packeteryclass
     }
 
     /**
-     * Creates packetery orders tab
-     * @return bool
-     */
-    public static function insertTab()
-    {
-        $tab = new Tab;
-        $module = new Packetery;
-        $id_parent = Tab::getIdFromClassName('AdminParentOrders');
-        $tab->id_parent = $id_parent;
-        $tab->module = 'packetery';
-        $tab->class_name = 'Adminpacketery';
-        $tab->name = self::createMultiLangField($module->l('Packeta Orders', 'packetery.class'));
-        $tab->position = $tab->getNewLastPosition($id_parent);
-        $tab->add();
-        return true;
-    }
-
-    /**
-     * Deletes packetery orders tab
-     * @return bool
-     */
-    public static function deleteTab()
-    {
-        $id_tab = Tab::getIdFromClassName('Adminpacketery');
-        if ($id_tab)
-        {
-            $tab = new Tab($id_tab);
-            $tab->active = false;
-            $tab->update();
-        }
-        return true;
-    }
-
-    /**
      * Set order exported
      * @param $id_order
      * @param $set
@@ -730,16 +696,6 @@ class Packeteryclass
             default:
                 return false;
         }
-    }
-
-    public static function createMultiLangField($field)
-    {
-        $res = array();
-        foreach (Language::getIDs(true) as $id_lang)
-        {
-            $res[$id_lang] = $field;
-        }
-        return $res;
     }
     /*END COMMON FUNCTIONS*/
 
