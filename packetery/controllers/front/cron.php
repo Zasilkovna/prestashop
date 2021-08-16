@@ -15,23 +15,23 @@ class PacketeryCronModuleFrontController extends ModuleFrontController {
 	 */
 	private function runDeleteLabels() {
 		$files = glob(__DIR__ . '/../../labels/*.pdf', GLOB_NOSORT);
-		$shiftDays = Configuration::get('PACKETERY_CRON_DELETE_LABELS_SHIFT', null, null, null, 7);
+		$shiftDays = Configuration::get('PACKETERY_CRON_DELETE_LABELS_SHIFT');
 		if($shiftDays === false) {
 			$this->writeMessage('Configuration can not be loaded.');
 			return;
 		}
+		$shift = 60 * 60 * 24 * $shiftDays;
+		$limit = time() - $shift;
 
 		foreach($files as $label) {
 			$labelName = basename($label);
-			$creationTime = filectime($label);
-			if($creationTime === false) {
-				$this->writeMessage('Failed to retrieve creation time for label "' . $labelName . '".');
+			$fileTime = filemtime($label);
+			if($fileTime === false) {
+				$this->writeMessage('Failed to retrieve file time for label "' . $labelName . '".');
 				continue;
 			}
 
-			$shift = 60 * 60 * 24 * $shiftDays;
-			$limit = time() - $shift;
-			if($creationTime < $limit) {
+			if($fileTime < $limit) {
 				$result = unlink($label);
 				if($result === false) {
 					$this->writeMessage('Failed to remove label "' . $labelName . '". Check permissions.');
@@ -49,8 +49,8 @@ class PacketeryCronModuleFrontController extends ModuleFrontController {
 	public function display() {
 		$this->ajax = 1;
 
-		if(php_sapi_name() !== 'cli') {
-			$this->writeMessage('Forbidden call.');
+		if($this->validateToken($this->getToken()) === false) {
+			$this->writeMessage('Invalid packetery cron token for task.');
 			exit;
 		}
 
@@ -74,19 +74,32 @@ class PacketeryCronModuleFrontController extends ModuleFrontController {
 	 * @param string $message Message to be printed.
 	 */
 	private function writeMessage($message) {
-		$this->ajaxRender("$message\n");
+		PrestaShopLogger::addLog('[packetery:cron]: ' . $message, 3, null, null, null, true);
 	}
 
 	/**
-	 * @return string|null task passed by CLI user
+	 * @return string|null task passed by user
 	 */
 	private function getTask() {
-		global $argv;
+		return \Packetery\Tools\Tools::getValue('task', null);
+	}
 
-		if(isset($argv[1])) {
-			return $argv[1];
+	private function validateToken($token) {
+		$storedToken = Configuration::get('PACKETERY_CRON_TOKEN');
+		if($storedToken === false) {
+			return false;
+		}
+		if($token === null) {
+			return false;
 		}
 
-		return null;
+		return $storedToken === $token;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	private function getToken() {
+		return \Packetery\Tools\Tools::getValue('token', null);
 	}
 }
