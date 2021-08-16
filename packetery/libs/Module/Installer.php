@@ -76,12 +76,13 @@ class Installer
     private function installDatabase()
     {
         if (!defined('_MYSQL_ENGINE_')) {
-            define('_MYSQL_ENGINE_', 'MyISAM');
+            define('_MYSQL_ENGINE_', 'InnoDB');
         }
 
         $sql = [];
 
-        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_order` (
+        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_order`';
+        $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_order` (
             `id_order` int,
             `id_cart` int,
             `id_branch` int NULL,
@@ -98,12 +99,14 @@ class Installer
             UNIQUE(`id_cart`)
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
-        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_payment` (
+        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';
+        $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_payment` (
             `module_name` varchar(255) not null primary key,
             `is_cod` tinyint(1) not null default 0
-        ) engine=' . _MYSQL_ENGINE_ . ' default charset=utf8;';
+        ) ENGINE=' . _MYSQL_ENGINE_ . ' default charset=utf8;';
 
-        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery` (
+        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
+        $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery` (
             `id_carrier` int NOT NULL PRIMARY KEY,
             `id_branch` int NULL,
             `name_branch` varchar(255) NULL,
