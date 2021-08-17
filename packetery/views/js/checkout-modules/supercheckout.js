@@ -20,7 +20,13 @@ var PacketeryCheckoutModuleSupercheckout = {
 
     hideValidationErrors: function () {
         hideGeneralError();
-    }
+    },
+
+    // used in PS 1.6 version
+    getExtraContentContainer: function ($selectedInput) {
+        return $selectedInput.closest('li');
+    },
+
 };
 
 $(function () {

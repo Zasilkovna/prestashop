@@ -36,10 +36,10 @@ if ($token !== $real_token) {
 
 switch (Tools::getValue('action')) {
     /*FRONT*/
-    case 'widgetsaveorderbranch':
+    case 'saveSelectedBranch':
         PacketeryApi::widgetSaveOrderBranch();
         break;
-    case 'packeteryCreateExtraContent':
+    case 'fetchExtraContent':
         echo PacketeryApi::packeteryCreateExtraContent();
         break;
     default:

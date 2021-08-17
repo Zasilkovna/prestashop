@@ -1,10 +1,375 @@
-// non-blocking AJAX loading, speeds up page load
-$.getScript("https://widget.packeta.com/v6/www/js/library.js")
-    .fail(function() {
-        console.error('Unable to load Packeta Widget.');
-    });
+PacketaModule = window.PacketaModule || {};
 
-var country = 'cz,sk'; /* Default countries */
+PacketaModule.tools = {
+    isPS16: function() {
+        return PacketaModule.config.prestashopVersion.indexOf('1.6') === 0;
+    },
+};
+
+PacketaModule.runner = {
+    /**
+     * Supposed to be called only once
+     */
+    onThisScriptLoad: function() {
+        // non-blocking AJAX loading, speeds up page load
+        $.getScript("https://widget.packeta.com/v6/www/js/library.js")
+            .success(PacketaModule.runner.onWidgetLoad)
+            .fail(function() {
+                console.error('Unable to load Packeta Widget.');
+            });
+    },
+
+    /**
+     * Supposed to be called only once
+     */
+    onWidgetLoad: function() {
+        // register on document load callback after widget is loaded
+        $(PacketaModule.runner.onDocumentLoad);
+    },
+
+    /**
+     * Supposed to be called only once
+     */
+    onDocumentLoad: function () {
+        if (typeof PacketaModule.config === 'undefined') {
+            return; // this script is not loaded on a page with a selection of shipping methods
+        }
+
+        PacketaModule.runner.onShippingLoad();
+    },
+
+    /**
+     * May be called more than once in a lifetime of this script, when shipping methods are updated via AJAX
+     */
+    onShippingLoad: function () {
+        if (PacketaModule.tools.isPS16()) {
+            PacketaModule.ui.addAllExtraContents(PacketaModule.runner.onExtraContentLoad);
+        } else {
+            PacketaModule.runner.onExtraContentLoad();
+        }
+    },
+
+    onExtraContentLoad: function () {
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        PacketaModule.ui.initializeWidget();
+        PacketaModule.ui.autoOpenWidget();
+
+        PacketaModule.ui.toggleSubmit();
+        PacketaModule.ui.toggleExtraContent();
+
+        var $deliveryInputs = module.findDeliveryOptions();
+        $deliveryInputs.off('change.packetery').on('change.packetery', function() {
+            PacketaModule.runner.onShippingChange($(this));
+        });
+    },
+
+    onShippingChange($selectedInput) {
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        // just in case this script dies, or an AJAX round trip delay would allow customer to continue without selecting a branch first
+        module.disableSubmitButton();
+
+        if (PacketaModule.config.toggleExtraContentOnShippingChange) {
+            PacketaModule.ui.autoOpenWidget();
+            PacketaModule.ui.toggleExtraContent();
+        }
+
+        var $extra = packeteryModulesManager.getWidgetParent($selectedInput);
+
+        // if selected carrier is not Packeta then enable Continue button and we're done here
+        if (!$extra.length) {
+            module.enableSubmitButton();
+            return;
+        }
+
+        var branchId = $extra.find(".packeta-branch-id").val();
+        if (branchId !== '') {
+            var prestashopCarrierId = packeteryModulesManager.getCarrierId($selectedInput);
+            var branchName = $extra.find(".packeta-branch-name").val();
+            var pickupPointType = $extra.find(".packeta-pickup-point-type").val();
+            var widgetCarrierId = $extra.find(".packeta-carrier-id").val();
+            var carrierPickupPointId = $extra.find(".packeta-carrier-pickup-point-id").val();
+
+            PacketaModule.ajax.saveSelectedBranch(
+                prestashopCarrierId,
+                branchId,
+                branchName,
+                pickupPointType,
+                widgetCarrierId,
+                carrierPickupPointId,
+                PacketaModule.ui.toggleSubmit
+            );
+        } else {
+            PacketaModule.ui.toggleSubmit();
+        }
+    },
+
+    /**
+     * Called in two scenarios:
+     * - during initial load - at this point, delivery methods have not been downloaded yet and module detection probably fails
+     * - on AJAX update of delivery methods
+     */
+    onBeforeCarrierLoad() {
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        if (module.findDeliveryOptions().length !== 0) {
+            PacketaModule.runner.onShippingLoad();
+        }
+    }
+}
+
+PacketaModule.ui = {
+    toggleExtraContent: function () {
+        // if template doesn't handle showing carrier-extra-content then we have to
+        if ((! PacketaModule.config.toggleExtraContent) && (! PacketaModule.tools.isPS16())) {
+            return;
+        }
+
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        // hide it for all carriers - if they happen to have it
+        $('.carrier-extra-content').hide();
+
+        // show it only for Packeta carriers (easier to do because we have id="packetery-carrier-{$carrier_id}")
+        packeteryModulesManager.getWidgetParent(module.getSelectedInput())
+            .closest('.carrier-extra-content')
+            .show();
+    },
+
+    extraContentCache: {},
+
+    /**
+     * May be called multiple times, even in a very short time, especially in Supercheckout PS 1.6
+     * @see display-before-carrier.tpl
+     */
+    addAllExtraContents: function (onExtraContentLoad) {
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        var $deliveryOptions = module.findDeliveryOptions();
+        var ajaxCalls = [],
+            loadedFromCache = false;
+
+        $deliveryOptions.each(function(i, e) {
+            var $deliveryInput = $(e);
+            var carrierId = packeteryModulesManager.getCarrierId($deliveryInput);
+
+            var isCarrierWithDeliveryPoints = PacketaModule.config.deliveryPointCarrierIds.indexOf(carrierId) >= 0;
+            if (!isCarrierWithDeliveryPoints) {
+                return;
+            }
+
+            if (typeof PacketaModule.ui.extraContentCache[carrierId] !== 'undefined') {
+                if (PacketaModule.ui.extraContentCache[carrierId] !== 'pending') {
+                    PacketaModule.ui.addOneExtraContent($deliveryInput, PacketaModule.ui.extraContentCache[carrierId]);
+                    loadedFromCache = true;
+                }
+                return;
+            }
+
+            PacketaModule.ui.extraContentCache[carrierId] = 'pending';
+
+            var ajaxCall = PacketaModule.ajax.fetchExtraContent(carrierId).done(function(result) {
+                PacketaModule.ui.addOneExtraContent($deliveryInput, result);
+                PacketaModule.ui.extraContentCache[carrierId] = result;
+            });
+            ajaxCalls.push(ajaxCall);
+        });
+
+        if (ajaxCalls.length > 0) {
+            $.when.apply(null, ajaxCalls).then(onExtraContentLoad);
+        }
+
+        if (loadedFromCache) {
+            onExtraContentLoad();
+        }
+    },
+
+    addOneExtraContent: function($deliveryInput, html) {
+        var isAlreadyThere = packeteryModulesManager.getWidgetParent($deliveryInput).length > 0;
+        if (isAlreadyThere) {
+            return;
+        }
+
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        module.getExtraContentContainer($deliveryInput).append(html);
+    },
+
+    toggleSubmit() {
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        var $widgetParent = packeteryModulesManager.getWidgetParent(module.getSelectedInput());
+        var branchId = $widgetParent.find(".packeta-branch-id").val();
+        if (branchId !== '') {
+            module.enableSubmitButton();
+            module.hideValidationErrors();
+        } else {
+            module.disableSubmitButton();
+        }
+    },
+
+    initializeWidget: function() {
+        if (PacketaModule.config.apiKey === '') {
+            return;
+        }
+
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        var country = 'cz,sk';
+        if (PacketaModule.config.customerCountry !== '') {
+            country = PacketaModule.config.customerCountry;
+        }
+
+        var language = 'en';
+        if (PacketaModule.config.shopLanguage !== '') {
+            language = PacketaModule.config.shopLanguage;
+        }
+
+        $('.open-packeta-widget').click(function (e) {
+            e.preventDefault();
+            var widgetOptions = {
+                appIdentity: PacketaModule.config.appIdentity,
+                country: country,
+                language: language,
+            };
+            var selectedInput = module.getSelectedInput();
+            if (selectedInput.length === 0) {
+                // in supercheckout after switching country and no delivery is selected
+                return;
+            }
+            var $widgetParent = packeteryModulesManager.getWidgetParent(selectedInput);
+            var widgetCarriers = $widgetParent.find('#widget_carriers').val();
+            if (widgetCarriers !== '') {
+                widgetOptions.carriers = widgetCarriers;
+            }
+            Packeta.Widget.pick(PacketaModule.config.apiKey, function (pickupPoint) {
+                if (pickupPoint == null) {
+                    return;
+                }
+
+                $widgetParent.find('.packeta-branch-id').val(pickupPoint.id);
+                $widgetParent.find('.packeta-branch-name').val(pickupPoint.name);
+                $widgetParent.find('.packeta-pickup-point-type').val(pickupPoint.pickupPointType);
+                $widgetParent.find('.packeta-carrier-id').val(pickupPoint.carrierId);
+                $widgetParent.find('.packeta-carrier-pickup-point-id').val(pickupPoint.carrierPickupPointId);
+
+                // let the customer know which branch he picked
+                $widgetParent.find('.picked-delivery-place').html(pickupPoint.name);
+
+                var prestashopCarrierId = packeteryModulesManager.getCarrierId(selectedInput);
+
+                /* Save packetery order without order ID - just cart id so we can access carrier data later */
+                PacketaModule.ajax.saveSelectedBranch(
+                    prestashopCarrierId,
+                    pickupPoint.id,
+                    pickupPoint.name,
+                    pickupPoint.pickupPointType,
+                    pickupPoint.carrierId,
+                    pickupPoint.carrierPickupPointId,
+                   PacketaModule.ui.toggleSubmit
+                );
+            }, widgetOptions);
+        });
+    },
+
+    autoOpenWidget: function () {
+        if (!PacketaModule.config.widgetAutoOpen) {
+            return;
+        }
+
+        var module = packeteryModulesManager.detectModule();
+        if (module === null) {
+            return;
+        }
+
+        var $selectedDeliveryOption = module.getSelectedInput();
+        if ($selectedDeliveryOption.length !== 1) {
+            return;
+        }
+
+        var $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
+        var $widgetButton = $widgetParent.find('.open-packeta-widget');
+        if (
+            $widgetButton.length === 1 &&
+            $widgetParent.find('.packeta-branch-id').val() === ''
+            // todo PePa: how could we reach this point with widget already open?
+            // &&
+            // $('iframe #packeta-widget').length === 0
+        ) {
+            $widgetButton.click();
+        }
+    }
+};
+
+PacketaModule.ajax = {
+    post: function (action, data, onSuccess) {
+        var url =
+            PacketaModule.config.baseUri +
+            '/modules/packetery/ajax_front.php?action=' + action +
+            '&token=' + PacketaModule.config.frontAjaxToken;
+
+        return $.ajax({
+            type: 'POST',
+            url: url,
+            data: data,
+            beforeSend: function() {
+                // todo: To which checkout module does this css class belong? Not Supercheckout PS 1.7, not PS 1.7, not PS 1.6 5-step nor OPC
+                $("body").toggleClass("wait");
+            },
+            success: function () {
+                if (typeof onSuccess !== 'undefined') {
+                    onSuccess();
+                }
+            },
+            complete: function() {
+                $("body").toggleClass("wait");
+            },
+        });
+    },
+
+    saveSelectedBranch: function(prestashopCarrierId, branchId, branchName, pickupPointType, widgetCarrierId, carrierPickupPointId, onSuccess) {
+        return PacketaModule.ajax.post('saveSelectedBranch', {
+            'prestashop_carrier_id': prestashopCarrierId,
+            'id_branch': branchId,
+            'name_branch': branchName,
+            'pickup_point_type': pickupPointType,
+            'widget_carrier_id': widgetCarrierId,
+            'carrier_pickup_point_id': carrierPickupPointId
+        }, onSuccess);
+    },
+
+    fetchExtraContent: function(prestashopCarrierId) {
+        return PacketaModule.ajax.post('fetchExtraContent', {
+            'prestashop_carrier_id': prestashopCarrierId,
+        });
+    }
+};
+
 
 function PacketeryCheckoutModulesManager() {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
@@ -58,299 +423,12 @@ function PacketeryCheckoutModulesManager() {
 
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 
-var packeteryCreateExtraContent = function(onSuccess) {
-    var zpointCarriers = $('#zpoint_carriers').val();
-    zpointCarriers = JSON.parse(zpointCarriers);
-    var module = packeteryModulesManager.detectModule();
-    if (module === null) {
-        return;
-    }
-
-    var $delivery_options = module.findDeliveryOptions();
-
-    var deferreds = [];
-    $delivery_options.each(function(i, e) {
-        // trim commas
-        var carrierId = packeteryModulesManager.getCarrierId($(e));
-        if (zpointCarriers.indexOf(carrierId) >= 0) {
-            /* Display button and inputs */
-            // todo redo id attr to class attr ?
-            var c = module.getExtraContentContainer($(e));
-            var carrierDeferred = packetery.packeteryCreateExtraContent(carrierId).done(function(result) {
-                c.find('.carrier-extra-content').remove();
-                c.append(result);
-                tools.checkExtraContentVisibility();
-            });
-
-            deferreds.push(carrierDeferred);
-        }
-
-    });
-
-    $.when.apply(null, deferreds).then(onSuccess);
-}
-
-$(document).ready(function() {
-    onShippingLoadedCallback();
-});
-
-window.initializePacketaWidget = function() {
-    // set YOUR Packeta API key
-    var packetaApiKey = $("#packeta-api-key").val();
-
-    // no Packetery carrier enabled
-    if (typeof packetaApiKey === 'undefined') {
-        return;
-    }
-
-    // parameters
-
-    var customerCountry = $('#customer_country').val();
-    if (customerCountry !== '') {
-        country = customerCountry;
-    }
-
-    var language = 'en';
-
-    var shopLanguage = $('#shop-language').val();
-    if (shopLanguage !== '') {
-        language = shopLanguage;
-    }
-
-    var module = packeteryModulesManager.detectModule();
-    if (module === null) {
-        return;
-    }
-
-    $('.open-packeta-widget').click(function(e) {
-        e.preventDefault();
-        var app_identity = $('#app_identity').val(); // Get module version for widget
-        var widgetOptions = {
-            appIdentity: app_identity,
-            country: country,
-            language: language,
-        };
-        var $selectedDeliveryOption = module.getSelectedInput();
-        if ($selectedDeliveryOption.length === 0) {
-            // in supercheckout after switching country and no delivery is selected
-            return;
-        }
-        var $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
-        var widgetCarriers = $widgetParent.find('#widget_carriers').val();
-        if (widgetCarriers !== '') {
-            widgetOptions.carriers = widgetCarriers;
-        }
-        Packeta.Widget.pick(packetaApiKey, function(pickupPoint) {
-            if (pickupPoint != null) {
-                /* Save needed pickup point attributes to inputs */
-                $widgetParent.find('.packeta-branch-id').val(pickupPoint.id);
-                $widgetParent.find('.packeta-branch-name').val(pickupPoint.name);
-                $widgetParent.find('.packeta-pickup-point-type').val(pickupPoint.pickupPointType);
-                $widgetParent.find('.packeta-carrier-id').val(pickupPoint.carrierId);
-                $widgetParent.find('.packeta-carrier-pickup-point-id').val(pickupPoint.carrierPickupPointId);
-
-                // We let customer know, which branch he picked by filling html inputs
-                $widgetParent.find('.picked-delivery-place').html(pickupPoint.name);
-
-                module.enableSubmitButton();
-
-                /* Get ID of selected carrier */
-                var prestashopCarrierId = packeteryModulesManager.getCarrierId($selectedDeliveryOption);
-
-                /* Save packetery order without order ID - just cart id so we can access carrier data later */
-                packetery.widgetSaveOrderBranch(
-                    prestashopCarrierId,
-                    pickupPoint.id,
-                    pickupPoint.name,
-                    pickupPoint.pickupPointType,
-                    pickupPoint.carrierId,
-                    pickupPoint.carrierPickupPointId
-                );
-
-                if (module !== null) {
-                    module.hideValidationErrors();
-                }
-            } else {
-                /* If point isn't selected - disable */
-                if ($widgetParent.find('.packeta-branch-id').val() === "") {
-                    module.disableSubmitButton();
-                }
-            }
-        }, widgetOptions);
-    });
-
-    if ($('#widgetAutoOpen').val() === '1') {
-        var openWidget = function () {
-            tools.openSelectedDeliveryWidget(module.getSelectedInput());
-        };
-        module.findDeliveryOptions().on('change', openWidget);
-        openWidget();
-    }
-};
-
-tools = {
-    isPS16: function() {
-        return window.prestashopVersion && window.prestashopVersion.indexOf('1.6') === 0;
-    },
-    checkExtraContentVisibility: function() {
-        var module = packeteryModulesManager.detectModule();
-        if (module === null) {
-            return;
-        }
-
-        var selectedCarrierId = packeteryModulesManager.getCarrierId(module.getSelectedInput());
-        $('.carrier-extra-content').each(function() {
-            var $extra = $(this);
-            if (!$extra.find('#packetery-widget').length) {
-                return;
-            }
-
-            var carrierId = String($extra.find('#carrier_id').val());
-            if (selectedCarrierId !== carrierId) {
-                $extra.find('#open-packeta-widget').hide();
-            } else {
-                $extra.find('#open-packeta-widget').show();
-
-                var id_branch = $extra.find(".packeta-branch-id").val();
-                if (id_branch <= 0) {
-                    module.disableSubmitButton();
-                }
-            }
-        });
-    },
-    fixextracontent: function() {
-        var module = packeteryModulesManager.detectModule();
-        if (module === null) {
-            return;
-        }
-
-        tools.checkExtraContentVisibility();
-
-        /* Enable / Disable continue buttons after carrier change */
-
-        var $deliveryInputs = module.findDeliveryOptions();
-        $deliveryInputs.off('change.packeteryFix').on('change.packeteryFix', function() {
-            module.disableSubmitButton();
-            tools.checkExtraContentVisibility();
-
-            var
-                $this = $(this),
-                prestashop_carrier_id = packeteryModulesManager.getCarrierId($this),
-                $extra = packeteryModulesManager.getWidgetParent($this);
-
-            // if selected carrier is not Packetery then enable Continue button and we're done here
-            if (!$extra.find('#packetery-widget').length) {
-                module.enableSubmitButton();
-                return;
-            }
-
-            if ($this.is(':checked')) {
-                var $wrapper = $extra.closest('.carrier-extra-content');
-                setTimeout(function() {
-                    if ($wrapper.is(':hidden')) {
-                        $wrapper.show();
-                    }
-                }, 500);
-            }
-
-            var id_branch = $extra.find(".packeta-branch-id").val();
-            if (id_branch !== '') {
-                var name_branch = $extra.find(".packeta-branch-name").val();
-                var pickup_point_type = $extra.find(".packeta-pickup-point-type").val();
-                var widget_carrier_id = $extra.find(".packeta-carrier-id").val();
-                var carrier_pickup_point_id = $extra.find(".packeta-carrier-pickup-point-id").val();
-                module.enableSubmitButton();
-                packetery.widgetSaveOrderBranch(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id);
-            } else {
-                module.disableSubmitButton();
-            }
-        });
-    },
-
-    openSelectedDeliveryWidget: function ($selectedDeliveryOption) {
-        if ($selectedDeliveryOption.length !== 1) {
-            return;
-        }
-        var $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
-        var $widgetButton = $widgetParent.find('.open-packeta-widget');
-        if (
-            $widgetButton.length === 1 &&
-            $widgetParent.find('.packeta-branch-id').val() === '' &&
-            $('iframe #packeta-widget').length === 0
-        ) {
-            $widgetButton.click();
-        }
-    },
-}
-
-packetery = {
-    widgetSaveOrderBranch: function(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id) {
-        $.ajax({
-            type: 'POST',
-            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=widgetsaveorderbranch' + ajaxs.checkToken(),
-            data: {
-                'prestashop_carrier_id': prestashop_carrier_id,
-                'id_branch': id_branch,
-                'name_branch': name_branch,
-                'pickup_point_type': pickup_point_type,
-                'widget_carrier_id': widget_carrier_id,
-                'carrier_pickup_point_id': carrier_pickup_point_id
-            },
-            beforeSend: function() {
-                $("body").toggleClass("wait");
-            },
-            success: function(msg) {
-                return true;
-            },
-            complete: function() {
-                $("body").toggleClass("wait");
-            },
-        });
-    },
-    packeteryCreateExtraContent: function(prestashop_carrier_id) {
-        return $.ajax({
-            type: 'POST',
-            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=packeteryCreateExtraContent' + ajaxs.checkToken(),
-            data: {
-                'prestashop_carrier_id': prestashop_carrier_id,
-            },
-            beforeSend: function() {
-                $("body").toggleClass("wait");
-            },
-            success: function(msg) {
-                return true;
-            },
-            complete: function() {
-                $("body").toggleClass("wait");
-            },
-        });
-    }
-}
-
-ajaxs = {
-    baseuri: function() {
-        return $('#baseuri').val();
-    },
-    checkToken: function() {
-        return '&token=' + window.packeteryAjaxFrontToken;
-    },
-}
 
 /**
- *  After document load or actions (new shipping methods load) of 3rd party checkouts to allow packeta initialization. E.g.: Supercheckout.
+ *  This function is called by third party checkout modules (e.g. Supercheckout) after shipping methods are fetched via AJAX
  */
 function onShippingLoadedCallback() {
-    if ($('#zpoint_carriers').length === 0) {
-        return; // incorrect context
-    }
-
-    if (tools.isPS16()) {
-        packeteryCreateExtraContent(function() {
-            initializePacketaWidget();
-            tools.fixextracontent();
-        });
-    } else {
-        initializePacketaWidget();
-        tools.fixextracontent();
-    }
+    PacketaModule.runner.onShippingLoad();
 }
+
+PacketaModule.runner.onThisScriptLoad();
