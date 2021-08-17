@@ -78,72 +78,33 @@ class Packetery extends CarrierModule
     }
 
     /**
-     * Don't forget to create update methods if needed:
-     * http://doc.prestashop.com/display/PS16/Enabling+the+Auto-Update
+     * Don't forget to create upgrade methods if needed:
+     * https://devdocs.prestashop.com/1.7/modules/creation/enabling-auto-update/
+     * @return bool
      */
     public function install()
     {
-        $db = Db::getInstance();
-        if (extension_loaded('curl') == false) {
+        if (extension_loaded('curl') === false) {
             $this->_errors[] = $this->l('You have to enable the cURL extension on your server to install this module');
             return false;
         }
-        Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4');
-        Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', 0);
 
-        // backup possible old order table
-        if (count($db->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'packetery_order"')) > 0) {
-            $db->execute('RENAME TABLE `' . _DB_PREFIX_ . 'packetery_order` TO `'. _DB_PREFIX_ .'packetery_order_old`');
-            $have_old_table = true;
-        } else {
-            $have_old_table = false;
-        }
-
-        $dbResult = include(__DIR__ . '/sql/install.php');
-        if (!$dbResult) {
+        if (!parent::install()) {
             return false;
         }
 
-        // copy data from old order table
-        if ($have_old_table) {
-            $fields = array();
-            foreach ($db->executeS('SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'packetery_order_old`') as $field) {
-                $fields[] = $field['Field'];
-            }
-            $db->execute(
-                'INSERT INTO `' . _DB_PREFIX_ . 'packetery_order`(`' . pSQL(implode('`, `', $fields)) . '`)
-                SELECT * FROM `' . _DB_PREFIX_ . 'packetery_order_old`'
-            );
-            $db->execute('DROP TABLE `' . _DB_PREFIX_ . 'packetery_order_old`');
-        }
-
-        return parent::install() &&
-            $this->registerHook($this->getModuleHooksList()) &&
-            Packeteryclass::insertTab();
+        $installer = $this->diContainer->get(\Packetery\Module\Installer::class);
+        // instance including id is needed to register hooks
+        return $installer->run($this);
     }
 
+    /**
+     * @return bool
+     */
     public function uninstall()
     {
-        Packeteryclass::deleteTab();
-
-        $dbResult = include(__DIR__ . '/sql/uninstall.php');
-        if (!$dbResult) {
-            return false;
-        }
-
-        foreach ($this->getModuleHooksList() as $hookName) {
-            if (!$this->unregisterHook($hookName)) {
-                return false;
-            }
-        }
-
-        if (
-            !Configuration::deleteByName('PACKETERY_APIPASS') ||
-            !Configuration::deleteByName('PACKETERY_ESHOP_ID') ||
-            !Configuration::deleteByName('PACKETERY_LABEL_FORMAT') ||
-            !Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') ||
-            !Configuration::deleteByName('PACKETERY_WIDGET_AUTOOPEN')
-        ) {
+        $uninstaller = $this->diContainer->get(\Packetery\Module\Uninstaller::class);
+        if ($uninstaller->run() === false) {
             return false;
         }
 
@@ -738,7 +699,7 @@ class Packetery extends CarrierModule
     /**
      * @return string[]
      */
-    private function getModuleHooksList()
+    public function getModuleHooksList()
     {
         $hooks = [
             'displayBeforeCarrier',
