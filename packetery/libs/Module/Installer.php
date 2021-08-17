@@ -6,6 +6,8 @@ use Packetery;
 use Packetery\Tools\DbTools;
 use Configuration;
 use Language;
+use PrestaShopException;
+use PrestaShopLogger;
 use Tab;
 
 class Installer
@@ -45,15 +47,23 @@ class Installer
      */
     private function insertTab()
     {
-        $tab = new Tab;
-        $parentId = Tab::getIdFromClassName('AdminParentOrders');
-        $tab->id_parent = $parentId;
-        $tab->module = 'packetery';
-        $tab->class_name = 'Adminpacketery';
-        $tab->name = $this->createMultiLangField($this->module->l('Packeta Orders', 'installer'));
-        $tab->position = Tab::getNewLastPosition($parentId);
+        try {
+            $tab = new Tab;
+            $parentId = Tab::getIdFromClassName('AdminParentOrders');
 
-        return $tab->add();
+            $tab->id_parent = $parentId;
+            $tab->module = 'packetery';
+            $tab->class_name = 'Adminpacketery';
+            $tab->name = $this->createMultiLangField($this->module->l('Packeta Orders', 'installer'));
+            $tab->position = Tab::getNewLastPosition($parentId);
+
+            return $tab->add();
+        } catch (PrestaShopException $exception) {
+            PrestaShopLogger::addLog($this->getExceptionRaisedText() . ' ' .
+                $exception->getMessage(), 3, null, null, null, true);
+
+            return false;
+        }
     }
 
     /**
@@ -86,7 +96,7 @@ class Installer
             `currency_branch` char(3) NULL,
             `is_cod` tinyint(1) NOT NULL DEFAULT 0,
             `exported` tinyint(1) NOT NULL DEFAULT 0,
-            `tracking_number` varchar(15) DEFAULT \'\',
+            `tracking_number` varchar(15) NULL,
             `id_carrier` int DEFAULT 0,
             `is_ad` int DEFAULT 0,
             `is_carrier` tinyint(1) NOT NULL DEFAULT 0,
@@ -143,7 +153,7 @@ class Installer
             `is_pickup_point` tinyint(1) NOT NULL DEFAULT 0
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
-        if (!$this->dbTools->executeQueries($sql, $this->module->l('Exception raised during Packetery module install:', 'installer'), true)) {
+        if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText(), true)) {
             return false;
         }
 
@@ -159,5 +169,13 @@ class Installer
             Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4') &&
             Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', 0)
         );
+    }
+
+    /**
+     * @return string
+     */
+    private function getExceptionRaisedText()
+    {
+        return $this->module->l('Exception raised during Packetery module install:', 'installer');
     }
 }

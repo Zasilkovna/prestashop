@@ -94,6 +94,7 @@ class Packetery extends CarrierModule
         }
 
         $installer = $this->diContainer->get(\Packetery\Module\Installer::class);
+        // instance including id is needed to register hooks
         return $installer->run($this);
     }
 
