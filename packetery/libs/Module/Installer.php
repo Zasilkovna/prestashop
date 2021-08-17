@@ -107,9 +107,9 @@ class Installer
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';
         $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_payment` (
-            `module_name` varchar(255) not null primary key,
-            `is_cod` tinyint(1) not null default 0
-        ) ENGINE=InnoDB default charset=utf8;';
+            `module_name` varchar(255) NOT NULL PRIMARY KEY,
+            `is_cod` tinyint(1) NOT NULL DEFAULT 0
+        ) ENGINE=InnoDB DEFAULT charset=utf8;';
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
         $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery` (
