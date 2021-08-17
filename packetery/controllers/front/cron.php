@@ -1,6 +1,7 @@
 <?php
 
-class PacketeryCronModuleFrontController extends ModuleFrontController {
+class PacketeryCronModuleFrontController extends ModuleFrontController
+{
     /** @var bool If set to true, will be redirected to authentication page */
     public $auth = false;
 
@@ -10,10 +11,11 @@ class PacketeryCronModuleFrontController extends ModuleFrontController {
     /**
      * Deletes labels if they are older than specified number of days.
      */
-    private function runDeleteLabels() {
-        $files = glob(__DIR__ . '/../../labels/*.pdf', GLOB_NOSORT);
+    private function runDeleteLabels()
+    {
+        $files = glob(dirname(__FILE__) . '/../../labels/*.pdf', GLOB_NOSORT);
         $shiftDays = Configuration::get('PACKETERY_CRON_DELETE_LABELS_SHIFT');
-        if($shiftDays === false) {
+        if ($shiftDays === false) {
             $this->logErrorMessage('Configuration can not be loaded.');
             return;
         }
@@ -21,17 +23,17 @@ class PacketeryCronModuleFrontController extends ModuleFrontController {
         $shift = 60 * 60 * 24 * $shiftDays;
         $limit = time() - $shift;
 
-        foreach($files as $label) {
+        foreach ($files as $label) {
             $labelName = basename($label);
             $fileTime = filemtime($label);
-            if($fileTime === false) {
+            if ($fileTime === false) {
                 $this->logErrorMessage('Failed to retrieve file time for label "' . $labelName . '".');
                 continue;
             }
 
-            if($fileTime < $limit) {
+            if ($fileTime < $limit) {
                 $result = unlink($label);
-                if($result === false) {
+                if ($result === false) {
                     $this->logErrorMessage('Failed to remove label "' . $labelName . '". Check permissions.');
                     continue;
                 }
@@ -42,22 +44,23 @@ class PacketeryCronModuleFrontController extends ModuleFrontController {
     /**
      * @return void
      */
-    public function display() {
+    public function display()
+    {
         $this->ajax = 1;
 
-        if($this->validateToken() === false) {
+        if ($this->validateToken() === false) {
             $this->logErrorMessage('Invalid packetery cron token for task.');
             return;
         }
 
         $task = \Packetery\Tools\Tools::getValue('task', null);
-        if(!$task) {
+        if (!$task) {
             $this->logErrorMessage('Cron task to run was not specified.');
             return;
         }
 
         $method = 'run' . ucfirst($task);
-        if(method_exists($this, $method) === false) {
+        if (method_exists($this, $method) === false) {
             $this->logErrorMessage('Task was not found.');
             return;
         }
@@ -68,21 +71,23 @@ class PacketeryCronModuleFrontController extends ModuleFrontController {
     /**
      * @param string $message
      */
-    private function logErrorMessage($message) {
+    private function logErrorMessage($message)
+    {
         PrestaShopLogger::addLog('[packetery:cron]: ' . $message, 3, null, null, null, true);
     }
 
     /**
      * @return bool
      */
-    private function validateToken() {
+    private function validateToken()
+    {
         $token = \Packetery\Tools\Tools::getValue('token');
-        if($token === false) {
+        if ($token === false) {
             return false;
         }
 
         $storedToken = Configuration::get('PACKETERY_CRON_TOKEN');
-        if($storedToken === false) {
+        if ($storedToken === false) {
             return false;
         }
 
