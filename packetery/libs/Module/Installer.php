@@ -75,10 +75,6 @@ class Installer
      */
     private function installDatabase()
     {
-        if (!defined('_MYSQL_ENGINE_')) {
-            define('_MYSQL_ENGINE_', 'InnoDB');
-        }
-
         $sql = [];
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_order`';
@@ -97,13 +93,13 @@ class Installer
             `carrier_pickup_point` varchar(40) NULL,      
             UNIQUE(`id_order`),
             UNIQUE(`id_cart`)
-        ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';
         $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_payment` (
             `module_name` varchar(255) not null primary key,
             `is_cod` tinyint(1) not null default 0
-        ) ENGINE=' . _MYSQL_ENGINE_ . ' default charset=utf8;';
+        ) ENGINE=InnoDB default charset=utf8;';
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
         $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery` (
@@ -113,7 +109,7 @@ class Installer
             `currency_branch` char(3) NULL,
             `is_cod` tinyint(1) NOT NULL DEFAULT 0,
             `pickup_point_type` varchar(40) NULL
-        ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_branch`';
         $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_branch` (
@@ -145,7 +141,7 @@ class Installer
             `opening_hours_regular` text NOT NULL,
             `is_ad` int NOT NULL,
             `is_pickup_point` tinyint(1) NOT NULL DEFAULT 0
-        ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
         if (!$this->dbTools->executeQueries($sql, $this->module->l('Exception raised during Packetery module install:', 'installer'), true)) {
             return false;
