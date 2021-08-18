@@ -89,7 +89,11 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
      */
     private function renderMessage($message)
     {
-        echo '<p>' . $message . '</p>';
+        $templateFilePath = dirname(__FILE__) . '/../../views/templates/front/cron-message-row.tpl';
+        $template = $this->context->smarty->createTemplate($templateFilePath, [
+            'message' => $message
+        ]);
+        echo $template->fetch();
     }
 
     /**
