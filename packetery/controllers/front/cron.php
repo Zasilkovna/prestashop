@@ -53,7 +53,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
             return;
         }
 
-        $task = \Tools::getValue('task', null);
+        $task = Tools::getValue('task', null);
         if (!$task) {
             $this->logErrorMessage('Cron task to run was not specified.');
             return;
@@ -81,7 +81,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
      */
     private function validateToken()
     {
-        $token = \Tools::getValue('token');
+        $token = Tools::getValue('token');
         if ($token === false) {
             return false;
         }
