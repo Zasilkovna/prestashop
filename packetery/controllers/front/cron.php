@@ -13,6 +13,8 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
      */
     private function runDeleteLabels()
     {
+        $this->renderMessage('Task "deleteLabels" is about to be executed.');
+
         $files = glob(dirname(__FILE__) . '/../../labels/*.pdf', GLOB_NOSORT);
         $shiftDays = Configuration::get('PACKETERY_LABEL_MAX_AGE_DAYS');
         if ($shiftDays === false) {
@@ -37,8 +39,12 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
                     $this->logErrorMessage('Failed to remove label "' . $labelName . '". Check permissions.');
                     continue;
                 }
+
+                $this->renderMessage('Label "' . $labelName . '" was removed.');
             }
         }
+
+        $this->renderMessage('Task "deleteLabels" finished.');
     }
 
     /**
@@ -47,6 +53,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     public function display()
     {
         $this->ajax = 1;
+        $this->renderMessage('Cron started');
 
         if ($this->validateToken() === false) {
             $this->logErrorMessage('Invalid packetery cron token for task.');
@@ -59,13 +66,24 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
             return;
         }
 
-        $method = 'run' . ucfirst($task);
-        if (method_exists($this, $method) === false) {
-            $this->logErrorMessage('Task was not found.');
-            return;
+        switch ($task) {
+            case 'deleteLabels':
+                $this->runDeleteLabels();
+                break;
+            default:
+                $this->logErrorMessage('Task was not found.');
         }
 
-        call_user_func([$this, $method]);
+        $this->renderMessage('Cron finished');
+    }
+
+    /**
+     * @param string $message
+     * @throws \PrestaShopException
+     */
+    private function renderMessage($message)
+    {
+        $this->ajaxRender('<p>' . $message . '</p>');
     }
 
     /**
@@ -73,6 +91,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
      */
     private function logErrorMessage($message)
     {
+        $this->renderMessage($message);
         PrestaShopLogger::addLog('[packetery:cron]: ' . $message, 3, null, null, null, true);
     }
 
