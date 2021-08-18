@@ -14,7 +14,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     private function runDeleteLabels()
     {
         $files = glob(dirname(__FILE__) . '/../../labels/*.pdf', GLOB_NOSORT);
-        $shiftDays = Configuration::get('PACKETERY_CRON_DELETE_LABELS_SHIFT');
+        $shiftDays = Configuration::get('PACKETERY_LABEL_MAX_AGE_DAYS');
         if ($shiftDays === false) {
             $this->logErrorMessage('Configuration can not be loaded.');
             return;
@@ -53,7 +53,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
             return;
         }
 
-        $task = \Packetery\Tools\Tools::getValue('task', null);
+        $task = \Tools::getValue('task', null);
         if (!$task) {
             $this->logErrorMessage('Cron task to run was not specified.');
             return;
@@ -81,7 +81,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
      */
     private function validateToken()
     {
-        $token = \Packetery\Tools\Tools::getValue('token');
+        $token = \Tools::getValue('token');
         if ($token === false) {
             return false;
         }
