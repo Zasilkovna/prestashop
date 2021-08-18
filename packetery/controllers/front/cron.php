@@ -83,7 +83,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
      */
     private function renderMessage($message)
     {
-        $this->ajaxRender('<p>' . $message . '</p>');
+        echo '<p>' . $message . '</p>';
     }
 
     /**
