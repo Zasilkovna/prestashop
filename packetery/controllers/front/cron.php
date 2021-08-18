@@ -13,11 +13,12 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
      */
     private function runDeleteLabels()
     {
-        $this->renderMessage('Task "deleteLabels" is about to be executed.');
+        $this->renderMessage(sprintf($this->module->l('Task "%s" is about to be executed.','cron'), Tools::getValue('task')));
 
         $files = glob(dirname(__FILE__) . '/../../labels/*.pdf', GLOB_NOSORT);
         $shiftDays = Configuration::get('PACKETERY_LABEL_MAX_AGE_DAYS');
         if ($shiftDays === false) {
+            $this->renderMessage($this->module->l('Configuration can not be loaded.','cron'));
             $this->logErrorMessage('Configuration can not be loaded.');
             return;
         }
@@ -29,22 +30,24 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
             $labelName = basename($label);
             $fileTime = filemtime($label);
             if ($fileTime === false) {
-                $this->logErrorMessage('Failed to retrieve file time for label "' . $labelName . '".');
+                $this->renderMessage(sprintf($this->module->l('Failed to retrieve file time for label "%s".','cron'), $labelName));
+                $this->logErrorMessage(sprintf('Failed to retrieve file time for label "%s".', $labelName));
                 continue;
             }
 
             if ($fileTime < $limit) {
                 $result = unlink($label);
                 if ($result === false) {
-                    $this->logErrorMessage('Failed to remove label "' . $labelName . '". Check permissions.');
+                    $this->renderMessage(sprintf($this->module->l('Failed to remove label "%s". Check permissions.','cron'), $labelName));
+                    $this->logErrorMessage(sprintf('Failed to remove label "%s". Check permissions.', $labelName));
                     continue;
                 }
 
-                $this->renderMessage('Label "' . $labelName . '" was removed.');
+                $this->renderMessage(sprintf($this->module->l('Label "%s" was removed.','cron'), $labelName));
             }
         }
 
-        $this->renderMessage('Task "deleteLabels" finished.');
+        $this->renderMessage(sprintf($this->module->l('Task "%s" finished.','cron'), Tools::getValue('task')));
     }
 
     /**
@@ -53,15 +56,17 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     public function display()
     {
         $this->ajax = 1;
-        $this->renderMessage('Cron started');
+        $this->renderMessage($this->module->l('Cron started.','cron'));
 
         if ($this->validateToken() === false) {
-            $this->logErrorMessage('Invalid packetery cron token for task.');
+            $this->renderMessage($this->module->l('Invalid packetery cron token.','cron'));
+            $this->logErrorMessage('Invalid packetery cron token.');
             return;
         }
 
         $task = Tools::getValue('task', null);
         if (!$task) {
+            $this->renderMessage($this->module->l('Cron task to run was not specified.','cron'));
             $this->logErrorMessage('Cron task to run was not specified.');
             return;
         }
@@ -71,10 +76,11 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
                 $this->runDeleteLabels();
                 break;
             default:
+                $this->renderMessage($this->module->l('Task was not found.','cron'));
                 $this->logErrorMessage('Task was not found.');
         }
 
-        $this->renderMessage('Cron finished');
+        $this->renderMessage($this->module->l('Cron finished.','cron'));
     }
 
     /**
@@ -91,7 +97,6 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
      */
     private function logErrorMessage($message)
     {
-        $this->renderMessage($message);
         PrestaShopLogger::addLog('[packetery:cron]: ' . $message, 3, null, null, null, true);
     }
 
