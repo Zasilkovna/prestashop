@@ -172,22 +172,23 @@ class Packeteryclass
         );
         $pages = ceil($orders_num_rows / $per_page);
         $sql = 'SELECT 
-                    o.id_order,
-                    o.id_currency,
-                    o.id_lang,
-                    concat(c.firstname, " ", c.lastname) customer,
-                    o.total_paid total,
-                    o.date_add date,
-                    po.is_cod,
-                    po.name_branch,
-                    po.exported,
-                    po.tracking_number,
-                    po.is_ad
-                FROM `' . _DB_PREFIX_ . 'orders` o
-                    JOIN `' . _DB_PREFIX_ . 'packetery_order` po ON po.id_order=o.id_order
-                    JOIN `' . _DB_PREFIX_ . 'customer` c ON c.id_customer=o.id_customer
-                WHERE o.id_shop = ' . (int)$id_shop . ' 
-                ORDER BY o.date_add DESC LIMIT ' . (($page - 1) * $per_page) . ',' . $per_page;
+                    `o`.`id_order`,
+                    `o`.`id_currency`,
+                    `o`.`id_lang`,
+                    CONCAT(`c`.`firstname`, " ", `c`.`lastname`) AS `customer`,
+                    `o`.`total_paid` AS `total`,
+                    `o`.`date_add` AS `date`,
+                    `po`.`is_cod`,
+                    `po`.`name_branch`,
+                    `po`.`exported`,
+                    `po`.`tracking_number`,
+                    `po`.`is_ad`,
+                    `po`.`weight`
+                FROM `' . _DB_PREFIX_ . 'orders` `o`
+                    JOIN `' . _DB_PREFIX_ . 'packetery_order` `po` ON `po`.`id_order` = `o`.`id_order`
+                    JOIN `' . _DB_PREFIX_ . 'customer` `c` ON `c`.`id_customer` = `o`.`id_customer`
+                WHERE `o`.`id_shop` = ' . (int)$id_shop . ' 
+                ORDER BY `o`.`date_add` DESC LIMIT ' . (($page - 1) * $per_page) . ',' . $per_page;
         $orders = Db::getInstance()->executeS($sql);
         return array($orders, $pages);
     }
@@ -231,6 +232,7 @@ class Packeteryclass
 
             $weight = '';
             if (Configuration::get('PS_WEIGHT_UNIT') === PacketeryApi::PACKET_WEIGHT_UNIT) {
+                // todo used saved if set
                 $weight = $order->getTotalWeight();
             }
 

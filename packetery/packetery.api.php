@@ -299,6 +299,7 @@ class PacketeryApi
         );
 
         if (Configuration::get('PS_WEIGHT_UNIT') === self::PACKET_WEIGHT_UNIT) {
+            // todo used saved if set
             $packet_attributes['weight'] = $order->getTotalWeight();
         }
 

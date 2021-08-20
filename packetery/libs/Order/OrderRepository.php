@@ -62,4 +62,14 @@ class OrderRepository
     {
         return $this->db->update('packetery_order', ['id_carrier' => $carrierId], '`id_order` = ' . $orderId);
     }
+
+    /**
+     * @param int $orderId
+     * @param int $weight
+     * @return bool
+     */
+    public function updateWeight($orderId, $weight)
+    {
+        return $this->db->update('packetery_order', ['weight' => $weight], '`id_order` = ' . $orderId, 0, true);
+    }
 }

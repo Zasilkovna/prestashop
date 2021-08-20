@@ -45,10 +45,6 @@
 	margin-top: 5px;
 }
 
-#packetery-form .download_pdf {
-	width:400px !important;
-}
-
 /*PAYMENTS*/
 #payment-list-table .table th:nth-child(3){
 	display: none;
@@ -60,8 +56,8 @@
 /*END PAYMENTS*/
 
 /*ORDERS*/
-#packetery-form .export_selected, #packetery-form .export_selected_csv {
-	width:400px !important;
+#packetery-form input[type='button'] {
+	width: 400px !important;
 }
 #packetery-form .ps-table-checkbox-all {
 	position:relative;
@@ -79,6 +75,13 @@
 }
 #packetery-form .prestaui-paginator a:active {
 	color: black !important;
+}
+input.weight {
+	width: 96px;
+}
+input.set_weights {
+	float: right;
+	margin-top: 5px;
 }
 /*END ORDERS*/
 

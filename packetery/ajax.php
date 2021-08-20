@@ -77,6 +77,11 @@ switch (Tools::getValue('action'))
     case 'download_pdf':
         PacketeryApi::downloadPdfAjax();
         break;
+    case 'setWeights':
+        $orderRepository = new \Packetery\Order\OrderRepository(Db::getInstance());
+        $orderAjax = new \Packetery\Order\Ajax($orderRepository);
+        echo $orderAjax->setWeights();
+        break;
     /*END ORDERS*/
     default:
         exit;
