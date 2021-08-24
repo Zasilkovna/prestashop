@@ -199,8 +199,8 @@ class Packeteryclass
     /**
      * Add computed weight to orders without saved weight
      *
-     * @param $orders
-     * @return mixed
+     * @param array $orders
+     * @return array
      */
     public static function loadWeightToOrders($orders)
     {

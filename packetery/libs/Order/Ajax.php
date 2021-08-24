@@ -17,7 +17,7 @@ class Ajax
     }
 
 
-    public function setWeights()
+    public function actionSetWeights()
     {
         $orderWeights = (\Tools::getIsset('orderWeights') ? \Tools::getValue('orderWeights') : null);
         if (empty($orderWeights)) {

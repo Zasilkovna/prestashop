@@ -80,7 +80,7 @@ switch (Tools::getValue('action'))
     case 'setWeights':
         $orderRepository = new \Packetery\Order\OrderRepository(Db::getInstance());
         $orderAjax = new \Packetery\Order\Ajax($orderRepository);
-        echo $orderAjax->setWeights();
+        echo $orderAjax->actionSetWeights();
         break;
     /*END ORDERS*/
     default:
