@@ -25,6 +25,7 @@ $_MODULE['<{packetery}prestashop>packetery_e80d50c020e2486595c969fae46393d1'] = 
 $_MODULE['<{packetery}prestashop>packetery_5ef3da0443efa6318d07751b9b680941'] = 'Doručovacia adresa';
 $_MODULE['<{packetery}prestashop>packetery_0001316ad0c7eb0f1a8e298fd6e5d070'] = 'Exportované';
 $_MODULE['<{packetery}prestashop>packetery_5068c162a60b5859f973f701333f45c5'] = 'Sledovacie číslo';
+$_MODULE['<{packetery}prestashop>packetery_8c489d0946f66d17d73f26366a4bf620'] = 'Hmotnost';
 $_MODULE['<{packetery}prestashop>packetery_0ace50d3fdc56a8b3ecf3532baa0990c'] = 'Výdejní místa Zásilkovny';
 $_MODULE['<{packetery}prestashop>packetery_85ad5aeec9dfb9e0650de5fbfecd88da'] = 'Všechna výdejní místa (Zásilkovna + dopravci)';
 $_MODULE['<{packetery}prestashop>packetery_b718adec73e04ce3ec720dd11a06a308'] = 'ID';
@@ -76,6 +77,7 @@ $_MODULE['<{packetery}prestashop>display_order_main_c9cc8cce247e49bae79f15173ce9
 $_MODULE['<{packetery}prestashop>tab_orders_6a3a997a0c7df6c54747d82080367a33'] = 'Stránky:';
 $_MODULE['<{packetery}prestashop>tab_orders_7442e29d7d53e549b78d93c46b8cdcfc'] = 'Objednávky:';
 $_MODULE['<{packetery}prestashop>tab_orders_5ece607071fe59ddc4c88dc6abfe2310'] = 'Nenašli sa žiadne položky';
+$_MODULE['<{packetery}prestashop>tab_orders_77f4e882dbc5906614a853fe12721f3b'] = 'Nastavit hmotnosti';
 $_MODULE['<{packetery}prestashop>tab_orders_44940301ddbd65606983e583e0a5760e'] = 'Podat vybrané zásilky';
 $_MODULE['<{packetery}prestashop>tab_orders_346bb64d32d0b3222ff3ba91f140ec76'] = 'Stiahnite si štítky v PDF';
 $_MODULE['<{packetery}prestashop>tab_orders_91dbbc2a3ac9204db85a4b7112661f4f'] = 'Je možné stáhnout pouze štítky k zásilkám, u kterých existuje číslo zásilky (podány přes tlačítko \"Podat vybrané zásilky\")';

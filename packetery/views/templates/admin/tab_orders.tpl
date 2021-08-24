@@ -50,8 +50,6 @@
 		</div>
 	</div>
 
-	{* todo funkcni rozliseni inputu *}
-
 	<input type="button" class="set_weights btn btn-default btn-block" name="set_weights"
 		id="submit_set_weights" value="{l s='Set weights' mod='packetery'}">
 

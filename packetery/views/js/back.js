@@ -204,8 +204,7 @@ $(document).ready(function(){
 				// get id_orders
 				var orders = [];
 				$('#packetery-orders-table table tbody input[type="checkbox"]:checked').each(function() {
-					// TODO use tr.data
-					var id_order = $(this).parents('tr.odd').find('td:eq(' + (orderColumnId + 1) + ') span').text();
+					var id_order = $(this).parents('tr.odd').data('id-order');
 					orders.push(id_order);
 				});
 				var orders_id = orders.join();
@@ -220,8 +219,7 @@ $(document).ready(function(){
 				var confirmed = true;
 
 				$('#packetery-orders-table table tbody input[type="checkbox"]:checked').each(function() {
-					// TODO use tr.data
-					var id_order = $(this).parents('tr.odd').find('td:eq(' + (orderColumnId + 1) + ') span').text();
+					var id_order = $(this).parents('tr.odd').data('id-order');
 					var tracking_number = $(this).parents('tr.odd').find('td:last').find('a').text();
 
 					if(tracking_number != "")
@@ -254,7 +252,7 @@ $(document).ready(function(){
 				// get id_orders
 				var orders = [];
 				$('#packetery-orders-table table tbody input[type="checkbox"]:checked').each(function() {
-					var id_order = $(this).parents('tr.odd').find('td:eq(' + (orderColumnId + 1) + ') span').text();
+					var id_order = $(this).parents('tr.odd').data('id-order');
 					orders.push(id_order);
 				});
 				orders = orders.join(',');
@@ -295,7 +293,7 @@ $(document).ready(function(){
 		order_cod: function() {
 			$('#packetery-orders-table table tr td:nth-child(' + (orderColumnCod + 1) + ')').find('i.status').unbind();
 			$('#packetery-orders-table table tr td:nth-child(' + (orderColumnCod + 1) + ')').find('i.status').click(function () {
-				var id_order = $(this).parent().parent().find('td:eq(' + (orderColumnId + 1) + ') span').text();
+				var id_order = $(this).parents('tr.odd').data('id-order');
 				if ($(this).hasClass('icon-remove'))
 					var value = 1;
 				else

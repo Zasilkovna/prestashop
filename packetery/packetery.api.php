@@ -299,8 +299,12 @@ class PacketeryApi
         );
 
         if (Configuration::get('PS_WEIGHT_UNIT') === self::PACKET_WEIGHT_UNIT) {
-            // todo used saved if set
-            $packet_attributes['weight'] = $order->getTotalWeight();
+            if ($packetery_order['weight'] !== null) {
+                // used saved if set
+                $packet_attributes['weight'] = $packetery_order['weight'];
+            } else {
+                $packet_attributes['weight'] = $order->getTotalWeight();
+            }
         }
 
         if ($packetery_order['is_carrier']) {

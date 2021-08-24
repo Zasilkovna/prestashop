@@ -134,7 +134,7 @@ class Packeteryclass
      */
     public static function getPacketeryOrderRow($id_order)
     {
-        $sql = 'SELECT `id_branch`, `id_carrier`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point` 
+        $sql = 'SELECT `id_branch`, `id_carrier`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point`, `weight` 
                     FROM `' . _DB_PREFIX_ . 'packetery_order` 
                     WHERE id_order = ' . (int)$id_order;
 
@@ -190,7 +190,30 @@ class Packeteryclass
                 WHERE `o`.`id_shop` = ' . (int)$id_shop . ' 
                 ORDER BY `o`.`date_add` DESC LIMIT ' . (($page - 1) * $per_page) . ',' . $per_page;
         $orders = Db::getInstance()->executeS($sql);
+
+        $orders = self::loadWeightToOrders($orders);
+
         return array($orders, $pages);
+    }
+
+    /**
+     * Add computed weight to orders without saved weight
+     *
+     * @param $orders
+     * @return mixed
+     */
+    public static function loadWeightToOrders($orders)
+    {
+        if ($orders) {
+            foreach ($orders as $index => $order) {
+                if ($order['weight'] === null) {
+                    $orderInstance = new \Order($order['id_order']);
+                    $order['weight'] = $orderInstance->getTotalWeight();
+                    $orders[$index] = $order;
+                }
+            }
+        }
+        return $orders;
     }
 
     /**
@@ -232,8 +255,12 @@ class Packeteryclass
 
             $weight = '';
             if (Configuration::get('PS_WEIGHT_UNIT') === PacketeryApi::PACKET_WEIGHT_UNIT) {
-                // todo used saved if set
-                $weight = $order->getTotalWeight();
+                if ($packeteryOrder['weight'] !== null) {
+                    // used saved if set
+                    $weight = $packeteryOrder['weight'];
+                } else {
+                    $weight = $order->getTotalWeight();
+                }
             }
 
             $data[$order_id] = [

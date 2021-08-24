@@ -280,7 +280,6 @@ class Packetery extends CarrierModule
                     array('content' => $this->l('Address delivery'), 'key' => 'is_ad', 'bool' => true,'center' => true),
                     array('content' => $this->l('Exported'), 'key' => 'exported', 'bool' => true, 'center' => true),
                     array('content' => $this->l('Tracking number'), 'key' => 'tracking_number', 'center' => true),
-                    // todo translation // todo vzit z objednavky
                     array('content' => $this->l('Weight'), 'key' => 'weight', 'center' => true),
                 ),
                 'rows' => $packetery_orders,
