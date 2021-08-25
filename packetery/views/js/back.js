@@ -322,9 +322,10 @@ $(document).ready(function(){
 					success: function (result) {
 						if (result.error) {
 							$(tableSelector + ' .panel').notify(result.error, "error", {position: "top"});
-						} else {
-							for (const orderId in result) {
-								console.log();
+							return;
+						}
+						for (const orderId in result) {
+							if (result.hasOwnProperty(orderId)) {
 								var $orderTr = $('tr[data-id-order="' + orderId + '"]');
 								if (result[orderId].value) {
 									$orderTr.find('td:eq(' + (orderColumnWeight + 1) + ') input').val(result[orderId].value);
@@ -332,7 +333,6 @@ $(document).ready(function(){
 								} else if (result[orderId].error) {
 									$orderTr.notify(result[orderId].error, "error", {position: "top"});
 								}
-
 							}
 						}
 					},
