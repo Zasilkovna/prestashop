@@ -324,7 +324,7 @@ $(document).ready(function(){
 							$(tableSelector + ' .panel').notify(result.error, "error", {position: "top"});
 							return;
 						}
-						for (const orderId in result) {
+						for (var orderId in result) {
 							if (result.hasOwnProperty(orderId)) {
 								var $orderTr = $('tr[data-id-order="' + orderId + '"]');
 								if (result[orderId].value) {
