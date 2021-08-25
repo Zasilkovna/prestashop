@@ -315,15 +315,29 @@ $(document).ready(function(){
 					type: 'POST',
 					url: ajaxs.baseuri() + '/modules/packetery/ajax.php?action=setWeights',
 					data: { 'orderWeights': orderWeights },
+					dataType: 'json',
 					beforeSend: function () {
 						$('body').toggleClass('wait');
 					},
-					success: function (msg) {
-						if (msg === 'ok') {
-							$(tableSelector + ' .panel').notify(lang_pac.success, "success", {position: "top"});
+					success: function (result) {
+						if (result.error) {
+							$(tableSelector + ' .panel').notify(result.error, "error", {position: "top"});
 						} else {
-							$(tableSelector + ' .panel').notify(lang_pac.error, "error", {position: "top"});
+							for (const orderId in result) {
+								console.log();
+								var $orderTr = $('tr[data-id-order="' + orderId + '"]');
+								if (result[orderId].value) {
+									$orderTr.find('td:eq(' + (orderColumnWeight + 1) + ') input').val(result[orderId].value);
+									$orderTr.notify(lang_pac.success, "success", {position: "top"});
+								} else if (result[orderId].error) {
+									$orderTr.notify(result[orderId].error, "error", {position: "top"});
+								}
+
+							}
 						}
+					},
+					error: function() {
+						$(tableSelector + ' .panel').notify(lang_pac.error, "error", {position: "top"});
 					},
 					complete: function () {
 						$('body').toggleClass('wait');

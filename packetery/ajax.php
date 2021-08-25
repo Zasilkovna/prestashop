@@ -79,7 +79,8 @@ switch (Tools::getValue('action'))
         break;
     case 'setWeights':
         $orderRepository = new \Packetery\Order\OrderRepository(Db::getInstance());
-        $orderAjax = new \Packetery\Order\Ajax($orderRepository);
+        $module = new Packetery();
+        $orderAjax = new \Packetery\Order\Ajax($module, $orderRepository);
         echo $orderAjax->actionSetWeights();
         break;
     /*END ORDERS*/

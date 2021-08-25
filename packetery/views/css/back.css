@@ -76,8 +76,9 @@
 #packetery-form .prestaui-paginator a:active {
 	color: black !important;
 }
-input.weight {
+.bootstrap input.weight {
 	width: 96px;
+	display: inline-block;
 }
 input.set_weights {
 	float: right;

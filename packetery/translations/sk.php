@@ -77,7 +77,7 @@ $_MODULE['<{packetery}prestashop>display_order_main_c9cc8cce247e49bae79f15173ce9
 $_MODULE['<{packetery}prestashop>tab_orders_6a3a997a0c7df6c54747d82080367a33'] = 'Stránky:';
 $_MODULE['<{packetery}prestashop>tab_orders_7442e29d7d53e549b78d93c46b8cdcfc'] = 'Objednávky:';
 $_MODULE['<{packetery}prestashop>tab_orders_5ece607071fe59ddc4c88dc6abfe2310'] = 'Nenašli sa žiadne položky';
-$_MODULE['<{packetery}prestashop>tab_orders_77f4e882dbc5906614a853fe12721f3b'] = 'Nastavit hmotnosti';
+$_MODULE['<{packetery}prestashop>tab_orders_85f24a0e8b5ef5a81886d28f2af117a4'] = 'Uložit hmotnosti';
 $_MODULE['<{packetery}prestashop>tab_orders_44940301ddbd65606983e583e0a5760e'] = 'Podat vybrané zásilky';
 $_MODULE['<{packetery}prestashop>tab_orders_346bb64d32d0b3222ff3ba91f140ec76'] = 'Stiahnite si štítky v PDF';
 $_MODULE['<{packetery}prestashop>tab_orders_91dbbc2a3ac9204db85a4b7112661f4f'] = 'Je možné stáhnout pouze štítky k zásilkám, u kterých existuje číslo zásilky (podány přes tlačítko \"Podat vybrané zásilky\")';
@@ -106,5 +106,7 @@ $_MODULE['<{packetery}prestashop>tab_settings_4be6bfa1b6a3582a32fcd1653dc24067']
 $_MODULE['<{packetery}prestashop>widget_422f03dbebc5e4e66d1d5b7e4564c355'] = 'Vybrať miesto vyzdvihnutia:';
 $_MODULE['<{packetery}prestashop>widget_81bd9c17af94c31967cdb6870f154d83'] = 'Vybrané miesto vyzdvihnutia:';
 $_MODULE['<{packetery}prestashop>widget_397164405b87202533b09fd47a137141'] = 'Vyberte prosím před potvrzením objednávky výdejní místo';
+$_MODULE['<{packetery}prestashop>ajax_486483a4548325db96ad59730d8cf7d7'] = 'Nejsou zadány žádné hmotnosti k uložení.';
+$_MODULE['<{packetery}prestashop>ajax_c2cb004cf813bc9db8135221db27e9f7'] = 'Zadejte prosím číslo.';
 $_MODULE['<{packetery}prestashop>uninstall_e21a827831f90240feccbb1f8fd8c7e3'] = 'Při odinstalování modulu Zásilkovny nastala výjimka:';
 $_MODULE['<{packetery}prestashop>adminpacketerycontroller_4a93d9164aad959a6abc2de389170ac9'] = 'Zásielkovňa';
