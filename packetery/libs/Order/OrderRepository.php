@@ -72,4 +72,16 @@ class OrderRepository
     {
         return $this->db->update('packetery_order', ['weight' => $weight], '`id_order` = ' . $orderId, 0, true);
     }
+
+    /**
+     * @param array $orderIds
+     * @return array
+     */
+    public function getWeights($orderIds)
+    {
+        return $this->db->executeS(
+            'SELECT `id_order`, `weight` FROM `' . _DB_PREFIX_ . 'packetery_order`
+            WHERE `id_order` IN (' . implode(',', $orderIds) . ')'
+        );
+    }
 }

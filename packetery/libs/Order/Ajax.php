@@ -32,6 +32,16 @@ class Ajax
             return json_encode($result);
         }
 
+        $storedWeights = $this->orderRepository->getWeights(array_keys($orderWeights));
+        if($storedWeights) {
+            $storedWeightsAssoc = array_combine(
+                array_column($storedWeights, 'id_order'),
+                array_column($storedWeights, 'weight')
+            );
+        } else {
+            $storedWeightsAssoc = [];
+        }
+
         foreach ($orderWeights as $orderId => $weight) {
             if ($weight === '') {
                 $weight = null;
@@ -39,11 +49,15 @@ class Ajax
                 $weight = str_replace([',', ' '], ['.', ''], $weight);
             }
             if ($weight === null || is_numeric($weight)) {
-                $this->orderRepository->updateWeight($orderId, $weight);
-                $result[$orderId]['value'] = $weight;
                 if ($weight === null) {
                     $order = new \Order($orderId);
                     $result[$orderId]['value'] = $order->getTotalWeight();
+                }
+                if ($weight != $storedWeightsAssoc[$orderId]) {
+                    $this->orderRepository->updateWeight($orderId, $weight);
+                    if ($weight !== null) {
+                        $result[$orderId]['value'] = $weight;
+                    }
                 }
             } else {
                 $result[$orderId]['error'] = $this->module->l('Please enter a number.', 'ajax');
