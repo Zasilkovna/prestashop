@@ -77,7 +77,7 @@ class OrderRepository
      * @param array $orderIds
      * @return array
      */
-    public function getWeights($orderIds)
+    public function getWeights(array $orderIds)
     {
         return $this->db->executeS(
             'SELECT `id_order`, `weight` FROM `' . _DB_PREFIX_ . 'packetery_order`

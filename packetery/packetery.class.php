@@ -202,7 +202,7 @@ class Packeteryclass
      * @param array $orders
      * @return array
      */
-    public static function loadWeightToOrders($orders)
+    public static function loadWeightToOrders(array $orders)
     {
         if ($orders) {
             foreach ($orders as $index => $order) {
