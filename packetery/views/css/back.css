@@ -84,6 +84,9 @@ input.set_weights {
 	float: right;
 	margin-top: 5px;
 }
+.notifyAnchor {
+	position: relative;
+}
 /*END ORDERS*/
 
 #packetery-form .export_selected_csv {

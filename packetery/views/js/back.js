@@ -129,7 +129,10 @@ $(document).ready(function(){
 			$(pstable_jq_select).find('table tbody tr').each(function () {
 				var orderId = $(this).data('id-order');
 				var $weightColumn = $(this).find('td:eq(' + orderColumnWeight + ')');
-				$weightColumn.html('<input type="text" value="' + $weightColumn.text().trim() + '" name="weight_' + orderId + '" class="weight">');
+				$weightColumn.html(
+					'<input type="text" value="' + $weightColumn.text().trim() + '" name="weight_' + orderId + '" class="weight">' +
+					'<div class="notifyAnchor"></div>'
+				);
 			});
 		},
 
@@ -321,7 +324,7 @@ $(document).ready(function(){
 					},
 					success: function (result) {
 						if (result.error) {
-							$(tableSelector + ' .panel').notify(result.error, "error", {position: "top"});
+							$(tableSelector + ' .panel').notify(result.error, "error");
 							return;
 						}
 						for (var orderId in result) {
@@ -329,15 +332,15 @@ $(document).ready(function(){
 								var $orderTr = $('tr[data-id-order="' + orderId + '"]');
 								if (result[orderId].value) {
 									$orderTr.find('td:eq(' + (orderColumnWeight + 1) + ') input').val(result[orderId].value);
-									$orderTr.notify(lang_pac.success, "success", {position: "top"});
+									$orderTr.find('.notifyAnchor').notify(lang_pac.success, "success");
 								} else if (result[orderId].error) {
-									$orderTr.notify(result[orderId].error, "error", {position: "top"});
+									$orderTr.find('.notifyAnchor').notify(result[orderId].error, "error");
 								}
 							}
 						}
 					},
 					error: function() {
-						$(tableSelector + ' .panel').notify(lang_pac.error, "error", {position: "top"});
+						$(tableSelector + ' .panel').notify(lang_pac.error, "error");
 					},
 					complete: function () {
 						$('body').toggleClass('wait');
