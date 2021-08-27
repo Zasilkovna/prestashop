@@ -88,6 +88,7 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
   in the "order confirmation" email, and the order detail view of the registered user.
 - Automatic export of orders to the Packeta system.
 - Export orders to the CSV file, which can be imported in the [client section](https://client.packeta.com/).
+- It is now possible to set the weight of the shipment in the list of Packeta orders, before sending it to Packeta.
 
 ### OPC support
 - One Page Supercheckout from [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout)
@@ -194,6 +195,7 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - Zobrazení informace o vybraném výdejní místě v posledním kroku objednávky, v emailu "potvrzení objednávky"
   a v detailu objednávky registrovaného uživatele.
 - Automatický export zásilek do systému Zásilkovny.
+- V seznamu objednávek Zásilkovny je nyní možné upravit hmotnost zásilky, před odesláním do Zásilkovny.
 
 ### Podpora pro OPC
 - One Page Supercheckout od [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout)
