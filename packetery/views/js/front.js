@@ -1,7 +1,7 @@
 PacketaModule = window.PacketaModule || {};
 
 PacketaModule.tools = {
-    isPS16: function() {
+    isPS16: function () {
         return PacketaModule.config.prestashopVersion.indexOf('1.6') === 0;
     },
 };
@@ -10,11 +10,11 @@ PacketaModule.runner = {
     /**
      * Supposed to be called only once
      */
-    onThisScriptLoad: function() {
+    onThisScriptLoad: function () {
         // non-blocking AJAX loading, speeds up page load
         $.getScript("https://widget.packeta.com/v6/www/js/library.js")
             .success(PacketaModule.runner.onWidgetLoad)
-            .fail(function() {
+            .fail(function () {
                 console.error('Unable to load Packeta Widget.');
             });
     },
@@ -22,7 +22,7 @@ PacketaModule.runner = {
     /**
      * Supposed to be called only once
      */
-    onWidgetLoad: function() {
+    onWidgetLoad: function () {
         // register on document load callback after widget is loaded
         $(PacketaModule.runner.onDocumentLoad);
     },
@@ -62,7 +62,7 @@ PacketaModule.runner = {
         PacketaModule.ui.toggleExtraContent();
 
         var $deliveryInputs = module.findDeliveryOptions();
-        $deliveryInputs.off('change.packetery').on('change.packetery', function() {
+        $deliveryInputs.off('change.packetery').on('change.packetery', function () {
             PacketaModule.runner.onShippingChange($(this));
         });
     },
@@ -165,7 +165,7 @@ PacketaModule.ui = {
         var ajaxCalls = [],
             loadedFromCache = false;
 
-        $deliveryOptions.each(function(i, e) {
+        $deliveryOptions.each(function (i, e) {
             var $deliveryInput = $(e);
             var carrierId = packeteryModulesManager.getCarrierId($deliveryInput);
 
@@ -184,7 +184,7 @@ PacketaModule.ui = {
 
             PacketaModule.ui.extraContentCache[carrierId] = 'pending';
 
-            var ajaxCall = PacketaModule.ajax.fetchExtraContent(carrierId).done(function(result) {
+            var ajaxCall = PacketaModule.ajax.fetchExtraContent(carrierId).done(function (result) {
                 PacketaModule.ui.addOneExtraContent($deliveryInput, result);
                 PacketaModule.ui.extraContentCache[carrierId] = result;
             });
@@ -200,7 +200,7 @@ PacketaModule.ui = {
         }
     },
 
-    addOneExtraContent: function($deliveryInput, html) {
+    addOneExtraContent: function ($deliveryInput, html) {
         var isAlreadyThere = packeteryModulesManager.getWidgetParent($deliveryInput).length > 0;
         if (isAlreadyThere) {
             return;
@@ -230,7 +230,7 @@ PacketaModule.ui = {
         }
     },
 
-    initializeWidget: function() {
+    initializeWidget: function () {
         if (PacketaModule.config.apiKey === '') {
             return;
         }
@@ -291,7 +291,7 @@ PacketaModule.ui = {
                     pickupPoint.pickupPointType,
                     pickupPoint.carrierId,
                     pickupPoint.carrierPickupPointId,
-                   PacketaModule.ui.toggleSubmit
+                    PacketaModule.ui.toggleSubmit
                 );
             }, widgetOptions);
         });
@@ -337,7 +337,7 @@ PacketaModule.ajax = {
             type: 'POST',
             url: url,
             data: data,
-            beforeSend: function() {
+            beforeSend: function () {
                 // todo: To which checkout module does this css class belong? Not Supercheckout PS 1.7, not PS 1.7, not PS 1.6 5-step nor OPC
                 $("body").toggleClass("wait");
             },
@@ -346,13 +346,13 @@ PacketaModule.ajax = {
                     onSuccess();
                 }
             },
-            complete: function() {
+            complete: function () {
                 $("body").toggleClass("wait");
             },
         });
     },
 
-    saveSelectedBranch: function(prestashopCarrierId, branchId, branchName, pickupPointType, widgetCarrierId, carrierPickupPointId, onSuccess) {
+    saveSelectedBranch: function (prestashopCarrierId, branchId, branchName, pickupPointType, widgetCarrierId, carrierPickupPointId, onSuccess) {
         return PacketaModule.ajax.post('saveSelectedBranch', {
             'prestashop_carrier_id': prestashopCarrierId,
             'id_branch': branchId,
@@ -363,7 +363,7 @@ PacketaModule.ajax = {
         }, onSuccess);
     },
 
-    fetchExtraContent: function(prestashopCarrierId) {
+    fetchExtraContent: function (prestashopCarrierId) {
         return PacketaModule.ajax.post('fetchExtraContent', {
             'prestashop_carrier_id': prestashopCarrierId,
         });
@@ -371,17 +371,18 @@ PacketaModule.ajax = {
 };
 
 
-function PacketeryCheckoutModulesManager() {
+function PacketeryCheckoutModulesManager()
+{
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
     this.supportedModules = ['Ps16', 'Ps17', 'Unknown', 'Supercheckout'];
     this.loadedModules = [];
     this.detectedModule = null;
 
-    this.loadModules = function() {
+    this.loadModules = function () {
         this.loadedModules = [];
         var manager = this;
 
-        this.supportedModules.forEach(function(moduleId) {
+        this.supportedModules.forEach(function (moduleId) {
             // moduleId = 'Standard' => className = 'PacketeryCheckoutModuleStandard'
             var className = 'PacketeryCheckoutModule' + moduleId;
 
@@ -392,7 +393,7 @@ function PacketeryCheckoutModulesManager() {
         });
     };
 
-    this.detectModule = function() {
+    this.detectModule = function () {
         if (this.detectedModule !== null) {
             return this.detectedModule;
         }
@@ -402,7 +403,7 @@ function PacketeryCheckoutModulesManager() {
         }
 
         var manager = this;
-        this.loadedModules.forEach(function(module) {
+        this.loadedModules.forEach(function (module) {
             if ((manager.detectedModule === null) && module.isActive()) {
                 manager.detectedModule = module;
             }
@@ -412,11 +413,11 @@ function PacketeryCheckoutModulesManager() {
     };
 
     // in case we need to change this in the future
-    this.getCarrierId = function($selectedInput) {
+    this.getCarrierId = function ($selectedInput) {
         return $selectedInput.val().replace(',', '');
     }
 
-    this.getWidgetParent = function($selectedInput) {
+    this.getWidgetParent = function ($selectedInput) {
         return $('#packetery-carrier-' + this.getCarrierId($selectedInput));
     }
 }
@@ -427,7 +428,8 @@ var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 /**
  *  This function is called by third party checkout modules (e.g. Supercheckout) after shipping methods are fetched via AJAX
  */
-function onShippingLoadedCallback() {
+function onShippingLoadedCallback()
+{
     PacketaModule.runner.onShippingLoad();
 }
 

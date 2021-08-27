@@ -30,16 +30,14 @@ if (!defined('_PS_ADMIN_DIR_')) {
 include_once(dirname(__file__) . '/packetery.class.php');
 include_once(dirname(__file__) . '/packetery.api.php');
 
-if (
-    !Context::getContext()->employee ||
+if (!Context::getContext()->employee ||
     !Context::getContext()->employee->isLoggedBack()
 ) {
     header($_SERVER['SERVER_PROTOCOL'] . ' 403 Forbidden');
     exit;
 }
 
-switch (Tools::getValue('action'))
-{
+switch (Tools::getValue('action')) {
     /*BACK*/
     case 'updatesettings':
         Packeteryclass::updateSettings();

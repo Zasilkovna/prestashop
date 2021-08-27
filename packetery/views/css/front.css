@@ -27,82 +27,82 @@
 /* TODO: review all - compare with front/widget.tpl */
 
 .clearfix::after {
-	content: "";
-	clear: both;
-	display: table;
+    content: "";
+    clear: both;
+    display: table;
 }
 
 /*WIDGET POPUP*/
 .packetery-widget-status{
-	width: 100%;
-	display:none;
-	height: 32px;
-	vertical-align: middle;
-	font-size: 18px;
+    width: 100%;
+    display:none;
+    height: 32px;
+    vertical-align: middle;
+    font-size: 18px;
 }
 .packetery-widget-status a{
-	color:red !important;
+    color:red !important;
 }
 
 .popup_wrapper{
 }
 .packetery_widget_wrapper img {
-	max-height: 250px !important;
-	height: auto;
+    max-height: 250px !important;
+    height: auto;
 }
 #packetery-widget {
-	margin-bottom: 25px;
+    margin-bottom: 25px;
 }
 #packetery-widget h3{
-	padding-left: 15px;
-	padding-top: 15px;
+    padding-left: 15px;
+    padding-top: 15px;
 }
 
 #packetery-widget button{
-	height: 50px;
-	margin-bottom: 10px;
+    height: 50px;
+    margin-bottom: 10px;
 }
 
 .packetery_widget_wrapper{
-	max-width: 700px;
-	height: 610px;
-	margin: auto;
-	margin-top: 100px;
-	background-color: #fff;
-	display: none;
+    max-width: 700px;
+    height: 610px;
+    margin: auto;
+    margin-top: 100px;
+    background-color: #fff;
+    display: none;
 }
 /*END WIDGET POPUP*/
 
 /*WIDGET*/
 #widget-button-container{
-	position: absolute;
+    position: absolute;
 
 }
 #widget-button-container input{
-	width: 100%;
-	}
+    width: 100%;
+    }
 .page-order table td, .page-order table th {
-	padding: 0;
+    padding: 0;
 }
 
 .packetery-widget-close {
-	position: absolute;
-	right: 5px;
-	top:1px;
-	cursor: pointer;
+    position: absolute;
+    right: 5px;
+    top:1px;
+    cursor: pointer;
 }
 
 #packetery-widget .col-md-6{
-	float:none;
+    float:none;
 }
 
 #packetery-widget .col-md-6{
-	width: 100%;
+    width: 100%;
 }
 
 .widget-left{
-	float:left;
-	width: 100%;
+    float:left;
+    width: 100%;
 }
 
 /*END WIDGET*/

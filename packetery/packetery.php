@@ -431,17 +431,17 @@ class Packetery extends CarrierModule
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
         if ($packeteryCarrier['pickup_point_type'] === 'external' && $packeteryCarrier['id_branch']) {
             $widgetCarriers = $packeteryCarrier['id_branch'];
-        } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
+        } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
             $widgetCarriers = 'packeta';
         }
 
         $this->context->smarty->assign('widget_carriers', $widgetCarriers);
-		$this->context->smarty->assign('id_branch', $id_branch);
-		$this->context->smarty->assign('name_branch', $name_branch);
-		$this->context->smarty->assign('currency_branch', $currency_branch);
-		$this->context->smarty->assign('pickup_point_type', $pickupPointType);
-		$this->context->smarty->assign('packeta_carrier_id', $carrierId);
-		$this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
+        $this->context->smarty->assign('id_branch', $id_branch);
+        $this->context->smarty->assign('name_branch', $name_branch);
+        $this->context->smarty->assign('currency_branch', $currency_branch);
+        $this->context->smarty->assign('pickup_point_type', $pickupPointType);
+        $this->context->smarty->assign('packeta_carrier_id', $carrierId);
+        $this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
 
         $this->context->smarty->assign('localPath', $this->local_path);
         /*END FIELDS FOR AJAX*/
@@ -452,7 +452,7 @@ class Packetery extends CarrierModule
         }
 
         $output = $this->context->smarty->fetch($this->local_path . $template);
-		return $output;
+        return $output;
     }
 
     /**
@@ -462,7 +462,8 @@ class Packetery extends CarrierModule
      * @param array $params
      * @return string
      */
-    public function hookDisplayBeforeCarrier(array $params) {
+    public function hookDisplayBeforeCarrier(array $params)
+    {
         /** @var \CartCore $cart */
         $cart = $params['cart'];
 
@@ -528,7 +529,7 @@ class Packetery extends CarrierModule
         ];
 
         $iterator = new GlobIterator(__DIR__ . '/views/js/checkout-modules/*.js', FilesystemIterator::CURRENT_AS_FILEINFO);
-        foreach($iterator as $entry) {
+        foreach ($iterator as $entry) {
             $js[] = 'checkout-modules/' . $entry->getBasename() . '?v=' . $this->version;
         }
 
@@ -549,8 +550,7 @@ class Packetery extends CarrierModule
      */
     public function hookActionOrderHistoryAddAfter($params)
     {
-        if (
-            isset($params['cart'], $params['order_history']) &&
+        if (isset($params['cart'], $params['order_history']) &&
             ($params['cart'] instanceof Cart) &&
             ($params['order_history'] instanceof OrderHistory)
         ) {
@@ -566,8 +566,7 @@ class Packetery extends CarrierModule
     public function packeteryHookDisplayAdminOrder($params)
     {
         $messages = [];
-        if (
-            Tools::isSubmit('pickup_point_change') &&
+        if (Tools::isSubmit('pickup_point_change') &&
             Tools::getIsset('pickup_point') &&
             Tools::getValue('pickup_point') !== ''
         ) {
@@ -637,13 +636,12 @@ class Packetery extends CarrierModule
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
         ];
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
-        if (
-            $packeteryCarrier['pickup_point_type'] === 'external' &&
+        if ($packeteryCarrier['pickup_point_type'] === 'external' &&
             $packeteryOrder['id_branch'] !== null &&
             (bool)$packeteryOrder['is_carrier'] === true
         ) {
             $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
-        } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
+        } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
             $widgetOptions['carriers'] = 'packeta';
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
@@ -804,8 +802,7 @@ class Packetery extends CarrierModule
      */
     public function hookSendMailAlterTemplateVars(&$params)
     {
-        if (
-            !isset($params['template'], $params['template_vars']['{id_order}'], $params['template_vars']['{carrier}']) ||
+        if (!isset($params['template'], $params['template_vars']['{id_order}'], $params['template_vars']['{carrier}']) ||
             strpos((string)$params['template'], 'order') === false
         ) {
             return;
@@ -833,5 +830,4 @@ class Packetery extends CarrierModule
         $actionObjectOrderUpdateBefore = $this->diContainer->get(\Packetery\Hooks\ActionObjectOrderUpdateBefore::class);
         $actionObjectOrderUpdateBefore->execute($params);
     }
-
 }

@@ -28,8 +28,14 @@ function upgrade_module_2_1_5($object)
     $oldPacketeryCarriers = Db::getInstance()->executeS('
         SELECT `id_carrier`, `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_carrier`');
     if ($oldPacketeryCarriers) {
-        $psCarriers = Carrier::getCarriers(Configuration::get('PS_LANG_DEFAULT'), false, false, false, null,
-            Carrier::PS_CARRIERS_AND_CARRIER_MODULES_NEED_RANGE);
+        $psCarriers = Carrier::getCarriers(
+            Configuration::get('PS_LANG_DEFAULT'),
+            false,
+            false,
+            false,
+            null,
+            Carrier::PS_CARRIERS_AND_CARRIER_MODULES_NEED_RANGE
+        );
         $psCarriersIds = array_column($psCarriers, 'id_carrier');
         foreach ($oldPacketeryCarriers as $oldPacketeryCarrier) {
             if (in_array($oldPacketeryCarrier['id_carrier'], $psCarriersIds)) {

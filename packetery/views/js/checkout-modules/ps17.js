@@ -2,7 +2,7 @@
 
 var PacketeryCheckoutModulePs17 = {
 
-    isActive: function() {
+    isActive: function () {
         return this.findDeliveryOptions().length > 0;
     },
 

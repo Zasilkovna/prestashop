@@ -7,7 +7,8 @@ class ControllerWrapper
     /** @var \ControllerCore */
     private $controller;
 
-    public function __construct(\ControllerCore $controller) {
+    public function __construct(\ControllerCore $controller)
+    {
         $this->controller = $controller;
     }
 
@@ -16,7 +17,8 @@ class ControllerWrapper
      * @param $uri
      * @param array $params
      */
-    public function registerJavascript($name, $uri, array $params) {
+    public function registerJavascript($name, $uri, array $params)
+    {
         if (Tools::version_compare(_PS_VERSION_, '1.7.0.0', '<')) {
             $this->controller->addJS($uri);
         } else {
@@ -29,7 +31,8 @@ class ControllerWrapper
      * @param $uri
      * @param array $params
      */
-    public function registerStylesheet($name, $uri, array $params) {
+    public function registerStylesheet($name, $uri, array $params)
+    {
         if (Tools::version_compare(_PS_VERSION_, '1.7.0.0', '<')) {
             $this->controller->addCSS($uri, 'all', null, false);
         } else {

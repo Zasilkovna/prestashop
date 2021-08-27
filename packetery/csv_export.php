@@ -17,7 +17,7 @@ header('Content-Disposition: attachment; filename="export_'.$date.'.csv"');
 $fp = fopen('php://output', 'wb');
 fputcsv($fp, ['version 6']);
 fputcsv($fp, []);
-foreach ( $orderData as $line ) {
+foreach ($orderData as $line) {
     fputcsv($fp, $line);
 }
 fclose($fp);
