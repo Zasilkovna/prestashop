@@ -181,12 +181,6 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - Při problému s použitím modulu nás kontaktujte na adrese [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
 
 ### Poskytované funkce
-- Integrace widgetu pro výběr výdejních míst v košíku eshopu.
-- Doručení na adresu přes externí dopravce Zásilkovny.
-- Automatický export zásilek do systému Zásilkovny.
-- Export zásilek do csv souboru, který lze importovat v [klientské sekci](https://client.packeta.com/).
-
-#### Poskytované funkce
 - Integrace [widgetu v6](https://widget.packeta.com/v6) pro výběr výdejních míst v košíku eshopu.
 - Podpora výdejních míst externích dopravců.
 - Doručení na adresu přes externí dopravce Zásilkovny.
@@ -195,6 +189,7 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - Zobrazení informace o vybraném výdejní místě v posledním kroku objednávky, v emailu "potvrzení objednávky"
   a v detailu objednávky registrovaného uživatele.
 - Automatický export zásilek do systému Zásilkovny.
+- Export zásilek do csv souboru, který lze importovat v [klientské sekci](https://client.packeta.com/).
 - V seznamu objednávek Zásilkovny je nyní možné upravit hmotnost zásilky, před odesláním do Zásilkovny.
 
 ### Podpora pro OPC
