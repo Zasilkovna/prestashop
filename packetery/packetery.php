@@ -59,7 +59,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.8';
+		$this->version = '2.1.9';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -279,7 +279,8 @@ class Packetery extends CarrierModule
                     array('content' => $this->l('Destination pickup point'), 'key' => 'name_branch', 'center' => true),
                     array('content' => $this->l('Address delivery'), 'key' => 'is_ad', 'bool' => true,'center' => true),
                     array('content' => $this->l('Exported'), 'key' => 'exported', 'bool' => true, 'center' => true),
-                    array('content' => $this->l('Tracking number'), 'key' => 'tracking_number', 'center' => true)
+                    array('content' => $this->l('Tracking number'), 'key' => 'tracking_number', 'center' => true),
+                    array('content' => $this->l('Weight'), 'key' => 'weight', 'center' => true),
                 ),
                 'rows' => $packetery_orders,
                 'url_params' => array('configure' => $this->name),

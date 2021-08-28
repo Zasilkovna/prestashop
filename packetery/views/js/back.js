@@ -33,6 +33,13 @@ $(document).ready(function(){
 		}
 	};
 
+	// starting with 0 before calling psTableAddCheckbox
+	var orderColumnId = 0;
+	var orderColumnCod = 4;
+	var orderColumnExported = 7;
+	var orderColumnTracking = 8;
+	var orderColumnWeight = 9;
+
 	tools = {
 		/*Pagination*/
 		psTablePaginationChange: function(pstable_jq_select) {
@@ -87,7 +94,7 @@ $(document).ready(function(){
 		},
 		/*END pagination*/
 
-		//packetery-orders-table
+		// this shifts column order
 		psTableAddCheckbox: function(pstable_jq_select) {
 			$(pstable_jq_select).find('table tbody tr').each(function() {
 				$(this).prepend('<td class="center"><span><input type="checkbox" class="ps-table-checkbox" value="0"/></span></td>');
@@ -100,14 +107,14 @@ $(document).ready(function(){
 
 		psTableAddDataOrder: function(pstable_jq_select) {
 			$(pstable_jq_select).find('table tbody tr').each(function() {
-				var id_order = $(this).find('td:eq(1) span').text();
+				var id_order = $(this).find('td:eq(' + orderColumnId + ') span').text();
 				$(this).attr('data-id-order', id_order);
 			});
 		},
 
 		psTableTrackingLinks: function(pstable_jq_select) {
 			$(pstable_jq_select).find('table tbody tr').each(function() {
-				var el = $(this).find('td:eq(8) span');
+				var el = $(this).find('td:eq(' + orderColumnTracking + ') span');
 				var tracking = $(el).text();
 				if (tracking.length > 0) {
 					var tracking_link = '<a href="https://www.zasilkovna.cz/Z'+tracking+'" target="_blank">Z'+tracking+'</a>';
@@ -117,6 +124,18 @@ $(document).ready(function(){
 			binds.checkboxAllTable();
 			binds.order_cod();
 		},
+
+		ordersAddWeightInputs: function (pstable_jq_select) {
+			$(pstable_jq_select).find('table tbody tr').each(function () {
+				var orderId = $(this).data('id-order');
+				var $weightColumn = $(this).find('td:eq(' + orderColumnWeight + ')');
+				$weightColumn.html(
+					'<input type="text" value="' + $weightColumn.text().trim() + '" name="weight_' + orderId + '" class="weight">' +
+					'<div class="notifyAnchor"></div>'
+				);
+			});
+		},
+
 		getmultilangfield: function(field_class) {
 			var field_vars = {};
 			$('.'+field_class).find('div[data-is="ps-input-text-lang-value"]').each(function() {
@@ -128,7 +147,8 @@ $(document).ready(function(){
 		},
 		ad_list_build: function() {
 			var carriers_json = decodeURIComponent($('#carriers_json').val());
-			$('#ad-carriers-list-table table tr td:nth-child(5)').each(function() {
+			var carrierColumnForSelect = 5;
+			$('#ad-carriers-list-table table tr td:nth-child(' + carrierColumnForSelect + ')').each(function () {
 				var id_branch_chosen = $(this).find('span').text();
 				var zpoint = $('#zpoint').val();
 				var pp_all = $('#pp_all').val();
@@ -187,7 +207,7 @@ $(document).ready(function(){
 				// get id_orders
 				var orders = [];
 				$('#packetery-orders-table table tbody input[type="checkbox"]:checked').each(function() {
-					var id_order = $(this).parents('tr.odd').find('td:eq(1) span').text();
+					var id_order = $(this).parents('tr.odd').data('id-order');
 					orders.push(id_order);
 				});
 				var orders_id = orders.join();
@@ -202,7 +222,7 @@ $(document).ready(function(){
 				var confirmed = true;
 
 				$('#packetery-orders-table table tbody input[type="checkbox"]:checked').each(function() {
-					var id_order = $(this).parents('tr.odd').find('td:eq(1) span').text();
+					var id_order = $(this).parents('tr.odd').data('id-order');
 					var tracking_number = $(this).parents('tr.odd').find('td:last').find('a').text();
 
 					if(tracking_number != "")
@@ -235,7 +255,7 @@ $(document).ready(function(){
 				// get id_orders
 				var orders = [];
 				$('#packetery-orders-table table tbody input[type="checkbox"]:checked').each(function() {
-					var id_order = $(this).parents('tr.odd').find('td:eq(1) span').text();
+					var id_order = $(this).parents('tr.odd').data('id-order');
 					orders.push(id_order);
 				});
 				orders = orders.join(',');
@@ -274,14 +294,58 @@ $(document).ready(function(){
 		},
 
 		order_cod: function() {
-			$('#packetery-orders-table table tr td:nth-child(6)').find('i.status').unbind();
-			$('#packetery-orders-table table tr td:nth-child(6)').find('i.status').click(function(){
-				var id_order = $(this).parent().parent().find('td:eq(1) span').text();
+			$('#packetery-orders-table table tr td:nth-child(' + (orderColumnCod + 1) + ')').find('i.status').unbind();
+			$('#packetery-orders-table table tr td:nth-child(' + (orderColumnCod + 1) + ')').find('i.status').click(function () {
+				var id_order = $(this).parents('tr.odd').data('id-order');
 				if ($(this).hasClass('icon-remove'))
 					var value = 1;
 				else
 					var value = 0;
 				ajaxs.change_order_cod(id_order, value, this);
+			});
+		},
+
+		setWeights: function () {
+			$('#tab-orders').on('click', 'input[name="set_weights"]', function () {
+				var tableSelector = '#packetery-orders-table';
+				var orderWeights = {};
+				$(tableSelector).find('table tbody tr').each(function () {
+					var orderId = $(this).data('id-order');
+					var weight = $(this).find('td:eq(' + (orderColumnWeight + 1) + ') input').val();
+					orderWeights[orderId] = weight;
+				});
+				$.ajax({
+					type: 'POST',
+					url: ajaxs.baseuri() + '/modules/packetery/ajax.php?action=setWeights',
+					data: { 'orderWeights': orderWeights },
+					dataType: 'json',
+					beforeSend: function () {
+						$('body').toggleClass('wait');
+					},
+					success: function (result) {
+						if (result.error) {
+							$(tableSelector + ' .panel').notify(result.error, "error");
+							return;
+						}
+						for (var orderId in result) {
+							if (result.hasOwnProperty(orderId)) {
+								var $orderTr = $('tr[data-id-order="' + orderId + '"]');
+								if (result[orderId].value) {
+									$orderTr.find('td:eq(' + (orderColumnWeight + 1) + ') input').val(result[orderId].value);
+									$orderTr.find('.notifyAnchor').notify(lang_pac.success, "success");
+								} else if (result[orderId].error) {
+									$orderTr.find('.notifyAnchor').notify(result[orderId].error, "error");
+								}
+							}
+						}
+					},
+					error: function() {
+						$(tableSelector + ' .panel').notify(lang_pac.error, "error");
+					},
+					complete: function () {
+						$('body').toggleClass('wait');
+					},
+				});
 			});
 		},
 
@@ -475,8 +539,8 @@ $(document).ready(function(){
 							if (orders[i][1] == 1) {
 								var tracking_number = orders[i][2];
 								var tr = $('#packetery-orders-table tr[data-id-order="'+id_order+'"]');
-								$(tr).find('td:eq(8) i').replaceWith('<i class="icon-check status"></i>');
-								$(tr).find('td:eq(9)').html('<span><a href="https://www.zasilkovna.cz/Z'+tracking_number+'" target="_blank">Z'+tracking_number+'</a></span>');
+								$(tr).find('td:eq(' + (orderColumnExported + 1) + ') i').replaceWith('<i class="icon-check status"></i>');
+								$(tr).find('td:eq(' + (orderColumnTracking + 1) + ')').html('<span><a href="https://www.zasilkovna.cz/Z' + tracking_number + '" target="_blank">Z' + tracking_number + '</a></span>');
 								$('#packetery-export-success').append('<div>Order '+id_order+' '+lang_pac.success_export+'</div>');
 								$('.r-message-success').css('display', 'block');
 							} else {
@@ -688,20 +752,20 @@ $(document).ready(function(){
 		ajaxs.updateBranches('#update-branches', false);
 	});
 	tools.ad_list_build();
-	tools.psTableTrackingLinks('#packetery-orders-table');
 
+	tools.psTableTrackingLinks('#packetery-orders-table');
 	tools.psTablePaginationChange('#packetery-orders-table');
-	tools.psTableAddCheckbox('#packetery-orders-table');
 	tools.psTableAddDataOrder('#packetery-orders-table');
+	tools.ordersAddWeightInputs('#packetery-orders-table');
+	tools.psTableAddCheckbox('#packetery-orders-table');
 
 	binds.order_update();
 	binds.order_download_pdf();
 	binds.order_export();
 	binds.order_export_csv();
 	binds.tab_branch_list();
-});
+	binds.setWeights();
 
-$(document).ready(function () {
 	var $widgetButton = $('.open-packeta-widget');
 	if ($widgetButton.length === 1) {
 		$.getScript("https://widget.packeta.com/v6/www/js/library.js")

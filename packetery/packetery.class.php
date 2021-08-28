@@ -134,7 +134,7 @@ class Packeteryclass
      */
     public static function getPacketeryOrderRow($id_order)
     {
-        $sql = 'SELECT `id_branch`, `id_carrier`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point` 
+        $sql = 'SELECT `id_branch`, `id_carrier`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point`, `weight` 
                     FROM `' . _DB_PREFIX_ . 'packetery_order` 
                     WHERE id_order = ' . (int)$id_order;
 
@@ -172,24 +172,48 @@ class Packeteryclass
         );
         $pages = ceil($orders_num_rows / $per_page);
         $sql = 'SELECT 
-                    o.id_order,
-                    o.id_currency,
-                    o.id_lang,
-                    concat(c.firstname, " ", c.lastname) customer,
-                    o.total_paid total,
-                    o.date_add date,
-                    po.is_cod,
-                    po.name_branch,
-                    po.exported,
-                    po.tracking_number,
-                    po.is_ad
-                FROM `' . _DB_PREFIX_ . 'orders` o
-                    JOIN `' . _DB_PREFIX_ . 'packetery_order` po ON po.id_order=o.id_order
-                    JOIN `' . _DB_PREFIX_ . 'customer` c ON c.id_customer=o.id_customer
-                WHERE o.id_shop = ' . (int)$id_shop . ' 
-                ORDER BY o.date_add DESC LIMIT ' . (($page - 1) * $per_page) . ',' . $per_page;
+                    `o`.`id_order`,
+                    `o`.`id_currency`,
+                    `o`.`id_lang`,
+                    CONCAT(`c`.`firstname`, " ", `c`.`lastname`) AS `customer`,
+                    `o`.`total_paid` AS `total`,
+                    `o`.`date_add` AS `date`,
+                    `po`.`is_cod`,
+                    `po`.`name_branch`,
+                    `po`.`exported`,
+                    `po`.`tracking_number`,
+                    `po`.`is_ad`,
+                    `po`.`weight`
+                FROM `' . _DB_PREFIX_ . 'orders` `o`
+                    JOIN `' . _DB_PREFIX_ . 'packetery_order` `po` ON `po`.`id_order` = `o`.`id_order`
+                    JOIN `' . _DB_PREFIX_ . 'customer` `c` ON `c`.`id_customer` = `o`.`id_customer`
+                WHERE `o`.`id_shop` = ' . (int)$id_shop . ' 
+                ORDER BY `o`.`date_add` DESC LIMIT ' . (($page - 1) * $per_page) . ',' . $per_page;
         $orders = Db::getInstance()->executeS($sql);
+
+        $orders = self::loadWeightToOrders($orders);
+
         return array($orders, $pages);
+    }
+
+    /**
+     * Add computed weight to orders without saved weight
+     *
+     * @param array $orders
+     * @return array
+     */
+    public static function loadWeightToOrders(array $orders)
+    {
+        if ($orders) {
+            foreach ($orders as $index => $order) {
+                if ($order['weight'] === null) {
+                    $orderInstance = new \Order($order['id_order']);
+                    $order['weight'] = $orderInstance->getTotalWeight();
+                    $orders[$index] = $order;
+                }
+            }
+        }
+        return $orders;
     }
 
     /**
@@ -231,7 +255,12 @@ class Packeteryclass
 
             $weight = '';
             if (Configuration::get('PS_WEIGHT_UNIT') === PacketeryApi::PACKET_WEIGHT_UNIT) {
-                $weight = $order->getTotalWeight();
+                if ($packeteryOrder['weight'] !== null) {
+                    // used saved if set
+                    $weight = $packeteryOrder['weight'];
+                } else {
+                    $weight = $order->getTotalWeight();
+                }
             }
 
             $data[$order_id] = [

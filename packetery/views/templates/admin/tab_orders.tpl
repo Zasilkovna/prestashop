@@ -50,6 +50,9 @@
 		</div>
 	</div>
 
+	<input type="button" class="set_weights btn btn-default btn-block" name="set_weights"
+		id="submit_set_weights" value="{l s='Save weights' mod='packetery'}">
+
 	<input type="button" class="export_selected btn btn-default btn-block"
 		id="submit_export_orders" value="{l s='Send selected orders and create shipment' mod='packetery'}">
 
