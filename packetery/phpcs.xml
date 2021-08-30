@@ -5,6 +5,7 @@
     <arg name="colors"/>
 
     <rule ref="PSR2">
+        <exclude-pattern>translations/*.php</exclude-pattern>
         <exclude name="PSR1.Files.SideEffects.FoundWithSymbols"/>
         <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
     </rule>
