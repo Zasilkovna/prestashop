@@ -166,7 +166,9 @@ class Packetery extends CarrierModule
             $have_error = true;
         } elseif (!$error) {
             if (Tools::file_get_contents($test) != 1) {
-                $error[] = $this->l('Cannot access Packeta API with specified password. Possibly the API password is wrong.');
+                $error[] = $this->l(
+                    'Cannot access Packeta API with specified password. Possibly the API password is wrong.'
+                );
                 $have_error = true;
             }
         }
@@ -233,17 +235,25 @@ class Packetery extends CarrierModule
         /*END ORDERS*/
 
         /*CARRIERS*/
-        $this->context->smarty->assign('carriers_json', rawurlencode(json_encode(PacketeryApi::getAdAndExternalCarriers())));
+        $this->context->smarty->assign(
+            'carriers_json',
+            rawurlencode(json_encode(PacketeryApi::getAdAndExternalCarriers()))
+        );
         $this->context->smarty->assign('zpoint', Packeteryclass::ZPOINT);
         $this->context->smarty->assign('pp_all', Packeteryclass::PP_ALL);
         $this->context->smarty->assign('packeta_pickup_points', $this->l('Packeta pickup points'));
-        $this->context->smarty->assign('all_packeta_pickup_points', $this->l('Packeta pickup points (Packeta + carriers)'));
+        $this->context->smarty->assign(
+            'all_packeta_pickup_points',
+            $this->l('Packeta pickup points (Packeta + carriers)')
+        );
 
         /*AD CARRIER LIST*/
         $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
         $carrierTools = $this->diContainer->get(\Packetery\Carrier\CarrierTools::class);
         foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
-            list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries($packeteryCarrier['id_carrier']);
+            list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
+                $packeteryCarrier['id_carrier']
+            );
             $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
             $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
             // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
@@ -264,7 +274,11 @@ class Packetery extends CarrierModule
                         'center' => true
                     ),
                     array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
-                    array('content' => $this->l('Packeta pickup point'), 'key' => 'pickup_point_type', 'hidden' => true),
+                    array(
+                        'content' => $this->l('Packeta pickup point'),
+                        'key' => 'pickup_point_type',
+                        'hidden' => true
+                    ),
                 ),
                 'rows' => $packeteryListAdCarriers,
                 'url_params' => array('configure' => $this->name),
@@ -332,10 +346,18 @@ class Packetery extends CarrierModule
             'success_export' => $this->l('Successfully exported'),
             'success_download_branches' => $this->l('Pickup points successfully updated.'),
             'reload5sec' => $this->l('Page will be reloaded in 5 seconds...'),
-            'try_download_branches' => $this->l('Trying to download pickup points. Please wait for download process end...'),
-            'confirm_tracking_exists' => $this->l('Tracking numbers of some selected orders already exist and will be rewritten by new ones. Do you want to continue?'),
+            'try_download_branches' => $this->l(
+                'Trying to download pickup points. Please wait for download process end...'
+            ),
+            'confirm_tracking_exists' => $this->l(
+                'Tracking numbers of some selected orders already exist and will be rewritten by new ones. 
+                Do you want to continue?'
+            ),
             'err_no_branch' => $this->l('Please select destination pickup point for order(s)'),
-            'error_export_unknown' => $this->l('There was an error trying to update list of pickup points, check if your API password is correct and try again.'),
+            'error_export_unknown' => $this->l(
+                'There was an error trying to update list of pickup points, 
+                check if your API password is correct and try again.'
+            ),
             'error_export' => $this->l('not exported. Error:'),
         );
         $ajaxfields_json = json_encode($ajaxfields);
@@ -351,7 +373,11 @@ class Packetery extends CarrierModule
             $messages = [
                 [
                     'text' => sprintf(
-                        $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to kg.'),
+                        $this->l(
+                            'The default weight unit for your store is: %s. 
+                            When exporting packets, the module will not state its weight for the packet. 
+                            If you want to export the weight of the packet, you need to set the default unit to kg.'
+                        ),
                         $usedWeightUnit
                     ),
                     'class' => 'info',
@@ -410,7 +436,12 @@ class Packetery extends CarrierModule
         $carrierId = '';
         $carrierPickupPointId = '';
         if (!empty($params['cart'])) {
-            $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
+            $row = Db::getInstance()->getRow(
+                'SELECT * FROM ' . _DB_PREFIX_ .
+                'packetery_order WHERE id_cart =' .
+                (int)$params['cart']->id .
+                ' AND id_carrier = ' . (int)$id_carrier
+            );
 
             $name_branch = $row['name_branch'];
             $currency_branch = $row['currency_branch'];
@@ -528,7 +559,10 @@ class Packetery extends CarrierModule
             'front.js?v=' . $this->version,
         ];
 
-        $iterator = new GlobIterator(__DIR__ . '/views/js/checkout-modules/*.js', FilesystemIterator::CURRENT_AS_FILEINFO);
+        $iterator = new GlobIterator(
+            __DIR__ . '/views/js/checkout-modules/*.js',
+            FilesystemIterator::CURRENT_AS_FILEINFO
+        );
         foreach ($iterator as $entry) {
             $js[] = 'checkout-modules/' . $entry->getBasename() . '?v=' . $this->version;
         }
@@ -537,10 +571,18 @@ class Packetery extends CarrierModule
         foreach ($js as $file) {
 //            $this->context->controller->addJS($this->_path . 'views/js/' . $file);
             $uri = $this->_path . 'views/js/' . $file;
-            $controllerWrapper->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
+            $controllerWrapper->registerJavascript(
+                sha1($uri),
+                $uri,
+                ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']
+            );
         }
 
-        $controllerWrapper->registerStylesheet('packetery-front', $this->_path . 'views/css/front.css?v=' . $this->version, ['server' => 'remote']);
+        $controllerWrapper->registerStylesheet(
+            'packetery-front',
+            $this->_path . 'views/css/front.css?v=' . $this->version,
+            ['server' => 'remote']
+        );
     }
 
     /*ORDERS*/
@@ -600,7 +642,9 @@ class Packetery extends CarrierModule
 
         if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
             $messages[] = [
-                'text' => $this->l('No pickup point selected for the order. It will not be possible to export the order to Packeta.'),
+                'text' => $this->l(
+                    'No pickup point selected for the order. It will not be possible to export the order to Packeta.'
+                ),
                 'class' => 'danger',
             ];
             // TODO try to open widget automatically
@@ -658,10 +702,17 @@ class Packetery extends CarrierModule
     {
         if (Tools::version_compare(_PS_VERSION_, '1.7.5', '<')) {
             // Code compliant from PrestaShop 1.5 to 1.7.4
-            return $this->context->link->getAdminLink('AdminOrders') . '&id_order=' . $orderId . '&vieworder#packetaPickupPointChange';
+            return $this->context->link->getAdminLink(
+                'AdminOrders'
+            ) . '&id_order=' . $orderId . '&vieworder#packetaPickupPointChange';
         }
         // Recommended code from PrestaShop 1.7.5
-        return $this->context->link->getAdminLink('AdminOrders', true, [], ['id_order' => $orderId, 'vieworder' => 1]) . '#packetaPickupPointChange';
+        return $this->context->link->getAdminLink(
+            'AdminOrders',
+            true,
+            [],
+            ['id_order' => $orderId, 'vieworder' => 1]
+        ) . '#packetaPickupPointChange';
     }
 
     /**
@@ -760,7 +811,11 @@ class Packetery extends CarrierModule
             return;
         }
         $orderData = Db::getInstance()->getRow(
-            sprintf('SELECT `name_branch` FROM `%spacketery_order` WHERE `id_cart` = %d AND `is_ad` = 0', _DB_PREFIX_, (int)$order->id_cart)
+            sprintf(
+                'SELECT `name_branch` FROM `%spacketery_order` WHERE `id_cart` = %d AND `is_ad` = 0',
+                _DB_PREFIX_,
+                (int)$order->id_cart
+            )
         );
         if (!$orderData) {
             return;
@@ -783,7 +838,11 @@ class Packetery extends CarrierModule
             return;
         }
         $orderData = Db::getInstance()->getRow(
-            sprintf('SELECT `name_branch` FROM `%spacketery_order` WHERE `id_order` = %d AND `is_ad` = 0', _DB_PREFIX_, (int)$params['order']->id)
+            sprintf(
+                'SELECT `name_branch` FROM `%spacketery_order` WHERE `id_order` = %d AND `is_ad` = 0',
+                _DB_PREFIX_,
+                (int)$params['order']->id
+            )
         );
         if (!$orderData) {
             return;
@@ -802,15 +861,23 @@ class Packetery extends CarrierModule
      */
     public function hookSendMailAlterTemplateVars(&$params)
     {
-        if (!isset($params['template'], $params['template_vars']['{id_order}'], $params['template_vars']['{carrier}']) ||
+        if (!isset(
+            $params['template'],
+            $params['template_vars']['{id_order}'],
+            $params['template_vars']['{carrier}']
+        ) ||
             strpos((string)$params['template'], 'order') === false
         ) {
             return;
         }
 
         $orderData = Db::getInstance()->getRow(
-            sprintf('SELECT `name_branch`, `id_branch`, `is_carrier`
-            FROM `%spacketery_order` WHERE `id_order` = %d AND `is_ad` = 0', _DB_PREFIX_, (int)$params['template_vars']['{id_order}'])
+            sprintf(
+                'SELECT `name_branch`, `id_branch`, `is_carrier`
+            FROM `%spacketery_order` WHERE `id_order` = %d AND `is_ad` = 0',
+                _DB_PREFIX_,
+                (int)$params['template_vars']['{id_order}']
+            )
         );
         if (!$orderData) {
             return;
