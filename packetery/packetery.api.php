@@ -197,7 +197,10 @@ class PacketeryApi
             if (!$total) {
                 return array(
                     0,
-                    $module->l('Can\'t find order currency rate between order and pickup point, order', 'packetery.api') . ' - ' . $id_order,
+                    $module->l(
+                        'Can\'t find order currency rate between order and pickup point, order',
+                        'packetery.api'
+                    ) . ' - ' . $id_order,
                 );
             }
         }
@@ -300,7 +303,8 @@ class PacketeryApi
                 $error_msg = $e->faultstring;
             }
             if (isset($e->detail->PacketAttributesFault->attributes->fault)) {
-                if (is_array($e->detail->PacketAttributesFault->attributes->fault) && count($e->detail->PacketAttributesFault->attributes->fault) > 1) {
+                if (is_array($e->detail->PacketAttributesFault->attributes->fault) &&
+                    count($e->detail->PacketAttributesFault->attributes->fault) > 1) {
                     foreach ($e->detail->PacketAttributesFault->attributes->fault as $fault) {
                         $error_msg = $error_msg . "\n" . $fault->name . ': ' . $fault->fault;
                     }
@@ -605,7 +609,9 @@ class PacketeryApi
         $prestashopCarrierId = Tools::getValue('prestashop_carrier_id');
         $pickupPointType = (Tools::getIsset('pickup_point_type') ? Tools::getValue('pickup_point_type') : 'internal');
         $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
-        $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
+        $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue(
+            'carrier_pickup_point_id'
+        ) : null);
 
         $packetery_carrier_row = Packeteryclass::getPacketeryCarrierById((int)$prestashopCarrierId);
         $is_cod = $packetery_carrier_row['is_cod'];
