@@ -133,9 +133,17 @@ class Packeteryclass
      */
     public static function getPacketeryOrderRow($id_order)
     {
-        $sql = 'SELECT `id_branch`, `id_carrier`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point` 
-                    FROM `' . _DB_PREFIX_ . 'packetery_order` 
-                    WHERE id_order = ' . (int)$id_order;
+        $sql = '
+            SELECT 
+                   `id_branch`, 
+                   `id_carrier`, 
+                   `is_cod`, 
+                   `is_ad`, 
+                   `currency_branch`, 
+                   `is_carrier`, 
+                   `carrier_pickup_point` 
+            FROM `' . _DB_PREFIX_ . 'packetery_order` 
+            WHERE id_order = ' . (int)$id_order;
 
         return Db::getInstance()->getRow($sql);
     }
@@ -218,7 +226,11 @@ class Packeteryclass
                 continue;
             }
 
-            $total = $order->getTotalProductsWithTaxes() + $order->total_shipping_tax_incl + $order->total_wrapping_tax_incl - $order->total_discounts_tax_incl;
+            $total =
+                $order->getTotalProductsWithTaxes() +
+                $order->total_shipping_tax_incl +
+                $order->total_wrapping_tax_incl -
+                $order->total_discounts_tax_incl;
             $cod = $packeteryOrder['is_cod'] == 1 ? $total : 0;
 
             $senderLabel = Configuration::get('PACKETERY_ESHOP_ID');
@@ -508,7 +520,13 @@ class Packeteryclass
                 $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
             }
             if ($isPacketeryCarrier) {
-                $result = $db->update('packetery_address_delivery', $fieldsToSet, '`id_carrier` = ' . ((int)$carrierId), 0, true);
+                $result = $db->update(
+                    'packetery_address_delivery',
+                    $fieldsToSet,
+                    '`id_carrier` = ' . ((int)$carrierId),
+                    0,
+                    true
+                );
             } else {
                 $fieldsToSet['is_cod'] = 0;
                 $fieldsToSet['id_carrier'] = (int)$carrierId;
@@ -537,8 +555,16 @@ class Packeteryclass
         $payments = [];
         foreach ($installedPaymentModules as $installedPaymentModule) {
             $instance = Module::getInstanceByName($installedPaymentModule['name']);
-            $is_cod = (array_key_exists($installedPaymentModule['name'], $paymentModules) ? (int)$paymentModules[$installedPaymentModule['name']] : 0);
-            $payments[] = ['name' => $instance->displayName , 'is_cod' => $is_cod, 'module_name' => $installedPaymentModule['name']];
+            $is_cod = (array_key_exists(
+                $installedPaymentModule['name'],
+                $paymentModules
+            ) ? (int)$paymentModules[$installedPaymentModule['name']] : 0
+            );
+            $payments[] = [
+                'name' => $instance->displayName,
+                'is_cod' => $is_cod,
+                'module_name' => $installedPaymentModule['name']
+            ];
         }
         return $payments;
     }
@@ -620,7 +646,10 @@ class Packeteryclass
             case 'PACKETERY_APIPASS':
                 if (Validate::isString($value)) {
                     if (Tools::strlen($value) !== 32) {
-                        return $packetery->l('Api password is wrong. Pickup points will not be updated.', 'packetery.class');
+                        return $packetery->l(
+                            'Api password is wrong. Pickup points will not be updated.',
+                            'packetery.class'
+                        );
                     } else {
                         return false;
                     }
@@ -636,7 +665,11 @@ class Packeteryclass
                     if ($e->senderNotExists === true) {
                         return $packetery->l('Provided sender indication does not exist.', 'packetery.class');
                     }
-                    return sprintf('%s: %s', $packetery->l('Sender indication validation failed', 'packetery.class'), $e->getMessage());
+                    return sprintf(
+                        '%s: %s',
+                        $packetery->l('Sender indication validation failed', 'packetery.class'),
+                        $e->getMessage()
+                    );
                 }
                 break;
             default:
