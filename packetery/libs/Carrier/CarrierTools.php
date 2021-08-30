@@ -3,9 +3,9 @@
 
 namespace Packetery\Carrier;
 
-use \Carrier;
-use \CountryCore as Country;
-use \ConfigurationCore as Configuration;
+use Carrier;
+use ConfigurationCore as Configuration;
+use CountryCore as Country;
 
 class CarrierTools
 {
@@ -20,7 +20,10 @@ class CarrierTools
         $carrierZones = $carrier->getZones();
         $carrierCountries = [];
         foreach ($carrierZones as $carrierZone) {
-            $zoneCountries = Country::getCountriesByZoneId($carrierZone['id_zone'], Configuration::get('PS_LANG_DEFAULT'));
+            $zoneCountries = Country::getCountriesByZoneId(
+                $carrierZone['id_zone'],
+                Configuration::get('PS_LANG_DEFAULT')
+            );
             foreach ($zoneCountries as $zoneCountry) {
                 if ($zoneCountry['active']) {
                     $carrierCountries[] = $zoneCountry[$countryParam];

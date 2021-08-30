@@ -2,7 +2,7 @@
 
 namespace Packetery\Payment;
 
-use \Db;
+use Db;
 
 class PaymentRepository
 {
@@ -20,7 +20,9 @@ class PaymentRepository
     public function isCod($paymentModuleName)
     {
         $isCod = $this->db->getValue(
-            'SELECT `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_payment` WHERE module_name="' . $this->db->escape($paymentModuleName) . '"'
+            'SELECT `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_payment` WHERE module_name="' . $this->db->escape(
+                $paymentModuleName
+            ) . '"'
         );
 
         return ((int)$isCod === 1);
