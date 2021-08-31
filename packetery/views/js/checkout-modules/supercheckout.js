@@ -2,7 +2,7 @@
 
 var PacketeryCheckoutModuleSupercheckout = {
 
-    isActive: function() {
+    isActive: function () {
         return this.findDeliveryOptions().length > 0;
     },
 
@@ -31,7 +31,7 @@ var PacketeryCheckoutModuleSupercheckout = {
 
 $(function () {
     if (typeof addSupercheckoutOrderValidator !== 'undefined') {
-        addSupercheckoutOrderValidator(function() {
+        addSupercheckoutOrderValidator(function () {
 
             var $selectedInput = PacketeryCheckoutModuleSupercheckout.getSelectedInput(),
                 $extra = packeteryModulesManager.getWidgetParent($selectedInput),

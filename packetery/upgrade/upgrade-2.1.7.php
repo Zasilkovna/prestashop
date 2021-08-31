@@ -24,7 +24,8 @@ function upgrade_module_2_1_7($module)
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
             LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` ON `pad`.`id_carrier` = `o`.`id_carrier`
-            WHERE `po`.`id_carrier` = 0 AND `pad`.`id_carrier` IS NOT NULL');
+            WHERE `po`.`id_carrier` = 0 AND `pad`.`id_carrier` IS NOT NULL'
+    );
     if (!$ordersWithoutIdCarrier) {
         return true;
     }

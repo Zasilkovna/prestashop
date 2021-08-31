@@ -36,7 +36,9 @@ function upgrade_module_2_1_6($object)
         return false;
     }
 
-    $previousSettings = Db::getInstance()->executeS('SELECT `option`, `value` FROM `' . _DB_PREFIX_ . 'packetery_settings`');
+    $previousSettings = Db::getInstance()->executeS(
+        'SELECT `option`, `value` FROM `' . _DB_PREFIX_ . 'packetery_settings`'
+    );
     if ($previousSettings) {
         foreach ($previousSettings as $previousSetting) {
             switch ($previousSetting['option']) {

@@ -41,7 +41,8 @@ class Packeteryclass
      * @param string $version
      * @return string
      */
-    public static function getAppIdentity($version) {
+    public static function getAppIdentity($version)
+    {
         return sprintf('prestashop-%s-packeta-%s', _PS_VERSION_, $version);
     }
 
@@ -67,25 +68,18 @@ class Packeteryclass
                         AND c.iso_code="' . pSQL($branch_currency_iso) . '";';
         $conversion_rate_branch = Db::getInstance()->getValue($sql);
 
-        if ($conversion_rate_branch)
-        {
+        if ($conversion_rate_branch) {
             $conversion_rate = $conversion_rate_branch / $conversion_rate_order;
             $total = round($conversion_rate * $total, 2);
-        }
-        else
-        {
-            if (!$cnb_rates)
-            {
+        } else {
+            if (!$cnb_rates) {
                 if ($data = @Tools::file_get_contents(
                     'http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt'
-                ))
-                {
+                )) {
                     $cnb_rates = array();
-                    foreach (array_slice(explode("\n", $data), 2) as $rate)
-                    {
+                    foreach (array_slice(explode("\n", $data), 2) as $rate) {
                         $rate = explode('|', $rate);
-                        if (!empty($rate[3]))
-                        {
+                        if (!empty($rate[3])) {
                             $cnb_rates[$rate[3]] = (float)preg_replace(
                                 '/[^0-9.]*/',
                                 '',
@@ -96,12 +90,9 @@ class Packeteryclass
                     $cnb_rates['CZK'] = 1;
                 }
             }
-            if (isset($cnb_rates[$order_currency_iso]) && ($cnb_rates))
-            {
+            if (isset($cnb_rates[$order_currency_iso]) && ($cnb_rates)) {
                 $total = round($total * $cnb_rates[$order_currency_iso] / $cnb_rates[$branch_currency_iso], 2);
-            }
-            else
-            {
+            } else {
                 return 0;
             }
         }
@@ -124,11 +115,12 @@ class Packeteryclass
      */
     public static function actionCarrierUpdate($params)
     {
-        if ($params['id_carrier'] != $params['carrier']->id)
-        {
-            Db::getInstance()->update('packetery_address_delivery',
+        if ($params['id_carrier'] != $params['carrier']->id) {
+            Db::getInstance()->update(
+                'packetery_address_delivery',
                 ['id_carrier' => ((int)$params['carrier']->id)],
-                '`id_carrier` = ' . ((int)$params['id_carrier']));
+                '`id_carrier` = ' . ((int)$params['id_carrier'])
+            );
         }
     }
 
@@ -141,9 +133,17 @@ class Packeteryclass
      */
     public static function getPacketeryOrderRow($id_order)
     {
-        $sql = 'SELECT `id_branch`, `id_carrier`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point` 
-                    FROM `' . _DB_PREFIX_ . 'packetery_order` 
-                    WHERE id_order = ' . (int)$id_order;
+        $sql = '
+            SELECT 
+                   `id_branch`, 
+                   `id_carrier`, 
+                   `is_cod`, 
+                   `is_ad`, 
+                   `currency_branch`, 
+                   `is_carrier`, 
+                   `carrier_pickup_point` 
+            FROM `' . _DB_PREFIX_ . 'packetery_order` 
+            WHERE id_order = ' . (int)$id_order;
 
         return Db::getInstance()->getRow($sql);
     }
@@ -209,27 +209,28 @@ class Packeteryclass
     public static function collectOrdersDataForCsvExport($order_ids)
     {
         $data = [];
-        foreach ($order_ids as $order_id)
-        {
+        foreach ($order_ids as $order_id) {
             $order = new Order($order_id);
             $customer = $order->getCustomer();
 
             /* Tried to use customer address before, but it's broken if the customer ever changes it */
             $address = (array)new Address($order->id_address_delivery);
 
-            if (empty($address))
-            {
+            if (empty($address)) {
                 continue;
             }
 
             $packeteryOrder = self::getPacketeryOrderRow($order_id);
 
-            if (empty($packeteryOrder) || !isset($packeteryOrder['id_branch']) || empty($packeteryOrder['id_branch']))
-            {
+            if (empty($packeteryOrder) || !isset($packeteryOrder['id_branch']) || empty($packeteryOrder['id_branch'])) {
                 continue;
             }
 
-            $total = $order->getTotalProductsWithTaxes() + $order->total_shipping_tax_incl + $order->total_wrapping_tax_incl - $order->total_discounts_tax_incl;
+            $total =
+                $order->getTotalProductsWithTaxes() +
+                $order->total_shipping_tax_incl +
+                $order->total_wrapping_tax_incl -
+                $order->total_discounts_tax_incl;
             $cod = $packeteryOrder['is_cod'] == 1 ? $total : 0;
 
             $senderLabel = Configuration::get('PACKETERY_ESHOP_ID');
@@ -268,7 +269,7 @@ class Packeteryclass
                 'Note' => "",
             ];
 
-            self::setPacketeryExport($order_id, TRUE);
+            self::setPacketeryExport($order_id, true);
         }
 
         return $data;
@@ -304,8 +305,7 @@ class Packeteryclass
                     AND tracking_number!=\'\';';
         $result = Db::getInstance()->executeS($sql);
         $tracking = array();
-        foreach ($result as $tn)
-        {
+        foreach ($result as $tn) {
             $tracking[] = "{$tn['tracking_number']}";
         }
         return $tracking;
@@ -319,27 +319,22 @@ class Packeteryclass
      */
     public static function updateOrderTrackingNumber($id_order, $tracking_number)
     {
-        if (!isset($id_order) || !isset($tracking_number))
-        {
+        if (!isset($id_order) || !isset($tracking_number)) {
             return false;
         }
         $db = Db::getInstance();
         $sql_is_set_order = 'SELECT 1 
                                 FROM `' . _DB_PREFIX_ . 'packetery_order` 
                                 WHERE id_order=' . (int)$id_order . ';';
-        if ($db->getValue($sql_is_set_order) == 1)
-        {
+        if ($db->getValue($sql_is_set_order) == 1) {
             $sql_update_order_tn = 'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
                                         SET tracking_number="' . pSQL($tracking_number) . '"
                                         WHERE id_order=' . (int)$id_order . ';';
-            if ($result = $db->execute($sql_update_order_tn))
-            {
+            if ($result = $db->execute($sql_update_order_tn)) {
                 self::updateOrderCarrierTracking($id_order, 'Z' . $tracking_number);
             }
             return $result;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -365,12 +360,9 @@ class Packeteryclass
     public static function changeOrderCodAjax()
     {
         $result = self::changeOrderCod();
-        if ($result)
-        {
+        if ($result) {
             echo 'ok';
-        }
-        else
-        {
+        } else {
             $module = new Packetery();
             echo $module->l('Error while trying to save the settings.', 'packetery.class');
         }
@@ -384,8 +376,7 @@ class Packeteryclass
     {
         $id_order = Tools::getValue('id_order');
         $value = Tools::getValue('value');
-        if (!isset($id_order) || (!isset($value)))
-        {
+        if (!isset($id_order) || (!isset($value))) {
             return false;
         }
         $db = Db::getInstance();
@@ -393,15 +384,12 @@ class Packeteryclass
                             FROM `' . _DB_PREFIX_ . 'packetery_order` 
                             WHERE id_order=' . (int)$id_order . ';';
 
-        if ($db->getValue($sql_is_set_cod) == 1)
-        {
+        if ($db->getValue($sql_is_set_cod) == 1) {
             $sql_update_payment_cod = 'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
                                         SET is_cod=' . ((int)$value) . ' 
                                         WHERE id_order=' . (int)$id_order . ';';
             $result = $db->execute($sql_update_payment_cod);
-        }
-        else
-        {
+        } else {
             return false;
         }
         return $result;
@@ -444,12 +432,9 @@ class Packeteryclass
     {
         $module = new Packetery;
         $result = self::changeAdCarrierCod();
-        if ($result)
-        {
+        if ($result) {
             echo 'ok';
-        }
-        else
-        {
+        } else {
             echo $module->l('Please set carrier association first.', 'packetery.class');
         }
     }
@@ -462,23 +447,19 @@ class Packeteryclass
     {
         $id_carrier = Tools::getValue('id_carrier');
         $is_cod = Tools::getValue('value');
-        if (!isset($id_carrier) || (!isset($is_cod)))
-        {
+        if (!isset($id_carrier) || (!isset($is_cod))) {
             return;
         }
         $db = Db::getInstance();
         $sql_is_set_carrier = 'SELECT 1 
                             FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` 
                             WHERE id_carrier=' . (int)$id_carrier . '';
-        if ($db->getValue($sql_is_set_carrier) == 1)
-        {
+        if ($db->getValue($sql_is_set_carrier) == 1) {
             $sql_update_payment_cod = 'UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery` 
                                         SET is_cod=' . (int)$is_cod . ' 
                                         WHERE id_carrier=' . (int)$id_carrier . '';
             $result = $db->execute($sql_update_payment_cod);
-        }
-        else
-        {
+        } else {
             $result = false;
         }
         return $result;
@@ -490,12 +471,9 @@ class Packeteryclass
     public static function setPacketeryCarrierAjax()
     {
         $result = self::setPacketeryCarrier();
-        if ($result)
-        {
+        if ($result) {
             echo 'ok';
-        }
-        else
-        {
+        } else {
             echo '';
         }
     }
@@ -542,7 +520,13 @@ class Packeteryclass
                 $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
             }
             if ($isPacketeryCarrier) {
-                $result = $db->update('packetery_address_delivery', $fieldsToSet, '`id_carrier` = ' . ((int)$carrierId), 0, true);
+                $result = $db->update(
+                    'packetery_address_delivery',
+                    $fieldsToSet,
+                    '`id_carrier` = ' . ((int)$carrierId),
+                    0,
+                    true
+                );
             } else {
                 $fieldsToSet['is_cod'] = 0;
                 $fieldsToSet['id_carrier'] = (int)$carrierId;
@@ -561,20 +545,28 @@ class Packeteryclass
      */
     public static function getListPayments()
     {
-    	$installedPaymentModules = PaymentModule::getInstalledPaymentModules();
-		$sql = 'SELECT DISTINCT `module_name`, `is_cod`
+        $installedPaymentModules = PaymentModule::getInstalledPaymentModules();
+        $sql = 'SELECT DISTINCT `module_name`, `is_cod`
             FROM `' . _DB_PREFIX_ . 'packetery_payment`';
 
-		$results = Db::getInstance()->executeS($sql);
-		$paymentModules = array_column($results, 'is_cod', 'module_name');
+        $results = Db::getInstance()->executeS($sql);
+        $paymentModules = array_column($results, 'is_cod', 'module_name');
 
-		$payments = [];
-		foreach ($installedPaymentModules as $installedPaymentModule) {
-			$instance = Module::getInstanceByName($installedPaymentModule['name']);
-			$is_cod = (array_key_exists($installedPaymentModule['name'], $paymentModules) ? (int)$paymentModules[$installedPaymentModule['name']] : 0);
-			$payments[] = ['name' => $instance->displayName , 'is_cod' => $is_cod, 'module_name' => $installedPaymentModule['name']];
-		}
-		return $payments;
+        $payments = [];
+        foreach ($installedPaymentModules as $installedPaymentModule) {
+            $instance = Module::getInstanceByName($installedPaymentModule['name']);
+            $is_cod = (array_key_exists(
+                $installedPaymentModule['name'],
+                $paymentModules
+            ) ? (int)$paymentModules[$installedPaymentModule['name']] : 0
+            );
+            $payments[] = [
+                'name' => $instance->displayName,
+                'is_cod' => $is_cod,
+                'module_name' => $installedPaymentModule['name']
+            ];
+        }
+        return $payments;
     }
 
     /**
@@ -583,12 +575,9 @@ class Packeteryclass
     public static function changePaymentCodAjax()
     {
         $result = self::changePaymentCod();
-        if ($result)
-        {
+        if ($result) {
             echo 'ok';
-        }
-        else
-        {
+        } else {
             echo '';
         }
     }
@@ -601,8 +590,7 @@ class Packeteryclass
     {
         $module_name = Tools::getValue('module_name');
         $value = Tools::getValue('value');
-        if (!isset($module_name) || (!isset($value)))
-        {
+        if (!isset($module_name) || (!isset($value))) {
             return false;
         }
         $db = Db::getInstance();
@@ -610,15 +598,12 @@ class Packeteryclass
                             FROM `' . _DB_PREFIX_ . 'packetery_payment` 
                             WHERE module_name="' . pSQL($module_name) . '"';
 
-        if ($db->getValue($sql_is_set_cod) == 1)
-        {
+        if ($db->getValue($sql_is_set_cod) == 1) {
             $sql_update_payment_cod = 'UPDATE `' . _DB_PREFIX_ . 'packetery_payment` 
                                         SET is_cod=' . ((int)$value) . ' 
                                         WHERE module_name="' . pSQL($module_name) . '"';
             $result = $db->execute($sql_update_payment_cod);
-        }
-        else
-        {
+        } else {
             $sql_insert_payment_cod = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_payment` 
                                         SET is_cod=' . ((int)$value) . ', 
                                             module_name="' . pSQL($module_name) . '"';
@@ -635,20 +620,14 @@ class Packeteryclass
         $id = Tools::getValue('id');
         $value = Tools::getValue('value');
         $validation = self::validateOptions($id, $value);
-        if (!$validation)
-        {
+        if (!$validation) {
             $result = Configuration::updateValue($id, $value);
-            if ($result)
-            {
+            if ($result) {
                 echo 'true';
-            }
-            else
-            {
+            } else {
                 echo json_encode(array(9, $module->l('Can\'t update setting', 'packetery.class')));
             }
-        }
-        else
-        {
+        } else {
             $message = $validation;
             $error = array($id, $message);
             echo json_encode($error);
@@ -663,22 +642,18 @@ class Packeteryclass
     public static function validateOptions($id, $value)
     {
         $packetery = new Packetery();
-        switch ($id)
-        {
+        switch ($id) {
             case 'PACKETERY_APIPASS':
-                if (Validate::isString($value))
-                {
-                    if (Tools::strlen($value) !== 32)
-                    {
-                        return $packetery->l('Api password is wrong. Pickup points will not be updated.', 'packetery.class');
-                    }
-                    else
-                    {
+                if (Validate::isString($value)) {
+                    if (Tools::strlen($value) !== 32) {
+                        return $packetery->l(
+                            'Api password is wrong. Pickup points will not be updated.',
+                            'packetery.class'
+                        );
+                    } else {
                         return false;
                     }
-                }
-                else
-                {
+                } else {
                     return $packetery->l('Api password must be string', 'packetery.class');
                 }
                 break;
@@ -690,7 +665,11 @@ class Packeteryclass
                     if ($e->senderNotExists === true) {
                         return $packetery->l('Provided sender indication does not exist.', 'packetery.class');
                     }
-                    return sprintf('%s: %s', $packetery->l('Sender indication validation failed', 'packetery.class'), $e->getMessage());
+                    return sprintf(
+                        '%s: %s',
+                        $packetery->l('Sender indication validation failed', 'packetery.class'),
+                        $e->getMessage()
+                    );
                 }
                 break;
             default:
@@ -698,5 +677,4 @@ class Packeteryclass
         }
     }
     /*END COMMON FUNCTIONS*/
-
 }

@@ -37,12 +37,9 @@ class PacketeryApi
     public static function downloadPdfAjax()
     {
         $result = self::downloadPdf();
-        if ($result)
-        {
+        if ($result) {
             echo $result;
-        }
-        else
-        {
+        } else {
             echo ' ';
         }
     }
@@ -50,8 +47,7 @@ class PacketeryApi
     public static function downloadPdf()
     {
         $id_orders = Tools::getValue('orders_id');
-        if ($id_orders == '')
-        {
+        if ($id_orders == '') {
             $module = new Packetery;
             echo $module->l('Please choose orders first.', 'packetery.api');
             return false;
@@ -67,25 +63,18 @@ class PacketeryApi
         $client = new SoapClient("https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl");
         $format = Configuration::get('PACKETERY_LABEL_FORMAT');
         $offset = 0;
-        try
-        {
+        try {
             $pdf = $client->packetsLabelsPdf($apiPassword, $packets, $format, $offset);
-            if ($pdf)
-            {
+            if ($pdf) {
                 $file_name = 'zasilkovna_' . date("Y-m-d") . '-' . rand(1000, 9999) . '.pdf';
                 file_put_contents(_PS_MODULE_DIR_ . 'packetery/labels/' . $file_name, $pdf);
                 return $file_name;
-            }
-            else
-            {
+            } else {
                 echo "\n error \n";
                 exit;
             }
-        }
-        catch (SoapFault $e)
-        {
-            if (isset($e->faultstring))
-            {
+        } catch (SoapFault $e) {
+            if (isset($e->faultstring)) {
                 $error_msg = $e->faultstring;
                 echo "\n$error_msg\n";
             }
@@ -106,20 +95,15 @@ class PacketeryApi
     {
         $err = array();
         $id_orders = explode(',', $orders_id);
-        foreach ($id_orders as $id_order)
-        {
+        foreach ($id_orders as $id_order) {
             $packetery_order = Packeteryclass::getPacketeryOrderRow($id_order);
-            if ($packetery_order['id_branch'] == 0)
-            {
+            if ($packetery_order['id_branch'] == 0) {
                 $err[] = $id_order;
             }
         }
-        if (count($err) > 0)
-        {
+        if (count($err) > 0) {
             return implode(',', $err);
-        }
-        else
-        {
+        } else {
             return 'ok';
         }
     }
@@ -127,12 +111,9 @@ class PacketeryApi
     public static function ordersExportAjax()
     {
         $packets = self::ordersExport();
-        if (is_array($packets) && !empty($packets))
-        {
+        if (is_array($packets) && !empty($packets)) {
             echo json_encode($packets);
-        }
-        else
-        {
+        } else {
             echo ' ';
         }
     }
@@ -141,8 +122,7 @@ class PacketeryApi
     {
         $apiPassword = self::getApiPass();
         $id_orders = Tools::getValue('orders_id');
-        if ($id_orders == '')
-        {
+        if ($id_orders == '') {
             $module = new Packetery;
             echo $module->l('Please choose orders first.', 'packetery.api');
             return false;
@@ -151,37 +131,28 @@ class PacketeryApi
         $packets_row = array();
         $packets = array();
         /*CREATE PACKET*/
-        foreach ($id_orders as $id_order)
-        {
+        foreach ($id_orders as $id_order) {
             Packeteryclass::setPacketeryExport($id_order, 0);
             $order = new Order($id_order);
             $packet_response = PacketeryApi::createPacket($order);
-            if ($packet_response[0] == 1)
-            {
+            if ($packet_response[0] == 1) {
                 $tracking_number = $packet_response[1];
                 $tracking_update = Packeteryclass::updateOrderTrackingNumber($id_order, $tracking_number);
-                if ($tracking_update)
-                {
+                if ($tracking_update) {
                     $packets_row[] = array($id_order, 1, $tracking_number);
                     $packets[] = $tracking_number;
                 }
-            }
-            else
-            {
+            } else {
                 $packets_row[] = array($id_order, 0, $packet_response[1]);
             }
         }
         /*CREATE SHIPMENT*/
         $shipment = self::createShipmentSoap($packets, $apiPassword);
-        if ($shipment[0])
-        {
-            foreach ($id_orders as $id_order)
-            {
+        if ($shipment[0]) {
+            foreach ($id_orders as $id_order) {
                 Packeteryclass::setPacketeryExport($id_order, 1);
             }
-        }
-        else
-        {
+        } else {
             $packets_row[] = array($id_order, 0, $shipment[1]);
         }
         return $packets_row;
@@ -190,22 +161,15 @@ class PacketeryApi
     public static function createShipmentSoap($packets, $apiPassword)
     {
         $client = new SoapClient(self::API_WSDL_URL);
-        try
-        {
+        try {
             $shipment = $client->createShipment($apiPassword, $packets);
-            if ($shipment)
-            {
+            if ($shipment) {
                 return array(1);
-            }
-            else
-            {
+            } else {
                 return array(0, "\n error creating Shipment \n");
             }
-        }
-        catch (SoapFault $e)
-        {
-            if (isset($e->faultstring))
-            {
+        } catch (SoapFault $e) {
+            if (isset($e->faultstring)) {
                 $error_msg = $e->faultstring;
                 return array(0, "\n$error_msg\n");
             }
@@ -228,14 +192,15 @@ class PacketeryApi
         $currency = new Currency($order->id_currency);
         $branch_currency_iso = $packetery_order['currency_branch'];
         $order_currency_iso = $currency->iso_code;
-        if ($order_currency_iso != $branch_currency_iso)
-        {
+        if ($order_currency_iso != $branch_currency_iso) {
             $total = Packeteryclass::getRateTotal($order_currency_iso, $branch_currency_iso, $total);
-            if (!$total)
-            {
+            if (!$total) {
                 return array(
                     0,
-                    $module->l('Can\'t find order currency rate between order and pickup point, order', 'packetery.api') . ' - ' . $id_order,
+                    $module->l(
+                        'Can\'t find order currency rate between order and pickup point, order',
+                        'packetery.api'
+                    ) . ' - ' . $id_order,
                 );
             }
         }
@@ -244,36 +209,26 @@ class PacketeryApi
         /*PHONE*/
         $customer_phone = '';
         $is_phone = Tools::strlen($address_delivery->phone);
-        if ($is_phone)
-        {
+        if ($is_phone) {
             $customer_phone = trim($address_delivery->phone);
         }
 
         $is_phone_mobile = Tools::strlen($address_delivery->phone_mobile);
-        if ($is_phone_mobile)
-        {
+        if ($is_phone_mobile) {
             $customer_phone = trim($address_delivery->phone_mobile);
         }
         /*END PHONE*/
 
         $is_cod = $packetery_order['is_cod'];
-        if ($is_cod)
-        {
-            if ($branch_currency_iso == 'CZK')
-            {
+        if ($is_cod) {
+            if ($branch_currency_iso == 'CZK') {
                 $cod = ceil($total);
-            }
-            elseif ($branch_currency_iso == 'HUF')
-            {
+            } elseif ($branch_currency_iso == 'HUF') {
                 $cod = Packeteryclass::roundUpMultiples($total);
-            }
-            else
-            {
+            } else {
                 $cod = round($total, 2);
             }
-        }
-        else
-        {
+        } else {
             $cod = 0;
         }
 
@@ -306,35 +261,26 @@ class PacketeryApi
             $packet_attributes['carrierPickupPoint'] = $packetery_order['carrier_pickup_point'];
         }
 
-        if (!(Tools::strlen($customer_email) > 1))
-        {
+        if (!(Tools::strlen($customer_email) > 1)) {
             return array(0, $module->l('No email assigned to customer.', 'packetery.api'));
         }
 
-        if ($is_packetery_ad)
-        {
+        if ($is_packetery_ad) {
             $packet_attributes['city'] = $address_delivery->city;
             $packet_attributes['zip'] = str_replace(' ', '', $address_delivery->postcode);
             $packet_attributes['street'] = $address_delivery->address1;
         }
         $customer_company ? $packet_attributes['company'] = "$customer_company" : false;
         $apiPassword = self::getApiPass();
-        if ($validate = self::validatePacketSoap($packet_attributes, $apiPassword))
-        {
-            if ($validate[0])
-            {
+        if ($validate = self::validatePacketSoap($packet_attributes, $apiPassword)) {
+            if ($validate[0]) {
                 $tracking_number = self::createPacketSoap($packet_attributes, $apiPassword);
-                if (($tracking_number[0]) && (Tools::strlen($tracking_number[1]) > 0))
-                {
+                if (($tracking_number[0]) && (Tools::strlen($tracking_number[1]) > 0)) {
                     return array(1, $tracking_number[1]);
-                }
-                else
-                {
+                } else {
                     return array(0, $tracking_number[1]);
                 }
-            }
-            else
-            {
+            } else {
                 return array(0, $validate[1]);
             }
         }
@@ -344,36 +290,25 @@ class PacketeryApi
     {
         $client = new SoapClient(self::API_WSDL_URL);
 
-        try
-        {
+        try {
             $validate = $client->packetAttributesValid($apiPassword, $packet_attributes);
-            if (!$validate)
-            {
+            if (!$validate) {
                 return array(1);
-            }
-            else
-            {
+            } else {
                 return array(0, "error validate");
             }
-        }
-        catch (SoapFault $e)
-        {
+        } catch (SoapFault $e) {
             $error_msg = '';
-            if (isset($e->faultstring))
-            {
+            if (isset($e->faultstring)) {
                 $error_msg = $e->faultstring;
             }
-            if (isset($e->detail->PacketAttributesFault->attributes->fault))
-            {
-                if (is_array($e->detail->PacketAttributesFault->attributes->fault) && count($e->detail->PacketAttributesFault->attributes->fault) > 1)
-                {
-                    foreach ($e->detail->PacketAttributesFault->attributes->fault as $fault)
-                    {
+            if (isset($e->detail->PacketAttributesFault->attributes->fault)) {
+                if (is_array($e->detail->PacketAttributesFault->attributes->fault) &&
+                    count($e->detail->PacketAttributesFault->attributes->fault) > 1) {
+                    foreach ($e->detail->PacketAttributesFault->attributes->fault as $fault) {
                         $error_msg = $error_msg . "\n" . $fault->name . ': ' . $fault->fault;
                     }
-                }
-                else
-                {
+                } else {
                     $fault = $e->detail->PacketAttributesFault->attributes->fault;
                     $error_msg = $error_msg . "\n" . $fault->name . ': ' . $fault->fault;
                 }
@@ -385,36 +320,24 @@ class PacketeryApi
     public static function createPacketSoap($packet_attributes, $apiPassword)
     {
         $client = new SoapClient(self::API_WSDL_URL);
-        try
-        {
+        try {
             $tracking_number = $client->createPacket($apiPassword, $packet_attributes);
-            if ($tracking_number->id)
-            {
+            if ($tracking_number->id) {
                 return array(1, $tracking_number->id);
-            }
-            else
-            {
+            } else {
                 return array(0, "\nError create packet \n");
             }
-        }
-        catch (SoapFault $e)
-        {
+        } catch (SoapFault $e) {
             $error_msg = '';
-            if (isset($e->faultstring))
-            {
+            if (isset($e->faultstring)) {
                 $error_msg = $e->faultstring;
             }
-            if (isset($e->detail->PacketAttributesFault->attributes->fault))
-            {
-                if (count($e->detail->PacketAttributesFault->attributes->fault) > 1)
-                {
-                    foreach ($e->detail->PacketAttributesFault->attributes->fault as $fault)
-                    {
+            if (isset($e->detail->PacketAttributesFault->attributes->fault)) {
+                if (count($e->detail->PacketAttributesFault->attributes->fault) > 1) {
+                    foreach ($e->detail->PacketAttributesFault->attributes->fault as $fault) {
                         $error_msg = $error_msg . "\n" . $fault->name . ': ' . $fault->fault;
                     }
-                }
-                else
-                {
+                } else {
                     $fault = $e->detail->PacketAttributesFault->attributes->fault;
                     $error_msg = $error_msg . "\n" . $fault->name . ': ' . $fault->fault;
                 }
@@ -442,8 +365,7 @@ class PacketeryApi
 
     public static function getApiKey($apiKey = false)
     {
-        if (!$apiKey)
-        {
+        if (!$apiKey) {
             $apiKey = Configuration::get('PACKETERY_APIPASS');
         }
 
@@ -452,8 +374,7 @@ class PacketeryApi
 
     public static function getApiPass($apiPassword = false)
     {
-        if (!$apiPassword)
-        {
+        if (!$apiPassword) {
             $apiPassword = Configuration::get('PACKETERY_APIPASS');
         }
         return $apiPassword;
@@ -462,12 +383,9 @@ class PacketeryApi
     public static function updateBranchListAjax()
     {
         $result = self::updateBranchList();
-        if ($result === FALSE)
-        {
+        if ($result === false) {
             echo 'true';
-        }
-        else
-        {
+        } else {
             echo json_encode([2, $result]);
         }
     }
@@ -478,13 +396,10 @@ class PacketeryApi
 
         $branch_new_url = 'https://www.zasilkovna.cz/api/v4/' . $api_key . '/branch.xml';
         $branches = self::parseBranches($branch_new_url);
-        if (($countBranches = self::countBranches()) && (!$branches))
-        {
+        if (($countBranches = self::countBranches()) && (!$branches)) {
             Configuration::updateValue('PACKETERY_LAST_BRANCHES_UPDATE', time());
             return false;
-        }
-        else
-        {
+        } else {
             return ($branches ? $branches : '') . ($countBranches ? $countBranches : '');
         }
     }
@@ -494,38 +409,35 @@ class PacketeryApi
         ignore_user_abort(true);
         $module = new Packetery();
 
-		// changed timeout from default 5 to 30 secs, and try fopen fallback if cUrl fails
-		try {
-			$response = Tools::file_get_contents($branch_url, false, NULL, 30, true);
-		}
-		catch (\Exception $e) {
-		    // TODO: log using PrestaShopLogger
-			return $e->getMessage();
-		}
+        // changed timeout from default 5 to 30 secs, and try fopen fallback if cUrl fails
+        try {
+            $response = Tools::file_get_contents($branch_url, false, null, 30, true);
+        } catch (\Exception $e) {
+            // TODO: log using PrestaShopLogger
+            return $e->getMessage();
+        }
 
         if (! $response) {
-			return $module->l('Can\'t download list of pickup points. Network error.', 'packetery.api');
-		}
+            return $module->l('Can\'t download list of pickup points. Network error.', 'packetery.api');
+        }
 
-		if (Tools::strpos($response, 'invalid API key') !== false) {
-			return $module->l('Invalid API key', 'packetery.api');
-		}
+        if (Tools::strpos($response, 'invalid API key') !== false) {
+            return $module->l('Invalid API key', 'packetery.api');
+        }
 
-		self::dropBranchList();
-		$xml = simplexml_load_string($response);
-		$i = 0;
-		foreach ($xml->branches->branch as $branch)
-		{
-			self::addBranch($branch);
-			$i++;
-		}
-		foreach ($xml->carriers->carrier as $carrier)
-		{
-			self::addCarrier($carrier);
-			$i++;
-		}
+        self::dropBranchList();
+        $xml = simplexml_load_string($response);
+        $i = 0;
+        foreach ($xml->branches->branch as $branch) {
+            self::addBranch($branch);
+            $i++;
+        }
+        foreach ($xml->carriers->carrier as $carrier) {
+            self::addCarrier($carrier);
+            $i++;
+        }
 
-		return false;
+        return false;
     }
 
     public static function countBranchesAjax()
@@ -533,19 +445,15 @@ class PacketeryApi
         $cnt = self::countBranches();
         $lastBranchesUpdate = '';
         $lastUpdateUnix = Configuration::get('PACKETERY_LAST_BRANCHES_UPDATE');
-        if ($lastUpdateUnix != '')
-        {
+        if ($lastUpdateUnix != '') {
             $date = new DateTime();
             $date->setTimestamp($lastUpdateUnix);
             $lastBranchesUpdate = $date->format('d.m.Y H:i:s');
         }
 
-        if ($cnt)
-        {
+        if ($cnt) {
             echo json_encode(array($cnt, $lastBranchesUpdate));
-        }
-        else
-        {
+        } else {
             echo json_encode(array(0, $lastBranchesUpdate));
         }
     }
@@ -554,12 +462,9 @@ class PacketeryApi
     {
         $sql = 'SELECT COUNT(*) FROM ' . _DB_PREFIX_ . 'packetery_branch';
         $result = Db::getInstance()->getValue($sql);
-        if ($result > 0)
-        {
+        if ($result > 0) {
             return $result;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -574,36 +479,24 @@ class PacketeryApi
     public static function addBranch($branch)
     {
         $opening_hours_xml = $branch->openingHours;
-        if (isset($opening_hours_xml->compactShort))
-        {
+        if (isset($opening_hours_xml->compactShort)) {
             $opening_hours_compact_short = (string)$opening_hours_xml->compactShort->asXML();
-        }
-        else
-        {
+        } else {
             $opening_hours_compact_short = '';
         }
-        if (isset($opening_hours_xml->compactLong))
-        {
+        if (isset($opening_hours_xml->compactLong)) {
             $opening_hours_compact_long = (string)$opening_hours_xml->compactLong->asXML();
-        }
-        else
-        {
+        } else {
             $opening_hours_compact_long = '';
         }
-        if (isset($opening_hours_xml->tableLong))
-        {
+        if (isset($opening_hours_xml->tableLong)) {
             $opening_hours_table_long = (string)$opening_hours_xml->tableLong->asXML();
-        }
-        else
-        {
+        } else {
             $opening_hours_table_long = '';
         }
-        if (isset($opening_hours_xml->regular))
-        {
+        if (isset($opening_hours_xml->regular)) {
             $opening_hours_regular = (string)$opening_hours_xml->regular->asXML();
-        }
-        else
-        {
+        } else {
             $opening_hours_regular = '';
         }
 
@@ -686,8 +579,7 @@ class PacketeryApi
                 ORDER BY `country`, `name`';
         $result = Db::getInstance()->executeS($sql);
         $branches = array();
-        foreach ($result as $branch)
-        {
+        foreach ($result as $branch) {
             $branches[] = array(
                 'id_branch' => $branch['id_branch'],
                 'name' => $branch['name'] . ', ' . Tools::strtoupper($branch['country']),
@@ -717,7 +609,9 @@ class PacketeryApi
         $prestashopCarrierId = Tools::getValue('prestashop_carrier_id');
         $pickupPointType = (Tools::getIsset('pickup_point_type') ? Tools::getValue('pickup_point_type') : 'internal');
         $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
-        $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
+        $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue(
+            'carrier_pickup_point_id'
+        ) : null);
 
         $packetery_carrier_row = Packeteryclass::getPacketeryCarrierById((int)$prestashopCarrierId);
         $is_cod = $packetery_carrier_row['is_cod'];
@@ -762,7 +656,8 @@ class PacketeryApi
      * @return string
      * @throws \SmartyException
      */
-    public static function packeteryCreateExtraContent() {
+    public static function packeteryCreateExtraContent()
+    {
         $carrierId = Tools::getValue('prestashop_carrier_id');
 
         $packetery = new Packetery();

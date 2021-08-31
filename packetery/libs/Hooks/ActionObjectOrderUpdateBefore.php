@@ -31,7 +31,6 @@ class ActionObjectOrderUpdateBefore
     public function execute($params)
     {
         if (!isset($params['object'], $params['object']->id, $params['object']->id_carrier)) {
-
             return;
         }
         $orderId = (int)$params['object']->id;
@@ -61,14 +60,12 @@ class ActionObjectOrderUpdateBefore
         $addressId = (int)$params['object']->id_address_delivery;
         $oldAddressId = (int)$orderOldVersion->id_address_delivery;
         if ($oldAddressId === $addressId) {
-
             return;
         }
 
         $address = new Address($addressId);
         $oldAddress = new Address($oldAddressId);
         if ($oldAddress->id_country === $address->id_country) {
-
             return;
         }
 

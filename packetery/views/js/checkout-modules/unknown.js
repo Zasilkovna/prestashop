@@ -4,7 +4,7 @@
 // this unknown module support already existed in front.js
 var PacketeryCheckoutModuleUnknown = {
 
-    isActive: function() {
+    isActive: function () {
         return this.findDeliveryOptions().length > 0;
     },
 
