@@ -92,7 +92,7 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
   (since version 2.1.9).
 
 ### OPC support
-- One Page Supercheckout from [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout)
+- One Page Supercheckout from [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout) (since version 6.0.9)
 
 In case you are using another third-party cart module, please write to [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
 Packeta module may not work with another OPC module.
@@ -194,7 +194,7 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - V seznamu objednávek Zásilkovny je nyní možné upravit hmotnost zásilky, před odesláním do Zásilkovny (od verze 2.1.9).
 
 ### Podpora pro OPC
-- One Page Supercheckout od [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout)
+- One Page Supercheckout od [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout) (od verze 6.0.9)
 
 Pokud používáte nějaký jiný modul košíku třetí strany, napište nám [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
 Modul Zásilkovny nemusí být s jiným OPC modulem funkční.
