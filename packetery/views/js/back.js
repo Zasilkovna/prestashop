@@ -765,7 +765,9 @@ $(document).ready(function(){
 	binds.order_export_csv();
 	binds.tab_branch_list();
 	binds.setWeights();
+});
 
+$(document).ready(function () {
 	var $widgetButton = $('.open-packeta-widget');
 	if ($widgetButton.length === 1) {
 		$.getScript("https://widget.packeta.com/v6/www/js/library.js")
