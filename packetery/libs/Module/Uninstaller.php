@@ -55,9 +55,7 @@ class Uninstaller
 
                 return false;
             }
-            $tab->active = false;
-
-            return $tab->update();
+            return $tab->delete();
         }
 
         return true;
