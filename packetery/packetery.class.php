@@ -254,7 +254,7 @@ class Packeteryclass
             $currency = new Currency($order->id_currency);
 
             $weight = '';
-            if (Configuration::get('PS_WEIGHT_UNIT') === PacketeryApi::PACKET_WEIGHT_UNIT) {
+            if (strtolower(Configuration::get('PS_WEIGHT_UNIT')) === PacketeryApi::PACKET_WEIGHT_UNIT) {
                 if ($packeteryOrder['weight'] !== null) {
                     // used saved if set
                     $weight = $packeteryOrder['weight'];

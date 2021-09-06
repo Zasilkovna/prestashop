@@ -298,7 +298,7 @@ class PacketeryApi
             'eshop' => $shop_name,
         );
 
-        if (Configuration::get('PS_WEIGHT_UNIT') === self::PACKET_WEIGHT_UNIT) {
+        if (strtolower(Configuration::get('PS_WEIGHT_UNIT')) === self::PACKET_WEIGHT_UNIT) {
             if ($packetery_order['weight'] !== null) {
                 // used saved if set
                 $packet_attributes['weight'] = $packetery_order['weight'];
