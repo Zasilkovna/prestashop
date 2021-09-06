@@ -402,7 +402,7 @@ class Packetery extends CarrierModule
         $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
         $this->context->smarty->assign('baseuri', $base_uri);
 
-        $usedWeightUnit = Configuration::get('PS_WEIGHT_UNIT');
+        $usedWeightUnit = strtolower(Configuration::get('PS_WEIGHT_UNIT'));
         if ($usedWeightUnit !== PacketeryApi::PACKET_WEIGHT_UNIT) {
             $messages = [
                 [
