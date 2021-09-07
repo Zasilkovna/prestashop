@@ -91,7 +91,13 @@ window.initializePacketaWidget = function ()
     }
 
     var module = packeteryModulesManager.detectModule();
-    var $widgetParent = packeteryModulesManager.getWidgetParent(module.getSelectedInput());
+    var $selectedInput = module.getSelectedInput();
+    if ($selectedInput.length === 0) {
+        $('#packetery-widget').hide();
+        return;
+    }
+
+    var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
     widgetCarriers = $widgetParent.find('#widget_carriers').val();
 
     $('.open-packeta-widget').click(function (e) {
@@ -191,6 +197,10 @@ tools = {
         var $deliveryInputs = module.findDeliveryOptions();
         $deliveryInputs.change(function ()
         {
+            if (typeof module.showWidget !== 'undefined') {
+                module.showWidget();
+            }
+
             var
                 $this = $(this),
                 prestashop_carrier_id = packeteryModulesManager.getCarrierId($this),

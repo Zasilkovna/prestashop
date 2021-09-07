@@ -16,6 +16,10 @@ var PacketeryCheckoutModuleSupercheckout = {
 
     hideValidationErrors: function () {
         hideGeneralError();
+    },
+
+    showWidget: function() {
+        $('#packetery-widget').show();
     }
 };
 
