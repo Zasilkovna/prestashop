@@ -68,4 +68,5 @@
 2.1.9 - Added: possibility to edit order weight in Packeta order administration
 2.1.10 	- Fixed: widget opening in order administration
 	- Fixed: Fix: weight units - accepting capital letters	
-2.1.11 - Updated: wider support for modified checkout templates (selector to hide widget button update)
+2.1.11 - Updated: wider support for modified checkout templates (selector to hide widget button update),
+         .carrier-extra-content now does not have to have display 'block' and is checked if is visible
