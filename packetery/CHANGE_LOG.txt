@@ -67,4 +67,5 @@
         in the administration, especially in the case of Z-BOXes (getting JSON correctly)
 2.1.9 - Added: possibility to edit order weight in Packeta order administration
 2.1.10 	- Fixed: widget opening in order administration
-	- Fixed: Fix: weight units - accepting capital letters	
+	- Fixed: Fix: weight units - accepting capital letters
+2.1.11 - Fixed: type error raised with some database drivers (Packeta orders list)

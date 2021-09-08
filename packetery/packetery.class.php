@@ -199,12 +199,12 @@ class Packeteryclass
     /**
      * Add computed weight to orders without saved weight
      *
-     * @param array $orders
+     * @param mixed $orders
      * @return array
      */
-    public static function loadWeightToOrders(array $orders)
+    public static function loadWeightToOrders($orders)
     {
-        if ($orders) {
+        if ($orders && (is_array($orders) || $orders instanceof Traversable)) {
             foreach ($orders as $index => $order) {
                 if ($order['weight'] === null) {
                     $orderInstance = new \Order($order['id_order']);
@@ -212,8 +212,10 @@ class Packeteryclass
                     $orders[$index] = $order;
                 }
             }
+            return $orders;
         }
-        return $orders;
+
+        return [];
     }
 
     /**
