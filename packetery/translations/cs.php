@@ -54,6 +54,8 @@ $_MODULE['<{packetery}prestashop>packetery_ee90bdb5836984e4bb59875948544ad1'] = 
 $_MODULE['<{packetery}prestashop>packetery_04973e4f636a6a6403c889bdf7e8dd86'] = 'Vyberte prosím cílové výdejní místo jednotlivých objednávek';
 $_MODULE['<{packetery}prestashop>packetery_ade0fd28ba0f51f9d8ac0c0803b020d0'] = 'Nastala chyba při pokusu o aktualizaci výdejních míst, zkontrolujte, zda máte správně zadané heslo API a zkuste spustit aktualizaci znovu.';
 $_MODULE['<{packetery}prestashop>packetery_43e4c4c34b72c8ee0421d21983d8d8a7'] = 'Nevyexportováno! Chyba:';
+$_MODULE['<{packetery}prestashop>packetery_584ad3e893aa1c232f67116fc2686325'] = 'Počet nastavených hmotností';
+$_MODULE['<{packetery}prestashop>packetery_047c5943be09f5e6a0711ff242153735'] = 'Počet chyb během nastavování hmotností';
 $_MODULE['<{packetery}prestashop>packetery_88a4478629eacd06dbbe1a47306a39b9'] = 'Výchozí jednotka hmotnosti pro Váš obchod je: %s. Při exportu zásilek modul nebude u zásilky uvádět její hmotnost. Pokud chcete exportovat hmotnost zásilky je potřeba nastavit výchozí jednotku na kg.';
 $_MODULE['<{packetery}prestashop>packetery_b18ce70ed15a7a117141d6ee14f9138c'] = 'Výdejní místo bylo úspěšně změněno.';
 $_MODULE['<{packetery}prestashop>packetery_f1111e5bc2fc07a2985e5273341fbd7b'] = 'Výdejní místo se nepodařilo změnit.';
@@ -106,7 +108,7 @@ $_MODULE['<{packetery}prestashop>tab_settings_4be6bfa1b6a3582a32fcd1653dc24067']
 $_MODULE['<{packetery}prestashop>widget_422f03dbebc5e4e66d1d5b7e4564c355'] = 'Vybrat místo vyzvednutí:';
 $_MODULE['<{packetery}prestashop>widget_81bd9c17af94c31967cdb6870f154d83'] = 'Vybrané místo vyzvednutí:';
 $_MODULE['<{packetery}prestashop>widget_397164405b87202533b09fd47a137141'] = 'Vyberte prosím před potvrzením objednávky výdejní místo';
-$_MODULE['<{packetery}prestashop>ajax_486483a4548325db96ad59730d8cf7d7'] = 'Nejsou zadány žádné hmotnosti k uložení.';
+$_MODULE['<{packetery}prestashop>ajax_bcebbe7faeccbb54f9bec8024fe4c0e5'] = 'Nebyly provedeny žádné změny hmotností.';
 $_MODULE['<{packetery}prestashop>ajax_c2cb004cf813bc9db8135221db27e9f7'] = 'Zadejte prosím číslo.';
 $_MODULE['<{packetery}prestashop>uninstall_e21a827831f90240feccbb1f8fd8c7e3'] = 'Při odinstalování modulu Zásilkovny nastala výjimka:';
 $_MODULE['<{packetery}prestashop>adminpacketerycontroller_4a93d9164aad959a6abc2de389170ac9'] = 'Zásilkovna';
