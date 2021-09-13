@@ -348,7 +348,6 @@ $(document).ready(function(){
 									$orderTr.find('.notifyAnchor').notify(result[orderId].error, "error");
 									errorCount++;
 								}
-								console.log(result[orderId]);
 							}
 						}
 						if (errorCount !== 0 || successCount !== 0) {
