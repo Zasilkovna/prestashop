@@ -30,6 +30,8 @@ include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
 require_once __DIR__ . '/autoload.php';
 
+defined('PACKETERY_PLUGIN_DIR') || define('PACKETERY_PLUGIN_DIR', dirname(__FILE__));
+
 /*
  * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
  */
