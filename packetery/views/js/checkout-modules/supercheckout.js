@@ -18,8 +18,8 @@ var PacketeryCheckoutModuleSupercheckout = {
         hideGeneralError();
     },
 
-    showWidget: function() {
-        $('#packetery-widget').show();
+    getExtraContentSelector: function () {
+        return '.kbshippingparceloption';
     }
 };
 

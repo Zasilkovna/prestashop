@@ -93,7 +93,7 @@ window.initializePacketaWidget = function ()
     var module = packeteryModulesManager.detectModule();
     var $selectedInput = module.getSelectedInput();
     if ($selectedInput.length === 0) {
-        $('#packetery-widget').hide();
+        $(module.getExtraContentSelector()).hide();
         return;
     }
 
@@ -167,7 +167,7 @@ tools = {
             return;
         }
 
-        $('.carrier-extra-content').each(function ()
+        $(module.getExtraContentSelector()).each(function ()
         {
             var $extra = $(this);
             if (! $extra.find('#packetery-widget').length) {
@@ -197,14 +197,12 @@ tools = {
         var $deliveryInputs = module.findDeliveryOptions();
         $deliveryInputs.change(function ()
         {
-            if (typeof module.showWidget !== 'undefined') {
-                module.showWidget();
-            }
-
             var
                 $this = $(this),
                 prestashop_carrier_id = packeteryModulesManager.getCarrierId($this),
                 $extra = packeteryModulesManager.getWidgetParent($this);
+
+            $extra.closest(module.getExtraContentSelector()).show();
 
             // if selected carrier is not Packetery then enable Continue button and we're done here
             if (! $extra.find('#packetery-widget').length) {
@@ -213,7 +211,7 @@ tools = {
             }
 
             if ($this.is(':checked')) {
-                var $wrapper = $extra.closest('.carrier-extra-content');
+                var $wrapper = $extra.closest(module.getExtraContentSelector());
                 setTimeout(function () {
                     if ($wrapper.is(':hidden')) {
                         $wrapper.show();
