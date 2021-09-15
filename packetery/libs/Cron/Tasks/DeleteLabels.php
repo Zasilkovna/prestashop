@@ -11,22 +11,17 @@ class DeleteLabels extends Base
     public $module;
 
     /** @var callback */
-    private $onRenderMessage;
-
-    /** @var callback */
     private $onRenderErrorMessage;
 
     /**
      * DeleteLabels constructor.
      *
      * @param \Module $module
-     * @param callable $onRenderMessage
      * @param callable $onRenderErrorMessage
      */
-    public function __construct(\Module $module, $onRenderMessage, $onRenderErrorMessage)
+    public function __construct(\Module $module, $onRenderErrorMessage)
     {
         $this->module = $module;
-        $this->onRenderMessage = $onRenderMessage;
         $this->onRenderErrorMessage = $onRenderErrorMessage;
     }
 
@@ -40,7 +35,7 @@ class DeleteLabels extends Base
         if ($shiftDays === false) {
             call_user_func(
                 $this->onRenderErrorMessage,
-                $this->module->l('Configuration can not be loaded.', 'cron.DeleteLabels')
+                $this->module->l('Configuration can not be loaded.', 'DeleteLabels')
             );
             return;
         }
@@ -48,33 +43,39 @@ class DeleteLabels extends Base
         $shift = 60 * 60 * 24 * $shiftDays;
         $limit = time() - $shift;
 
+        $errorAggregator = [
+            'filemtime' => false,
+            'unlink' => false,
+        ];
+
         foreach ($files as $label) {
-            $labelName = basename($label);
             $fileTime = filemtime($label);
             if ($fileTime === false) {
-                call_user_func(
-                    $this->onRenderErrorMessage,
-                    sprintf(
-                        $this->module->l('Failed to retrieve file time for label "%s". Check file permissions.', 'cron.DeleteLabels'),
-                        $labelName
-                    )
-                );
+                $errorAggregator['filemtime'] = true;
                 continue;
             }
 
             if ($fileTime < $limit) {
                 $result = unlink($label);
                 if ($result === false) {
-                    call_user_func(
-                        $this->onRenderMessage,
-                        sprintf(
-                            $this->module->l('Failed to remove label "%s". Check file permissions.', 'cron.DeleteLabels'),
-                            $labelName
-                        )
-                    );
+                    $errorAggregator['unlink'] = true;
                     continue;
                 }
             }
+        }
+
+        if ($errorAggregator['filemtime']) {
+            call_user_func(
+                $this->onRenderErrorMessage,
+                $this->module->l('Failed to retrieve file time for some labels. Check file permissions.', 'DeleteLabels')
+            );
+        }
+
+        if ($errorAggregator['unlink']) {
+            call_user_func(
+                $this->onRenderErrorMessage,
+                $this->module->l('Failed to remove some labels. Check file permissions.', 'DeleteLabels')
+            );
         }
     }
 }

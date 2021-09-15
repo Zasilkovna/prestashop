@@ -10,6 +10,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     /** @var bool */
     public $ajax = true;
 
+    /** @var bool */
     private $hasError = false;
 
     /**
@@ -17,8 +18,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
      */
     public function display()
     {
-        // Ignore connection-closing by the client/user
-        ignore_user_abort(true);
+        ignore_user_abort(true); // Ignore connection-closing by the client/user
         @ob_end_clean();
 
         $this->renderMessage($this->module->l('Cron started.', 'cron'));
@@ -43,7 +43,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
         switch ($task) {
             case DeleteLabels::getTaskName():
-                (new DeleteLabels($this->module, [$this, 'renderMessage'], [$this, 'renderErrorMessage']))->execute();
+                (new DeleteLabels($this->module, [$this, 'renderErrorMessage']))->execute();
                 break;
             default:
                 $this->renderErrorMessage($this->module->l('Task was not found.', 'cron'));
@@ -59,6 +59,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /**
      * @param string $message
+     * @return void
      */
     public function renderMessage($message)
     {
@@ -74,6 +75,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /**
      * @param string $message
+     * @return void
      */
     public function renderErrorMessage($message)
     {
