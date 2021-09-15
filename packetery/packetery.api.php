@@ -25,13 +25,13 @@
 
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Order\OrderRepository;
+use Packetery\Weight\Converter;
 
 include_once(dirname(__file__) . '/packetery.class.php');
 
 class PacketeryApi
 {
     const API_WSDL_URL = 'https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl';
-    const PACKET_WEIGHT_UNIT = 'kg';
 
     /*LABELS*/
     public static function downloadPdfAjax()
@@ -298,12 +298,12 @@ class PacketeryApi
             'eshop' => $shop_name,
         );
 
-        if (strtolower(Configuration::get('PS_WEIGHT_UNIT')) === self::PACKET_WEIGHT_UNIT) {
+        if (Converter::isKgConvertionSupported()) {
             if ($packetery_order['weight'] !== null) {
                 // used saved if set
                 $packet_attributes['weight'] = $packetery_order['weight'];
             } else {
-                $packet_attributes['weight'] = $order->getTotalWeight();
+                $packet_attributes['weight'] = Converter::getKilos($order->getTotalWeight());
             }
         }
 
