@@ -59,7 +59,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.10';
+		$this->version = '2.1.11';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -393,6 +393,8 @@ class Packetery extends CarrierModule
             'err_no_branch' => $this->l('Please select destination pickup point for order(s)'),
             'error_export_unknown' => $this->l('There was an error trying to update list of pickup points, check if your API password is correct and try again.'),
             'error_export' => $this->l('not exported. Error:'),
+            'weights_ok' => $this->l('Count of weights set'),
+            'weights_error' => $this->l('Count of errors during setting weights'),
         );
         $ajaxfields_json = json_encode($ajaxfields);
         $ajaxfields_json = rawurlencode($ajaxfields_json);

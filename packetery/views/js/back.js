@@ -305,14 +305,23 @@ $(document).ready(function(){
 			});
 		},
 
+		watchWeights: function () {
+			$('#tab-orders').on('change', 'input.weight', function () {
+				$(this).data('changed', 'true');
+			});
+		},
+
 		setWeights: function () {
 			$('#tab-orders').on('click', 'input[name="set_weights"]', function () {
 				var tableSelector = '#packetery-orders-table';
 				var orderWeights = {};
 				$(tableSelector).find('table tbody tr').each(function () {
-					var orderId = $(this).data('id-order');
-					var weight = $(this).find('td:eq(' + (orderColumnWeight + 1) + ') input').val();
-					orderWeights[orderId] = weight;
+					var $input = $(this).find('td:eq(' + (orderColumnWeight + 1) + ') input');
+					if ($input.data('changed') === 'true') {
+						var orderId = $(this).data('id-order');
+						var weight = $input.val();
+						orderWeights[orderId] = weight;
+					}
 				});
 				$.ajax({
 					type: 'POST',
@@ -323,20 +332,30 @@ $(document).ready(function(){
 						$('body').toggleClass('wait');
 					},
 					success: function (result) {
-						if (result.error) {
-							$(tableSelector + ' .panel').notify(result.error, "error");
-							return;
+						if (result.info) {
+							$(tableSelector + ' .panel').notify(result.info, 'info');
 						}
+						var successCount = 0;
+						var errorCount = 0;
 						for (var orderId in result) {
 							if (result.hasOwnProperty(orderId)) {
 								var $orderTr = $('tr[data-id-order="' + orderId + '"]');
 								if (result[orderId].value) {
 									$orderTr.find('td:eq(' + (orderColumnWeight + 1) + ') input').val(result[orderId].value);
 									$orderTr.find('.notifyAnchor').notify(lang_pac.success, "success");
+									successCount++;
 								} else if (result[orderId].error) {
 									$orderTr.find('.notifyAnchor').notify(result[orderId].error, "error");
+									errorCount++;
 								}
 							}
+						}
+						if (errorCount !== 0 || successCount !== 0) {
+							$(tableSelector + ' .panel').notify(
+								(errorCount !== 0 ? lang_pac.weights_error + ': ' + errorCount + ' ' : '') +
+								(successCount !== 0 ? lang_pac.weights_ok + ': ' + successCount : ''),
+								(errorCount !== 0 ? 'error' : 'success')
+							);
 						}
 					},
 					error: function() {
@@ -764,6 +783,7 @@ $(document).ready(function(){
 	binds.order_export();
 	binds.order_export_csv();
 	binds.tab_branch_list();
+	binds.watchWeights();
 	binds.setWeights();
 });
 
