@@ -209,7 +209,7 @@ class Packeteryclass
             foreach ($orders as $index => $order) {
                 if ($order['weight'] === null) {
                     $orderInstance = new \Order($order['id_order']);
-                    $order['weight'] = Converter::getKilos($orderInstance->getTotalWeight());
+                    $order['weight'] = Converter::getKilograms($orderInstance->getTotalWeight());
                     $orders[$index] = $order;
                 }
             }
@@ -260,7 +260,7 @@ class Packeteryclass
                     // used saved if set
                     $weight = $packeteryOrder['weight'];
                 } else {
-                    $weight = Converter::getKilos($order->getTotalWeight());
+                    $weight = Converter::getKilograms($order->getTotalWeight());
                 }
             }
 

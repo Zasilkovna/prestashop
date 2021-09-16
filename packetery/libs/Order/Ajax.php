@@ -54,7 +54,7 @@ class Ajax
             if ($weight === null || is_numeric($weight)) {
                 if ($weight === null) {
                     $order = new \Order($orderId);
-                    $result[$orderId]['value'] = Converter::getKilos($order->getTotalWeight());
+                    $result[$orderId]['value'] = Converter::getKilograms($order->getTotalWeight());
                 }
                 if ($weight != $storedWeightsAssoc[$orderId]) {
                     $this->orderRepository->updateWeight($orderId, $weight);

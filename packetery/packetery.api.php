@@ -303,7 +303,7 @@ class PacketeryApi
                 // used saved if set
                 $packet_attributes['weight'] = $packetery_order['weight'];
             } else {
-                $packet_attributes['weight'] = Converter::getKilos($order->getTotalWeight());
+                $packet_attributes['weight'] = Converter::getKilograms($order->getTotalWeight());
             }
         }
 

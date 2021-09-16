@@ -22,7 +22,7 @@ class Converter
      * @param mixed $value
      * @return float|null
      */
-    public static function getKilos($value)
+    public static function getKilograms($value)
     {
         return self::convert($value, \Configuration::get('PS_WEIGHT_UNIT'), self::UNIT_KILOGRAMS);
     }
@@ -50,7 +50,7 @@ class Converter
      */
     public static function isKgConvertionSupported()
     {
-        $value = self::getKilos(1.0);
+        $value = self::getKilograms(1.0);
         return $value !== null;
     }
 }
