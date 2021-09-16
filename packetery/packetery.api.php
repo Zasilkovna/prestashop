@@ -518,16 +518,10 @@ class PacketeryApi
 
 		self::dropBranchList();
 		$xml = simplexml_load_string($response);
-		$i = 0;
-		foreach ($xml->branches->branch as $branch)
-		{
-			self::addBranch($branch);
-			$i++;
-		}
+
 		foreach ($xml->carriers->carrier as $carrier)
 		{
 			self::addCarrier($carrier);
-			$i++;
 		}
 
 		return false;
@@ -572,76 +566,6 @@ class PacketeryApi
     public static function dropBranchList()
     {
         $sql = 'DELETE FROM ' . _DB_PREFIX_ . 'packetery_branch';
-        $result = Db::getInstance()->execute($sql);
-        return $result;
-    }
-
-    public static function addBranch($branch)
-    {
-        $opening_hours_xml = $branch->openingHours;
-        if (isset($opening_hours_xml->compactShort))
-        {
-            $opening_hours_compact_short = (string)$opening_hours_xml->compactShort->asXML();
-        }
-        else
-        {
-            $opening_hours_compact_short = '';
-        }
-        if (isset($opening_hours_xml->compactLong))
-        {
-            $opening_hours_compact_long = (string)$opening_hours_xml->compactLong->asXML();
-        }
-        else
-        {
-            $opening_hours_compact_long = '';
-        }
-        if (isset($opening_hours_xml->tableLong))
-        {
-            $opening_hours_table_long = (string)$opening_hours_xml->tableLong->asXML();
-        }
-        else
-        {
-            $opening_hours_table_long = '';
-        }
-        if (isset($opening_hours_xml->regular))
-        {
-            $opening_hours_regular = (string)$opening_hours_xml->regular->asXML();
-        }
-        else
-        {
-            $opening_hours_regular = '';
-        }
-
-        $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'packetery_branch VALUES(
-                    ' . (int)$branch->id . ',
-                    \'' . (string)addslashes($branch->name) . '\',
-                    \'' . (string)addslashes($branch->nameStreet) . '\',
-                    \'' . (string)addslashes($branch->place) . '\',
-                    \'' . (string)addslashes($branch->street) . '\',
-                    \'' . (string)addslashes($branch->city) . '\',
-                    \'' . (string)addslashes($branch->zip) . '\',
-                    \'' . (string)addslashes($branch->country) . '\',
-                    \'' . (string)addslashes($branch->currency) . '\',
-                    \'' . (string)addslashes($branch->wheelchairAccessible) . '\',
-                    \'' . (string)addslashes($branch->latitude) . '\',
-                    \'' . (string)addslashes($branch->longitude) . '\',
-                    \'' . (string)addslashes($branch->url) . '\',
-                    ' . (int)$branch->dressingRoom . ',
-                    ' . (int)$branch->claimAssistant . ',
-                    ' . (int)$branch->packetConsignment . ',
-                    ' . (int)$branch->maxWeight . ',
-                    \'' . pSQL((string)addslashes($branch->region)) . '\',
-                    \'' . pSQL((string)addslashes($branch->district)) . '\',
-                    \'' . pSQL((string)addslashes($branch->labelRouting)) . '\',
-                    \'' . pSQL((string)addslashes($branch->labelName)) . '\',
-                    \'' . pSQL((string)addslashes($opening_hours_table_long)) . '\',
-                    \'' . pSQL((string)addslashes($branch->photos->photo->normal)) . '\',
-                    \'' . pSQL((string)addslashes($opening_hours_compact_short)) . '\',
-                    \'' . pSQL((string)addslashes($opening_hours_compact_long)) . '\',
-                    \'' . pSQL((string)addslashes($opening_hours_regular)) . '\',
-                    0,
-                    0
-                    );';
         $result = Db::getInstance()->execute($sql);
         return $result;
     }
