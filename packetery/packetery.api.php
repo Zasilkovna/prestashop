@@ -481,7 +481,7 @@ class PacketeryApi
     {
         $api_key = self::getApiPass($apiPassword);
 
-        $branch_new_url = 'https://www.zasilkovna.cz/api/v4/' . $api_key . '/branch.xml';
+        $branch_new_url = 'https://www.zasilkovna.cz/api/v4/' . $api_key . '/branch.xml?address-delivery';
         $branches = self::parseBranches($branch_new_url);
         if (($countBranches = self::countBranches()) && (!$branches))
         {
