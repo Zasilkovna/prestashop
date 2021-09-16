@@ -509,7 +509,7 @@ class PacketeryApi
 		}
 
         if (! $response) {
-			return $module->l('Can\'t download list of pickup points. Network error.', 'packetery.api');
+			return $module->l('Can\'t download list of carriers. Network error.', 'packetery.api');
 		}
 
 		if (Tools::strpos($response, 'invalid API key') !== false) {
