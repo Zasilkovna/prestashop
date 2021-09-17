@@ -69,3 +69,4 @@
 2.1.10 	- Fixed: widget opening in order administration
 	- Fixed: Fix: weight units - accepting capital letters	
 2.1.11 - Updated: order weight editing in Packeta order administration: saving only changed values, better display of results
+       - Updated: branch updater downloads carriers only
