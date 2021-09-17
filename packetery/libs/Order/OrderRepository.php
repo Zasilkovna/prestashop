@@ -54,6 +54,14 @@ class OrderRepository
     }
 
     /**
+     * @param int $cartId
+     */
+    public function deleteByCartId($cartId)
+    {
+        $this->db->delete('packetery_order', '`id_cart` = ' . (int)$cartId);
+    }
+
+    /**
      * @param int $orderId
      * @param int $carrierId
      * @return bool
