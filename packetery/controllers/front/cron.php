@@ -19,18 +19,17 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     public function display()
     {
         ignore_user_abort(true); // Ignore connection-closing by the client/user
-        @ob_end_clean();
 
         $this->renderMessage($this->module->l('Cron started.', 'cron'));
 
         if ($this->validateToken() === false) {
-            $this->renderErrorMessage($this->module->l('Invalid packetery cron token.', 'cron'));
+            $this->renderError($this->module->l('Invalid packetery cron token.', 'cron'));
             return;
         }
 
         $task = Tools::getValue('task', null);
         if (!$task) {
-            $this->renderErrorMessage($this->module->l('Cron task to run was not specified.', 'cron'));
+            $this->renderError($this->module->l('Cron task to run was not specified.', 'cron'));
             return;
         }
 
@@ -43,10 +42,11 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
         switch ($task) {
             case DeleteLabels::getTaskName():
-                (new DeleteLabels($this->module, [$this, 'renderErrorMessage']))->execute();
+                $errors = (new DeleteLabels($this->module))->execute();
+                $this->renderErrors($errors);
                 break;
             default:
-                $this->renderErrorMessage($this->module->l('Task was not found.', 'cron'));
+                $this->renderError($this->module->l('Task was not found.', 'cron'));
         }
 
         if ($this->hasError) {
@@ -54,7 +54,17 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
         }
 
         $this->renderMessage($this->module->l('Cron finished.', 'cron'));
-        exit; // to avoid Prestashop calling ob_end_flush()
+    }
+
+    /**
+     * @param array $errors
+     * @return void
+     */
+    public function renderErrors(array $errors)
+    {
+        foreach ($errors as $error) {
+            $this->renderError($error);
+        }
     }
 
     /**
@@ -68,16 +78,15 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
             'message' => $message
         ]);
 
-        ob_start();
+        // gzip compression forces browser to wait for all messages, no point in calling flush()
         echo $template->fetch();
-        ob_end_flush();
     }
 
     /**
      * @param string $message
      * @return void
      */
-    public function renderErrorMessage($message)
+    public function renderError($message)
     {
         $this->hasError = true;
         $this->renderMessage($message);

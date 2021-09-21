@@ -10,72 +10,52 @@ class DeleteLabels extends Base
     /** @var \Module */
     public $module;
 
-    /** @var callback */
-    private $onRenderErrorMessage;
-
     /**
      * DeleteLabels constructor.
      *
      * @param \Module $module
-     * @param callable $onRenderErrorMessage
      */
-    public function __construct(\Module $module, $onRenderErrorMessage)
+    public function __construct(\Module $module)
     {
         $this->module = $module;
-        $this->onRenderErrorMessage = $onRenderErrorMessage;
     }
 
     /**
-     * @return void
+     * @return string[]
      */
     public function execute()
     {
+        $errors = [];
         $files = glob(PACKETERY_PLUGIN_DIR . '/labels/*.pdf', GLOB_NOSORT);
         $shiftDays = \Configuration::get('PACKETERY_LABEL_MAX_AGE_DAYS');
         if ($shiftDays === false) {
-            call_user_func(
-                $this->onRenderErrorMessage,
-                $this->module->l('Configuration can not be loaded.', 'DeleteLabels')
-            );
-            return;
+            $errors[] = $this->module->l('Configuration can not be loaded.', 'DeleteLabels');
+            return $errors;
         }
 
         $shift = 60 * 60 * 24 * $shiftDays;
         $limit = time() - $shift;
 
-        $errorAggregator = [
-            'filemtime' => false,
-            'unlink' => false,
-        ];
-
         foreach ($files as $label) {
             $fileTime = filemtime($label);
             if ($fileTime === false) {
-                $errorAggregator['filemtime'] = true;
+                $errors['filemtime'] = $this->module->l(
+                    'Failed to retrieve file time for some labels. Check file permissions.', 'DeleteLabels'
+                );
                 continue;
             }
 
             if ($fileTime < $limit) {
                 $result = unlink($label);
                 if ($result === false) {
-                    $errorAggregator['unlink'] = true;
+                    $errors['unlink'] = $this->module->l(
+                        'Failed to remove some labels. Check file permissions.', 'DeleteLabels'
+                    );
                     continue;
                 }
             }
         }
 
-        if ($errorAggregator['filemtime']) {
-            call_user_func(
-                $this->onRenderErrorMessage,
-                $this->module->l('Failed to retrieve file time for some labels. Check file permissions.', 'DeleteLabels')
-            );
-        }
-
-        if ($errorAggregator['unlink']) {
-            call_user_func(
-                $this->onRenderErrorMessage,
-                $this->module->l('Failed to remove some labels. Check file permissions.', 'DeleteLabels')
-            );
-        }
+        return $errors;
     }
 }

@@ -113,5 +113,5 @@ $_MODULE['<{packetery}prestashop>cron_aee4c3ffdf25619455f67b0ca1d1e946'] = 'Nesp
 $_MODULE['<{packetery}prestashop>cron_36114979c9d11968c61fc8c8cf447349'] = 'Úloha nebyla specifikována.';
 $_MODULE['<{packetery}prestashop>cron_a5e0021bf76278d7abffb156003aa46d'] = 'Úloha \"%s\" se začíná zpracovávat.';
 $_MODULE['<{packetery}prestashop>cron_f7aa8bd8b7067c9f4eaea7193a1f394b'] = 'Úloha nenalezena.';
-$_MODULE['<{packetery}prestashop>cron_5b0b85cec0101e5ddabfdb0c5531af80'] = 'Všechny vykreslené chyby jsou uložené v datázi Prestashopu.';
+$_MODULE['<{packetery}prestashop>cron_5b0b85cec0101e5ddabfdb0c5531af80'] = 'Všechny vykreslené chyby jsou uložené v databázi Prestashopu.';
 $_MODULE['<{packetery}prestashop>cron_d037eff66e9db3deaeb73e4d44939ff8'] = 'Zpracování úloh dokončeno.';
