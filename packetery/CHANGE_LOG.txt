@@ -70,3 +70,4 @@
 	- Fixed: Fix: weight units - accepting capital letters	
 2.1.11 - Updated: order weight editing in Packeta order administration: saving only changed values, better display of results
        - Updated: pickup point update changed to carrier update, improving speed and reliability
+       - Fixed: no more displaying of selected pickup point on confirmation page if the order is not a pickup point order
