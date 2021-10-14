@@ -386,13 +386,15 @@ class Packetery extends CarrierModule
             'error' => $this->l('Error'),
             'success' => $this->l('Success'),
             'success_export' => $this->l('Successfully exported'),
-            'success_download_branches' => $this->l('Pickup points successfully updated.'),
+            'success_download_branches' => $this->l('Carriers successfully updated.'),
             'reload5sec' => $this->l('Page will be reloaded in 5 seconds...'),
-            'try_download_branches' => $this->l('Trying to download pickup points. Please wait for download process end...'),
+            'try_download_branches' => $this->l('Trying to download carriers. Please wait for download process end...'),
             'confirm_tracking_exists' => $this->l('Tracking numbers of some selected orders already exist and will be rewritten by new ones. Do you want to continue?'),
             'err_no_branch' => $this->l('Please select destination pickup point for order(s)'),
-            'error_export_unknown' => $this->l('There was an error trying to update list of pickup points, check if your API password is correct and try again.'),
+            'error_export_unknown' => $this->l('There was an error trying to update list of carriers, check if your API password is correct and try again.'),
             'error_export' => $this->l('not exported. Error:'),
+            'weights_ok' => $this->l('Count of weights set'),
+            'weights_error' => $this->l('Count of errors during setting weights'),
         );
         $ajaxfields_json = json_encode($ajaxfields);
         $ajaxfields_json = rawurlencode($ajaxfields_json);
@@ -762,9 +764,19 @@ class Packetery extends CarrierModule
         if (!isset($params['order'])) {
             return;
         }
+
         $orderData = Db::getInstance()->getRow(
-            sprintf('SELECT `name_branch` FROM `%spacketery_order` WHERE `id_cart` = %d AND `is_ad` = 0', _DB_PREFIX_, (int)$params['order']->id_cart)
+            sprintf(
+                'SELECT po.`name_branch` 
+                FROM `%spacketery_order` po
+                JOIN `%spacketery_address_delivery` pad ON po.`id_carrier` = pad.`id_carrier`
+                WHERE pad.`pickup_point_type` IS NOT NULL AND po.`id_cart` = %d AND po.`is_ad` = 0',
+                _DB_PREFIX_,
+                _DB_PREFIX_,
+                (int)$params['order']->id_cart
+            )
         );
+
         if (!$orderData) {
             return;
         }
