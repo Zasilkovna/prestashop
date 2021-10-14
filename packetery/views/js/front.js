@@ -183,7 +183,7 @@ tools = {
             }
 
             /* Only displayed extra content */
-            if ($extra.css('display') === 'block') {
+            if ($extra.is(':visible')) {
                 /* And branch is not set, disable */
                 var id_branch = $extra.find(".packeta-branch-id").val();
                 if (id_branch <= 0) {

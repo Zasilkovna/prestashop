@@ -28,7 +28,7 @@ class Ajax
         $result = [];
         $orderWeights = (\Tools::getIsset('orderWeights') ? \Tools::getValue('orderWeights') : null);
         if (empty($orderWeights)) {
-            $result['error'] = $this->module->l('No order weights to set provided.', 'ajax');
+            $result['info'] = $this->module->l('No changes to weights.', 'ajax');
             return json_encode($result);
         }
 
@@ -42,6 +42,7 @@ class Ajax
             $storedWeightsAssoc = [];
         }
 
+        $changeCounter = 0;
         foreach ($orderWeights as $orderId => $weight) {
             if ($weight === '') {
                 $weight = null;
@@ -55,6 +56,7 @@ class Ajax
                 }
                 if ($weight != $storedWeightsAssoc[$orderId]) {
                     $this->orderRepository->updateWeight($orderId, $weight);
+                    $changeCounter++;
                     if ($weight !== null) {
                         $result[$orderId]['value'] = $weight;
                     }
@@ -62,6 +64,9 @@ class Ajax
             } else {
                 $result[$orderId]['error'] = $this->module->l('Please enter a number.', 'ajax');
             }
+        }
+        if ($changeCounter === 0) {
+            $result['info'] = $this->module->l('No changes to weights.', 'ajax');
         }
 
         return json_encode($result);
