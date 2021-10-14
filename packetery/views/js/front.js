@@ -4,7 +4,7 @@ $.getScript("https://widget.packeta.com/v6/www/js/library.js")
         console.error('Unable to load Packeta Widget.');
     });
 
-$.getScript("https://widget.packeta.com/v6/www/js/library-hd.js").fail(function () {
+$.getScript('https://widget-hd.packeta.com/www/js/library-hd.js').fail(function () {
     console.error('Unable to load Packeta home delivery widget.');
 });
 
@@ -98,9 +98,6 @@ window.initializePacketaWidget = function ()
         return;
     }
 
-    var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
-    var widgetCarriers = $widgetParent.find('#widget_carriers').val();
-
     $('.open-packeta-widget').click(function (e) {
         e.preventDefault();
         var widgetOptions = {
@@ -108,6 +105,8 @@ window.initializePacketaWidget = function ()
             country: country,
             language: language,
         };
+        var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
+        var widgetCarriers = $widgetParent.find('#widget_carriers').val();
         if (widgetCarriers !== '') {
             widgetOptions.carriers = widgetCarriers;
         }
@@ -159,6 +158,8 @@ window.initializePacketaWidget = function ()
 
     $('.open-packeta-widget-hd').click(function (e) {
         e.preventDefault();
+        var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
+        var widgetCarriers = $widgetParent.find('#widget_carriers').val();
         var widgetOptions = {
             appIdentity: app_identity,
             layout: 'hd',

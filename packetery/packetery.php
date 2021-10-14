@@ -60,7 +60,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.11';
+		$this->version = '2.1.12';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -463,7 +463,6 @@ class Packetery extends CarrierModule
 
         $id_carrier = $params['carrier']['id'];
         $this->context->smarty->assign('carrier_id', $id_carrier);
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
 
         $this->context->smarty->assign('app_identity', Packeteryclass::APP_IDENTITY_PREFIX . $this->version);
         $this->context->smarty->assign('language', (array)$language);
@@ -482,6 +481,14 @@ class Packetery extends CarrierModule
             $customerPostcode = $address->postcode;
         }
         $this->context->smarty->assign('customerCountry', $customerCountry);
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
+        $widgetCarriers = '';
+        if (is_numeric($packeteryCarrier['id_branch'])) {
+            $widgetCarriers = $packeteryCarrier['id_branch'];
+        } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
+            $widgetCarriers = 'packeta';
+        }
+        $this->context->smarty->assign('widget_carriers', $widgetCarriers);
 
         if ($packeteryCarrier['pickup_point_type'] === null) {
             $this->context->smarty->assign('customerStreet', $customerStreet);
@@ -527,14 +534,6 @@ class Packetery extends CarrierModule
             $this->context->smarty->assign('pickup_point_type', $pickupPointType);
             $this->context->smarty->assign('packeta_carrier_id', $carrierId);
             $this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
-
-            $widgetCarriers = '';
-            if ($packeteryCarrier['pickup_point_type'] === 'external' && $packeteryCarrier['id_branch']) {
-                $widgetCarriers = $packeteryCarrier['id_branch'];
-            } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
-                $widgetCarriers = 'packeta';
-            }
-            $this->context->smarty->assign('widget_carriers', $widgetCarriers);
 
             $base_uri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
             $this->context->smarty->assign('baseuri', $base_uri);
