@@ -461,78 +461,87 @@ class Packetery extends CarrierModule
     {
         global $language;
 
-		$id_carrier = $params['carrier']['id'];
+        $id_carrier = $params['carrier']['id'];
+        $this->context->smarty->assign('carrier_id', $id_carrier);
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
 
-        $zPointCarriers = Db::getInstance()->executeS(
-            'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
-            JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`)
-            WHERE `c`.`deleted` = 0 AND `pad`.`pickup_point_type` IS NOT NULL'
-        );
-        $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
+        $this->context->smarty->assign('app_identity', Packeteryclass::APP_IDENTITY_PREFIX . $this->version);
+        $this->context->smarty->assign('language', (array)$language);
 
-		$this->context->smarty->assign('carrier_id', $id_carrier);
-
-		$name_branch = '';
-		$currency_branch = '';
-		$id_branch = '';
-        $pickupPointType = 'internal';
-        $carrierId = '';
-        $carrierPickupPointId = '';
-		if(!empty($params['cart']))
-		{
-            $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
-
-            if ($row) {
-                $name_branch = $row['name_branch'];
-                $currency_branch = $row['currency_branch'];
-                $carrierPickupPointId = $row['carrier_pickup_point'];
-
-                if ($row['is_carrier'] == 1) {
-                    // to be consistent with widget behavior
-                    $id_branch = $row['carrier_pickup_point'];
-
-                    $pickupPointType = 'external';
-                    $carrierId = $row['id_branch'];
-                } else {
-                    $id_branch = $row['id_branch'];
-                }
-            }
-        }
-
+        $cart = $params['cart'];
         $customerCountry = '';
-        if (isset($params['cart']->id_address_delivery) && !empty($params['cart']->id_address_delivery)) {
-            $address = new AddressCore($params['cart']->id_address_delivery);
+        $customerStreet = '';
+        $customerCity = '';
+        $customerPostcode = '';
+        if (isset($cart->id_address_delivery) && !empty($cart->id_address_delivery)) {
+            $address = new AddressCore($cart->id_address_delivery);
             $countryObj = new CountryCore($address->id_country);
             $customerCountry = strtolower($countryObj->iso_code);
+            $customerStreet = $address->address1 . ($address->address2 ? ' ' . $address->address2 : '');
+            $customerCity = $address->city;
+            $customerPostcode = $address->postcode;
         }
-        $this->context->smarty->assign('customer_country', $customerCountry);
+        $this->context->smarty->assign('customerCountry', $customerCountry);
 
-        $widgetCarriers = '';
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
-        if ($packeteryCarrier['pickup_point_type'] === 'external' && $packeteryCarrier['id_branch']) {
-            $widgetCarriers = $packeteryCarrier['id_branch'];
-        } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
-            $widgetCarriers = 'packeta';
+        if ($packeteryCarrier['pickup_point_type'] === null) {
+            $this->context->smarty->assign('customerStreet', $customerStreet);
+            $this->context->smarty->assign('customerCity', $customerCity);
+            $this->context->smarty->assign('customerPostcode', $customerPostcode);
+            $addressInfo = $customerStreet . ', ' . $customerPostcode . ' ' . $customerCity;
+            $this->context->smarty->assign('addressInfo', $addressInfo);
+            $this->context->smarty->assign('addressValidationSetting', Configuration::get('PACKETERY_ADDRESS_VALIDATION'));
+
+            $output = $this->context->smarty->fetch($this->local_path . 'views/templates/front/widget-hd.tpl');
+        } else {
+            $zPointCarriers = Db::getInstance()->executeS(
+                'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
+                JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`)
+                WHERE `c`.`deleted` = 0 AND `pad`.`pickup_point_type` IS NOT NULL'
+            );
+            $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
+            $this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
+            $name_branch = '';
+            $currency_branch = '';
+            $id_branch = '';
+            $pickupPointType = 'internal';
+            $carrierId = '';
+            $carrierPickupPointId = '';
+            if (!empty($cart)) {
+                $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$cart->id . ' AND id_carrier = ' . (int)$id_carrier);
+                if ($row) {
+                    $name_branch = $row['name_branch'];
+                    $currency_branch = $row['currency_branch'];
+                    $carrierPickupPointId = $row['carrier_pickup_point'];
+                    if ($row['is_carrier'] == 1) {
+                        $id_branch = $row['carrier_pickup_point']; // to be consistent with widget behavior
+                        $pickupPointType = 'external';
+                        $carrierId = $row['id_branch'];
+                    } else {
+                        $id_branch = $row['id_branch'];
+                    }
+                }
+            }
+            $this->context->smarty->assign('id_branch', $id_branch);
+            $this->context->smarty->assign('name_branch', $name_branch);
+            $this->context->smarty->assign('currency_branch', $currency_branch);
+            $this->context->smarty->assign('pickup_point_type', $pickupPointType);
+            $this->context->smarty->assign('packeta_carrier_id', $carrierId);
+            $this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
+
+            $widgetCarriers = '';
+            if ($packeteryCarrier['pickup_point_type'] === 'external' && $packeteryCarrier['id_branch']) {
+                $widgetCarriers = $packeteryCarrier['id_branch'];
+            } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
+                $widgetCarriers = 'packeta';
+            }
+            $this->context->smarty->assign('widget_carriers', $widgetCarriers);
+
+            $base_uri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+            $this->context->smarty->assign('baseuri', $base_uri);
+            $this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
+            $output = $this->context->smarty->fetch($this->local_path . 'views/templates/front/widget.tpl');
         }
-
-    $this->context->smarty->assign('app_identity', Packeteryclass::APP_IDENTITY_PREFIX . $this->version);
-		$this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
-        $this->context->smarty->assign('widget_carriers', $widgetCarriers);
-		$this->context->smarty->assign('id_branch', $id_branch);
-		$this->context->smarty->assign('name_branch', $name_branch);
-		$this->context->smarty->assign('currency_branch', $currency_branch);
-		$this->context->smarty->assign('pickup_point_type', $pickupPointType);
-		$this->context->smarty->assign('packeta_carrier_id', $carrierId);
-		$this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
-
-		$base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-		$this->context->smarty->assign('baseuri', $base_uri);
-		$this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
-		$this->context->smarty->assign('language', (array)$language);
-		/*END FIELDS FOR AJAX*/
-
-		$output = $this->context->smarty->fetch($this->local_path.'views/templates/front/widget.tpl');
-		return $output;
+        return $output;
     }
 
     /**

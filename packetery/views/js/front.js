@@ -4,8 +4,12 @@ $.getScript("https://widget.packeta.com/v6/www/js/library.js")
         console.error('Unable to load Packeta Widget.');
     });
 
-var country = 'cz,sk'; /* Default countries */
+$.getScript("https://widget.packeta.com/v6/www/js/library-hd.js").fail(function () {
+    console.error('Unable to load Packeta home delivery widget.');
+});
 
+var country = 'cz,sk'; /* Default countries */
+var addressValidationSetting = $('#addressValidationSetting').val();
 
 function PacketeryCheckoutModulesManager() {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
@@ -57,7 +61,6 @@ function PacketeryCheckoutModulesManager() {
     }
 }
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
-var widgetCarriers;
 
 $(document).ready(function ()
 {
@@ -76,19 +79,17 @@ window.initializePacketaWidget = function ()
         return;
     }
 
-    // parameters
-
-    var customerCountry = $('#customer_country').val();
+    // parameters common to all carriers
+    var customerCountry = $('#customerCountry').val();
     if (customerCountry !== '') {
         country = customerCountry;
     }
-
     var language = 'en';
-
     var shopLanguage = $('#shop-language').val();
     if (shopLanguage !== '') {
         language = shopLanguage;
     }
+    var app_identity = $('#app_identity').val(); // Get module version for widgets
 
     var module = packeteryModulesManager.detectModule();
     var $selectedInput = module.getSelectedInput();
@@ -98,11 +99,10 @@ window.initializePacketaWidget = function ()
     }
 
     var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
-    widgetCarriers = $widgetParent.find('#widget_carriers').val();
+    var widgetCarriers = $widgetParent.find('#widget_carriers').val();
 
     $('.open-packeta-widget').click(function (e) {
         e.preventDefault();
-        var app_identity = $('#app_identity').val(); // Get module version for widget
         var widgetOptions = {
             appIdentity: app_identity,
             country: country,
@@ -156,6 +156,37 @@ window.initializePacketaWidget = function ()
             }
         }, widgetOptions);
     });
+
+    $('.open-packeta-widget-hd').click(function (e) {
+        e.preventDefault();
+        var widgetOptions = {
+            appIdentity: app_identity,
+            layout: 'hd',
+            language: language,
+            country: country,
+            // in this case, there will always be one carrier
+            carrierId: widgetCarriers,
+            houseNumber: '',
+            street: $('#customerStreet').val(),
+            city: $('#customerCity').val(),
+            postCode: $('#customerPostcode').val(),
+        };
+        Packeta.Widget.pick(packetaApiKey, function (address) {
+            var $selectedDeliveryOption = module.getSelectedInput();
+            $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
+
+            if (address != null) {
+                // TODO: widget-hd
+                console.log(address);
+                module.enableSubmitButton();
+            } else {
+                // TODO: widget-hd check for validated address
+                if (addressValidationSetting === 'required') {
+                    module.disableSubmitButton();
+                }
+            }
+        }, widgetOptions);
+    });
 };
 
 tools = {
@@ -170,23 +201,31 @@ tools = {
         $(module.getExtraContentSelector()).each(function ()
         {
             var $extra = $(this);
-            if (! $extra.find('#packetery-widget').length) {
+            if (!$extra.find('#open-packeta-widget').length && !$extra.find('#open-packeta-widget-hd').length) {
                 return;
             }
 
-            var carrierId = String($extra.find('#carrier_id').val());
-            var zpointCarriers = $extra.find('#zpoint_carriers').val();
-            zpointCarriers = JSON.parse(zpointCarriers);
-            if (!zpointCarriers.includes(carrierId)) {
-                $extra.find('#open-packeta-widget').hide();
-                $extra.find('#selected-branch').hide();
-            }
+            if ($extra.find('#open-packeta-widget').length) {
+                var carrierId = String($extra.find('#carrier_id').val());
+                var zpointCarriers = $extra.find('#zpoint_carriers').val();
+                zpointCarriers = JSON.parse(zpointCarriers);
+                if (!zpointCarriers.includes(carrierId)) {
+                    $extra.find('#open-packeta-widget').hide();
+                    $extra.find('#selected-branch').hide();
+                }
 
-            /* Only displayed extra content */
-            if ($extra.is(':visible')) {
-                /* And branch is not set, disable */
-                var id_branch = $extra.find(".packeta-branch-id").val();
-                if (id_branch <= 0) {
+                /* Only displayed extra content */
+                if ($extra.is(':visible')) {
+                    /* And branch is not set, disable */
+                    var id_branch = $extra.find(".packeta-branch-id").val();
+                    if (id_branch <= 0) {
+                        module.disableSubmitButton();
+                    }
+                }
+            }
+            if ($extra.find('#open-packeta-widget-hd').length) {
+                // TODO: widget-hd check for validated address
+                if (addressValidationSetting === 'required') {
                     module.disableSubmitButton();
                 }
             }
@@ -204,8 +243,8 @@ tools = {
 
             $extra.closest(module.getExtraContentSelector()).show();
 
-            // if selected carrier is not Packetery then enable Continue button and we're done here
-            if (! $extra.find('#packetery-widget').length) {
+            // if selected carrier has no Packeta widget then enable Continue button and we're done here
+            if (!$extra.find('#open-packeta-widget').length && !$extra.find('#open-packeta-widget-hd').length) {
                 module.enableSubmitButton();
                 return;
             }
@@ -219,18 +258,24 @@ tools = {
                 }, 500);
             }
 
-            widgetCarriers = $extra.find("#widget_carriers").val();
-
-            var id_branch = $extra.find(".packeta-branch-id").val();
-            if (id_branch !== '') {
-                var name_branch = $extra.find(".packeta-branch-name").val();
-                var pickup_point_type = $extra.find(".packeta-pickup-point-type").val();
-                var widget_carrier_id = $extra.find(".packeta-carrier-id").val();
-                var carrier_pickup_point_id = $extra.find(".packeta-carrier-pickup-point-id").val();
-                module.enableSubmitButton();
-                packetery.widgetSaveOrderBranch(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id);
-            } else {
-                module.disableSubmitButton();
+            if ($extra.find('#open-packeta-widget').length) {
+                var id_branch = $extra.find(".packeta-branch-id").val();
+                if (id_branch !== '') {
+                    var name_branch = $extra.find(".packeta-branch-name").val();
+                    var pickup_point_type = $extra.find(".packeta-pickup-point-type").val();
+                    var widget_carrier_id = $extra.find(".packeta-carrier-id").val();
+                    var carrier_pickup_point_id = $extra.find(".packeta-carrier-pickup-point-id").val();
+                    module.enableSubmitButton();
+                    packetery.widgetSaveOrderBranch(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id);
+                } else {
+                    module.disableSubmitButton();
+                }
+            }
+            if ($extra.find('#open-packeta-widget-hd').length) {
+                // TODO: widget-hd check for validated address
+                if (addressValidationSetting === 'required') {
+                    module.disableSubmitButton();
+                }
             }
         });
     }
