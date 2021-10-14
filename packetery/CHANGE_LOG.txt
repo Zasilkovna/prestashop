@@ -71,3 +71,5 @@
 2.1.11 - Updated: order weight editing in Packeta order administration: saving only changed values, better display of results
        - Updated: pickup point update changed to carrier update, improving speed and reliability
        - Fixed: no more displaying of selected pickup point on confirmation page if the order is not a pickup point order
+       - Updated: wider support for modified checkout templates (selector to hide widget button update),
+         .carrier-extra-content now does not have to have display 'block' and is checked if is visible
