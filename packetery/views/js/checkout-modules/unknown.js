@@ -23,5 +23,9 @@ var PacketeryCheckoutModuleUnknown = {
             .css("pointer-events", "none");
     },
 
-    hideValidationErrors: function () {}
+    hideValidationErrors: function () {},
+
+    getExtraContentSelector: function () {
+        return '.carrier-extra-content';
+    }
 };
