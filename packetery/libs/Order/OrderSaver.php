@@ -37,6 +37,8 @@ class OrderSaver
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$cart->id_carrier);
         if ($packeteryCarrier) {
             $this->save($order, $packeteryCarrier);
+        } else {
+            $this->orderRepository->deleteByCartId($cart->id);
         }
     }
 

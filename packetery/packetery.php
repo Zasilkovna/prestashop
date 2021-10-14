@@ -764,9 +764,19 @@ class Packetery extends CarrierModule
         if (!isset($params['order'])) {
             return;
         }
+
         $orderData = Db::getInstance()->getRow(
-            sprintf('SELECT `name_branch` FROM `%spacketery_order` WHERE `id_cart` = %d AND `is_ad` = 0', _DB_PREFIX_, (int)$params['order']->id_cart)
+            sprintf(
+                'SELECT po.`name_branch` 
+                FROM `%spacketery_order` po
+                JOIN `%spacketery_address_delivery` pad ON po.`id_carrier` = pad.`id_carrier`
+                WHERE pad.`pickup_point_type` IS NOT NULL AND po.`id_cart` = %d AND po.`is_ad` = 0',
+                _DB_PREFIX_,
+                _DB_PREFIX_,
+                (int)$params['order']->id_cart
+            )
         );
+
         if (!$orderData) {
             return;
         }
