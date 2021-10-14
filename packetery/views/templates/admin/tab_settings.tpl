@@ -68,6 +68,19 @@
 		</option>
 	</select>
 	<br>
+
+	<label class="control-label col-lg-3" for="address_validation">
+		{l s='Address validation in cart' mod='packetery'}
+	</label>
+	<select name="address_validation" id="address_validation" data-id="PACKETERY_ADDRESS_VALIDATION">
+		{foreach from=$addressValidationOptions key=addressValidationValue item=addressValidationOption}
+		<option value="{$addressValidationValue}"
+				{if $settings['PACKETERY_ADDRESS_VALIDATION'] eq $addressValidationValue}selected{/if}>
+		{$addressValidationOption}
+		</option>
+		{/foreach}
+	</select>
+	<br>
 </div>
 
 <!--Address Delivery Carriers List-->

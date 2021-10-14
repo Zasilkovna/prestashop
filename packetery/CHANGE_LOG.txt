@@ -77,3 +77,4 @@
        - Fixed: functionality of KnowBand SuperCheckout when no shipping method is preselected
        - Fixed: fresh checkout no longer throws error in development mode
 2.1.12 - Added: support for Packeta address validation widget in the cart
+       - Added: Address validation setting with 'none', 'optional' and 'required' options
