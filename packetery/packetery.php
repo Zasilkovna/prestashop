@@ -481,18 +481,20 @@ class Packetery extends CarrierModule
 		{
             $row = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . (int)$params['cart']->id . ' AND id_carrier = ' . (int)$id_carrier);
 
-            $name_branch = $row['name_branch'];
-            $currency_branch = $row['currency_branch'];
-            $carrierPickupPointId = $row['carrier_pickup_point'];
+            if ($row) {
+                $name_branch = $row['name_branch'];
+                $currency_branch = $row['currency_branch'];
+                $carrierPickupPointId = $row['carrier_pickup_point'];
 
-            if ($row['is_carrier'] == 1) {
-                // to be consistent with widget behavior
-                $id_branch = $row['carrier_pickup_point'];
+                if ($row['is_carrier'] == 1) {
+                    // to be consistent with widget behavior
+                    $id_branch = $row['carrier_pickup_point'];
 
-                $pickupPointType = 'external';
-                $carrierId = $row['id_branch'];
-            } else {
-                $id_branch = $row['id_branch'];
+                    $pickupPointType = 'external';
+                    $carrierId = $row['id_branch'];
+                } else {
+                    $id_branch = $row['id_branch'];
+                }
             }
         }
 
