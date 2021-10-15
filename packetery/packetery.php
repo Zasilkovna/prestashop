@@ -31,6 +31,7 @@ use Packetery\Order\OrderRepository;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Hooks\ActionObjectOrderUpdateBefore;
 use Packetery\Carrier\CarrierTools;
+use Packetery\Weight\Converter;
 
 include_once(dirname(__file__).'/packetery.class.php');
 include_once(dirname(__file__).'/packetery.api.php');
@@ -280,7 +281,7 @@ class Packetery extends CarrierModule
                     array('content' => $this->l('Address delivery'), 'key' => 'is_ad', 'bool' => true,'center' => true),
                     array('content' => $this->l('Exported'), 'key' => 'exported', 'bool' => true, 'center' => true),
                     array('content' => $this->l('Tracking number'), 'key' => 'tracking_number', 'center' => true),
-                    array('content' => $this->l('Weight'), 'key' => 'weight', 'center' => true),
+                    array('content' => $this->l('Weight (kg)'), 'key' => 'weight', 'center' => true),
                 ),
                 'rows' => $packetery_orders,
                 'url_params' => array('configure' => $this->name),
@@ -405,11 +406,11 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('baseuri', $base_uri);
 
         $usedWeightUnit = strtolower(Configuration::get('PS_WEIGHT_UNIT'));
-        if ($usedWeightUnit !== PacketeryApi::PACKET_WEIGHT_UNIT) {
+        if (Converter::isKgConvertionSupported() === false) {
             $messages = [
                 [
                     'text' => sprintf(
-                        $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to kg.'),
+                        $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to kg or g.'),
                         $usedWeightUnit
                     ),
                     'class' => 'info',
