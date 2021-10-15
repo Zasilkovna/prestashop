@@ -74,3 +74,4 @@
        - Updated: wider support for modified checkout templates (selector to hide widget button update),
          .carrier-extra-content now does not have to have display 'block' and is checked if is visible
        - Fixed: functionality of KnowBand SuperCheckout when no shipping method is preselected
+       - Fixed: fresh checkout no longer throws error in development mode
