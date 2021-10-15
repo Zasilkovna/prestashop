@@ -727,7 +727,7 @@ class Packeteryclass
                 {
                     if (Tools::strlen($value) !== 32)
                     {
-                        return $packetery->l('Api password is wrong. Pickup points will not be updated.', 'packetery.class');
+                        return $packetery->l('Api password is wrong. Carriers will not be updated.', 'packetery.class');
                     }
                     else
                     {

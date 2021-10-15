@@ -16,6 +16,10 @@ var PacketeryCheckoutModuleSupercheckout = {
 
     hideValidationErrors: function () {
         hideGeneralError();
+    },
+
+    getExtraContentSelector: function () {
+        return '.kbshippingparceloption';
     }
 };
 

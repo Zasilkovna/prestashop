@@ -23,18 +23,18 @@
 *}
 <!--Branches count-->
 <label class="control-label col-lg-3" for="packetery-total-branches">
-	{l s='Total pickup points' mod='packetery'}:
+	{l s='Total carriers' mod='packetery'}:
 </label>
 <div name="packetery-total-branches" class="packetery-total-branches"><b>{$total_branches|escape:'htmlall':'UTF-8'}</b></div>
 <br style="clear: both;">
 <label class="control-label col-lg-3" for="packetery-last-branches-update">
-	{l s='Last pickup points update' mod='packetery'}:
+	{l s='Last carriers update' mod='packetery'}:
 </label>
 <div name="packetery-last-branches-update" class="packetery-last-branches-update">{$last_branches_update|escape:'htmlall':'UTF-8'}</div>
 <!--End Branches count-->
 <br>
 <br style="clear: both;">
 <label class="control-label col-lg-3" for="update-branches">
-	{l s='Manually update the list of pickup points' mod='packetery'}:
+	{l s='Manually update the list of carriers' mod='packetery'}:
 </label>
-<p><input type="button" name="update-branches" class="btn btn-default btn-block" id="update-branches" value="{l s='Update pickup points'  mod='packetery'}" style="padding-left:10px;padding-right:10px;"></p>
+<p><input type="button" name="update-branches" class="btn btn-default btn-block" id="update-branches" value="{l s='Update carriers'  mod='packetery'}" style="padding-left:10px;padding-right:10px;"></p>
