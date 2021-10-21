@@ -18,7 +18,11 @@
                     <ul>
                         <li>{l s='Selected delivery address' mod='packetery'}:
                             <span id="picked-delivery-place" class="picked-delivery-place">
-                                {$customerStreet}{if $customerZip}, {$customerZip}{/if}{if $customerCity} {$customerCity}{/if}
+                                {assign var=addressInfo value=[]}
+                                {if $customerStreet}{$addressInfo[]=$customerStreet}{/if}
+                                {if $customerCity}{$addressInfo[]=$customerCity}{/if}
+                                {if $customerZip}{$addressInfo[]=$customerZip}{/if}
+                                {', '|implode:$addressInfo}
                             </span>
                         </li>
                     </ul>

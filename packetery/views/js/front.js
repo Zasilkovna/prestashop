@@ -160,16 +160,25 @@ window.initializePacketaWidget = function ()
         e.preventDefault();
         var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
         var widgetCarriers = $widgetParent.find('#widget_carriers').val();
+        var customerStreet = $('#customerStreet').val();
+        var customerCity = $('#customerCity').val();
+        var customerZip = $('#customerZip').val();
         var widgetOptions = {
             layout: 'hd',
             language: language,
             country: country,
             // in this case, there will always be one carrier
             carrierId: widgetCarriers,
-            street: $('#customerStreet').val(),
-            city: $('#customerCity').val(),
-            postCode: $('#customerZip').val(),
         };
+        if (customerStreet) {
+            widgetOptions.street = customerStreet;
+        }
+        if (customerCity) {
+            widgetOptions.city = customerCity;
+        }
+        if (customerZip) {
+            widgetOptions.postCode = customerZip;
+        }
         PacketaHD.Widget.pick(packetaApiKey, function (address) {
             var $selectedDeliveryOption = module.getSelectedInput();
             $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
