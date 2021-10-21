@@ -593,11 +593,6 @@ class Packeteryclass
                 $fieldsToSet['name_branch'] = pSQL($branchName);
                 $fieldsToSet['currency_branch'] = pSQL($branchCurrency);
             }
-            if ($pickupPointType) {
-                $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
-            } else {
-                $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
-            }
             if ($isPacketeryCarrier) {
                 $result = $db->update('packetery_address_delivery', $fieldsToSet, '`id_carrier` = ' . ((int)$carrierId), 0, true);
             } else {
@@ -605,6 +600,7 @@ class Packeteryclass
                 $fieldsToSet['id_carrier'] = (int)$carrierId;
                 $result = $db->insert('packetery_address_delivery', $fieldsToSet, true);
             }
+            $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
         }
         $db->update('carrier', $carrierUpdate, '`id_carrier` = ' . ((int)$carrierId), 0, true);
 
