@@ -5,7 +5,7 @@
     <input type="hidden" id="customerCountry" name="customerCountry" value="{$customerCountry|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerStreet" name="customerStreet" value="{$customerStreet|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerCity" name="customerCity" value="{$customerCity|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" id="customerPostcode" name="customerPostcode" value="{$customerPostcode|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="customerZip" name="customerZip" value="{$customerZip|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="addressValidationSetting" name="addressValidationSetting" value="{$addressValidationSetting|escape:'htmlall':'UTF-8'}">
     <div id="packetery-widget" class="clearfix">
         <div class="widget-left">
@@ -15,9 +15,11 @@
                             id="open-packeta-widget-hd">{l s='Validate delivery address' mod='packetery'}
                     </button>
                     <br>
-                    <ul id="selected-branch">
+                    <ul>
                         <li>{l s='Selected delivery address' mod='packetery'}:
-                            <span id="picked-delivery-place" class="picked-delivery-place">{$addressInfo}</span>
+                            <span id="picked-delivery-place" class="picked-delivery-place">
+                                {$customerStreet}{if $customerZip}, {$customerZip}{/if}{if $customerCity} {$customerCity}{/if}
+                            </span>
                         </li>
                     </ul>
                 </div>

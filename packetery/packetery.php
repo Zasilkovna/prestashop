@@ -452,7 +452,7 @@ class Packetery extends CarrierModule
 
     /**
      * Display widget selection button and chosen branch info for every carrier
-     * @param $params
+     * @param array $params
      * @return string
      * @throws PrestaShopDatabaseException
      * @throws SmartyException
@@ -471,14 +471,14 @@ class Packetery extends CarrierModule
         $customerCountry = '';
         $customerStreet = '';
         $customerCity = '';
-        $customerPostcode = '';
+        $customerZip = '';
         if (isset($cart->id_address_delivery) && !empty($cart->id_address_delivery)) {
             $address = new AddressCore($cart->id_address_delivery);
             $countryObj = new CountryCore($address->id_country);
             $customerCountry = strtolower($countryObj->iso_code);
-            $customerStreet = $address->address1 . ($address->address2 ? ' ' . $address->address2 : '');
+            $customerStreet = $address->address1;
             $customerCity = $address->city;
-            $customerPostcode = $address->postcode;
+            $customerZip = $address->postcode;
         }
         $this->context->smarty->assign('customerCountry', $customerCountry);
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
@@ -491,14 +491,17 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('widget_carriers', $widgetCarriers);
 
         if ($packeteryCarrier['pickup_point_type'] === null) {
-            $this->context->smarty->assign('customerStreet', $customerStreet);
-            $this->context->smarty->assign('customerCity', $customerCity);
-            $this->context->smarty->assign('customerPostcode', $customerPostcode);
-            $addressInfo = $customerStreet . ', ' . $customerPostcode . ' ' . $customerCity;
-            $this->context->smarty->assign('addressInfo', $addressInfo);
-            $this->context->smarty->assign('addressValidationSetting', Configuration::get('PACKETERY_ADDRESS_VALIDATION'));
+            $addressValidationSetting = Configuration::get('PACKETERY_ADDRESS_VALIDATION');
+            if ($addressValidationSetting === 'none') {
+                $output = '';
+            } else {
+                $this->context->smarty->assign('customerStreet', $customerStreet);
+                $this->context->smarty->assign('customerCity', $customerCity);
+                $this->context->smarty->assign('customerZip', $customerZip);
+                $this->context->smarty->assign('addressValidationSetting', $addressValidationSetting);
 
-            $output = $this->context->smarty->fetch($this->local_path . 'views/templates/front/widget-hd.tpl');
+                $output = $this->context->smarty->fetch($this->local_path . 'views/templates/front/widget-hd.tpl');
+            }
         } else {
             $zPointCarriers = Db::getInstance()->executeS(
                 'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
