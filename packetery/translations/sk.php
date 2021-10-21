@@ -107,6 +107,8 @@ $_MODULE['<{packetery}prestashop>tab_settings_4be6bfa1b6a3582a32fcd1653dc24067']
 $_MODULE['<{packetery}prestashop>widget_422f03dbebc5e4e66d1d5b7e4564c355'] = 'Vybrať miesto vyzdvihnutia:';
 $_MODULE['<{packetery}prestashop>widget_81bd9c17af94c31967cdb6870f154d83'] = 'Vybrané miesto vyzdvihnutia:';
 $_MODULE['<{packetery}prestashop>widget_397164405b87202533b09fd47a137141'] = 'Vyberte prosím před potvrzením objednávky výdejní místo';
+$_MODULE['<{packetery}prestashop>widget-hd_412d643c177ac66b1f8d2dc84ac74779'] = 'Ověřit adresu doručení';
+$_MODULE['<{packetery}prestashop>widget-hd_d57ac83f33b2ef09dc08ec77e7e4f421'] = 'Vybraná doručovací adresa';
 $_MODULE['<{packetery}prestashop>ajax_bcebbe7faeccbb54f9bec8024fe4c0e5'] = 'Nebyly provedeny žádné změny hmotností.';
 $_MODULE['<{packetery}prestashop>ajax_c2cb004cf813bc9db8135221db27e9f7'] = 'Zadejte prosím číslo.';
 $_MODULE['<{packetery}prestashop>uninstall_e21a827831f90240feccbb1f8fd8c7e3'] = 'Při odinstalování modulu Zásilkovny nastala výjimka:';
