@@ -55,7 +55,6 @@ $_MODULE['<{packetery}prestashop>packetery_43e4c4c34b72c8ee0421d21983d8d8a7'] = 
 $_MODULE['<{packetery}prestashop>packetery_584ad3e893aa1c232f67116fc2686325'] = 'Počet nastavených hmotností';
 $_MODULE['<{packetery}prestashop>packetery_047c5943be09f5e6a0711ff242153735'] = 'Počet chyb během nastavování hmotností';
 $_MODULE['<{packetery}prestashop>packetery_91c3f498fbbc9f6961c22401cdb145bf'] = 'Výchozí jednotka hmotnosti pro Váš obchod je: %s. Při exportu zásilek modul nebude u zásilky uvádět její hmotnost. Pokud chcete exportovat hmotnost zásilky je potřeba nastavit výchozí jednotku na kg nebo g.';
-$_MODULE['<{packetery}prestashop>packetery_88a4478629eacd06dbbe1a47306a39b9'] = 'Výchozí jednotka hmotnosti pro Váš obchod je: %s. Při exportu zásilek modul nebude u zásilky uvádět její hmotnost. Pokud chcete exportovat hmotnost zásilky je potřeba nastavit výchozí jednotku na kg.';
 $_MODULE['<{packetery}prestashop>packetery_d7f3d218a18889e8160bf8a7344bc057'] = 'Nepoužívat ověření adresy';
 $_MODULE['<{packetery}prestashop>packetery_fc5e036bb1ec788b52b8fd53148da1ff'] = 'Nepovinné ověření adresy';
 $_MODULE['<{packetery}prestashop>packetery_170432033bed78c61eb7562efc6ea983'] = 'Povinné ověření adresy';
