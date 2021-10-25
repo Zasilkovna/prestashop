@@ -161,7 +161,7 @@ class Packeteryclass
     public static function getListOrders($page = 1)
     {
         $id_shop = Context::getContext()->shop->id;
-        $per_page = 50;
+        $per_page = Configuration::get('PACKETERY_ORDERS_PER_PAGE');
         $orders_num_rows = Db::getInstance()->getValue(
             'SELECT COUNT(*)
             FROM `' . _DB_PREFIX_ . 'orders` o
