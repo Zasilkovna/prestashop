@@ -33,7 +33,7 @@ $(document).ready(function(){
 		}
 	};
 
-	// starting with 0 before calling psTableAddCheckbox
+	// starting with 0 before calling psTableAddCheckbox; see drawOrdersRow
 	var orderColumnId = 0;
 	var orderColumnCod = 4;
 	var orderColumnExported = 7;
@@ -43,7 +43,7 @@ $(document).ready(function(){
 	tools = {
 		/*Pagination*/
 		psTablePaginationChange: function(pstable_jq_select) {
-			$('.prestaui-paginator-page').click(function() {
+			$('.prestaui-paginator').on('click', '.prestaui-paginator-page', function () {
 				var page = $(this).text();
 				tools.clearOrdersTable(pstable_jq_select);
 				ajaxs.getOrdersRows(page);
@@ -84,6 +84,7 @@ $(document).ready(function(){
 				} else {
 					html += '<td class="center"><span></span></td>';
 				}
+				html += '<td class="center">  <span>' + orders[i].weight + '</span> </td>';
 				html += '</tr>';
 				$('#packetery-orders-table tbody').append(html);
 			}
@@ -125,10 +126,10 @@ $(document).ready(function(){
 			binds.order_cod();
 		},
 
-		ordersAddWeightInputs: function (pstable_jq_select) {
+		ordersAddWeightInputs: function (pstable_jq_select, columnOffset) {
 			$(pstable_jq_select).find('table tbody tr').each(function () {
 				var orderId = $(this).data('id-order');
-				var $weightColumn = $(this).find('td:eq(' + orderColumnWeight + ')');
+				var $weightColumn = $(this).find('td:eq(' + (orderColumnWeight + columnOffset) + ')');
 				$weightColumn.html(
 					'<input type="text" value="' + $weightColumn.text().trim() + '" name="weight_' + orderId + '" class="weight">' +
 					'<div class="notifyAnchor"></div>'
@@ -418,6 +419,7 @@ $(document).ready(function(){
 				},
 				success: function(msg) {
 					tools.drawOrdersRow(msg);
+					tools.ordersAddWeightInputs('#packetery-orders-table', 1);
 				},
 				complete: function() {
 					$("body").toggleClass("wait");
@@ -775,7 +777,7 @@ $(document).ready(function(){
 	tools.psTableTrackingLinks('#packetery-orders-table');
 	tools.psTablePaginationChange('#packetery-orders-table');
 	tools.psTableAddDataOrder('#packetery-orders-table');
-	tools.ordersAddWeightInputs('#packetery-orders-table');
+	tools.ordersAddWeightInputs('#packetery-orders-table', 0);
 	tools.psTableAddCheckbox('#packetery-orders-table');
 
 	binds.order_update();
