@@ -68,3 +68,4 @@
 2.2.0 - Added: compatibility with PrestaShop 1.6
         Added: ability to open widget right after choosing delivery method without the need to click on button
       - Updated: packetery orders table is backed up and deleted upon uninstall
+      - Added: One page checkout by Zelarg support (tested OPC v2.3.12 with PS v1.6.1.7)

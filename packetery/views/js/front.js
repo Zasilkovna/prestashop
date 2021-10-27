@@ -67,7 +67,7 @@ PacketaModule.runner = {
         });
     },
 
-    onShippingChange($selectedInput) {
+    onShippingChange: function ($selectedInput) {
         var module = packeteryModulesManager.detectModule();
         if (module === null) {
             return;
@@ -116,7 +116,7 @@ PacketaModule.runner = {
      * - during initial load - at this point, delivery methods have not been downloaded yet and module detection probably fails
      * - on AJAX update of delivery methods
      */
-    onBeforeCarrierLoad() {
+    onBeforeCarrierLoad: function () {
         var module = packeteryModulesManager.detectModule();
         if (module === null) {
             return;
@@ -214,7 +214,7 @@ PacketaModule.ui = {
         module.getExtraContentContainer($deliveryInput).append(html);
     },
 
-    toggleSubmit() {
+    toggleSubmit: function () {
         var module = packeteryModulesManager.detectModule();
         if (module === null) {
             return;
@@ -374,7 +374,7 @@ PacketaModule.ajax = {
 function PacketeryCheckoutModulesManager()
 {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
-    this.supportedModules = ['Ps16', 'Ps17', 'Unknown', 'Supercheckout'];
+    this.supportedModules = ['Ps16', 'Ps17', 'Unknown', 'Supercheckout', 'OpcZelarg'];
     this.loadedModules = [];
     this.detectedModule = null;
 
