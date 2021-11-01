@@ -56,6 +56,9 @@ $_MODULE['<{packetery}prestashop>packetery_43e4c4c34b72c8ee0421d21983d8d8a7'] = 
 $_MODULE['<{packetery}prestashop>packetery_584ad3e893aa1c232f67116fc2686325'] = 'Počet nastavených hmotností';
 $_MODULE['<{packetery}prestashop>packetery_047c5943be09f5e6a0711ff242153735'] = 'Počet chyb během nastavování hmotností';
 $_MODULE['<{packetery}prestashop>packetery_91c3f498fbbc9f6961c22401cdb145bf'] = 'Výchozí jednotka hmotnosti pro Váš obchod je: %s. Při exportu zásilek modul nebude u zásilky uvádět její hmotnost. Pokud chcete exportovat hmotnost zásilky je potřeba nastavit výchozí jednotku na kg nebo g.';
+$_MODULE['<{packetery}prestashop>packetery_d7f3d218a18889e8160bf8a7344bc057'] = 'Nepoužívat ověření adresy';
+$_MODULE['<{packetery}prestashop>packetery_fc5e036bb1ec788b52b8fd53148da1ff'] = 'Nepovinné ověření adresy';
+$_MODULE['<{packetery}prestashop>packetery_170432033bed78c61eb7562efc6ea983'] = 'Povinné ověření adresy';
 $_MODULE['<{packetery}prestashop>packetery_b18ce70ed15a7a117141d6ee14f9138c'] = 'Výdejní místo bylo úspěšně změněno.';
 $_MODULE['<{packetery}prestashop>packetery_f1111e5bc2fc07a2985e5273341fbd7b'] = 'Výdejní místo se nepodařilo změnit.';
 $_MODULE['<{packetery}prestashop>packetery_47838d234bae5339a17c704bb605d01a'] = 'U objednávky není vybrané žádné výdejní místo. Zásilku nebude možné exportovat do Zásilkovny.';
@@ -101,6 +104,7 @@ $_MODULE['<{packetery}prestashop>tab_settings_1e5b2eadf83c2678a69f1d4608b673c8']
 $_MODULE['<{packetery}prestashop>tab_settings_ff0c01bbc46cf7e4687f36889fbb9270'] = '1/4 A4, tisk na A4, 4ks/stránka';
 $_MODULE['<{packetery}prestashop>tab_settings_4b7b2401eede004b1901ebd3f73bb286'] = '1/8 A4, přímý tisk, 1ks/stránka';
 $_MODULE['<{packetery}prestashop>tab_settings_b457f4aa9f09cd579e9df57dd154ed57'] = '1/16 A4, přímý tisk, 1ks/stránka';
+$_MODULE['<{packetery}prestashop>tab_settings_46433074fd4c57f7aa128c8e4d3f407d'] = 'Validace adresy v košíku';
 $_MODULE['<{packetery}prestashop>tab_settings_2f5fdf39f1e94a9a62df58227b00845b'] = 'Seznam dopravců';
 $_MODULE['<{packetery}prestashop>tab_settings_5ece607071fe59ddc4c88dc6abfe2310'] = 'Nenašli sa žiadne položky';
 $_MODULE['<{packetery}prestashop>tab_settings_4be6bfa1b6a3582a32fcd1653dc24067'] = 'Zoznam platieb';
