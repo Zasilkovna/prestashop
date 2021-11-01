@@ -104,7 +104,17 @@ $_MODULE['<{packetery}prestashop>tab_settings_4be6bfa1b6a3582a32fcd1653dc24067']
 $_MODULE['<{packetery}prestashop>widget_422f03dbebc5e4e66d1d5b7e4564c355'] = 'Vybrať miesto vyzdvihnutia:';
 $_MODULE['<{packetery}prestashop>widget_81bd9c17af94c31967cdb6870f154d83'] = 'Vybrané miesto vyzdvihnutia:';
 $_MODULE['<{packetery}prestashop>widget_397164405b87202533b09fd47a137141'] = 'Vyberte prosím před potvrzením objednávky výdejní místo';
+$_MODULE['<{packetery}prestashop>deletelabels_c14077f78432a7944ec8c09566b5f25d'] = 'Konfiguraci nelze načíst.';
+$_MODULE['<{packetery}prestashop>deletelabels_79500929219856f7162cea4f4d85d9b7'] = 'Nepodařilo se získat čas vytvoření některých štítků. Zkontrolujte souborová oprávnění.';
+$_MODULE['<{packetery}prestashop>deletelabels_60abf2c345b55a7ed556d3293ea5c70c'] = 'Nepodařilo se odstranit některé štítky. Zkontrolujte souborová oprávnění.';
 $_MODULE['<{packetery}prestashop>uninstaller_e21a827831f90240feccbb1f8fd8c7e3'] = 'Při odinstalování modulu Zásilkovny nastala výjimka:';
 $_MODULE['<{packetery}prestashop>installer_ddd6dc80580e42e39480b99a2fd30e1e'] = 'Objednávky Zásilkovna';
 $_MODULE['<{packetery}prestashop>installer_eabcd81deb732e90093180b9eba3320a'] = 'Při instalování modulu Zásilkovny nastala výjimka:';
 $_MODULE['<{packetery}prestashop>adminpacketerycontroller_4a93d9164aad959a6abc2de389170ac9'] = 'Zásielkovňa';
+$_MODULE['<{packetery}prestashop>cron_76c4c3d745dc842c73ec10cd7cbb4206'] = 'Zpracování úloh začalo.';
+$_MODULE['<{packetery}prestashop>cron_aee4c3ffdf25619455f67b0ca1d1e946'] = 'Nesprávný token.';
+$_MODULE['<{packetery}prestashop>cron_36114979c9d11968c61fc8c8cf447349'] = 'Úloha nebyla specifikována.';
+$_MODULE['<{packetery}prestashop>cron_a5e0021bf76278d7abffb156003aa46d'] = 'Úloha \"%s\" se začíná zpracovávat.';
+$_MODULE['<{packetery}prestashop>cron_f7aa8bd8b7067c9f4eaea7193a1f394b'] = 'Úloha nenalezena.';
+$_MODULE['<{packetery}prestashop>cron_5b0b85cec0101e5ddabfdb0c5531af80'] = 'Všechny vykreslené chyby jsou uložené v databázi Prestashopu.';
+$_MODULE['<{packetery}prestashop>cron_d037eff66e9db3deaeb73e4d44939ff8'] = 'Zpracování úloh dokončeno.';

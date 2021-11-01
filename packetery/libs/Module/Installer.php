@@ -167,7 +167,9 @@ class Installer
     {
         return (
             Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4') &&
-            Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', 0)
+            Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', 0) &&
+            Configuration::updateValue('PACKETERY_CRON_TOKEN', \Tools::passwdGen(32)) &&
+            Configuration::updateValue('PACKETERY_LABEL_MAX_AGE_DAYS', 7)
         );
     }
 
