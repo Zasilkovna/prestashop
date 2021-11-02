@@ -60,7 +60,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.11';
+		$this->version = '2.1.12';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -109,6 +109,7 @@ class Packetery extends CarrierModule
             return false;
         }
         Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4');
+        Configuration::updateValue('PACKETERY_ORDERS_PER_PAGE', 50);
 
         // backup possible old order table
         if (count($db->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'packetery_order"')) > 0) {
@@ -160,6 +161,7 @@ class Packetery extends CarrierModule
             !Configuration::deleteByName('PACKETERY_APIPASS') ||
             !Configuration::deleteByName('PACKETERY_ESHOP_ID') ||
             !Configuration::deleteByName('PACKETERY_LABEL_FORMAT') ||
+            !Configuration::deleteByName('PACKETERY_ORDERS_PER_PAGE') ||
             !Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE')
         ) {
             return false;
