@@ -299,12 +299,12 @@ class Packeteryclass
      */
     public static function getTrackingFromOrders($id_orders)
     {
-        $tracking = [];
         $sql = 'SELECT tracking_number
                 FROM `' . _DB_PREFIX_ . 'packetery_order` 
                 WHERE id_order IN(' . pSQL($id_orders) . ') 
                     AND tracking_number!=\'\';';
         $result = Db::getInstance()->executeS($sql);
+        $tracking = [];
         if ($result) {
             foreach ($result as $tn) {
                 $tracking[] = "{$tn['tracking_number']}";
@@ -551,8 +551,8 @@ class Packeteryclass
         $sql = 'SELECT DISTINCT `module_name`, `is_cod`
             FROM `' . _DB_PREFIX_ . 'packetery_payment`';
 
-        $paymentModules = [];
         $results = Db::getInstance()->executeS($sql);
+        $paymentModules = [];
         if ($results) {
             $paymentModules = array_column($results, 'is_cod', 'module_name');
         }

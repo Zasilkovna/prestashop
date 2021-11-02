@@ -576,12 +576,12 @@ class PacketeryApi
 
     public static function getAdAndExternalCarriers()
     {
-        $branches = [];
         $sql = 'SELECT `id_branch`, `name`, `country`, `currency`, `is_pickup_point`
                 FROM `' . _DB_PREFIX_ . 'packetery_branch`
                 WHERE `is_ad` = 1 OR `is_pickup_point` = 1
                 ORDER BY `country`, `name`';
         $result = Db::getInstance()->executeS($sql);
+        $branches = [];
         if ($result) {
             foreach ($result as $branch) {
                 $branches[] = array(
