@@ -4,7 +4,7 @@ var PacketeryCheckoutModulePs16 = {
 
     isActive: function () {
         var isCorrectVersion = PacketaModule.tools.isPS16();
-        return isCorrectVersion && this.findDeliveryOptions().length > 0 && $('#opc_checkout').length === 0;
+        return isCorrectVersion && this.findDeliveryOptions().length > 0;
     },
 
     getSelectedInput: function () {
@@ -12,7 +12,7 @@ var PacketeryCheckoutModulePs16 = {
     },
 
     findDeliveryOptions: function () {
-        return $('.delivery_option input');
+        return $('#carrier_area .delivery_option input');
     },
 
     enableSubmitButton: function () {

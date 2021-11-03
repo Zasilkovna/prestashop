@@ -2,17 +2,15 @@
 
 var PacketeryCheckoutModuleOpcZelarg = {
 
-    submitButtonSelector: '.button-continue .confirm_button',
-
-    submitButtonBackground: 'linear-gradient(to bottom, rgba(105,211,88,1) 0%,rgba(35,127,25,1) 100%)',
+    submitButtonBackground: null,
 
     isActive: function () {
         var isCorrectVersion = PacketaModule.tools.isPS16();
-        var $button = $(this.submitButtonSelector);
-        if ($button.length === 1) {
-            this.submitButtonBackground = $button.css('background');
-        }
-        return isCorrectVersion && this.findDeliveryOptions().length > 0 && $('#opc_checkout').length > 0;
+        return isCorrectVersion && this.findDeliveryOptions().length > 0;
+    },
+
+    getSubmitButton: function() {
+        return $('.button-continue .confirm_button');
     },
 
     getSelectedInput: function () {
@@ -20,18 +18,25 @@ var PacketeryCheckoutModuleOpcZelarg = {
     },
 
     findDeliveryOptions: function () {
-        return $('.delivery_option input');
+        return $('form#carriers_section .delivery_option input');
     },
 
     enableSubmitButton: function () {
-        var $button = $(this.submitButtonSelector);
+        var $button = this.getSubmitButton();
+        if ($button.prop('disabled') !== true) {
+            return;
+        }
         $button.css('background', this.submitButtonBackground);
         $button.css('cursor', 'pointer');
         $button.prop('disabled', false);
     },
 
     disableSubmitButton: function () {
-        var $button = $(this.submitButtonSelector);
+        var $button = this.getSubmitButton();
+        if ($button.prop('disabled') !== false) {
+            return;
+        }
+        this.submitButtonBackground = $button.css('background');
         $button.css('background', 'gray');
         $button.css('cursor', 'default');
         $button.prop('disabled', true);

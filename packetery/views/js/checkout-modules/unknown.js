@@ -5,7 +5,7 @@
 var PacketeryCheckoutModuleUnknown = {
 
     isActive: function () {
-        return this.findDeliveryOptions().length > 0 && $('#opc_checkout').length === 0;
+        return this.findDeliveryOptions().length > 0;
     },
 
     getSelectedInput: function () {
