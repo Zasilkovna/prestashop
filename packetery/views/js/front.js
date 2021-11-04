@@ -67,7 +67,7 @@ PacketaModule.runner = {
         });
     },
 
-    onShippingChange($selectedInput) {
+    onShippingChange: function ($selectedInput) {
         var module = packeteryModulesManager.detectModule();
         if (module === null) {
             return;
@@ -104,7 +104,6 @@ PacketaModule.runner = {
                 pickupPointType,
                 widgetCarrierId,
                 carrierPickupPointId,
-                // todo 197 anonymni fce + zpracovani json
                 PacketaModule.ui.toggleSubmit
             );
         } else {
@@ -117,7 +116,7 @@ PacketaModule.runner = {
      * - during initial load - at this point, delivery methods have not been downloaded yet and module detection probably fails
      * - on AJAX update of delivery methods
      */
-    onBeforeCarrierLoad() {
+    onBeforeCarrierLoad: function () {
         var module = packeteryModulesManager.detectModule();
         if (module === null) {
             return;
@@ -215,7 +214,7 @@ PacketaModule.ui = {
         module.getExtraContentContainer($deliveryInput).append(html);
     },
 
-    toggleSubmit() {
+    toggleSubmit: function () {
         var module = packeteryModulesManager.detectModule();
         if (module === null) {
             return;
@@ -292,7 +291,13 @@ PacketaModule.ui = {
                     pickupPoint.pickupPointType,
                     pickupPoint.carrierId,
                     pickupPoint.carrierPickupPointId,
-                    PacketaModule.ui.toggleSubmit
+                    function (jsonResponse) {
+                        if (jsonResponse.result === true) {
+                            PacketaModule.ui.toggleSubmit();
+                        } else {
+                            console.error(jsonResponse.message);
+                        }
+                    }
                 );
             }, widgetOptions);
         });
@@ -342,13 +347,9 @@ PacketaModule.ajax = {
                 // todo: To which checkout module does this css class belong? Not Supercheckout PS 1.7, not PS 1.7, not PS 1.6 5-step nor OPC
                 $("body").toggleClass("wait");
             },
-            success: function (jsonResponse) {
-                if (jsonResponse.result === true) {
-                    if (typeof onSuccess !== 'undefined') {
-                        onSuccess();
-                    }
-                } else {
-                    console.error(jsonResponse.message);
+            success: function (response) {
+                if (typeof onSuccess !== 'undefined') {
+                    onSuccess(response);
                 }
             },
             complete: function () {

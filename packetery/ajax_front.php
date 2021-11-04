@@ -37,6 +37,7 @@ if ($token !== $real_token) {
 switch (Tools::getValue('action')) {
     /*FRONT*/
     case 'savePickupPointInCart':
+        // todo 197 use DI
         $module = new Packetery();
         header('Content-Type: application/json');
         echo $module->savePickupPointInCartAjax();
