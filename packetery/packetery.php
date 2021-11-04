@@ -60,7 +60,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.12';
+		$this->version = '2.1.13';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -112,7 +112,8 @@ class Packetery extends CarrierModule
         Configuration::updateValue('PACKETERY_ORDERS_PER_PAGE', 50);
 
         // backup possible old order table
-        if (count($db->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'packetery_order"')) > 0) {
+        $orderTableCheck = $db->executeS('SHOW TABLES LIKE "' . _DB_PREFIX_ . 'packetery_order"');
+        if ($orderTableCheck && count($orderTableCheck) > 0) {
             $db->execute('RENAME TABLE `' . _DB_PREFIX_ . 'packetery_order` TO `'. _DB_PREFIX_ .'packetery_order_old`');
             $have_old_table = true;
         } else {
@@ -126,15 +127,18 @@ class Packetery extends CarrierModule
 
         // copy data from old order table
         if ($have_old_table) {
-            $fields = array();
-            foreach ($db->executeS('SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'packetery_order_old`') as $field) {
-                $fields[] = $field['Field'];
-            }
-            $db->execute(
-                'INSERT INTO `' . _DB_PREFIX_ . 'packetery_order`(`' . pSQL(implode('`, `', $fields)) . '`)
+            $fields = [];
+            $oldOrdersColumns = $db->executeS('SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'packetery_order_old`');
+            if ($oldOrdersColumns) {
+                foreach ($oldOrdersColumns as $field) {
+                    $fields[] = $field['Field'];
+                }
+                $db->execute(
+                    'INSERT INTO `' . _DB_PREFIX_ . 'packetery_order`(`' . pSQL(implode('`, `', $fields)) . '`)
                 SELECT * FROM `' . _DB_PREFIX_ . 'packetery_order_old`'
-            );
-            $db->execute('DROP TABLE `' . _DB_PREFIX_ . 'packetery_order_old`');
+                );
+                $db->execute('DROP TABLE `' . _DB_PREFIX_ . 'packetery_order_old`');
+            }
         }
 
         return parent::install() &&
@@ -301,13 +305,15 @@ class Packetery extends CarrierModule
 
         /*AD CARRIER LIST*/
         $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
-        foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
-            list($carrierZones, $carrierCountries) = $this->carrierTools->getZonesAndCountries($packeteryCarrier['id_carrier']);
-            $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
-            $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
-            // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
-            $packeteryListAdCarriers[$index]['name'] =
-                ($packeteryCarrier['name'] === '0' ? Carrier::getCarrierNameFromShopName() : $packeteryCarrier['name']);
+        if ($packeteryListAdCarriers) {
+            foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
+                list($carrierZones, $carrierCountries) = $this->carrierTools->getZonesAndCountries($packeteryCarrier['id_carrier']);
+                $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
+                $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
+                // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
+                $packeteryListAdCarriers[$index]['name'] =
+                    ($packeteryCarrier['name'] === '0' ? Carrier::getCarrierNameFromShopName() : $packeteryCarrier['name']);
+            }
         }
 
         $this->context->smarty->assign(array(
@@ -455,7 +461,7 @@ class Packetery extends CarrierModule
     /**
      * Display widget selection button and chosen branch info for every carrier
      * @param $params
-     * @return string
+     * @return string|void
      * @throws PrestaShopDatabaseException
      * @throws SmartyException
      */
@@ -470,6 +476,9 @@ class Packetery extends CarrierModule
             JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`)
             WHERE `c`.`deleted` = 0 AND `pad`.`pickup_point_type` IS NOT NULL'
         );
+        if (!$zPointCarriers) {
+            $zPointCarriers = [];
+        }
         $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
 
 		$this->context->smarty->assign('carrier_id', $id_carrier);
@@ -511,6 +520,9 @@ class Packetery extends CarrierModule
 
         $widgetCarriers = '';
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
+        if (!$packeteryCarrier) {
+            return;
+        }
         if ($packeteryCarrier['pickup_point_type'] === 'external' && $packeteryCarrier['id_branch']) {
             $widgetCarriers = $packeteryCarrier['id_branch'];
         } else if ($packeteryCarrier['pickup_point_type'] === 'internal') {
@@ -654,6 +666,9 @@ class Packetery extends CarrierModule
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
         ];
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
+        if (!$packeteryCarrier) {
+            return;
+        }
         if (
             $packeteryCarrier['pickup_point_type'] === 'external' &&
             $packeteryOrder['id_branch'] !== null &&
