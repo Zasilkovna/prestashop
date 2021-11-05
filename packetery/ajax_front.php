@@ -36,8 +36,11 @@ if ($token !== $real_token) {
 
 switch (Tools::getValue('action')) {
     /*FRONT*/
-    case 'saveSelectedBranch':
-        PacketeryApi::widgetSaveOrderBranch();
+    case 'savePickupPointInCart':
+        $module = new Packetery();
+        $orderSaver = $module->diContainer->get(\Packetery\Order\OrderSaver::class);
+        header('Content-Type: application/json');
+        echo $orderSaver->savePickupPointInCartGetJson();
         break;
     case 'fetchExtraContent':
         echo PacketeryApi::packeteryCreateExtraContent();
