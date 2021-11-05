@@ -70,3 +70,4 @@
       - Updated: packetery orders table is backed up and deleted upon uninstall
       - Updated: improved compatibility with PHP versions 7.2,7.4
       - Updated: refactored saving pickup point information in cart
+      - Updated: hook for new orders changed from actionOrderHistoryAddAfter to actionValidateOrder

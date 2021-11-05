@@ -10,7 +10,6 @@ use CurrencyCore;
 use CartCore as Cart;
 use Db;
 use OrderCore as PrestaShopOrder;
-use OrderHistoryCore as OrderHistory;
 use PrestaShopException;
 use Tools;
 
@@ -38,11 +37,10 @@ class OrderSaver
     /**
      * Save packetery order after order is created
      * @param Cart $cart
-     * @param OrderHistory $orderHistory
+     * @param PrestaShopOrder $order
      */
-    public function saveAfterActionOrderHistoryAdd(Cart $cart, OrderHistory $orderHistory)
+    public function saveNewOrder(Cart $cart, PrestaShopOrder $order)
     {
-        $order = new PrestaShopOrder((int)$orderHistory->id_order);
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$cart->id_carrier);
         if ($packeteryCarrier) {
             $this->save($order, $packeteryCarrier);
