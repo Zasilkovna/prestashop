@@ -304,9 +304,11 @@ class Packeteryclass
                 WHERE id_order IN(' . pSQL($id_orders) . ') 
                     AND tracking_number!=\'\';';
         $result = Db::getInstance()->executeS($sql);
-        $tracking = array();
-        foreach ($result as $tn) {
-            $tracking[] = "{$tn['tracking_number']}";
+        $tracking = [];
+        if ($result) {
+            foreach ($result as $tn) {
+                $tracking[] = "{$tn['tracking_number']}";
+            }
         }
         return $tracking;
     }
@@ -550,7 +552,10 @@ class Packeteryclass
             FROM `' . _DB_PREFIX_ . 'packetery_payment`';
 
         $results = Db::getInstance()->executeS($sql);
-        $paymentModules = array_column($results, 'is_cod', 'module_name');
+        $paymentModules = [];
+        if ($results) {
+            $paymentModules = array_column($results, 'is_cod', 'module_name');
+        }
 
         $payments = [];
         foreach ($installedPaymentModules as $installedPaymentModule) {
