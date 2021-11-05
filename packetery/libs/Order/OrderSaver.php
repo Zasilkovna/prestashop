@@ -8,6 +8,7 @@ use Packetery\Tools\Logger;
 use Context;
 use CurrencyCore;
 use CartCore as Cart;
+use Db;
 use OrderCore as PrestaShopOrder;
 use PrestaShopException;
 use Tools;

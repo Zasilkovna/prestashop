@@ -11,6 +11,8 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_2_2_0($module)
 {
     return (
+        $module->unregisterHook('actionOrderHistoryAddAfter') &&
+        $module->registerHook('actionValidateOrder') &&
         $module->registerHook('displayBeforeCarrier') &&
         Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', 0) &&
         Configuration::updateValue('PACKETERY_CRON_TOKEN', Tools::passwdGen(32)) &&
