@@ -37,10 +37,10 @@ if ($token !== $real_token) {
 switch (Tools::getValue('action')) {
     /*FRONT*/
     case 'savePickupPointInCart':
-        // todo 197 use DI
         $module = new Packetery();
+        $orderSaver = $module->diContainer->get(\Packetery\Order\OrderSaver::class);
         header('Content-Type: application/json');
-        echo $module->savePickupPointInCartAjax();
+        echo $orderSaver->savePickupPointInCartGetJson();
         break;
     case 'fetchExtraContent':
         echo PacketeryApi::packeteryCreateExtraContent();
