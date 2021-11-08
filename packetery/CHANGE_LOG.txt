@@ -69,3 +69,6 @@
         Added: ability to open widget right after choosing delivery method without the need to click on button
       - Updated: packetery orders table is backed up and deleted upon uninstall
       - Added: One page checkout by Zelarg support (tested OPC v2.3.12 with PS v1.6.1.7)
+      - Updated: improved compatibility with PHP versions 7.2,7.4
+      - Updated: refactored saving pickup point information in cart
+      - Updated: hook for new orders changed from actionOrderHistoryAddAfter to actionValidateOrder

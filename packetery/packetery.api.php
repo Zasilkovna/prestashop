@@ -24,7 +24,6 @@
  */
 
 use Packetery\Exceptions\SenderGetReturnRoutingException;
-use Packetery\Order\OrderRepository;
 
 include_once(dirname(__file__) . '/packetery.class.php');
 
@@ -97,7 +96,7 @@ class PacketeryApi
         $id_orders = explode(',', $orders_id);
         foreach ($id_orders as $id_order) {
             $packetery_order = Packeteryclass::getPacketeryOrderRow($id_order);
-            if ($packetery_order['id_branch'] == 0) {
+            if ($packetery_order && (int)$packetery_order['id_branch'] === 0) {
                 $err[] = $id_order;
             }
         }
@@ -183,6 +182,9 @@ class PacketeryApi
         $module = new Packetery;
         $id_order = $order->id;
         $packetery_order = Packeteryclass::getPacketeryOrderRow($id_order);
+        if (!$packetery_order) {
+            return [0, $module->l('Can\'t load order to create packet.', 'packetery.api')];
+        }
         $id_address_delivery = $order->id_address_delivery;
         $address_delivery = new Address($id_address_delivery);
         $is_packetery_ad = $packetery_order['is_ad'];
@@ -333,7 +335,7 @@ class PacketeryApi
                 $error_msg = $e->faultstring;
             }
             if (isset($e->detail->PacketAttributesFault->attributes->fault)) {
-                if (count($e->detail->PacketAttributesFault->attributes->fault) > 1) {
+                if (is_array($e->detail->PacketAttributesFault->attributes->fault) && count($e->detail->PacketAttributesFault->attributes->fault) > 1) {
                     foreach ($e->detail->PacketAttributesFault->attributes->fault as $fault) {
                         $error_msg = $error_msg . "\n" . $fault->name . ': ' . $fault->fault;
                     }
@@ -578,79 +580,20 @@ class PacketeryApi
                 WHERE `is_ad` = 1 OR `is_pickup_point` = 1
                 ORDER BY `country`, `name`';
         $result = Db::getInstance()->executeS($sql);
-        $branches = array();
-        foreach ($result as $branch) {
-            $branches[] = array(
-                'id_branch' => $branch['id_branch'],
-                'name' => $branch['name'] . ', ' . Tools::strtoupper($branch['country']),
-                'currency' => $branch['currency'],
-                'pickup_point_type' => ($branch['is_pickup_point'] ? 'external' : null),
-            );
+        $branches = [];
+        if ($result) {
+            foreach ($result as $branch) {
+                $branches[] = array(
+                    'id_branch' => $branch['id_branch'],
+                    'name' => $branch['name'] . ', ' . Tools::strtoupper($branch['country']),
+                    'currency' => $branch['currency'],
+                    'pickup_point_type' => ($branch['is_pickup_point'] ? 'external' : null),
+                );
+            }
         }
         return $branches;
     }
     /*END BRANCHES*/
-
-    /*WIDGET*/
-    public static function widgetSaveOrderBranch()
-    {
-        $id_cart = Context::getContext()->cart->id;
-
-        if (!isset($id_cart) ||
-            !Tools::getIsset('id_branch') ||
-            !Tools::getIsset('name_branch') ||
-            !Tools::getIsset('prestashop_carrier_id')
-        ) {
-            return false;
-        }
-
-        $id_branch = Tools::getValue('id_branch');
-        $name_branch = Tools::getValue('name_branch');
-        $prestashopCarrierId = Tools::getValue('prestashop_carrier_id');
-        $pickupPointType = (Tools::getIsset('pickup_point_type') ? Tools::getValue('pickup_point_type') : 'internal');
-        $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
-        $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue(
-            'carrier_pickup_point_id'
-        ) : null);
-
-        $packetery_carrier_row = Packeteryclass::getPacketeryCarrierById((int)$prestashopCarrierId);
-        $is_cod = $packetery_carrier_row['is_cod'];
-
-        $currency = CurrencyCore::getCurrency(Context::getContext()->cart->id_currency);
-        $currency_branch = $currency['iso_code'];
-
-        if (!isset($currency_branch) ||
-            !isset($is_cod)
-        ) {
-            return false;
-        }
-
-        $packeteryOrderFields = [
-            'id_branch' => (int)$id_branch,
-            'name_branch' => pSQL($name_branch),
-            'currency_branch' => pSQL($currency_branch),
-            'id_carrier' => (int)$prestashopCarrierId,
-            'is_cod' => (int)$is_cod,
-            'is_ad' => 0,
-        ];
-        if ($pickupPointType === 'external') {
-            $packeteryOrderFields['is_carrier'] = 1;
-            $packeteryOrderFields['id_branch'] = (int)$widgetCarrierId;
-            $packeteryOrderFields['carrier_pickup_point'] = pSQL($carrierPickupPointId);
-        }
-
-        $db = Db::getInstance();
-        $isOrderSaved = (new OrderRepository($db))->existsByCart($id_cart);
-        if ($isOrderSaved) {
-            $result = $db->update('packetery_order', $packeteryOrderFields, '`id_cart` = ' . ((int)$id_cart));
-        } else {
-            $packeteryOrderFields['id_cart'] = ((int)$id_cart);
-            $result = $db->insert('packetery_order', $packeteryOrderFields);
-        }
-
-        return $result;
-    }
-    /*END WIDGET*/
 
     /** Endpoint is called in PS 1.6 only. PS 1.6 does not have hook for carrier extra content.
      * @return string

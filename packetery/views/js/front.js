@@ -97,7 +97,7 @@ PacketaModule.runner = {
             var widgetCarrierId = $extra.find(".packeta-carrier-id").val();
             var carrierPickupPointId = $extra.find(".packeta-carrier-pickup-point-id").val();
 
-            PacketaModule.ajax.saveSelectedBranch(
+            PacketaModule.ajax.savePickupPointInCart(
                 prestashopCarrierId,
                 branchId,
                 branchName,
@@ -284,14 +284,20 @@ PacketaModule.ui = {
                 var prestashopCarrierId = packeteryModulesManager.getCarrierId(selectedInput);
 
                 /* Save packetery order without order ID - just cart id so we can access carrier data later */
-                PacketaModule.ajax.saveSelectedBranch(
+                PacketaModule.ajax.savePickupPointInCart(
                     prestashopCarrierId,
                     pickupPoint.id,
                     pickupPoint.name,
                     pickupPoint.pickupPointType,
                     pickupPoint.carrierId,
                     pickupPoint.carrierPickupPointId,
-                    PacketaModule.ui.toggleSubmit
+                    function (jsonResponse) {
+                        if (jsonResponse.result === true) {
+                            PacketaModule.ui.toggleSubmit();
+                        } else {
+                            console.error(jsonResponse.message);
+                        }
+                    }
                 );
             }, widgetOptions);
         });
@@ -341,9 +347,9 @@ PacketaModule.ajax = {
                 // todo: To which checkout module does this css class belong? Not Supercheckout PS 1.7, not PS 1.7, not PS 1.6 5-step nor OPC
                 $("body").toggleClass("wait");
             },
-            success: function () {
+            success: function (response) {
                 if (typeof onSuccess !== 'undefined') {
-                    onSuccess();
+                    onSuccess(response);
                 }
             },
             complete: function () {
@@ -352,8 +358,8 @@ PacketaModule.ajax = {
         });
     },
 
-    saveSelectedBranch: function (prestashopCarrierId, branchId, branchName, pickupPointType, widgetCarrierId, carrierPickupPointId, onSuccess) {
-        return PacketaModule.ajax.post('saveSelectedBranch', {
+    savePickupPointInCart: function (prestashopCarrierId, branchId, branchName, pickupPointType, widgetCarrierId, carrierPickupPointId, onSuccess) {
+        return PacketaModule.ajax.post('savePickupPointInCart', {
             'prestashop_carrier_id': prestashopCarrierId,
             'id_branch': branchId,
             'name_branch': branchName,
