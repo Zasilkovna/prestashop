@@ -12,7 +12,7 @@ var PacketeryCheckoutModulePs16 = {
     },
 
     findDeliveryOptions: function () {
-        return $('.delivery_option input');
+        return $('#carrier_area .delivery_option input');
     },
 
     enableSubmitButton: function () {

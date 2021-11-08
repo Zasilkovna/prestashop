@@ -380,7 +380,8 @@ PacketaModule.ajax = {
 function PacketeryCheckoutModulesManager()
 {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
-    this.supportedModules = ['Ps16', 'Ps17', 'Unknown', 'Supercheckout'];
+    // order is important because of false positives (Unknown has to be last)
+    this.supportedModules = ['Ps16', 'Ps17', 'Supercheckout', 'OpcZelarg', 'Unknown'];
     this.loadedModules = [];
     this.detectedModule = null;
 
