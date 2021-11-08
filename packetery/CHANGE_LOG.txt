@@ -77,3 +77,4 @@
        - Fixed: functionality of KnowBand SuperCheckout when no shipping method is preselected
        - Fixed: fresh checkout no longer throws error in development mode
 2.1.12 - Fixed: weight loading and setting in case Packeta orders are paged
+2.1.13 - Updated: improved compatibility with PHP versions 7.2,7.4

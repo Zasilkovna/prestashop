@@ -109,8 +109,7 @@ class PacketeryApi
         foreach ($id_orders as $id_order)
         {
             $packetery_order = Packeteryclass::getPacketeryOrderRow($id_order);
-            if ($packetery_order['id_branch'] == 0)
-            {
+            if ($packetery_order && (int)$packetery_order['id_branch'] === 0) {
                 $err[] = $id_order;
             }
         }
@@ -219,6 +218,9 @@ class PacketeryApi
         $module = new Packetery;
         $id_order = $order->id;
         $packetery_order = Packeteryclass::getPacketeryOrderRow($id_order);
+        if (!$packetery_order) {
+            return [0, $module->l('Can\'t load order to create packet.', 'packetery.api')];
+        }
         $id_address_delivery = $order->id_address_delivery;
         $address_delivery = new Address($id_address_delivery);
         $is_packetery_ad = $packetery_order['is_ad'];
@@ -411,7 +413,7 @@ class PacketeryApi
             }
             if (isset($e->detail->PacketAttributesFault->attributes->fault))
             {
-                if (count($e->detail->PacketAttributesFault->attributes->fault) > 1)
+                if (is_array($e->detail->PacketAttributesFault->attributes->fault) && count($e->detail->PacketAttributesFault->attributes->fault) > 1)
                 {
                     foreach ($e->detail->PacketAttributesFault->attributes->fault as $fault)
                     {
@@ -614,15 +616,16 @@ class PacketeryApi
                 WHERE `is_ad` = 1 OR `is_pickup_point` = 1
                 ORDER BY `country`, `name`';
         $result = Db::getInstance()->executeS($sql);
-        $branches = array();
-        foreach ($result as $branch)
-        {
-            $branches[] = array(
-                'id_branch' => $branch['id_branch'],
-                'name' => $branch['name'] . ', ' . Tools::strtoupper($branch['country']),
-                'currency' => $branch['currency'],
-                'pickup_point_type' => ($branch['is_pickup_point'] ? 'external' : null),
-            );
+        $branches = [];
+        if ($result) {
+            foreach ($result as $branch) {
+                $branches[] = array(
+                    'id_branch' => $branch['id_branch'],
+                    'name' => $branch['name'] . ', ' . Tools::strtoupper($branch['country']),
+                    'currency' => $branch['currency'],
+                    'pickup_point_type' => ($branch['is_pickup_point'] ? 'external' : null),
+                );
+            }
         }
         return $branches;
     }
@@ -649,6 +652,9 @@ class PacketeryApi
         $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
 
         $packetery_carrier_row = Packeteryclass::getPacketeryCarrierById((int)$prestashopCarrierId);
+        if (!$packetery_carrier_row) {
+            return false;
+        }
         $is_cod = $packetery_carrier_row['is_cod'];
 
         $currency = CurrencyCore::getCurrency(Context::getContext()->cart->id_currency);
