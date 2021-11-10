@@ -548,8 +548,7 @@ class Packeteryclass
     public static function getListPayments()
     {
         $installedPaymentModules = PaymentModule::getInstalledPaymentModules();
-        $sql = 'SELECT DISTINCT `module_name`, `is_cod`
-            FROM `' . _DB_PREFIX_ . 'packetery_payment`';
+        $sql = 'SELECT DISTINCT `module_name`, `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_payment`';
 
         $results = Db::getInstance()->executeS($sql);
         $paymentModules = [];
@@ -560,6 +559,9 @@ class Packeteryclass
         $payments = [];
         foreach ($installedPaymentModules as $installedPaymentModule) {
             $instance = Module::getInstanceByName($installedPaymentModule['name']);
+            if ($instance === false) {
+                continue;
+            }
             $is_cod = (array_key_exists(
                 $installedPaymentModule['name'],
                 $paymentModules
