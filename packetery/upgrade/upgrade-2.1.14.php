@@ -16,4 +16,7 @@ function upgrade_module_2_1_14(Packetery $module)
         $module->unregisterHook('backOfficeHeader') &&
         $module->registerHook('displayBackOfficeHeader')
     );
+    /* todo 573 widget-hd
+    return Configuration::updateValue('PACKETERY_ADDRESS_VALIDATION', 'none');
+    */
 }
