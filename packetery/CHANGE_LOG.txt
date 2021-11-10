@@ -72,3 +72,4 @@
       - Updated: improved compatibility with PHP versions 7.2,7.4
       - Updated: refactored saving pickup point information in cart
       - Updated: hook for new orders changed from actionOrderHistoryAddAfter to actionValidateOrder
+      - Fixed: treated a rare situation where the payment module cannot be instantiated
