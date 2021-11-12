@@ -714,7 +714,7 @@ class Packetery extends CarrierModule
      * @param array $packeteryOrder
      * @param int $orderId
      */
-    private function prepareAddressChange($apiKey, $packeteryOrder, $orderId)
+    private function prepareAddressChange($apiKey, array $packeteryOrder, $orderId)
     {
         $employee = Context::getContext()->employee;
         $widgetOptions = [
@@ -989,7 +989,7 @@ class Packetery extends CarrierModule
     /**
      * @param array $params
      */
-    public function hookActionValidateStepComplete(&$params)
+    public function hookActionValidateStepComplete(array &$params)
     {
         if (Configuration::get('PACKETERY_ADDRESS_VALIDATION') !== 'required') {
             $params['completed'] = true;
