@@ -7,6 +7,10 @@
     <input type="hidden" id="customerCity" name="customerCity" value="{$customerCity|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerZip" name="customerZip" value="{$customerZip|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="addressValidationSetting" name="addressValidationSetting" value="{$addressValidationSetting|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="addressValidated" name="addressValidated" value="{$addressValidated|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="addressValidatedMessage" name="addressValidatedMessage" value="{$addressValidatedMessage|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="addressNotValidatedMessage" name="addressNotValidatedMessage" value="{$addressNotValidatedMessage|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="countryDiffersMessage" name="countryDiffersMessage" value="{$countryDiffersMessage|escape:'htmlall':'UTF-8'}">
     <div id="packetery-widget" class="clearfix">
         <div class="widget-left">
             <div class="col-md-12">
@@ -17,12 +21,20 @@
                     <br>
                     <ul>
                         <li>{l s='Selected delivery address' mod='packetery'}:
-                            <span id="picked-delivery-place" class="picked-delivery-place">
+                            <span class="picked-delivery-place">
                                 {assign var=addressInfo value=[]}
                                 {if $customerStreet}{$addressInfo[]=$customerStreet}{/if}
                                 {if $customerCity}{$addressInfo[]=$customerCity}{/if}
                                 {if $customerZip}{$addressInfo[]=$customerZip}{/if}
                                 {', '|implode:$addressInfo}
+                            </span>
+                            <br>
+                            <span class="address-validation-result{if $addressValidated} address-validated{/if}">
+                                {if $addressValidated}
+                                    {$addressValidatedMessage|escape:'htmlall':'UTF-8'}
+                                {else}
+                                    {$addressNotValidatedMessage|escape:'htmlall':'UTF-8'}
+                                {/if}
                             </span>
                         </li>
                     </ul>

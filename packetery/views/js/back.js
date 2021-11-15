@@ -36,9 +36,9 @@ $(document).ready(function(){
 	// starting with 0 before calling psTableAddCheckbox; see drawOrdersRow
 	var orderColumnId = 0;
 	var orderColumnCod = 4;
-	var orderColumnExported = 7;
-	var orderColumnTracking = 8;
-	var orderColumnWeight = 9;
+	var orderColumnExported = 8;
+	var orderColumnTracking = 9;
+	var orderColumnWeight = 10;
 
 	tools = {
 		/*Pagination*/
@@ -790,6 +790,40 @@ $(document).ready(function(){
 });
 
 $(document).ready(function () {
+	var $widgetHdButton = $('.open-packeta-hd-widget');
+	if ($widgetHdButton.length === 1) {
+		// TODO: add hd widget address
+		$.getScript('...').fail(function () {
+			console.error('Unable to load Packeta home delivery widget.');
+		});
+
+		var widgetHdOptionsData = $widgetHdButton.data('widget-options');
+		var widgetHdOptions = {
+			layout: 'hd',
+			carrierId: widgetHdOptionsData['carrierId'],
+			country: widgetHdOptionsData['country'],
+			language: widgetHdOptionsData['language'],
+			street: widgetHdOptionsData['street'],
+			houseNumber: widgetHdOptionsData['houseNumber'],
+			city: widgetHdOptionsData['city'],
+			postcode: widgetHdOptionsData['zip']
+		};
+		$widgetHdButton.on('click', function (event) {
+			event.preventDefault();
+			PacketaHD.Widget.pick(widgetHdOptionsData['apiKey'], function (result) {
+				if (result !== null && result.address !== null) {
+					var address = result.address;
+					$('.packetery form input[name="address"]').val(JSON.stringify(address));
+					$('.packetery-street').text(address.street + ' ' + address.houseNumber);
+					$('.packetery-city').text(address.city);
+					$('.packetery-zip').text(address.zip);
+					$('.packetery-county').text(address.county);
+					$('.packetery-gps').text(address.latitude + ', ' + address.longitude);
+				}
+			}, widgetHdOptions);
+		});
+	}
+
 	var $widgetButton = $('.open-packeta-widget');
 	if ($widgetButton.length === 1) {
 		$.getScript("https://widget.packeta.com/v6/www/js/library.js")

@@ -4,7 +4,8 @@ $.getScript("https://widget.packeta.com/v6/www/js/library.js")
         console.error('Unable to load Packeta Widget.');
     });
 
-$.getScript('https://widget-hd.packeta.com/www/js/library-hd.js').fail(function () {
+// TODO: add hd widget address
+$.getScript('...').fail(function () {
     console.error('Unable to load Packeta home delivery widget.');
 });
 
@@ -61,6 +62,7 @@ function PacketeryCheckoutModulesManager() {
     }
 }
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
+var $selectedInput;
 
 $(document).ready(function ()
 {
@@ -92,7 +94,7 @@ window.initializePacketaWidget = function ()
     var app_identity = $('#app_identity').val(); // Get module version for widgets
 
     var module = packeteryModulesManager.detectModule();
-    var $selectedInput = module.getSelectedInput();
+    $selectedInput = module.getSelectedInput();
     if ($selectedInput.length === 0) {
         $(module.getExtraContentSelector()).hide();
         return;
@@ -179,18 +181,30 @@ window.initializePacketaWidget = function ()
         if (customerZip) {
             widgetOptions.postCode = customerZip;
         }
-        PacketaHD.Widget.pick(packetaApiKey, function (address) {
+        PacketaHD.Widget.pick(packetaApiKey, function (result) {
             var $selectedDeliveryOption = module.getSelectedInput();
             $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
 
-            if (address != null) {
-                // TODO: widget-hd
-                console.log(address);
-                module.enableSubmitButton();
-            } else {
-                // TODO: widget-hd check for validated address
-                if (addressValidationSetting === 'required') {
-                    module.disableSubmitButton();
+            if (result != null && result.address != null) {
+                // there is also property packetaWidgetMessage which is true
+                var address = result.address;
+                var $addressValidationResult = $widgetParent.find('.address-validation-result');
+                if (address.country === country) {
+                    packetery.widgetSaveOrderAddress(address);
+                    $widgetParent.find('#addressValidated').val(true);
+                    $addressValidationResult.addClass('address-validated');
+                    $addressValidationResult.text($widgetParent.find('#addressValidatedMessage').val());
+                    $widgetParent.find('.picked-delivery-place').html(
+                        address.street + ' ' + address.houseNumber + ', ' + address.city + ', ' + address.postcode
+                    );
+                    module.enableSubmitButton();
+                } else {
+                    $widgetParent.find('#addressValidated').val(false);
+                    $addressValidationResult.removeClass('address-validated');
+                    $addressValidationResult.text($widgetParent.find('#countryDiffersMessage').val());
+                    if (tools.isAddressValidationUnsatisfied($widgetParent)) {
+                        module.disableSubmitButton();
+                    }
                 }
             }
         }, widgetOptions);
@@ -231,11 +245,11 @@ tools = {
                     }
                 }
             }
-            if ($extra.find('#open-packeta-widget-hd').length) {
-                // TODO: widget-hd check for validated address
-                if (addressValidationSetting === 'required') {
-                    module.disableSubmitButton();
-                }
+            if ($extra.is(':visible') &&
+                $extra.find('#open-packeta-widget-hd').length &&
+                tools.isAddressValidationUnsatisfied($extra)
+            ) {
+                module.disableSubmitButton();
             }
         });
 
@@ -258,6 +272,7 @@ tools = {
             }
 
             if ($this.is(':checked')) {
+                $selectedInput = $this;
                 var $wrapper = $extra.closest(module.getExtraContentSelector());
                 setTimeout(function () {
                     if ($wrapper.is(':hidden')) {
@@ -279,13 +294,13 @@ tools = {
                     module.disableSubmitButton();
                 }
             }
-            if ($extra.find('#open-packeta-widget-hd').length) {
-                // TODO: widget-hd check for validated address
-                if (addressValidationSetting === 'required') {
-                    module.disableSubmitButton();
-                }
+            if ($extra.find('#open-packeta-widget-hd').length && tools.isAddressValidationUnsatisfied($extra)) {
+                module.disableSubmitButton();
             }
         });
+    },
+    isAddressValidationUnsatisfied: function($widgetParent) {
+        return addressValidationSetting === 'required' && $widgetParent.find('#addressValidated').val() !== true;
     }
 }
 
@@ -312,6 +327,21 @@ packetery = {
             complete: function () {
                 $("body").toggleClass("wait");
             },
+        });
+    },
+    widgetSaveOrderAddress: function (address) {
+        $.ajax({
+            type: 'POST',
+            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=widgetSaveOrderAddress' + ajaxs.checkToken(),
+            data: {
+                'address': address
+            },
+            beforeSend: function () {
+                $("body").toggleClass("wait");
+            },
+            complete: function () {
+                $("body").toggleClass("wait");
+            }
         });
     }
 }
