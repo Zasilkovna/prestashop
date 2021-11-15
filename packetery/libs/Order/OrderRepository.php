@@ -92,4 +92,23 @@ class OrderRepository
             WHERE `id_order` IN (' . implode(',', $orderIds) . ')'
         );
     }
+
+    /**
+     * @param int $cartId
+     * @return array|bool|object|null
+     */
+    public function getByCart($cartId)
+    {
+        return $this->db->getRow('SELECT `is_ad`, `zip` FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . $cartId);
+    }
+
+    /**
+     * @param int $cartId
+     * @param int $carrierId
+     * @return array|bool|object|null
+     */
+    public function getByCartAndCarrier($cartId, $carrierId)
+    {
+        return $this->db->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'packetery_order WHERE id_cart =' . $cartId . ' AND id_carrier = ' . $carrierId);
+    }
 }

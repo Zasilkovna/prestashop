@@ -39,6 +39,12 @@ switch (Tools::getValue('action')) {
     case 'widgetsaveorderbranch':
         PacketeryApi::widgetSaveOrderBranch();
         break;
+    case 'widgetSaveOrderAddress':
+        $orderRepository = new \Packetery\Order\OrderRepository(Db::getInstance());
+        $module = new Packetery();
+        $orderAjax = new \Packetery\Order\Ajax($module, $orderRepository);
+        $orderAjax->widgetSaveOrderAddress();
+        break;
     default:
         exit;
 }
