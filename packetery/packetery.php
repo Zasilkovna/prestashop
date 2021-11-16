@@ -113,9 +113,17 @@ class Packetery extends CarrierModule
         return parent::uninstall();
     }
 
+    /**
+     * @param array $params hook parameters
+     * @throws PrestaShopDatabaseException
+     * @throws ReflectionException
+     */
     public function hookActionCarrierUpdate($params)
     {
-        Packeteryclass::actionCarrierUpdate($params);
+        if ($params['id_carrier'] != $params['carrier']->id) {
+            $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+            $carrierRepository->swapId((int)$params['id_carrier'], (int)$params['carrier']->id);
+        }
     }
 
     private static function transportMethod()
@@ -237,9 +245,10 @@ class Packetery extends CarrierModule
         /*END ORDERS*/
 
         /*CARRIERS*/
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $this->context->smarty->assign(
             'carriers_json',
-            rawurlencode(json_encode(PacketeryApi::getAdAndExternalCarriers()))
+            rawurlencode(json_encode($carrierRepository->getAdAndExternalCarriers()))
         );
         $this->context->smarty->assign('zpoint', Packeteryclass::ZPOINT);
         $this->context->smarty->assign('pp_all', Packeteryclass::PP_ALL);
@@ -250,7 +259,7 @@ class Packetery extends CarrierModule
         );
 
         /*AD CARRIER LIST*/
-        $packeteryListAdCarriers = Packeteryclass::getPacketeryCarriersList();
+        $packeteryListAdCarriers = $carrierRepository->getPacketeryCarriersList();
         if ($packeteryListAdCarriers) {
             $carrierTools = $this->diContainer->get(\Packetery\Carrier\CarrierTools::class);
             foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
@@ -292,7 +301,8 @@ class Packetery extends CarrierModule
         /*END AD CARRIER LIST*/
 
         /*PAYMENT LIST*/
-        $payment_list = Packeteryclass::getListPayments();
+        $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
+        $payment_list = Packeteryclass::getListPayments($paymentRepository);
         $this->context->smarty->assign(array(
             'payment_list' => Tools::jsonEncode(array(
                 'columns' => array(
@@ -308,7 +318,7 @@ class Packetery extends CarrierModule
         /*END PAYMENT LIST*/
 
         /*BRANCHES*/
-        $total_branches = PacketeryApi::countBranches();
+        $total_branches = $carrierRepository->getAdAndExternalCount();
         $last_branches_update = '';
         if ((string)$settings['PACKETERY_LAST_BRANCHES_UPDATE'] !== '') {
             $date = new DateTime();
@@ -439,31 +449,28 @@ class Packetery extends CarrierModule
         $carrierId = '';
         $carrierPickupPointId = '';
         if (!empty($params['cart'])) {
-            $row = Db::getInstance()->getRow(
-                'SELECT * FROM ' . _DB_PREFIX_ .
-                'packetery_order WHERE id_cart =' .
-                (int)$params['cart']->id .
-                ' AND id_carrier = ' . (int)$id_carrier
-            );
-            if ($row) {
-                $name_branch = $row['name_branch'];
-                $currency_branch = $row['currency_branch'];
-                $carrierPickupPointId = $row['carrier_pickup_point'];
+            $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+            $orderData = $orderRepository->getByCartAndCarrier((int)$params['cart']->id, (int)$id_carrier);
+            if ($orderData) {
+                $name_branch = $orderData['name_branch'];
+                $currency_branch = $orderData['currency_branch'];
+                $carrierPickupPointId = $orderData['carrier_pickup_point'];
 
-                if ($row['is_carrier'] == 1) {
+                if ($orderData['is_carrier'] == 1) {
                     // to be consistent with widget behavior
-                    $id_branch = $row['carrier_pickup_point'];
+                    $id_branch = $orderData['carrier_pickup_point'];
 
                     $pickupPointType = 'external';
-                    $carrierId = $row['id_branch'];
+                    $carrierId = $orderData['id_branch'];
                 } else {
-                    $id_branch = $row['id_branch'];
+                    $id_branch = $orderData['id_branch'];
                 }
             }
         }
 
         $widgetCarriers = '';
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$id_carrier);
         if ($packeteryCarrier) {
             if ($packeteryCarrier['pickup_point_type'] === 'external' && $packeteryCarrier['id_branch']) {
                 $widgetCarriers = $packeteryCarrier['id_branch'];
@@ -511,11 +518,8 @@ class Packetery extends CarrierModule
             $customerCountry = strtolower($countryIso);
         }
 
-        $deliveryPointCarriers = Db::getInstance()->executeS(
-            'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
-            JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`)
-            WHERE `c`.`deleted` = 0 AND `pad`.`pickup_point_type` IS NOT NULL'
-        );
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        $deliveryPointCarriers = $carrierRepository->getPickupPointCarriers();
         $deliveryPointCarrierIds = array_column($deliveryPointCarriers, 'id_carrier');
 
         /* Get language from cart, global $language updates weirdly */
@@ -635,15 +639,8 @@ class Packetery extends CarrierModule
         }
 
         $apiKey = PacketeryApi::getApiKey();
-        $packeteryOrder = Db::getInstance()->getRow(
-            'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`, `po`.`is_carrier`,
-                    `c`.`iso_code` AS `country`
-            FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
-            JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
-            JOIN `' . _DB_PREFIX_ . 'address` `a` ON `a`.`id_address` = `o`.`id_address_delivery` 
-            JOIN `' . _DB_PREFIX_ . 'country` `c` ON `c`.`id_country` = `a`.`id_country`
-            WHERE `po`.`id_order` = ' . ((int)$params['id_order'])
-        );
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        $packeteryOrder = $orderRepository->getOrderWithCountry((int)$params['id_order']);
         if (!$apiKey || !$packeteryOrder) {
             return;
         }
@@ -687,7 +684,9 @@ class Packetery extends CarrierModule
             'module_dir' => _MODULE_DIR_,
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
         ];
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
+
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
         if ($packeteryCarrier) {
             if (
                 $packeteryCarrier['pickup_point_type'] === 'external' &&
@@ -728,6 +727,7 @@ class Packetery extends CarrierModule
 
     /**
      * @return bool
+     * @throws PrestaShopDatabaseException
      */
     private function savePickupPointChange()
     {
@@ -737,17 +737,19 @@ class Packetery extends CarrierModule
             return false;
         }
 
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         $packeteryOrderFields = [
             'id_branch' => (int)$pickupPoint->id,
-            'name_branch' => pSQL($pickupPoint->name),
-            'currency_branch' => pSQL($pickupPoint->currency),
+            'name_branch' => $orderRepository->db->escape($pickupPoint->name),
+            'currency_branch' => $orderRepository->db->escape($pickupPoint->currency),
         ];
         if ($pickupPoint->pickupPointType === 'external') {
             $packeteryOrderFields['is_carrier'] = 1;
             $packeteryOrderFields['id_branch'] = (int)$pickupPoint->carrierId;
-            $packeteryOrderFields['carrier_pickup_point'] = pSQL($pickupPoint->carrierPickupPointId);
+            $packeteryOrderFields['carrier_pickup_point'] = $orderRepository->db->escape($pickupPoint->carrierPickupPointId);
         }
-        return (bool)Db::getInstance()->update('packetery_order', $packeteryOrderFields, '`id_order` = ' . $orderId);
+
+        return $orderRepository->updateByOrder($packeteryOrderFields, $orderId);
     }
 
     /**
@@ -821,13 +823,8 @@ class Packetery extends CarrierModule
         if (empty($order)) {
             return;
         }
-        $orderData = Db::getInstance()->getRow(
-            sprintf(
-                'SELECT `name_branch` FROM `%spacketery_order` WHERE `id_cart` = %d AND `is_ad` = 0',
-                _DB_PREFIX_,
-                (int)$order->id_cart
-            )
-        );
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        $orderData = $orderRepository->getBranchNameByCart((int)$order->id_cart);
         if (!$orderData) {
             return;
         }
@@ -848,13 +845,8 @@ class Packetery extends CarrierModule
         if (!isset($params['order'])) {
             return;
         }
-        $orderData = Db::getInstance()->getRow(
-            sprintf(
-                'SELECT `name_branch` FROM `%spacketery_order` WHERE `id_order` = %d AND `is_ad` = 0',
-                _DB_PREFIX_,
-                (int)$params['order']->id
-            )
-        );
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        $orderData = $orderRepository->getBranchNameByOrder((int)$params['order']->id);
         if (!$orderData) {
             return;
         }
@@ -882,14 +874,8 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $orderData = Db::getInstance()->getRow(
-            sprintf(
-                'SELECT `name_branch`, `id_branch`, `is_carrier`
-            FROM `%spacketery_order` WHERE `id_order` = %d AND `is_ad` = 0',
-                _DB_PREFIX_,
-                (int)$params['template_vars']['{id_order}']
-            )
-        );
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        $orderData = $orderRepository->getByOrder((int)$params['template_vars']['{id_order}']);
         if (!$orderData) {
             return;
         }

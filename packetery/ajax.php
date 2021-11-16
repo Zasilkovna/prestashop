@@ -23,6 +23,10 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Carrier\CarrierRepository;
+use Packetery\Order\OrderRepository;
+use Packetery\Payment\PaymentRepository;
+
 if (!defined('_PS_ADMIN_DIR_')) {
     define('_PS_ADMIN_DIR_', getcwd());
 }
@@ -43,20 +47,28 @@ switch (Tools::getValue('action')) {
         Packeteryclass::updateSettings();
         break;
     case 'getcountbranches':
-        PacketeryApi::countBranchesAjax();
+        $module = new Packetery();
+        $carrierRepository = $module->diContainer->get(CarrierRepository::class);
+        PacketeryApi::countBranchesAjax($carrierRepository);
         break;
     case 'updatebranches':
-        PacketeryApi::updateBranchListAjax();
+        $module = new Packetery();
+        $carrierRepository = $module->diContainer->get(CarrierRepository::class);
+        PacketeryApi::updateBranchListAjax($carrierRepository);
         break;
     /*SETTINGS*/
     case 'change_payment_cod':
-        Packeteryclass::changePaymentCodAjax();
+        $module = new Packetery();
+        $paymentRepository = $module->diContainer->get(PaymentRepository::class);
+        Packeteryclass::changePaymentCodAjax($paymentRepository);
         break;
     case 'change_ad_carrier_cod':
         Packeteryclass::changeAdCarrierCodAjax();
         break;
     case 'set_ad_carrier_association':
-        Packeteryclass::setPacketeryCarrierAjax();
+        $module = new Packetery();
+        $carrierRepository = $module->diContainer->get(CarrierRepository::class);
+        Packeteryclass::setPacketeryCarrierAjax($carrierRepository);
         break;
     /*END SETTINGS*/
     /*ORDERS*/
@@ -67,13 +79,19 @@ switch (Tools::getValue('action')) {
         Packeteryclass::changeOrderCodAjax();
         break;
     case 'prepare_order_export':
-        PacketeryApi::prepareOrderExportAjax();
+        $module = new Packetery();
+        $orderRepository = $module->diContainer->get(OrderRepository::class);
+        PacketeryApi::prepareOrderExportAjax($orderRepository);
         break;
     case 'order_export':
-        PacketeryApi::ordersExportAjax();
+        $module = new Packetery();
+        $orderRepository = $module->diContainer->get(OrderRepository::class);
+        PacketeryApi::ordersExportAjax($orderRepository);
         break;
     case 'download_pdf':
-        PacketeryApi::downloadPdfAjax();
+        $module = new Packetery();
+        $orderRepository = $module->diContainer->get(OrderRepository::class);
+        PacketeryApi::downloadPdfAjax($orderRepository);
         break;
     /*END ORDERS*/
     default:

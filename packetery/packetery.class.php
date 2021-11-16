@@ -23,7 +23,10 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Carrier\CarrierRepository;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
+use Packetery\Order\OrderRepository;
+use Packetery\Payment\PaymentRepository;
 
 require_once(dirname(__FILE__) . '../../../config/config.inc.php');
 require_once(dirname(__FILE__) . '../../../classes/Cookie.php');
@@ -48,25 +51,18 @@ class Packeteryclass
 
     /**
      * Converts price from order currency to branch currency
-     * @param $order_currency_iso
-     * @param $branch_currency_iso
-     * @param $total
+     * @param string $order_currency_iso
+     * @param string $branch_currency_iso
+     * @param float|int $total
+     * @param OrderRepository $orderRepository
      * @return float|int
+     * @throws PrestaShopException
      */
-    public static function getRateTotal($order_currency_iso, $branch_currency_iso, $total)
+    public static function getRateTotal($order_currency_iso, $branch_currency_iso, $total, OrderRepository $orderRepository)
     {
         $cnb_rates = null;
-        $sql = 'SELECT cs.conversion_rate
-                    FROM `' . _DB_PREFIX_ . 'currency_shop` cs 
-                    INNER JOIN `' . _DB_PREFIX_ . 'currency` c ON c.id_currency=cs.id_currency 
-                        AND c.iso_code="' . pSQL($order_currency_iso) . '";';
-        $conversion_rate_order = Db::getInstance()->getValue($sql);
-
-        $sql = 'SELECT cs.conversion_rate
-                    FROM `' . _DB_PREFIX_ . 'currency_shop` cs 
-                    INNER JOIN `' . _DB_PREFIX_ . 'currency` c ON c.id_currency=cs.id_currency 
-                        AND c.iso_code="' . pSQL($branch_currency_iso) . '";';
-        $conversion_rate_branch = Db::getInstance()->getValue($sql);
+        $conversion_rate_order = $orderRepository->getConversionRate($order_currency_iso);
+        $conversion_rate_branch = $orderRepository->getConversionRate($branch_currency_iso);
 
         if ($conversion_rate_branch) {
             $conversion_rate = $conversion_rate_branch / $conversion_rate_order;
@@ -109,44 +105,7 @@ class Packeteryclass
         return (ceil($n) % $x === 0) ? ceil($n) : round(($n + $x / 2) / $x) * $x;
     }
 
-    /**
-     * Update packetery carrier data
-     * @param $params
-     */
-    public static function actionCarrierUpdate($params)
-    {
-        if ($params['id_carrier'] != $params['carrier']->id) {
-            Db::getInstance()->update(
-                'packetery_address_delivery',
-                ['id_carrier' => ((int)$params['carrier']->id)],
-                '`id_carrier` = ' . ((int)$params['id_carrier'])
-            );
-        }
-    }
-
     /*ORDERS*/
-
-    /**
-     * Return packetery order by order ID
-     * @param $id_order
-     * @return array|bool|null|object
-     */
-    public static function getPacketeryOrderRow($id_order)
-    {
-        $sql = '
-            SELECT 
-                   `id_branch`, 
-                   `id_carrier`, 
-                   `is_cod`, 
-                   `is_ad`, 
-                   `currency_branch`, 
-                   `is_carrier`, 
-                   `carrier_pickup_point` 
-            FROM `' . _DB_PREFIX_ . 'packetery_order` 
-            WHERE id_order = ' . (int)$id_order;
-
-        return Db::getInstance()->getRow($sql);
-    }
 
     /**
      * Outputs order rows for ajax
@@ -160,6 +119,7 @@ class Packeteryclass
 
     /**
      * Get order data for datagrid
+     * TODO: will be removed by PES-113
      * @param int $page
      * @return array
      * @throws PrestaShopDatabaseException
@@ -201,12 +161,13 @@ class Packeteryclass
 
     /**
      * Get data for CSV Export
-     * @param $order_ids - IDs of orders to be exported
+     * @param array $order_ids - IDs of orders to be exported
+     * @param OrderRepository $orderRepository
      * @return array - Order data
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
-    public static function collectOrdersDataForCsvExport($order_ids)
+    public static function collectOrdersDataForCsvExport(array $order_ids, OrderRepository $orderRepository)
     {
         $data = [];
         foreach ($order_ids as $order_id) {
@@ -220,7 +181,7 @@ class Packeteryclass
                 continue;
             }
 
-            $packeteryOrder = self::getPacketeryOrderRow($order_id);
+            $packeteryOrder = $orderRepository->getPacketeryOrderRow($order_id);
 
             if (empty($packeteryOrder) || !isset($packeteryOrder['id_branch']) || empty($packeteryOrder['id_branch'])) {
                 continue;
@@ -269,41 +230,23 @@ class Packeteryclass
                 'Note' => "",
             ];
 
-            self::setPacketeryExport($order_id, true);
+            $orderRepository->setExported(true, $order_id);
         }
 
         return $data;
     }
 
     /**
-     * Set order exported
-     * @param $id_order
-     * @param $set
-     * @return bool
-     */
-    public static function setPacketeryExport($id_order, $set)
-    {
-        $result = false;
-        $sql = 'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-                                    SET exported=' . (int)$set . '
-                                    WHERE id_order=' . (int)$id_order . ';';
-        $result = Db::getInstance()->execute($sql);
-        return $result;
-    }
-
-    /**
      * Returns packetery order tracking number
-     * @param $id_orders
+     * @param string $id_orders comma separated integers
+     * @param OrderRepository $orderRepository
      * @return array
      * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
-    public static function getTrackingFromOrders($id_orders)
+    public static function getTrackingFromOrders($id_orders, OrderRepository $orderRepository)
     {
-        $sql = 'SELECT tracking_number
-                FROM `' . _DB_PREFIX_ . 'packetery_order` 
-                WHERE id_order IN(' . pSQL($id_orders) . ') 
-                    AND tracking_number!=\'\';';
-        $result = Db::getInstance()->executeS($sql);
+        $result = $orderRepository->getTrackingNumbers($id_orders);
         $tracking = [];
         if ($result) {
             foreach ($result as $tn) {
@@ -315,45 +258,23 @@ class Packeteryclass
 
     /**
      * Updates eshop and packetery order tracking number
-     * @param $id_order
-     * @param $tracking_number
+     * @param int $id_order
+     * @param string $tracking_number numeric
+     * @param OrderRepository $orderRepository
      * @return bool
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
-    public static function updateOrderTrackingNumber($id_order, $tracking_number)
+    public static function updateOrderTrackingNumber($id_order, $tracking_number, OrderRepository $orderRepository)
     {
         if (!isset($id_order) || !isset($tracking_number)) {
             return false;
         }
-        $db = Db::getInstance();
-        $sql_is_set_order = 'SELECT 1 
-                                FROM `' . _DB_PREFIX_ . 'packetery_order` 
-                                WHERE id_order=' . (int)$id_order . ';';
-        if ($db->getValue($sql_is_set_order) == 1) {
-            $sql_update_order_tn = 'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-                                        SET tracking_number="' . pSQL($tracking_number) . '"
-                                        WHERE id_order=' . (int)$id_order . ';';
-            if ($result = $db->execute($sql_update_order_tn)) {
-                self::updateOrderCarrierTracking($id_order, 'Z' . $tracking_number);
-            }
-            return $result;
-        } else {
-            return false;
+        if ($orderRepository->existsByOrder((int)$id_order)) {
+            return $orderRepository->setTrackingNumber((int)$id_order, $tracking_number);
         }
-    }
 
-    /**
-     * Updates packetery order tracking number
-     * @param $id_order
-     * @param $tracking_number
-     * @return bool
-     */
-    public static function updateOrderCarrierTracking($id_order, $tracking_number)
-    {
-        $sql_update_order_tn = 'UPDATE `' . _DB_PREFIX_ . 'order_carrier` 
-                                    SET tracking_number="' . pSQL($tracking_number) . '"
-                                    WHERE id_order=' . (int)$id_order . ';';
-        $result = Db::getInstance()->execute($sql_update_order_tn);
-        return $result;
+        return false;
     }
 
     /**
@@ -372,6 +293,7 @@ class Packeteryclass
 
     /**
      * Change order COD in DB
+     * TODO: will be removed by PES-113
      * @return bool
      */
     public static function changeOrderCod()
@@ -399,41 +321,13 @@ class Packeteryclass
     /*END ORDERS*/
 
     /**
-     * Get packetery carrier
-     * @param int $id_carrier
-     * @return array|bool|null|object
-     */
-    public static function getPacketeryCarrierById($id_carrier)
-    {
-        return Db::getInstance()->getRow('
-            SELECT `id_carrier`, `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`
-            FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
-            WHERE `id_carrier` = ' . $id_carrier);
-    }
-
-    /**
-     * Get all active packetery AD carriers
-     * @return array|false|mysqli_result|null|PDOStatement|resource
-     * @throws PrestaShopDatabaseException
-     */
-    public static function getPacketeryCarriersList()
-    {
-        return Db::getInstance()->executeS('
-            SELECT `c`.`id_carrier`, `c`.`name`, `pad`.`id_branch`, `pad`.`is_cod`, `pad`.`pickup_point_type` 
-            FROM `' . _DB_PREFIX_ . 'carrier` `c`
-            LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` USING(`id_carrier`)
-            WHERE `c`.`deleted` = 0
-            AND `c`.`active` = 1
-        ');
-    }
-
-    /**
      * Change COD for address delivery carriers - called by AJAX
      */
     public static function changeAdCarrierCodAjax()
     {
         $module = new Packetery;
-        $result = self::changeAdCarrierCod();
+        $carrierRepository = $module->diContainer->get(CarrierRepository::class);
+        $result = self::changeAdCarrierCod($carrierRepository);
         if ($result) {
             echo 'ok';
         } else {
@@ -443,24 +337,20 @@ class Packeteryclass
 
     /**
      * Change COD for address delivery carriers in DB
+     * @param CarrierRepository $carrierRepository
      * @return bool|void
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
-    public static function changeAdCarrierCod()
+    public static function changeAdCarrierCod(CarrierRepository $carrierRepository)
     {
         $id_carrier = Tools::getValue('id_carrier');
         $is_cod = Tools::getValue('value');
         if (!isset($id_carrier) || (!isset($is_cod))) {
             return;
         }
-        $db = Db::getInstance();
-        $sql_is_set_carrier = 'SELECT 1 
-                            FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` 
-                            WHERE id_carrier=' . (int)$id_carrier . '';
-        if ($db->getValue($sql_is_set_carrier) == 1) {
-            $sql_update_payment_cod = 'UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery` 
-                                        SET is_cod=' . (int)$is_cod . ' 
-                                        WHERE id_carrier=' . (int)$id_carrier . '';
-            $result = $db->execute($sql_update_payment_cod);
+        if ($carrierRepository->existsById((int)$id_carrier)) {
+            $result = $carrierRepository->setCodFlag((int)$id_carrier, (int)$is_cod);
         } else {
             $result = false;
         }
@@ -469,10 +359,13 @@ class Packeteryclass
 
     /**
      * Add address delivery to carrier - called by ajax
+     * @param CarrierRepository $carrierRepository
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
-    public static function setPacketeryCarrierAjax()
+    public static function setPacketeryCarrierAjax(CarrierRepository $carrierRepository)
     {
-        $result = self::setPacketeryCarrier();
+        $result = self::setPacketeryCarrier($carrierRepository);
         if ($result) {
             echo 'ok';
         } else {
@@ -482,9 +375,12 @@ class Packeteryclass
 
     /**
      * Add address delivery to carrier in DB
+     * @param CarrierRepository $carrierRepository
      * @return bool
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
-    private static function setPacketeryCarrier()
+    private static function setPacketeryCarrier(CarrierRepository $carrierRepository)
     {
         $branchName = Tools::getValue('branch_name');
         $branchCurrency = Tools::getValue('currency_branch');
@@ -496,13 +392,10 @@ class Packeteryclass
         $carrierId = Tools::getValue('id_carrier');
         $branchId = Tools::getValue('id_branch');
 
-        $db = Db::getInstance();
-        $isPacketeryCarrier = ($db->getValue('SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
-            WHERE id_carrier=' . (int)$carrierId) == 1);
-
+        $isPacketeryCarrier = $carrierRepository->existsById((int)$carrierId);
         if ($branchId === '' && $isPacketeryCarrier) {
             $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
-            $result = $db->delete('packetery_address_delivery', '`id_carrier` = ' . ((int)$carrierId));
+            $result = $carrierRepository->deleteById((int)$carrierId);
         } else {
             $fieldsToSet = [
                 'pickup_point_type' => $pickupPointType,
@@ -513,8 +406,8 @@ class Packeteryclass
                 $fieldsToSet['currency_branch'] = null;
             } else {
                 $fieldsToSet['id_branch'] = (int)$branchId;
-                $fieldsToSet['name_branch'] = pSQL($branchName);
-                $fieldsToSet['currency_branch'] = pSQL($branchCurrency);
+                $fieldsToSet['name_branch'] = $carrierRepository->db->escape($branchName);
+                $fieldsToSet['currency_branch'] = $carrierRepository->db->escape($branchCurrency);
             }
             if ($pickupPointType) {
                 $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
@@ -522,38 +415,32 @@ class Packeteryclass
                 $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
             }
             if ($isPacketeryCarrier) {
-                $result = $db->update(
-                    'packetery_address_delivery',
-                    $fieldsToSet,
-                    '`id_carrier` = ' . ((int)$carrierId),
-                    0,
-                    true
-                );
+                $result = $carrierRepository->updatePacketery($fieldsToSet, (int)$carrierId);
             } else {
                 $fieldsToSet['is_cod'] = 0;
                 $fieldsToSet['id_carrier'] = (int)$carrierId;
-                $result = $db->insert('packetery_address_delivery', $fieldsToSet, true);
+                $result = $carrierRepository->packeteryInsert($fieldsToSet);
             }
         }
-        $db->update('carrier', $carrierUpdate, '`id_carrier` = ' . ((int)$carrierId), 0, true);
+        $carrierRepository->updatePresta($carrierUpdate, (int)$carrierId);
 
         return $result;
     }
 
     /**
      * Get list of payments for configuration
+     * @param PaymentRepository $paymentRepository
      * @return array
      * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
-    public static function getListPayments()
+    public static function getListPayments(PaymentRepository $paymentRepository)
     {
         $installedPaymentModules = PaymentModule::getInstalledPaymentModules();
-        $sql = 'SELECT DISTINCT `module_name`, `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_payment`';
-
-        $results = Db::getInstance()->executeS($sql);
+        $packeteryPaymentConfig = $paymentRepository->getAll();
         $paymentModules = [];
-        if ($results) {
-            $paymentModules = array_column($results, 'is_cod', 'module_name');
+        if ($packeteryPaymentConfig) {
+            $paymentModules = array_column($packeteryPaymentConfig, 'is_cod', 'module_name');
         }
 
         $payments = [];
@@ -578,10 +465,13 @@ class Packeteryclass
 
     /**
      * Change COD for payment - called by Ajax
+     * @param PaymentRepository $paymentRepository
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
-    public static function changePaymentCodAjax()
+    public static function changePaymentCodAjax(PaymentRepository $paymentRepository)
     {
-        $result = self::changePaymentCod();
+        $result = self::changePaymentCod($paymentRepository);
         if ($result) {
             echo 'ok';
         } else {
@@ -591,30 +481,22 @@ class Packeteryclass
 
     /**
      * Change COD for payment in DB
+     * @param PaymentRepository $paymentRepository
      * @return bool
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
-    public static function changePaymentCod()
+    public static function changePaymentCod(PaymentRepository $paymentRepository)
     {
         $module_name = Tools::getValue('module_name');
         $value = Tools::getValue('value');
         if (!isset($module_name) || (!isset($value))) {
             return false;
         }
-        $db = Db::getInstance();
-        $sql_is_set_cod = 'SELECT 1 
-                            FROM `' . _DB_PREFIX_ . 'packetery_payment` 
-                            WHERE module_name="' . pSQL($module_name) . '"';
-
-        if ($db->getValue($sql_is_set_cod) == 1) {
-            $sql_update_payment_cod = 'UPDATE `' . _DB_PREFIX_ . 'packetery_payment` 
-                                        SET is_cod=' . ((int)$value) . ' 
-                                        WHERE module_name="' . pSQL($module_name) . '"';
-            $result = $db->execute($sql_update_payment_cod);
+        if ($paymentRepository->existsByModuleName($module_name)) {
+            $result = $paymentRepository->setCod((int)$value, $module_name);
         } else {
-            $sql_insert_payment_cod = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_payment` 
-                                        SET is_cod=' . ((int)$value) . ', 
-                                            module_name="' . pSQL($module_name) . '"';
-            $result = $db->execute($sql_insert_payment_cod);
+            $result = $paymentRepository->insert((int)$value, $module_name);
         }
         return $result;
     }
