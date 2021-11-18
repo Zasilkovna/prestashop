@@ -58,11 +58,19 @@ function PacketeryCheckoutModulesManager() {
 }
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 var widgetCarriers;
+var widgetInitialized = false;
 
-$(document).ready(function ()
-{
-    if ($(".zas-box").length) {
+$(document).ready(function () {
+    if ($('.zas-box').length) {
         onShippingLoadedCallback();
+        widgetInitialized = true;
+    }
+});
+
+$(window).load(function () {
+    if ($('.zas-box').length && widgetInitialized === false) {
+        onShippingLoadedCallback();
+        widgetInitialized = true;
     }
 });
 
