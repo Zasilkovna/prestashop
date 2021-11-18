@@ -73,3 +73,4 @@
       - Updated: refactored saving pickup point information in cart
       - Updated: hook for new orders changed from actionOrderHistoryAddAfter to actionValidateOrder
       - Fixed: treated a rare situation where the payment module cannot be instantiated
+      - Fixed: functionality of KnowBand SuperCheckout when no shipping method is preselected

@@ -27,5 +27,9 @@ var PacketeryCheckoutModulePs17 = {
     },
 
     hideValidationErrors: function () {
+    },
+
+    getExtraContentSelector: function () {
+        return '.carrier-extra-content';
     }
 };

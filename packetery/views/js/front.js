@@ -130,22 +130,30 @@ PacketaModule.runner = {
 
 PacketaModule.ui = {
     toggleExtraContent: function () {
-        // if template doesn't handle showing carrier-extra-content then we have to
-        if ((! PacketaModule.config.toggleExtraContent) && (! PacketaModule.tools.isPS16())) {
-            return;
-        }
-
         var module = packeteryModulesManager.detectModule();
         if (module === null) {
             return;
         }
 
+        // if template doesn't handle showing carrier-extra-content then we have to
+        var toggleExtraContent = PacketaModule.config.toggleExtraContent;
+        if (typeof module.toggleExtraContent !== 'undefined') {
+            toggleExtraContent = module.toggleExtraContent;
+        }
+        if (!toggleExtraContent && !PacketaModule.tools.isPS16()) {
+            return;
+        }
+
         // hide it for all carriers - if they happen to have it
-        $('.carrier-extra-content').hide();
+        $(module.getExtraContentSelector()).hide();
 
         // show it only for Packeta carriers (easier to do because we have id="packetery-carrier-{$carrier_id}")
-        packeteryModulesManager.getWidgetParent(module.getSelectedInput())
-            .closest('.carrier-extra-content')
+        var $selectedInput = module.getSelectedInput();
+        if ($selectedInput.length === 0) {
+            return;
+        }
+        packeteryModulesManager.getWidgetParent($selectedInput)
+            .closest(module.getExtraContentSelector())
             .show();
     },
 
@@ -220,7 +228,11 @@ PacketaModule.ui = {
             return;
         }
 
-        var $widgetParent = packeteryModulesManager.getWidgetParent(module.getSelectedInput());
+        var $selectedInput = module.getSelectedInput();
+        if ($selectedInput.length === 0) {
+            return;
+        }
+        var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
         var branchId = $widgetParent.find(".packeta-branch-id").val();
         if (branchId !== '') {
             module.enableSubmitButton();
