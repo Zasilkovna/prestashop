@@ -107,7 +107,7 @@ class PacketeryApi
         $err = array();
         $id_orders = explode(',', $orders_id);
         foreach ($id_orders as $id_order) {
-            $packetery_order = $orderRepository->getPacketeryOrderRow($id_order);
+            $packetery_order = $orderRepository->getById($id_order);
             if ($packetery_order && (int)$packetery_order['id_branch'] === 0) {
                 $err[] = $id_order;
             }
@@ -210,7 +210,7 @@ class PacketeryApi
     {
         $module = new Packetery;
         $id_order = $order->id;
-        $packetery_order = $orderRepository->getPacketeryOrderRow($id_order);;
+        $packetery_order = $orderRepository->getById($id_order);;
         if (!$packetery_order) {
             return [0, $module->l('Can\'t load order to create packet.', 'packetery.api')];
         }

@@ -124,7 +124,7 @@ class OrderRepository
      */
     public function getByCart($cartId)
     {
-        return $this->db->getRow('SELECT `is_ad`, `zip` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` =' . $cartId);
+        return $this->db->getRow('SELECT `is_ad`, `zip`, `name_branch` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` =' . $cartId);
     }
 
     /**
@@ -157,63 +157,16 @@ class OrderRepository
     }
 
     /**
-     * @param int $cartId
-     * @return array|bool|object|null
-     * @throws PrestaShopException
-     */
-    public function getBranchNameByCart($cartId)
-    {
-        return $this->db->getRow(
-            sprintf(
-                'SELECT `name_branch` FROM `%spacketery_order` WHERE `id_cart` = %d AND `is_ad` = 0',
-                _DB_PREFIX_,
-                $cartId
-            )
-        );
-    }
-
-    /**
      * @param int $orderId
      * @return array|bool|object|null
      * @throws PrestaShopException
      */
-    public function getBranchNameByOrder($orderId)
-    {
-        return $this->db->getRow(
-            sprintf(
-                'SELECT `name_branch` FROM `%spacketery_order` WHERE `id_order` = %d AND `is_ad` = 0',
-                _DB_PREFIX_,
-                $orderId
-            )
-        );
-    }
-
-    /**
-     * @param int $orderId
-     * @return array|bool|object|null
-     * @throws PrestaShopException
-     */
-    public function getByOrder($orderId)
-    {
-        return $this->db->getRow(
-            sprintf(
-                'SELECT `name_branch`, `id_branch`, `is_carrier` FROM `%spacketery_order` WHERE `id_order` = %d AND `is_ad` = 0',
-                _DB_PREFIX_,
-                $orderId
-            )
-        );
-    }
-
-    /**
-     * @param int $orderId
-     * @return array|bool|object|null
-     * @throws PrestaShopException
-     */
-    public function getPacketeryOrderRow($orderId)
+    public function getById($orderId)
     {
         return $this->db->getRow('
             SELECT 
                    `id_branch`, 
+                   `name_branch`
                    `id_carrier`, 
                    `is_cod`, 
                    `is_ad`, 

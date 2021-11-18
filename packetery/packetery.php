@@ -824,7 +824,7 @@ class Packetery extends CarrierModule
             return;
         }
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getBranchNameByCart((int)$order->id_cart);
+        $orderData = $orderRepository->getByCart((int)$order->id_cart);
         if (!$orderData) {
             return;
         }
@@ -846,7 +846,7 @@ class Packetery extends CarrierModule
             return;
         }
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getBranchNameByOrder((int)$params['order']->id);
+        $orderData = $orderRepository->getById((int)$params['order']->id);
         if (!$orderData) {
             return;
         }
@@ -875,7 +875,7 @@ class Packetery extends CarrierModule
         }
 
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getByOrder((int)$params['template_vars']['{id_order}']);
+        $orderData = $orderRepository->getById((int)$params['template_vars']['{id_order}']);
         if (!$orderData) {
             return;
         }

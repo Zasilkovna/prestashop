@@ -53,7 +53,7 @@ class ActionObjectOrderUpdateBefore
         $orderOldVersion = new Order($orderId);
 
         $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById($idCarrier);
-        $packeteryOrderData = $this->orderRepository->getPacketeryOrderRow($orderId);
+        $packeteryOrderData = $this->orderRepository->getById($orderId);
         if (!$packeteryOrderData) {
             if ($packeteryCarrier && $idCarrier !== (int)$orderOldVersion->id_carrier) {
                 $this->orderSaver->save($params['object'], $packeteryCarrier);

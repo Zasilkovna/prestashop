@@ -181,7 +181,7 @@ class Packeteryclass
                 continue;
             }
 
-            $packeteryOrder = $orderRepository->getPacketeryOrderRow($order_id);
+            $packeteryOrder = $orderRepository->getById($order_id);
 
             if (empty($packeteryOrder) || !isset($packeteryOrder['id_branch']) || empty($packeteryOrder['id_branch'])) {
                 continue;
