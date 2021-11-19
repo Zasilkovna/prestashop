@@ -118,7 +118,7 @@ class Packetery extends CarrierModule
      * @throws PrestaShopDatabaseException
      * @throws ReflectionException
      */
-    public function hookActionCarrierUpdate($params)
+    public function hookActionCarrierUpdate(array $params)
     {
         if ($params['id_carrier'] != $params['carrier']->id) {
             $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);

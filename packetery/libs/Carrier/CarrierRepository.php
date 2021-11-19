@@ -115,7 +115,7 @@ class CarrierRepository
      * @return bool
      * @throws PrestaShopDatabaseException
      */
-    public function packeteryInsert($fieldsToSet)
+    public function insertPacketery(array $fieldsToSet)
     {
         return $this->db->insert('packetery_address_delivery', $fieldsToSet, true);
     }
@@ -125,7 +125,7 @@ class CarrierRepository
      * @param int $carrierId
      * @throws PrestaShopDatabaseException
      */
-    public function updatePresta($carrierUpdate, $carrierId)
+    public function updatePresta(array $carrierUpdate, $carrierId)
     {
         $this->db->update('carrier', $carrierUpdate, '`id_carrier` = ' . $carrierId, 0, true);
     }
@@ -136,7 +136,7 @@ class CarrierRepository
      * @return bool
      * @throws PrestaShopDatabaseException
      */
-    public function updatePacketery($carrierUpdate, $carrierId)
+    public function updatePacketery(array $carrierUpdate, $carrierId)
     {
         return $this->db->update('packetery_address_delivery', $carrierUpdate, '`id_carrier` = ' . $carrierId, 0, true);
     }

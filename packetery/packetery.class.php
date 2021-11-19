@@ -419,7 +419,7 @@ class Packeteryclass
             } else {
                 $fieldsToSet['is_cod'] = 0;
                 $fieldsToSet['id_carrier'] = (int)$carrierId;
-                $result = $carrierRepository->packeteryInsert($fieldsToSet);
+                $result = $carrierRepository->insertPacketery($fieldsToSet);
             }
         }
         $carrierRepository->updatePresta($carrierUpdate, (int)$carrierId);

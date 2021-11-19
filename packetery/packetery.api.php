@@ -35,6 +35,9 @@ class PacketeryApi
     const PACKET_WEIGHT_UNIT = 'kg';
 
     /*LABELS*/
+    /**
+     * @param OrderRepository $orderRepository
+     */
     public static function downloadPdfAjax(OrderRepository $orderRepository)
     {
         $result = self::downloadPdf($orderRepository);
@@ -45,6 +48,12 @@ class PacketeryApi
         }
     }
 
+    /**
+     * @param OrderRepository $orderRepository
+     * @return false|string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     public static function downloadPdf(OrderRepository $orderRepository)
     {
         $id_orders = Tools::getValue('orders_id');
@@ -411,6 +420,9 @@ class PacketeryApi
         return $apiPassword;
     }
 
+    /**
+     * @param CarrierRepository $carrierRepository
+     */
     public static function updateBranchListAjax(CarrierRepository $carrierRepository)
     {
         $result = self::updateBranchList($carrierRepository);
@@ -439,6 +451,8 @@ class PacketeryApi
      * @param string $branch_url
      * @param CarrierRepository $carrierRepository
      * @return false|string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public static function parseBranches($branch_url, CarrierRepository $carrierRepository)
     {

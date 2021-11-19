@@ -71,7 +71,7 @@ class OrderRepository
      * @return bool
      * @throws \PrestaShopDatabaseException
      */
-    public function insert($fields)
+    public function insert(array $fields)
     {
         return $this->db->insert('packetery_order', $fields);
     }
@@ -82,7 +82,7 @@ class OrderRepository
      * @return bool
      * @throws \PrestaShopDatabaseException
      */
-    public function updateByCart($fields, $cartId)
+    public function updateByCart(array $fields, $cartId)
     {
         return $this->db->update('packetery_order', $fields, '`id_cart` = ' . $cartId);
     }
@@ -93,7 +93,7 @@ class OrderRepository
      * @return bool
      * @throws \PrestaShopDatabaseException
      */
-    public function updateByOrder($fields, $orderId)
+    public function updateByOrder(array $fields, $orderId)
     {
         return $this->db->update('packetery_order', $fields, '`id_order` = ' . $orderId);
     }
@@ -178,7 +178,7 @@ class OrderRepository
     }
 
     /**
-     * @param $currencyIsoCode
+     * @param string $currencyIsoCode
      * @return false|string|null
      * @throws PrestaShopException
      */
