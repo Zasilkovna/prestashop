@@ -27,6 +27,11 @@ var PacketeryCheckoutModuleSupercheckout = {
         return $selectedInput.closest('li');
     },
 
+    getExtraContentSelector: function () {
+        return '.kbshippingparceloption';
+    },
+
+    toggleExtracContent: true
 };
 
 $(function () {

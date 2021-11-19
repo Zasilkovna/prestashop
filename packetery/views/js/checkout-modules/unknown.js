@@ -32,5 +32,9 @@ var PacketeryCheckoutModuleUnknown = {
 
     getExtraContentContainer: function () {
         return $('.delivery_option');
+    },
+
+    getExtraContentSelector: function () {
+        return '.carrier-extra-content';
     }
 };
