@@ -105,10 +105,19 @@ class OrderRepository
     /**
      * @param int $orderId
      */
-    public function delete($orderId)
+    public function deleteByOrder($orderId)
     {
         $orderId = (int)$orderId;
         $this->db->delete('packetery_order', '`id_order` = ' . $orderId);
+    }
+
+    /**
+     * @param int $cartId
+     */
+    public function deleteByCart($cartId)
+    {
+        $cartId = (int)$cartId;
+        $this->db->delete('packetery_order', '`id_cart` = ' . $cartId);
     }
 
     /**

@@ -65,7 +65,7 @@
       - Fixed: proper generation and use of translations called outside the module's main class file
 2.1.8 - Fixed: fix of bug in PrestaShop version lower than 1.7.6, when saving a change of pickup point
         in the administration, especially in the case of Z-BOXes (getting JSON correctly)
-2.2.0 - Added: compatibility with PrestaShop 1.6
+3.0.0 - Added: compatibility with PrestaShop 1.6
         Added: ability to open widget right after choosing delivery method without the need to click on button
       - Updated: packetery orders table is backed up and deleted upon uninstall
       - Added: One page checkout by Zelarg support (tested OPC v2.3.12 with PS v1.6.1.7)
@@ -74,3 +74,4 @@
       - Updated: hook for new orders changed from actionOrderHistoryAddAfter to actionValidateOrder
       - Fixed: treated a rare situation where the payment module cannot be instantiated
       - Fixed: functionality of KnowBand SuperCheckout when no shipping method is preselected
+      - Updated: treated the situation when the country of the pickup point does not correspond to the customer's address

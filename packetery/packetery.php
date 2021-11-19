@@ -47,7 +47,7 @@ class Packetery extends CarrierModule
     {
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '2.2.0';
+        $this->version = '3.0.0';
         $this->author = 'Packeta s.r.o.';
         $this->need_instance = 0;
         $this->is_configurable = 1;
@@ -787,6 +787,7 @@ class Packetery extends CarrierModule
             'displayOrderDetail',
             'sendMailAlterTemplateVars',
             'actionObjectOrderUpdateBefore',
+            'actionObjectCartUpdateBefore',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -894,4 +895,37 @@ class Packetery extends CarrierModule
         $actionObjectOrderUpdateBefore = $this->diContainer->get(\Packetery\Hooks\ActionObjectOrderUpdateBefore::class);
         $actionObjectOrderUpdateBefore->execute($params);
     }
+
+    /**
+     * @param array $params
+     * @throws ReflectionException
+     */
+    public function hookActionObjectCartUpdateBefore(array $params)
+    {
+        if (!isset($params['cart'])) {
+            return;
+        }
+        /** @var Cart $cart */
+        $cart = $params['cart'];
+        $oldCart = new CartCore($cart->id);
+        if (!is_object($cart) || !is_object($oldCart)) {
+            return;
+        }
+
+        $addressId = (int)$cart->id_address_delivery;
+        $oldAddressId = (int)$oldCart->id_address_delivery;
+        if ($oldAddressId === $addressId) {
+            return;
+        }
+
+        $address = new Address($addressId);
+        $oldAddress = new Address($oldAddressId);
+        if ($oldAddress->id_country === $address->id_country) {
+            return;
+        }
+
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        $orderRepository->deleteByCart($cart->id);
+    }
+
 }

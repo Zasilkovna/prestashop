@@ -65,7 +65,7 @@ class ActionObjectOrderUpdateBefore
             if ($packeteryCarrier) {
                 $this->orderSaver->save($params['object'], $packeteryCarrier, true);
             } else {
-                $this->orderRepository->delete($orderId);
+                $this->orderRepository->deleteByOrder($orderId);
             }
 
             return;
@@ -85,7 +85,7 @@ class ActionObjectOrderUpdateBefore
 
         list($carrierZones, $carrierCountries) = $this->carrierTools->getZonesAndCountries($idCarrier, 'id_country');
         if (!in_array($address->id_country, $carrierCountries)) {
-            $this->orderRepository->delete($orderId);
+            $this->orderRepository->deleteByOrder($orderId);
 
             return;
         }
