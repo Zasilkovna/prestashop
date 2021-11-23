@@ -23,7 +23,9 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Carrier\CarrierRepository;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
+use Packetery\Order\OrderRepository;
 
 include_once(dirname(__file__) . '/packetery.class.php');
 
@@ -33,9 +35,12 @@ class PacketeryApi
     const PACKET_WEIGHT_UNIT = 'kg';
 
     /*LABELS*/
-    public static function downloadPdfAjax()
+    /**
+     * @param OrderRepository $orderRepository
+     */
+    public static function downloadPdfAjax(OrderRepository $orderRepository)
     {
-        $result = self::downloadPdf();
+        $result = self::downloadPdf($orderRepository);
         if ($result) {
             echo $result;
         } else {
@@ -43,7 +48,13 @@ class PacketeryApi
         }
     }
 
-    public static function downloadPdf()
+    /**
+     * @param OrderRepository $orderRepository
+     * @return false|string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public static function downloadPdf(OrderRepository $orderRepository)
     {
         $id_orders = Tools::getValue('orders_id');
         if ($id_orders == '') {
@@ -51,7 +62,7 @@ class PacketeryApi
             echo $module->l('Please choose orders first.', 'packetery.api');
             return false;
         }
-        $packets = Packeteryclass::getTrackingFromOrders($id_orders);
+        $packets = Packeteryclass::getTrackingFromOrders($id_orders, $orderRepository);
         $apiPassword = Configuration::get('PACKETERY_APIPASS');
         $pdf_result = self::packetsLabelsPdf($packets, $apiPassword);
         return $pdf_result;
@@ -83,19 +94,29 @@ class PacketeryApi
     /*END LABELS*/
 
     /*ORDERS EXPORT*/
-    public static function prepareOrderExportAjax()
+    /**
+     * @param OrderRepository $orderRepository
+     * @throws PrestaShopException
+     */
+    public static function prepareOrderExportAjax(OrderRepository $orderRepository)
     {
         $id_orders = Tools::getValue('orders_id');
-        $result = self::prepareOrderExport($id_orders);
+        $result = self::prepareOrderExport($id_orders, $orderRepository);
         echo $result;
     }
 
-    public static function prepareOrderExport($orders_id)
+    /**
+     * @param string $orders_id
+     * @param OrderRepository $orderRepository
+     * @return string
+     * @throws PrestaShopException
+     */
+    public static function prepareOrderExport($orders_id, OrderRepository $orderRepository)
     {
         $err = array();
         $id_orders = explode(',', $orders_id);
         foreach ($id_orders as $id_order) {
-            $packetery_order = Packeteryclass::getPacketeryOrderRow($id_order);
+            $packetery_order = $orderRepository->getById($id_order);
             if ($packetery_order && (int)$packetery_order['id_branch'] === 0) {
                 $err[] = $id_order;
             }
@@ -107,9 +128,14 @@ class PacketeryApi
         }
     }
 
-    public static function ordersExportAjax()
+    /**
+     * @param OrderRepository $orderRepository
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public static function ordersExportAjax(OrderRepository $orderRepository)
     {
-        $packets = self::ordersExport();
+        $packets = self::ordersExport($orderRepository);
         if (is_array($packets) && !empty($packets)) {
             echo json_encode($packets);
         } else {
@@ -117,7 +143,13 @@ class PacketeryApi
         }
     }
 
-    public static function ordersExport()
+    /**
+     * @param OrderRepository $orderRepository
+     * @return array|false
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public static function ordersExport(OrderRepository $orderRepository)
     {
         $apiPassword = self::getApiPass();
         $id_orders = Tools::getValue('orders_id');
@@ -131,12 +163,12 @@ class PacketeryApi
         $packets = array();
         /*CREATE PACKET*/
         foreach ($id_orders as $id_order) {
-            Packeteryclass::setPacketeryExport($id_order, 0);
+            $orderRepository->setExported(0, $id_order);
             $order = new Order($id_order);
-            $packet_response = PacketeryApi::createPacket($order);
+            $packet_response = PacketeryApi::createPacket($order, $orderRepository);
             if ($packet_response[0] == 1) {
                 $tracking_number = $packet_response[1];
-                $tracking_update = Packeteryclass::updateOrderTrackingNumber($id_order, $tracking_number);
+                $tracking_update = Packeteryclass::updateOrderTrackingNumber($id_order, $tracking_number, $orderRepository);
                 if ($tracking_update) {
                     $packets_row[] = array($id_order, 1, $tracking_number);
                     $packets[] = $tracking_number;
@@ -149,7 +181,7 @@ class PacketeryApi
         $shipment = self::createShipmentSoap($packets, $apiPassword);
         if ($shipment[0]) {
             foreach ($id_orders as $id_order) {
-                Packeteryclass::setPacketeryExport($id_order, 1);
+                $orderRepository->setExported(1, $id_order);
             }
         } else {
             $packets_row[] = array($id_order, 0, $shipment[1]);
@@ -177,11 +209,17 @@ class PacketeryApi
     /*END ORDERS EXPORT*/
 
     /*PACKET*/
-    public static function createPacket($order)
+    /**
+     * @param Order $order
+     * @param OrderRepository $orderRepository
+     * @return array
+     * @throws PrestaShopException
+     */
+    public static function createPacket($order, OrderRepository $orderRepository)
     {
         $module = new Packetery;
         $id_order = $order->id;
-        $packetery_order = Packeteryclass::getPacketeryOrderRow($id_order);
+        $packetery_order = $orderRepository->getById($id_order);;
         if (!$packetery_order) {
             return [0, $module->l('Can\'t load order to create packet.', 'packetery.api')];
         }
@@ -195,7 +233,7 @@ class PacketeryApi
         $branch_currency_iso = $packetery_order['currency_branch'];
         $order_currency_iso = $currency->iso_code;
         if ($order_currency_iso != $branch_currency_iso) {
-            $total = Packeteryclass::getRateTotal($order_currency_iso, $branch_currency_iso, $total);
+            $total = Packeteryclass::getRateTotal($order_currency_iso, $branch_currency_iso, $total, $orderRepository);
             if (!$total) {
                 return array(
                     0,
@@ -382,9 +420,12 @@ class PacketeryApi
         return $apiPassword;
     }
 
-    public static function updateBranchListAjax()
+    /**
+     * @param CarrierRepository $carrierRepository
+     */
+    public static function updateBranchListAjax(CarrierRepository $carrierRepository)
     {
-        $result = self::updateBranchList();
+        $result = self::updateBranchList($carrierRepository);
         if ($result === false) {
             echo 'true';
         } else {
@@ -392,13 +433,13 @@ class PacketeryApi
         }
     }
 
-    public static function updateBranchList($apiPassword = false)
+    public static function updateBranchList(CarrierRepository $carrierRepository, $apiPassword = false)
     {
         $api_key = self::getApiPass($apiPassword);
 
         $branch_new_url = 'https://www.zasilkovna.cz/api/v4/' . $api_key . '/branch.xml';
-        $branches = self::parseBranches($branch_new_url);
-        if (($countBranches = self::countBranches()) && (!$branches)) {
+        $branches = self::parseBranches($branch_new_url, $carrierRepository);
+        if (($countBranches = $carrierRepository->getAdAndExternalCount()) && (!$branches)) {
             Configuration::updateValue('PACKETERY_LAST_BRANCHES_UPDATE', time());
             return false;
         } else {
@@ -406,7 +447,14 @@ class PacketeryApi
         }
     }
 
-    public static function parseBranches($branch_url)
+    /**
+     * @param string $branch_url
+     * @param CarrierRepository $carrierRepository
+     * @return false|string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public static function parseBranches($branch_url, CarrierRepository $carrierRepository)
     {
         ignore_user_abort(true);
         $module = new Packetery();
@@ -427,24 +475,25 @@ class PacketeryApi
             return $module->l('Invalid API key', 'packetery.api');
         }
 
-        self::dropBranchList();
+        $carrierRepository->dropBranchList();
         $xml = simplexml_load_string($response);
-        $i = 0;
         foreach ($xml->branches->branch as $branch) {
-            self::addBranch($branch);
-            $i++;
+            self::addBranch($branch, $carrierRepository);
         }
         foreach ($xml->carriers->carrier as $carrier) {
-            self::addCarrier($carrier);
-            $i++;
+            $carrierRepository->addCarrier($carrier);
         }
 
         return false;
     }
 
-    public static function countBranchesAjax()
+    /**
+     * @param CarrierRepository $carrierRepository
+     * @throws PrestaShopException
+     */
+    public static function countBranchesAjax(CarrierRepository $carrierRepository)
     {
-        $cnt = self::countBranches();
+        $cnt = $carrierRepository->getAdAndExternalCount();
         $lastBranchesUpdate = '';
         $lastUpdateUnix = Configuration::get('PACKETERY_LAST_BRANCHES_UPDATE');
         if ($lastUpdateUnix != '') {
@@ -460,25 +509,13 @@ class PacketeryApi
         }
     }
 
-    public static function countBranches()
-    {
-        $sql = 'SELECT COUNT(*) FROM ' . _DB_PREFIX_ . 'packetery_branch';
-        $result = Db::getInstance()->getValue($sql);
-        if ($result > 0) {
-            return $result;
-        } else {
-            return false;
-        }
-    }
-
-    public static function dropBranchList()
-    {
-        $sql = 'DELETE FROM ' . _DB_PREFIX_ . 'packetery_branch';
-        $result = Db::getInstance()->execute($sql);
-        return $result;
-    }
-
-    public static function addBranch($branch)
+    /**
+     * @param object $branch
+     * @param CarrierRepository $carrierRepository
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public static function addBranch($branch, CarrierRepository $carrierRepository)
     {
         $opening_hours_xml = $branch->openingHours;
         if (isset($opening_hours_xml->compactShort)) {
@@ -502,96 +539,7 @@ class PacketeryApi
             $opening_hours_regular = '';
         }
 
-        $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'packetery_branch VALUES(
-                    ' . (int)$branch->id . ',
-                    \'' . (string)addslashes($branch->name) . '\',
-                    \'' . (string)addslashes($branch->nameStreet) . '\',
-                    \'' . (string)addslashes($branch->place) . '\',
-                    \'' . (string)addslashes($branch->street) . '\',
-                    \'' . (string)addslashes($branch->city) . '\',
-                    \'' . (string)addslashes($branch->zip) . '\',
-                    \'' . (string)addslashes($branch->country) . '\',
-                    \'' . (string)addslashes($branch->currency) . '\',
-                    \'' . (string)addslashes($branch->wheelchairAccessible) . '\',
-                    \'' . (string)addslashes($branch->latitude) . '\',
-                    \'' . (string)addslashes($branch->longitude) . '\',
-                    \'' . (string)addslashes($branch->url) . '\',
-                    ' . (int)$branch->dressingRoom . ',
-                    ' . (int)$branch->claimAssistant . ',
-                    ' . (int)$branch->packetConsignment . ',
-                    ' . (int)$branch->maxWeight . ',
-                    \'' . pSQL((string)addslashes($branch->region)) . '\',
-                    \'' . pSQL((string)addslashes($branch->district)) . '\',
-                    \'' . pSQL((string)addslashes($branch->labelRouting)) . '\',
-                    \'' . pSQL((string)addslashes($branch->labelName)) . '\',
-                    \'' . pSQL((string)addslashes($opening_hours_table_long)) . '\',
-                    \'' . pSQL((string)addslashes($branch->photos->photo->normal)) . '\',
-                    \'' . pSQL((string)addslashes($opening_hours_compact_short)) . '\',
-                    \'' . pSQL((string)addslashes($opening_hours_compact_long)) . '\',
-                    \'' . pSQL((string)addslashes($opening_hours_regular)) . '\',
-                    0,
-                    0
-                    );';
-        $result = Db::getInstance()->execute($sql);
-        return $result;
-    }
-
-    public static function addCarrier($carrier)
-    {
-        $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_branch` VALUES(
-                    ' . (int)$carrier->id . ',
-                    \'' . (string)addslashes($carrier->name) . '\',
-                    \'' . (string)addslashes($carrier->labelName) . '\',
-                    \'\',
-                    \'\',
-                    \'\',
-                    \'\',
-                    \'' . (string)addslashes($carrier->country) . '\',
-                    \'' . (string)addslashes($carrier->currency) . '\',
-                    \'\',
-                    \'\',
-                    \'\',
-                    \'\',
-                    0,
-                    0,
-                    0,
-                    0,
-                    \'\',
-                    \'\',
-                    \'' . pSQL((string)addslashes($carrier->labelRouting)) . '\',
-                    \'' . pSQL((string)addslashes($carrier->labelName)) . '\',
-                    \'\',
-                    \'\',
-                    \'\',
-                    \'\',
-                    \'\',
-                    ' . ((string)$carrier->pickupPoints === 'false' ? 1 : 0) . ',
-                    ' . ((string)$carrier->pickupPoints === 'true' ? 1 : 0) . '
-                    );';
-
-        $result = Db::getInstance()->execute($sql);
-        return $result;
-    }
-
-    public static function getAdAndExternalCarriers()
-    {
-        $sql = 'SELECT `id_branch`, `name`, `country`, `currency`, `is_pickup_point`
-                FROM `' . _DB_PREFIX_ . 'packetery_branch`
-                WHERE `is_ad` = 1 OR `is_pickup_point` = 1
-                ORDER BY `country`, `name`';
-        $result = Db::getInstance()->executeS($sql);
-        $branches = [];
-        if ($result) {
-            foreach ($result as $branch) {
-                $branches[] = array(
-                    'id_branch' => $branch['id_branch'],
-                    'name' => $branch['name'] . ', ' . Tools::strtoupper($branch['country']),
-                    'currency' => $branch['currency'],
-                    'pickup_point_type' => ($branch['is_pickup_point'] ? 'external' : null),
-                );
-            }
-        }
-        return $branches;
+        $carrierRepository->addBranch($branch, $opening_hours_table_long, $opening_hours_compact_short, $opening_hours_compact_long, $opening_hours_regular);
     }
     /*END BRANCHES*/
 

@@ -2,14 +2,13 @@
 
 namespace Packetery\Order;
 
-use Packeteryclass;
-use Packetery\Payment\PaymentRepository;
-use Packetery\Tools\Logger;
+use CartCore as Cart;
 use Context;
 use CurrencyCore;
-use CartCore as Cart;
-use Db;
 use OrderCore as PrestaShopOrder;
+use Packetery\Carrier\CarrierRepository;
+use Packetery\Payment\PaymentRepository;
+use Packetery\Tools\Logger;
 use PrestaShopException;
 use Tools;
 
@@ -24,14 +23,27 @@ class OrderSaver
     /** @var Logger */
     private $logger;
 
+    /** @var CarrierRepository */
+    private $carrierRepository;
+
     /**
      * TODO: later inherit from some Base class
+     * @param OrderRepository $orderRepository
+     * @param PaymentRepository $paymentRepository
+     * @param Logger $logger
+     * @param CarrierRepository $carrierRepository
      */
-    public function __construct(OrderRepository $orderRepository, PaymentRepository $paymentRepository, Logger $logger)
+    public function __construct(
+        OrderRepository $orderRepository,
+        PaymentRepository $paymentRepository,
+        Logger $logger,
+        CarrierRepository $carrierRepository
+    )
     {
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
         $this->logger = $logger;
+        $this->carrierRepository = $carrierRepository;
     }
 
     /**
@@ -41,7 +53,7 @@ class OrderSaver
      */
     public function saveNewOrder(Cart $cart, PrestaShopOrder $order)
     {
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$cart->id_carrier);
+        $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
         if ($packeteryCarrier) {
             $this->save($order, $packeteryCarrier);
         }
@@ -116,7 +128,7 @@ class OrderSaver
         $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
         $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
 
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$prestashopCarrierId);
+        $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int)$prestashopCarrierId);
         $isCod = $packeteryCarrier['is_cod'];
 
         $currency = CurrencyCore::getCurrency(Context::getContext()->cart->id_currency);
@@ -132,11 +144,10 @@ class OrderSaver
             ];
         }
 
-        $db = Db::getInstance();
         $packeteryOrderFields = [
             'id_branch' => (int)$branchId,
-            'name_branch' => $db->escape($branchName),
-            'currency_branch' => $db->escape($branchCurrency),
+            'name_branch' => $this->orderRepository->db->escape($branchName),
+            'currency_branch' => $this->orderRepository->db->escape($branchCurrency),
             'id_carrier' => (int)$prestashopCarrierId,
             'is_cod' => (int)$isCod,
             'is_ad' => 0,
@@ -144,15 +155,15 @@ class OrderSaver
         if ($pickupPointType === 'external') {
             $packeteryOrderFields['is_carrier'] = 1;
             $packeteryOrderFields['id_branch'] = (int)$widgetCarrierId;
-            $packeteryOrderFields['carrier_pickup_point'] = $db->escape($carrierPickupPointId);
+            $packeteryOrderFields['carrier_pickup_point'] = $this->orderRepository->db->escape($carrierPickupPointId);
         }
 
-        $isOrderSaved = (new OrderRepository($db))->existsByCart($cartId);
+        $isOrderSaved = $this->orderRepository->existsByCart($cartId);
         if ($isOrderSaved) {
-            $result = $db->update('packetery_order', $packeteryOrderFields, '`id_cart` = ' . ((int)$cartId));
+            $result = $this->orderRepository->updateByCart($packeteryOrderFields, (int)$cartId);
         } else {
             $packeteryOrderFields['id_cart'] = ((int)$cartId);
-            $result = $db->insert('packetery_order', $packeteryOrderFields);
+            $result = $this->orderRepository->insert($packeteryOrderFields);
         }
 
         return [

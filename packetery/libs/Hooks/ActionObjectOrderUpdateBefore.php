@@ -2,13 +2,12 @@
 
 namespace Packetery\Hooks;
 
+use AddressCore as Address;
+use OrderCore as Order;
+use Packetery\Carrier\CarrierRepository;
 use Packetery\Carrier\CarrierTools;
 use Packetery\Order\OrderSaver;
 use Packetery\Order\OrderRepository;
-use \Db;
-use \AddressCore as Address;
-use \OrderCore as Order;
-use \Packeteryclass;
 
 class ActionObjectOrderUpdateBefore
 {
@@ -21,11 +20,27 @@ class ActionObjectOrderUpdateBefore
     /** @var CarrierTools */
     private $carrierTools;
 
-    public function __construct(OrderRepository $orderRepository, OrderSaver $orderSaver, CarrierTools $carrierTools)
+    /** @var CarrierRepository */
+    private $carrierRepository;
+
+    /**
+     * ActionObjectOrderUpdateBefore constructor.
+     * @param OrderRepository $orderRepository
+     * @param OrderSaver $orderSaver
+     * @param CarrierTools $carrierTools
+     * @param CarrierRepository $carrierRepository
+     */
+    public function __construct(
+        OrderRepository $orderRepository,
+        OrderSaver $orderSaver,
+        CarrierTools $carrierTools,
+        CarrierRepository $carrierRepository
+    )
     {
         $this->orderRepository = $orderRepository;
         $this->orderSaver = $orderSaver;
         $this->carrierTools = $carrierTools;
+        $this->carrierRepository = $carrierRepository;
     }
 
     public function execute($params)
@@ -37,9 +52,8 @@ class ActionObjectOrderUpdateBefore
         $idCarrier = (int)$params['object']->id_carrier;
         $orderOldVersion = new Order($orderId);
 
-        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById($idCarrier);
-
-        $packeteryOrderData = Packeteryclass::getPacketeryOrderRow($orderId);
+        $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById($idCarrier);
+        $packeteryOrderData = $this->orderRepository->getById($orderId);
         if (!$packeteryOrderData) {
             if ($packeteryCarrier && $idCarrier !== (int)$orderOldVersion->id_carrier) {
                 $this->orderSaver->save($params['object'], $packeteryCarrier);

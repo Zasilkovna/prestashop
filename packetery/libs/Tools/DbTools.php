@@ -2,7 +2,6 @@
 
 namespace Packetery\Tools;
 
-use Packetery;
 use Db;
 use PrestaShopException;
 use PrestaShopLogger;
