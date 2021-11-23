@@ -28,8 +28,9 @@ class OrderRepository
      */
     public function existsByCart($cartId)
     {
+        $cartId = (int)$cartId;
         $result = $this->db->getValue(
-            'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . (int)$cartId
+            'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId
         );
 
         return ((int)$result === 1);
@@ -42,8 +43,9 @@ class OrderRepository
      */
     public function existsByOrder($orderId)
     {
+        $orderId = (int)$orderId;
         $result = $this->db->getValue(
-            'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . (int)$orderId
+            'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . $orderId
         );
 
         return ((int)$result === 1);
@@ -84,6 +86,7 @@ class OrderRepository
      */
     public function updateByCart(array $fields, $cartId)
     {
+        $cartId = (int)$cartId;
         return $this->db->update('packetery_order', $fields, '`id_cart` = ' . $cartId);
     }
 
@@ -95,6 +98,7 @@ class OrderRepository
      */
     public function updateByOrder(array $fields, $orderId)
     {
+        $orderId = (int)$orderId;
         return $this->db->update('packetery_order', $fields, '`id_order` = ' . $orderId);
     }
 
@@ -103,6 +107,7 @@ class OrderRepository
      */
     public function delete($orderId)
     {
+        $orderId = (int)$orderId;
         $this->db->delete('packetery_order', '`id_order` = ' . $orderId);
     }
 
@@ -114,6 +119,8 @@ class OrderRepository
      */
     public function updateCarrierId($orderId, $carrierId)
     {
+        $orderId = (int)$orderId;
+        $carrierId = (int)$carrierId;
         return $this->db->update('packetery_order', ['id_carrier' => $carrierId], '`id_order` = ' . $orderId);
     }
 
@@ -124,6 +131,7 @@ class OrderRepository
      */
     public function getByCart($cartId)
     {
+        $cartId = (int)$cartId;
         return $this->db->getRow('SELECT `is_ad`, `zip`, `name_branch` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` =' . $cartId);
     }
 
@@ -135,6 +143,8 @@ class OrderRepository
      */
     public function getByCartAndCarrier($cartId, $carrierId)
     {
+        $cartId = (int)$cartId;
+        $carrierId = (int)$carrierId;
         return $this->db->getRow('SELECT * FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` =' . $cartId . ' AND `id_carrier` = ' . $carrierId);
     }
 
@@ -145,6 +155,7 @@ class OrderRepository
      */
     public function getOrderWithCountry($orderId)
     {
+        $orderId = (int)$orderId;
         return $this->db->getRow(
             'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`, `po`.`is_carrier`,
                     `c`.`iso_code` AS `country`
@@ -163,6 +174,7 @@ class OrderRepository
      */
     public function getById($orderId)
     {
+        $orderId = (int)$orderId;
         return $this->db->getRow('
             SELECT 
                    `id_branch`, 
@@ -216,6 +228,7 @@ class OrderRepository
      */
     public function setTrackingNumber($orderId, $trackingNumber)
     {
+        $orderId = (int)$orderId;
         return $this->db->execute('UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
             SET `tracking_number` = "' . $this->db->escape($trackingNumber) . '"
             WHERE `id_order` = ' . $orderId);
@@ -230,6 +243,7 @@ class OrderRepository
      */
     public function setExported($exported, $orderId)
     {
+        $orderId = (int)$orderId;
         return $this->db->execute('UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
             SET `exported` = ' . $exported . '
             WHERE `id_order` = ' . $orderId );

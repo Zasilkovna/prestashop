@@ -28,8 +28,9 @@ class CarrierRepository
      */
     public function existsById($carrierId)
     {
+        $carrierId = (int)$carrierId;
         $result = $this->db->getValue(
-            'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` WHERE `id_carrier` = ' . (int)$carrierId
+            'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` WHERE `id_carrier` = ' . $carrierId
         );
 
         return ((int)$result === 1);
@@ -72,6 +73,7 @@ class CarrierRepository
      */
     public function getPacketeryCarrierById($carrierId)
     {
+        $carrierId = (int)$carrierId;
         return $this->db->getRow('
             SELECT `id_carrier`, `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`
             FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
@@ -85,6 +87,8 @@ class CarrierRepository
      */
     public function swapId($oldId, $newId)
     {
+        $oldId = (int)$oldId;
+        $newId = (int)$newId;
         $this->db->update('packetery_address_delivery', ['id_carrier' => $newId], '`id_carrier` = ' . $oldId);
     }
 
@@ -97,6 +101,8 @@ class CarrierRepository
      */
     public function setCodFlag($carrierId, $isCod)
     {
+        $carrierId = (int)$carrierId;
+        $isCod = (int)$isCod;
         return $this->db->execute('UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery` 
             SET `is_cod` = ' . $isCod . ' WHERE `id_carrier` = ' . $carrierId);
     }
@@ -107,6 +113,7 @@ class CarrierRepository
      */
     public function deleteById($carrierId)
     {
+        $carrierId = (int)$carrierId;
         return $this->db->delete('packetery_address_delivery', '`id_carrier` = ' . $carrierId);
     }
 
@@ -127,6 +134,7 @@ class CarrierRepository
      */
     public function updatePresta(array $carrierUpdate, $carrierId)
     {
+        $carrierId = (int)$carrierId;
         $this->db->update('carrier', $carrierUpdate, '`id_carrier` = ' . $carrierId, 0, true);
     }
 
@@ -138,6 +146,7 @@ class CarrierRepository
      */
     public function updatePacketery(array $carrierUpdate, $carrierId)
     {
+        $carrierId = (int)$carrierId;
         return $this->db->update('packetery_address_delivery', $carrierUpdate, '`id_carrier` = ' . $carrierId, 0, true);
     }
 

@@ -59,6 +59,7 @@ class PaymentRepository
      */
     public function setCod($value, $moduleName)
     {
+        $value = (int)$value;
         return $this->db->execute('UPDATE `' . _DB_PREFIX_ . 'packetery_payment` 
             SET `is_cod` = ' . $value . ' 
             WHERE `module_name` = "' . $this->db->escape($moduleName) . '"');
@@ -73,6 +74,7 @@ class PaymentRepository
      */
     public function insert($isCod, $moduleName)
     {
+        $isCod = (int)$isCod;
         return $this->db->execute('INSERT INTO `' . _DB_PREFIX_ . 'packetery_payment` 
             SET `is_cod` = ' . $isCod . ', 
             `module_name` = "' . $this->db->escape($moduleName) . '"');
