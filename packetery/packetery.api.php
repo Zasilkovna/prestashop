@@ -24,6 +24,7 @@
  */
 
 use Packetery\Carrier\CarrierRepository;
+use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Order\OrderRepository;
 
@@ -37,6 +38,8 @@ class PacketeryApi
     /*LABELS*/
     /**
      * @param OrderRepository $orderRepository
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public static function downloadPdfAjax(OrderRepository $orderRepository)
     {
@@ -51,6 +54,7 @@ class PacketeryApi
     /**
      * @param OrderRepository $orderRepository
      * @return false|string
+     * @throws DatabaseException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
@@ -96,6 +100,7 @@ class PacketeryApi
     /*ORDERS EXPORT*/
     /**
      * @param OrderRepository $orderRepository
+     * @throws DatabaseException
      * @throws PrestaShopException
      */
     public static function prepareOrderExportAjax(OrderRepository $orderRepository)
@@ -109,7 +114,7 @@ class PacketeryApi
      * @param string $orders_id
      * @param OrderRepository $orderRepository
      * @return string
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public static function prepareOrderExport($orders_id, OrderRepository $orderRepository)
     {
@@ -130,6 +135,7 @@ class PacketeryApi
 
     /**
      * @param OrderRepository $orderRepository
+     * @throws DatabaseException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
@@ -146,6 +152,7 @@ class PacketeryApi
     /**
      * @param OrderRepository $orderRepository
      * @return array|false
+     * @throws DatabaseException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
@@ -213,6 +220,7 @@ class PacketeryApi
      * @param Order $order
      * @param OrderRepository $orderRepository
      * @return array
+     * @throws DatabaseException
      * @throws PrestaShopException
      */
     public static function createPacket($order, OrderRepository $orderRepository)
@@ -403,25 +411,32 @@ class PacketeryApi
         }
     }
 
-    public static function getApiKey($apiKey = false)
+    /**
+     * @return false|string
+     */
+    public static function getApiKey()
     {
-        if (!$apiKey) {
-            $apiKey = Configuration::get('PACKETERY_APIPASS');
+        $apiPass = self::getApiPass();
+        if ($apiPass === false) {
+            return false;
         }
 
-        return substr($apiKey, 0, 16);
+        return substr($apiPass, 0, 16);
     }
 
-    public static function getApiPass($apiPassword = false)
+    /**
+     * @return false|string
+     */
+    public static function getApiPass()
     {
-        if (!$apiPassword) {
-            $apiPassword = Configuration::get('PACKETERY_APIPASS');
-        }
-        return $apiPassword;
+        return Configuration::get('PACKETERY_APIPASS');
     }
 
     /**
      * @param CarrierRepository $carrierRepository
+     * @throws DatabaseException
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public static function updateBranchListAjax(CarrierRepository $carrierRepository)
     {
@@ -433,9 +448,16 @@ class PacketeryApi
         }
     }
 
-    public static function updateBranchList(CarrierRepository $carrierRepository, $apiPassword = false)
+    /**
+     * @param CarrierRepository $carrierRepository
+     * @return false|string
+     * @throws DatabaseException
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public static function updateBranchList(CarrierRepository $carrierRepository)
     {
-        $api_key = self::getApiPass($apiPassword);
+        $api_key = self::getApiKey();
 
         $branch_new_url = 'https://www.zasilkovna.cz/api/v4/' . $api_key . '/branch.xml';
         $branches = self::parseBranches($branch_new_url, $carrierRepository);
@@ -451,6 +473,7 @@ class PacketeryApi
      * @param string $branch_url
      * @param CarrierRepository $carrierRepository
      * @return false|string
+     * @throws DatabaseException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
@@ -489,7 +512,7 @@ class PacketeryApi
 
     /**
      * @param CarrierRepository $carrierRepository
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public static function countBranchesAjax(CarrierRepository $carrierRepository)
     {
@@ -512,8 +535,7 @@ class PacketeryApi
     /**
      * @param object $branch
      * @param CarrierRepository $carrierRepository
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public static function addBranch($branch, CarrierRepository $carrierRepository)
     {

@@ -115,8 +115,8 @@ class Packetery extends CarrierModule
 
     /**
      * @param array $params hook parameters
-     * @throws PrestaShopDatabaseException
      * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function hookActionCarrierUpdate(array $params)
     {
@@ -188,6 +188,12 @@ class Packetery extends CarrierModule
 
     /**
      * Load the configuration form
+     * @return string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
+     * @throws SmartyException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function getContent()
     {
@@ -432,12 +438,13 @@ class Packetery extends CarrierModule
 
     /**
      * Display widget selection button and chosen branch info for every carrier
-     * @param $params
+     * @param array $params
      * @return string
-     * @throws PrestaShopDatabaseException
+     * @throws ReflectionException
      * @throws SmartyException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
-    public function hookDisplayCarrierExtraContent($params)
+    public function hookDisplayCarrierExtraContent(array $params)
     {
         $id_carrier = $params['carrier']['id'];
         $this->context->smarty->assign('carrier_id', $id_carrier);
@@ -504,7 +511,13 @@ class Packetery extends CarrierModule
      * Compatibility: PS 1.6, PS 1.7
      *
      * @param array $params
-     * @return string
+     * @return false|string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
+     * @throws SmartyException
+     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws \PrestaShop\PrestaShop\Adapter\CoreException
      */
     public function hookDisplayBeforeCarrier(array $params)
     {
@@ -616,6 +629,11 @@ class Packetery extends CarrierModule
 
     /**
      * @param array $params parameters provided by PrestaShop
+     * @return false|string|void
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function packeteryHookDisplayAdminOrder($params)
     {
@@ -673,6 +691,8 @@ class Packetery extends CarrierModule
      * @param string $apiKey
      * @param array $packeteryOrder
      * @param int $orderId
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     private function preparePickupPointChange($apiKey, $packeteryOrder, $orderId)
     {
@@ -727,7 +747,8 @@ class Packetery extends CarrierModule
 
     /**
      * @return bool
-     * @throws PrestaShopDatabaseException
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     private function savePickupPointChange()
     {
@@ -810,6 +831,8 @@ class Packetery extends CarrierModule
      * Shows information about selected pickup point, right after information about sent mail
      * @param array $params
      * @return string|void
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function hookDisplayOrderConfirmation($params)
     {
@@ -839,6 +862,8 @@ class Packetery extends CarrierModule
      * Show information about selected pickup point in frontend order detail, between address and products
      * @param array $params
      * @return string|void
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function hookDisplayOrderDetail($params)
     {
@@ -861,6 +886,8 @@ class Packetery extends CarrierModule
      * Alters variables of order e-mails
      * inspiration: https://github.com/PrestaShop/ps_legalcompliance/blob/dev/ps_legalcompliance.php
      * @param array $params
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function hookSendMailAlterTemplateVars(&$params)
     {

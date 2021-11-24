@@ -7,9 +7,9 @@ use Context;
 use CurrencyCore;
 use OrderCore as PrestaShopOrder;
 use Packetery\Carrier\CarrierRepository;
+use Packetery\Exceptions\DatabaseException;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Tools\Logger;
-use PrestaShopException;
 use Tools;
 
 class OrderSaver
@@ -102,7 +102,7 @@ class OrderSaver
 
     /**
      * @return array with result and message
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     private function savePickupPointInCart() {
         $cartId = Context::getContext()->cart->id;
@@ -181,7 +181,8 @@ class OrderSaver
     public function savePickupPointInCartGetJson() {
         try {
             $result = $this->savePickupPointInCart();
-        } catch (PrestaShopException $exception) {
+        } catch (DatabaseException $exception) {
+            // there are more details in Packeta log
             $result = [
                 'result' => false,
                 'message' => $exception->getMessage(),

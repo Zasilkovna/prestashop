@@ -4,10 +4,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-/* @var $object Packetery */
-function upgrade_module_2_1_5($object)
+/* @var $module Packetery */
+function upgrade_module_2_1_5($module)
 {
-    $result = Db::getInstance()->execute('
+    $dbTools = $module->diContainer->get(\Packetery\Tools\DbTools::class);
+    $result = $dbTools->execute('
         DELETE FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
         WHERE `id_branch` = 0;
  
@@ -25,7 +26,7 @@ function upgrade_module_2_1_5($object)
     }
 
     $carriersToPair = [];
-    $oldPacketeryCarriers = Db::getInstance()->executeS('
+    $oldPacketeryCarriers = $dbTools->getRows('
         SELECT `id_carrier`, `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_carrier`');
     if ($oldPacketeryCarriers) {
         $psCarriers = Carrier::getCarriers(
@@ -48,10 +49,10 @@ function upgrade_module_2_1_5($object)
         }
     }
     if ($carriersToPair) {
-        Db::getInstance()->insert('packetery_address_delivery', $carriersToPair);
+        $dbTools->insert('packetery_address_delivery', $carriersToPair);
     }
 
-    return Db::getInstance()->execute('
+    return $dbTools->execute('
         DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_carrier`;
         
         ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
