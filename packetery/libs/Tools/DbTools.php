@@ -51,21 +51,21 @@ class DbTools
     }
 
     /**
-     * @param string|null $methodName
-     * @param mixed $result
      * @param string $query
+     * @param PrestaShopException|null $exception
      * @throws DatabaseException
      */
-    private function logAndThrow($methodName, $result, $query)
+    private function logAndThrow($query, $exception)
     {
-        if ($result instanceof PrestaShopException) {
-            $this->logger->logToFile($result->getMessage() . ', query: ' . $query);
-            throw new DatabaseException($result->getMessage() . ', see details in Packeta log');
-        } elseif ($result === false) {
-            // in case DEV mode is turned off, methods return false instead of raising an exception
-            $message = $methodName . ' method returned false';
-            $this->logger->logToFile($message . ', query: ' . $query);
-            throw new DatabaseException($message . ', see details in Packeta log');
+        if ($exception instanceof PrestaShopException) {
+            $this->logger->logToFile($exception->getMessage() . ', query: ' . $query);
+            throw new DatabaseException($exception->getMessage() . ', see details in Packeta log');
+        } else {
+            $error = $this->db->getNumberError();
+            if ($error) {
+                $this->logger->logToFile($this->db->getMsgError() . ', query: ' . $query);
+                throw new DatabaseException($this->db->getMsgError() . ', see details in Packeta log');
+            }
         }
     }
 
@@ -79,9 +79,9 @@ class DbTools
         try {
             $result = $this->db->executeS($sql);
         } catch (PrestaShopException $exception) {
-            $this->logAndThrow(null, $exception, $sql);
+            $this->logAndThrow($sql, $exception);
         }
-        $this->logAndThrow('executeS', $result, $sql);
+        $this->logAndThrow($sql, null);
         return $result;
     }
 
@@ -95,7 +95,7 @@ class DbTools
         try {
             $result = $this->db->getRow($sql);
         } catch (PrestaShopException $exception) {
-            $this->logAndThrow(null, $exception, $sql);
+            $this->logAndThrow($sql, $exception);
         }
         // in this case, false is ok
         return $result;
@@ -127,9 +127,9 @@ class DbTools
         try {
             $result = $this->db->execute($sql, $useCache);
         } catch (PrestaShopException $exception) {
-            $this->logAndThrow(null, $exception, $sql);
+            $this->logAndThrow($sql, $exception);
         }
-        $this->logAndThrow('execute', $result, $sql);
+        $this->logAndThrow($sql, null);
         return $result;
     }
 
@@ -148,9 +148,9 @@ class DbTools
         try {
             $result = $this->db->delete($table, $where, $limit, $useCache, $addPrefix);
         } catch (PrestaShopException $exception) {
-            $this->logAndThrow(null, $exception, $queryForLog);
+            $this->logAndThrow($queryForLog, $exception);
         }
-        $this->logAndThrow('delete', $result, $queryForLog);
+        $this->logAndThrow($queryForLog, null);
         return $result;
     }
 
@@ -170,9 +170,9 @@ class DbTools
         try {
             $result = $this->db->insert($table, $data, $nullValues, $useCache, $type, $addPrefix);
         } catch (PrestaShopException $exception) {
-            $this->logAndThrow(null, $exception, $queryForLog);
+            $this->logAndThrow($queryForLog, $exception);
         }
-        $this->logAndThrow('insert', $result, $queryForLog);
+        $this->logAndThrow($queryForLog, null);
         return $result;
     }
 
@@ -193,9 +193,9 @@ class DbTools
         try {
             $result = $this->db->update($table, $data, $where, $limit, $nullValues, $useCache, $addPrefix);
         } catch (PrestaShopException $exception) {
-            $this->logAndThrow(null, $exception, $queryForLog);
+            $this->logAndThrow($queryForLog, $exception);
         }
-        $this->logAndThrow('update', $result, $queryForLog);
+        $this->logAndThrow($queryForLog, null);
         return $result;
     }
 }
