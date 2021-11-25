@@ -112,10 +112,19 @@ class OrderRepository
      * @param int $orderId
      * @throws DatabaseException
      */
-    public function delete($orderId)
+    public function deleteByOrder($orderId)
     {
         $orderId = (int)$orderId;
         $this->dbTools->delete('packetery_order', '`id_order` = ' . $orderId);
+    }
+
+    /**
+     * @param int $cartId
+     */
+    public function deleteByCart($cartId)
+    {
+        $cartId = (int)$cartId;
+        $this->db->delete('packetery_order', '`id_cart` = ' . $cartId);
     }
 
     /**
