@@ -200,7 +200,8 @@ class OrderRepository
                    `is_ad`, 
                    `currency_branch`, 
                    `is_carrier`, 
-                   `carrier_pickup_point` 
+                   `carrier_pickup_point`,
+                   `tracking_number`
             FROM `' . _DB_PREFIX_ . 'packetery_order` 
             WHERE id_order = ' . $orderId);
     }
@@ -258,4 +259,15 @@ class OrderRepository
         return $this->dbTools->update('packetery_order', ['exported' => $exported], '`id_order` = ' . $orderId);
     }
 
+    /**
+     * @param int $orderId
+     * @param float|null $value
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function setWeight($orderId, $value)
+    {
+        $orderId = (int)$orderId;
+        return $this->dbTools->update('packetery_order', ['weight' => $value], '`id_order` = ' . $orderId, 0, true);
+    }
 }

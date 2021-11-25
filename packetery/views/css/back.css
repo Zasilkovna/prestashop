@@ -34,21 +34,6 @@
     width: 400px !important;
 }
 
-#packetery-form .r-message-success, #packetery-form .validation-error {
-    display: none;
-}
-
-#packetery-form .pdf_link {
-    width: 100%;
-    height: 17px;
-    padding: 6px 0;
-    margin-top: 5px;
-}
-
-#packetery-form .download_pdf {
-    width:400px !important;
-}
-
 /*PAYMENTS*/
 #payment-list-table .table th:nth-child(3){
     display: none;
@@ -58,33 +43,6 @@
     display: none;
 }
 /*END PAYMENTS*/
-
-/*ORDERS*/
-#packetery-form .export_selected, #packetery-form .export_selected_csv {
-    width:400px !important;
-}
-#packetery-form .ps-table-checkbox-all {
-    position:relative;
-    margin-right: 5px !important;
-}
-#packetery-form .all-fix {
-    margin-bottom: 3px;
-}
-#packetery-orders-table table tr td:nth-child(6){
-    cursor: pointer;
-}
-#packetery-form .prestaui-paginator {
-    width: 100%;
-    text-align: right;
-}
-#packetery-form .prestaui-paginator a:active {
-    color: black !important;
-}
-/*END ORDERS*/
-
-#packetery-form .export_selected_csv {
-    margin-top: 20px;
-}
 
 #packetery-form input[type="radio"], #packetery-form input[type="checkbox"] {
     margin-top: 7px;

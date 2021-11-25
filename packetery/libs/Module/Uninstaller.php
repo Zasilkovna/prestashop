@@ -45,7 +45,7 @@ class Uninstaller
      */
     private function deleteTab()
     {
-        $tabId = Tab::getIdFromClassName('Adminpacketery');
+        $tabId = Tab::getIdFromClassName('PacketeryOrderGrid');
         if ($tabId) {
             try {
                 $tab = new Tab($tabId);

@@ -221,34 +221,8 @@ class Packetery extends CarrierModule
         $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
         $this->context->smarty->assign('module_dir', $this->_path);
         $this->context->smarty->assign('baseuri', $base_uri);
-
-        /*ORDERS*/
         $active_tab = Tools::getValue('active_tab');
         $this->context->smarty->assign('active_tab', $active_tab);
-
-        $packetery_orders_array = Packeteryclass::getListOrders();
-        $packetery_orders = $packetery_orders_array[0];
-        $packetery_orders_pages = $packetery_orders_array[1];
-        $this->context->smarty->assign('po_pages', $packetery_orders_pages);
-        $this->context->smarty->assign(array(
-            'packetery_orders' => Tools::jsonEncode(array(
-                'columns' => array(
-                    array('content' => $this->l('Ord.nr.'), 'key' => 'id_order', 'center' => true),
-                    array('content' => $this->l('Customer'), 'key' => 'customer', 'center' => true),
-                    array('content' => $this->l('Total Price'), 'key' => 'total', 'center' => true),
-                    array('content' => $this->l('Order Date'), 'key' => 'date', 'center' => true),
-                    array('content' => $this->l('Is COD'), 'bool' => true, 'key' => 'is_cod'),
-                    array('content' => $this->l('Destination pickup point'), 'key' => 'name_branch', 'center' => true),
-                    array('content' => $this->l('Address delivery'), 'key' => 'is_ad', 'bool' => true,'center' => true),
-                    array('content' => $this->l('Exported'), 'key' => 'exported', 'bool' => true, 'center' => true),
-                    array('content' => $this->l('Tracking number'), 'key' => 'tracking_number', 'center' => true)
-                ),
-                'rows' => $packetery_orders,
-                'url_params' => array('configure' => $this->name),
-                'identifier' => 'id_order',
-            ))
-        ));
-        /*END ORDERS*/
 
         /*CARRIERS*/
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
@@ -726,15 +700,17 @@ class Packetery extends CarrierModule
     /**
      * see https://devdocs.prestashop.com/1.7/modules/core-updates/1.7.5/
      * @param int $orderId
+     * @param string $anchor
      * @return string
+     * @throws PrestaShopException
      */
-    private function getAdminLink($orderId)
+    public function getAdminLink($orderId, $anchor = '#packetaPickupPointChange')
     {
         if (Tools::version_compare(_PS_VERSION_, '1.7.5', '<')) {
             // Code compliant from PrestaShop 1.5 to 1.7.4
             return $this->context->link->getAdminLink(
                 'AdminOrders'
-            ) . '&id_order=' . $orderId . '&vieworder#packetaPickupPointChange';
+            ) . '&id_order=' . $orderId . '&vieworder'. $anchor;
         }
         // Recommended code from PrestaShop 1.7.5
         return $this->context->link->getAdminLink(
@@ -742,7 +718,7 @@ class Packetery extends CarrierModule
             true,
             [],
             ['id_order' => $orderId, 'vieworder' => 1]
-        ) . '#packetaPickupPointChange';
+        ) . $anchor;
     }
 
     /**
@@ -809,6 +785,8 @@ class Packetery extends CarrierModule
             'sendMailAlterTemplateVars',
             'actionObjectOrderUpdateBefore',
             'actionObjectCartUpdateBefore',
+            'displayPacketeryOrderGridListAfter',
+            'actionPacketeryOrderGridListingResultsModifier',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -955,4 +933,29 @@ class Packetery extends CarrierModule
         $orderRepository->deleteByCart($cart->id);
     }
 
+    /**
+     * Displays save button after Packter orders list
+     * @return false|string
+     */
+    public function hookDisplayPacketeryOrderGridListAfter()
+    {
+        return $this->display(__FILE__, 'display_order_list_footer.tpl');
+    }
+
+    /**
+     * Adds computed weight to orders without saved weight
+     * @param array $params Hook parameters
+     */
+    public function hookActionPacketeryOrderGridListingResultsModifier(&$params)
+    {
+        if (isset($params['list']) && is_array($params['list'])) {
+            foreach ($params['list'] as &$order) {
+                if ($order['weight'] === null) {
+                    $orderInstance = new \Order($order['id_order']);
+                    // TODO: use Converter::getKilograms later
+                    $order['weight'] = $orderInstance->getTotalWeight();
+                }
+            }
+        }
+    }
 }

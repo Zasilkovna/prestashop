@@ -36,10 +36,7 @@
 		</div>
 	</div>
 	<ps-tabs position="top">
-		<ps-tab title="{l s='Orders' mod='packetery'}" id="tab-orders" {if $active_tab eq 'orders' or not $active_tab}active="true"{/if} icon="icon-AdminParentModules" >
-		    {include file="./tab_orders.tpl"}
-		</ps-tab>
-		<ps-tab title="{l s='Settings' mod='packetery'}" id="tab-settings" {if $active_tab eq 'settings'}active="true"{/if} icon="icon-AdminParentModules" >
+		<ps-tab title="{l s='Settings' mod='packetery'}" id="tab-settings" {if $active_tab eq 'settings' or not $active_tab}active="true"{/if} icon="icon-AdminParentModules" >
 		    {include file="./tab_settings.tpl"}
 		</ps-tab>
 		<ps-tab title="{l s='Pickup points' mod='packetery'}" id="tab-branch" {if $active_tab eq 'branch'}active="true"{/if} icon="" >

@@ -38,30 +38,18 @@ class PacketeryApi
     /*LABELS*/
     /**
      * @param OrderRepository $orderRepository
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public static function downloadPdfAjax(OrderRepository $orderRepository)
-    {
-        $result = self::downloadPdf($orderRepository);
-        if ($result) {
-            echo $result;
-        } else {
-            echo ' ';
-        }
-    }
-
-    /**
-     * @param OrderRepository $orderRepository
-     * @return false|string
+     * @param string|null $id_orders Comma separated integers
+     * @return string|false PDF contents
      * @throws DatabaseException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
-    public static function downloadPdf(OrderRepository $orderRepository)
+    public static function downloadPdf(OrderRepository $orderRepository, $id_orders = null)
     {
-        $id_orders = Tools::getValue('orders_id');
-        if ($id_orders == '') {
+        if ($id_orders === null) {
+            $id_orders = Tools::getValue('orders_id');
+        }
+        if (!$id_orders) {
             $module = new Packetery;
             echo $module->l('Please choose orders first.', 'packetery.api');
             return false;
@@ -100,72 +88,26 @@ class PacketeryApi
     /*ORDERS EXPORT*/
     /**
      * @param OrderRepository $orderRepository
-     * @throws DatabaseException
-     * @throws PrestaShopException
-     */
-    public static function prepareOrderExportAjax(OrderRepository $orderRepository)
-    {
-        $id_orders = Tools::getValue('orders_id');
-        $result = self::prepareOrderExport($id_orders, $orderRepository);
-        echo $result;
-    }
-
-    /**
-     * @param string $orders_id
-     * @param OrderRepository $orderRepository
-     * @return string
-     * @throws DatabaseException
-     */
-    public static function prepareOrderExport($orders_id, OrderRepository $orderRepository)
-    {
-        $err = array();
-        $id_orders = explode(',', $orders_id);
-        foreach ($id_orders as $id_order) {
-            $packetery_order = $orderRepository->getById($id_order);
-            if ($packetery_order && (int)$packetery_order['id_branch'] === 0) {
-                $err[] = $id_order;
-            }
-        }
-        if (count($err) > 0) {
-            return implode(',', $err);
-        } else {
-            return 'ok';
-        }
-    }
-
-    /**
-     * @param OrderRepository $orderRepository
-     * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public static function ordersExportAjax(OrderRepository $orderRepository)
-    {
-        $packets = self::ordersExport($orderRepository);
-        if (is_array($packets) && !empty($packets)) {
-            echo json_encode($packets);
-        } else {
-            echo ' ';
-        }
-    }
-
-    /**
-     * @param OrderRepository $orderRepository
+     * @param string|null $id_orders Comma separated integers
      * @return array|false
      * @throws DatabaseException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
-    public static function ordersExport(OrderRepository $orderRepository)
+    public static function ordersExport(OrderRepository $orderRepository, $id_orders = null)
     {
         $apiPassword = self::getApiPass();
-        $id_orders = Tools::getValue('orders_id');
-        if ($id_orders == '') {
+
+        if (!is_array($id_orders)) {
+            $id_orders = Tools::getValue('orders_id');
+            $id_orders = explode(',', $id_orders);
+        }
+        if (!$id_orders) {
             $module = new Packetery;
             echo $module->l('Please choose orders first.', 'packetery.api');
             return false;
         }
-        $id_orders = explode(',', $id_orders);
+
         $packets_row = array();
         $packets = array();
         /*CREATE PACKET*/
