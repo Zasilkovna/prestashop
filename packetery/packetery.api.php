@@ -38,17 +38,12 @@ class PacketeryApi
     /*LABELS*/
     /**
      * @param OrderRepository $orderRepository
-     * @param string|null $id_orders Comma separated integers
+     * @param string $id_orders Comma separated integers
      * @return string|false PDF contents
      * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
      */
-    public static function downloadPdf(OrderRepository $orderRepository, $id_orders = null)
+    public static function downloadPdf(OrderRepository $orderRepository, $id_orders)
     {
-        if ($id_orders === null) {
-            $id_orders = Tools::getValue('orders_id');
-        }
         if (!$id_orders) {
             $module = new Packetery;
             echo $module->l('Please choose orders first.', 'packetery.api');
@@ -88,20 +83,15 @@ class PacketeryApi
     /*ORDERS EXPORT*/
     /**
      * @param OrderRepository $orderRepository
-     * @param string|null $id_orders Comma separated integers
+     * @param array $id_orders Comma separated integers
      * @return array|false
      * @throws DatabaseException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
-    public static function ordersExport(OrderRepository $orderRepository, $id_orders = null)
+    public static function ordersExport(OrderRepository $orderRepository, array $id_orders)
     {
         $apiPassword = self::getApiPass();
-
-        if (!is_array($id_orders)) {
-            $id_orders = Tools::getValue('orders_id');
-            $id_orders = explode(',', $id_orders);
-        }
         if (!$id_orders) {
             $module = new Packetery;
             echo $module->l('Please choose orders first.', 'packetery.api');

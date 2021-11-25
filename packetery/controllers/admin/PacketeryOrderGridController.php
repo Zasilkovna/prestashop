@@ -111,7 +111,7 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'title' => $this->l('Is COD'),
                 'type' => 'bool',
                 'align' => 'center',
-                'callback' => 'booleanIcon',
+                'callback' => 'getIconForBoolean',
                 'filter_key' => 'po!is_cod',
             ],
             'name_branch' => [
@@ -122,19 +122,19 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'title' => $this->l('Address delivery'),
                 'type' => 'bool',
                 'align' => 'center',
-                'callback' => 'booleanIcon',
+                'callback' => 'getIconForBoolean',
                 'filter_key' => 'po!is_ad',
             ],
             'exported' => [
                 'title' => $this->l('Exported'),
                 'type' => 'bool',
                 'align' => 'center',
-                'callback' => 'booleanIcon',
+                'callback' => 'getIconForBoolean',
                 'filter_key' => 'po!exported',
             ],
             'tracking_number' => [
                 'title' => $this->l('Tracking number'),
-                'callback' => 'linkTracking',
+                'callback' => 'getTrackingLink',
                 'filter_key' => 'po!tracking_number',
             ],
             'weight' => [
@@ -145,7 +145,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         ];
 
         $this->bulk_actions = [
-             // use 'confirm' key to require confirmation
+            // use 'confirm' key to require confirmation
             'CreatePacket' => [
                 'text' => $this->l('Send selected orders and create shipment'),
                 'icon' => 'icon-send',
@@ -165,13 +165,15 @@ class PacketeryOrderGridController extends ModuleAdminController
         $this->toolbar_title = $title;
     }
 
-    public function processBulkCreatePacket()
+    /**
+     * @param array $ids
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
+     */
+    private function createPackets(array $ids)
     {
-        $ids = $this->boxes;
-        if (!$ids) {
-            $this->informations = $this->l('No orders were selected.');
-            return;
-        }
         $module = $this->getModule();
         $orderRepository = $module->diContainer->get(OrderRepository::class);
         $exportResult = PacketeryApi::ordersExport($orderRepository, $ids);
@@ -185,7 +187,38 @@ class PacketeryOrderGridController extends ModuleAdminController
         if ($this->errors) {
             return;
         }
-        Tools::redirectAdmin(self::$currentIndex . '&conf=4&token=' . $this->token);
+        Tools::redirectAdmin(self::$currentIndex . '&token=' . $this->token);
+    }
+
+    public function processBulkCreatePacket()
+    {
+        $ids = $this->boxes;
+        if (!$ids) {
+            $this->informations = $this->l('No orders were selected.');
+            return;
+        }
+        $this->createPackets($ids);
+    }
+
+    public function processSubmit()
+    {
+        $this->createPackets([Tools::getValue('id_order')]);
+    }
+
+    /**
+     * @param array $ids
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
+     */
+    private function prepareLabels(array $ids)
+    {
+        $module = $this->getModule();
+        $orderRepository = $module->diContainer->get(OrderRepository::class);
+        $fileName = PacketeryApi::downloadPdf($orderRepository, implode(',', $ids));
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        echo file_get_contents(_PS_MODULE_DIR_ . 'packetery/labels/' . $fileName);
+        die();
     }
 
     public function processBulkLabelPdf()
@@ -195,13 +228,12 @@ class PacketeryOrderGridController extends ModuleAdminController
             $this->informations = $this->l('No orders were selected.');
             return;
         }
-        $module = $this->getModule();
-        $orderRepository = $module->diContainer->get(OrderRepository::class);
-        $fileName = PacketeryApi::downloadPdf($orderRepository, implode(',', $ids));
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="' . $fileName . '"');
-        echo file_get_contents(_PS_MODULE_DIR_ . 'packetery/labels/' . $fileName);
-        die();
+        $this->prepareLabels($ids);
+    }
+
+    public function processPrint()
+    {
+        $this->prepareLabels([Tools::getValue('id_order')]);
     }
 
     public function processBulkCsvExport()
@@ -260,7 +292,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         parent::postProcess();
     }
 
-    public function linkTracking($trackingNumber)
+    public function getTrackingLink($trackingNumber)
     {
         if ($trackingNumber) {
             return "<a href='https://tracking.packeta.com/?id={$trackingNumber}' target='_blank'>{$trackingNumber}</a>";
@@ -268,7 +300,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         return '';
     }
 
-    public function booleanIcon($booleanValue)
+    public function getIconForBoolean($booleanValue)
     {
         if ($booleanValue) {
             return '<span class="list-action-enable action-enabled"><i class="icon-check"></i></span>';
@@ -287,20 +319,15 @@ class PacketeryOrderGridController extends ModuleAdminController
             if ($orderData['tracking_number']) {
                 $action = 'print';
                 $iconClass = 'icon-print';
-                $event = 'submitBulkLabelPdforders';
                 $title = $this->l('Print');
             } else {
                 $action = 'submit';
                 $iconClass = 'icon-send';
-                $event = 'submitBulkCreatePacketorders';
                 $title = $this->l('Export');
             }
-            $script = htmlspecialchars("checkDelBoxes($(this).closest('form').get(0), 'ordersBox[]', false);" .
-                "$(this).closest('tr').find('input[name=\"ordersBox[]\"]').prop('checked', true);" .
-                "sendBulkAction($(this).closest('form').get(0), '$event');"
-            );
-
-            $links[$action] = '<a href="javascript:" onclick="' . $script . '"><i class="' . $iconClass . '"></i> ' . $title . '</a>';
+            $href = $this->context->link->getAdminLink('PacketeryOrderGrid') .
+                '&amp;id_order=' . $orderId . '&amp;action=' . $action;
+            $links[$action] = '<a href="' . $href . '"><i class="' . $iconClass . '"></i> ' . $title . '</a>';
         }
         return $links;
     }
