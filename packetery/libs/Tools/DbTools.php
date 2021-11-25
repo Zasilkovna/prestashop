@@ -55,7 +55,7 @@ class DbTools
      * @param PrestaShopException|null $exception
      * @throws DatabaseException
      */
-    private function logAndThrow($query, $exception)
+    private function logAndThrow($query, $exception = null)
     {
         if ($exception instanceof PrestaShopException) {
             $this->logger->logToFile($exception->getMessage() . ', query: ' . $query);
@@ -81,7 +81,7 @@ class DbTools
         } catch (PrestaShopException $exception) {
             $this->logAndThrow($sql, $exception);
         }
-        $this->logAndThrow($sql, null);
+        $this->logAndThrow($sql);
         return $result;
     }
 
@@ -97,7 +97,7 @@ class DbTools
         } catch (PrestaShopException $exception) {
             $this->logAndThrow($sql, $exception);
         }
-        // in this case, false is ok
+        $this->logAndThrow($sql);
         return $result;
     }
 
@@ -129,7 +129,7 @@ class DbTools
         } catch (PrestaShopException $exception) {
             $this->logAndThrow($sql, $exception);
         }
-        $this->logAndThrow($sql, null);
+        $this->logAndThrow($sql);
         return $result;
     }
 
@@ -150,7 +150,7 @@ class DbTools
         } catch (PrestaShopException $exception) {
             $this->logAndThrow($queryForLog, $exception);
         }
-        $this->logAndThrow($queryForLog, null);
+        $this->logAndThrow($queryForLog);
         return $result;
     }
 
@@ -172,7 +172,7 @@ class DbTools
         } catch (PrestaShopException $exception) {
             $this->logAndThrow($queryForLog, $exception);
         }
-        $this->logAndThrow($queryForLog, null);
+        $this->logAndThrow($queryForLog);
         return $result;
     }
 
@@ -195,7 +195,7 @@ class DbTools
         } catch (PrestaShopException $exception) {
             $this->logAndThrow($queryForLog, $exception);
         }
-        $this->logAndThrow($queryForLog, null);
+        $this->logAndThrow($queryForLog);
         return $result;
     }
 }
