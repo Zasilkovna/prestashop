@@ -3,8 +3,8 @@
 namespace Packetery\Carrier;
 
 use Db;
-use PrestaShopDatabaseException;
-use PrestaShopException;
+use Packetery\Exceptions\DatabaseException;
+use Packetery\Tools\DbTools;
 use Tools;
 
 class CarrierRepository
@@ -12,24 +12,29 @@ class CarrierRepository
     /** @var Db $db */
     public $db;
 
+    /** @var DbTools */
+    private $dbTools;
+
     /**
-     * PaymentRepository constructor.
+     * CarrierRepository constructor.
      * @param Db $db
+     * @param DbTools $dbTools
      */
-    public function __construct(Db $db)
+    public function __construct(Db $db, DbTools $dbTools)
     {
         $this->db = $db;
+        $this->dbTools = $dbTools;
     }
 
     /**
      * @param int $carrierId
      * @return bool
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function existsById($carrierId)
     {
         $carrierId = (int)$carrierId;
-        $result = $this->db->getValue(
+        $result = $this->dbTools->getValue(
             'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` WHERE `id_carrier` = ' . $carrierId
         );
 
@@ -39,11 +44,11 @@ class CarrierRepository
     /**
      * Get all active packetery AD carriers
      * @return array|false|\mysqli_result|null|\PDOStatement|resource
-     * @throws PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function getPacketeryCarriersList()
     {
-        return $this->db->executeS('
+        return $this->dbTools->getRows('
             SELECT `c`.`id_carrier`, `c`.`name`, `pad`.`id_branch`, `pad`.`is_cod`, `pad`.`pickup_point_type` 
             FROM `' . _DB_PREFIX_ . 'carrier` `c`
             LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` USING(`id_carrier`)
@@ -54,12 +59,11 @@ class CarrierRepository
 
     /**
      * @return array|bool|\mysqli_result|\PDOStatement|resource|null
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function getPickupPointCarriers()
     {
-        return $this->db->executeS(
+        return $this->dbTools->getRows(
             'SELECT `pad`.`id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
             JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`)
             WHERE `c`.`deleted` = 0 AND `pad`.`pickup_point_type` IS NOT NULL'
@@ -69,12 +73,12 @@ class CarrierRepository
     /**
      * @param int $carrierId
      * @return array|bool|object|null
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function getPacketeryCarrierById($carrierId)
     {
         $carrierId = (int)$carrierId;
-        return $this->db->getRow('
+        return $this->dbTools->getRow('
             SELECT `id_carrier`, `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`
             FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
             WHERE `id_carrier` = ' . $carrierId);
@@ -83,71 +87,70 @@ class CarrierRepository
     /**
      * @param int $oldId
      * @param int $newId
-     * @throws PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function swapId($oldId, $newId)
     {
         $oldId = (int)$oldId;
         $newId = (int)$newId;
-        $this->db->update('packetery_address_delivery', ['id_carrier' => $newId], '`id_carrier` = ' . $oldId);
+        $this->dbTools->update('packetery_address_delivery', ['id_carrier' => $newId], '`id_carrier` = ' . $oldId);
     }
 
     /**
      * @param int $carrierId
      * @param int $isCod
      * @return bool
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function setCodFlag($carrierId, $isCod)
     {
         $carrierId = (int)$carrierId;
         $isCod = (int)$isCod;
-        return $this->db->execute('UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery` 
-            SET `is_cod` = ' . $isCod . ' WHERE `id_carrier` = ' . $carrierId);
+        return $this->dbTools->update('packetery_address_delivery', ['is_cod' => $isCod], '`id_carrier` = ' . $carrierId);
     }
 
     /**
      * @param int $carrierId
      * @return bool
+     * @throws DatabaseException
      */
     public function deleteById($carrierId)
     {
         $carrierId = (int)$carrierId;
-        return $this->db->delete('packetery_address_delivery', '`id_carrier` = ' . $carrierId);
+        return $this->dbTools->delete('packetery_address_delivery', '`id_carrier` = ' . $carrierId);
     }
 
     /**
      * @param array $fieldsToSet
      * @return bool
-     * @throws PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function insertPacketery(array $fieldsToSet)
     {
-        return $this->db->insert('packetery_address_delivery', $fieldsToSet, true);
+        return $this->dbTools->insert('packetery_address_delivery', $fieldsToSet, true);
     }
 
     /**
      * @param array $carrierUpdate
      * @param int $carrierId
-     * @throws PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function updatePresta(array $carrierUpdate, $carrierId)
     {
         $carrierId = (int)$carrierId;
-        $this->db->update('carrier', $carrierUpdate, '`id_carrier` = ' . $carrierId, 0, true);
+        $this->dbTools->update('carrier', $carrierUpdate, '`id_carrier` = ' . $carrierId, 0, true);
     }
 
     /**
      * @param array $carrierUpdate
      * @param int $carrierId
      * @return bool
-     * @throws PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function updatePacketery(array $carrierUpdate, $carrierId)
     {
         $carrierId = (int)$carrierId;
-        return $this->db->update('packetery_address_delivery', $carrierUpdate, '`id_carrier` = ' . $carrierId, 0, true);
+        return $this->dbTools->update('packetery_address_delivery', $carrierUpdate, '`id_carrier` = ' . $carrierId, 0, true);
     }
 
     // Methods below work with branch table, which is now used only for carriers obtained through API feed
@@ -155,11 +158,11 @@ class CarrierRepository
 
     /**
      * @return false|string|null
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function getAdAndExternalCount()
     {
-        $result = $this->db->getValue('SELECT COUNT(*) FROM ' . _DB_PREFIX_ . 'packetery_branch');
+        $result = $this->dbTools->getValue('SELECT COUNT(*) FROM ' . _DB_PREFIX_ . 'packetery_branch');
         if ($result > 0) {
             return $result;
         }
@@ -169,8 +172,7 @@ class CarrierRepository
 
     /**
      * @return array
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function getAdAndExternalCarriers()
     {
@@ -178,7 +180,7 @@ class CarrierRepository
                 FROM `' . _DB_PREFIX_ . 'packetery_branch`
                 WHERE `is_ad` = 1 OR `is_pickup_point` = 1
                 ORDER BY `country`, `name`';
-        $result = $this->db->executeS($sql);
+        $result = $this->dbTools->getRows($sql);
         $branches = [];
         if ($result) {
             foreach ($result as $branch) {
@@ -200,11 +202,11 @@ class CarrierRepository
      * @param string $openingHoursCompactLong
      * @param string $openingHoursRegular
      * @return bool
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function addBranch($branch, $openingHoursTableLong, $openingHoursCompactShort, $openingHoursCompactLong, $openingHoursRegular)
     {
+        // TODO: use "insert" method
         $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'packetery_branch VALUES(
                     ' . (int)$branch->id . ',
                     \'' . $this->db->escape($branch->name) . '\',
@@ -235,16 +237,16 @@ class CarrierRepository
                     0,
                     0
                     );';
-        return $this->db->execute($sql);
+        return $this->dbTools->execute($sql);
     }
 
     /**
      * @param object $carrier
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function addCarrier($carrier)
     {
+        // TODO: use "insert" method
         $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_branch` VALUES(
                     ' . (int)$carrier->id . ',
                     \'' . $this->db->escape($carrier->name) . '\',
@@ -276,16 +278,15 @@ class CarrierRepository
                     ' . ((string)$carrier->pickupPoints === 'true' ? 1 : 0) . '
                     );';
 
-        $this->db->execute($sql);
+        $this->dbTools->execute($sql);
     }
 
     /**
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function dropBranchList()
     {
-        $this->db->execute('DELETE FROM `' . _DB_PREFIX_ . 'packetery_branch`');
+        $this->dbTools->delete('packetery_branch');
     }
 
 }

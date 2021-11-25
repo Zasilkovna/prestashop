@@ -3,8 +3,8 @@
 namespace Packetery\Order;
 
 use Db;
-use PrestaShopDatabaseExceptionCore as PrestaShopDatabaseException;
-use PrestaShopException;
+use Packetery\Exceptions\DatabaseException;
+use Packetery\Tools\DbTools;
 use PrestaShopLoggerCore as PrestaShopLogger;
 
 class OrderRepository
@@ -12,24 +12,29 @@ class OrderRepository
     /** @var Db $db */
     public $db;
 
+    /** @var DbTools */
+    private $dbTools;
+
     /**
      * OrderRepository constructor.
      * @param Db $db
+     * @param DbTools $dbTools
      */
-    public function __construct(Db $db)
+    public function __construct(Db $db, DbTools $dbTools)
     {
         $this->db = $db;
+        $this->dbTools = $dbTools;
     }
 
     /**
      * @param int $cartId
      * @return bool
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function existsByCart($cartId)
     {
         $cartId = (int)$cartId;
-        $result = $this->db->getValue(
+        $result = $this->dbTools->getValue(
             'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId
         );
 
@@ -39,12 +44,12 @@ class OrderRepository
     /**
      * @param int $orderId
      * @return bool
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function existsByOrder($orderId)
     {
         $orderId = (int)$orderId;
-        $result = $this->db->getValue(
+        $result = $this->dbTools->getValue(
             'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . $orderId
         );
 
@@ -62,8 +67,9 @@ class OrderRepository
             }
         }
         try {
-            $this->db->insert('packetery_order', $data, true, true, Db::ON_DUPLICATE_KEY);
-        } catch (PrestaShopDatabaseException $exception) {
+            $this->dbTools->insert('packetery_order', $data, true, true, Db::ON_DUPLICATE_KEY);
+        } catch (DatabaseException $exception) {
+            // there are more details in Packeta log
             PrestaShopLogger::addLog($exception->getMessage(), 3, null, null, null, true);
         }
     }
@@ -71,92 +77,93 @@ class OrderRepository
     /**
      * @param array $fields
      * @return bool
-     * @throws \PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function insert(array $fields)
     {
-        return $this->db->insert('packetery_order', $fields);
+        return $this->dbTools->insert('packetery_order', $fields);
     }
 
     /**
      * @param array $fields
      * @param int $cartId
      * @return bool
-     * @throws \PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function updateByCart(array $fields, $cartId)
     {
         $cartId = (int)$cartId;
-        return $this->db->update('packetery_order', $fields, '`id_cart` = ' . $cartId);
+        return $this->dbTools->update('packetery_order', $fields, '`id_cart` = ' . $cartId);
     }
 
     /**
      * @param array $fields
      * @param int $orderId
      * @return bool
-     * @throws \PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function updateByOrder(array $fields, $orderId)
     {
         $orderId = (int)$orderId;
-        return $this->db->update('packetery_order', $fields, '`id_order` = ' . $orderId);
+        return $this->dbTools->update('packetery_order', $fields, '`id_order` = ' . $orderId);
     }
 
     /**
      * @param int $orderId
+     * @throws DatabaseException
      */
     public function delete($orderId)
     {
         $orderId = (int)$orderId;
-        $this->db->delete('packetery_order', '`id_order` = ' . $orderId);
+        $this->dbTools->delete('packetery_order', '`id_order` = ' . $orderId);
     }
 
     /**
      * @param int $orderId
      * @param int $carrierId
      * @return bool
-     * @throws \PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function updateCarrierId($orderId, $carrierId)
     {
         $orderId = (int)$orderId;
         $carrierId = (int)$carrierId;
-        return $this->db->update('packetery_order', ['id_carrier' => $carrierId], '`id_order` = ' . $orderId);
+        return $this->dbTools->update('packetery_order', ['id_carrier' => $carrierId], '`id_order` = ' . $orderId);
     }
 
     /**
      * @param int $cartId
      * @return array|bool|object|null
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function getByCart($cartId)
     {
         $cartId = (int)$cartId;
-        return $this->db->getRow('SELECT `is_ad`, `zip`, `name_branch` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` =' . $cartId);
+        return $this->dbTools->getRow('SELECT `name_branch` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId);
     }
 
     /**
      * @param int $cartId
      * @param int $carrierId
      * @return array|bool|object|null
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function getByCartAndCarrier($cartId, $carrierId)
     {
         $cartId = (int)$cartId;
         $carrierId = (int)$carrierId;
-        return $this->db->getRow('SELECT * FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` =' . $cartId . ' AND `id_carrier` = ' . $carrierId);
+        return $this->dbTools->getRow('SELECT * FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId . ' AND `id_carrier` = ' . $carrierId);
     }
 
     /**
      * @param int $orderId
      * @return array|bool|object|null
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function getOrderWithCountry($orderId)
     {
         $orderId = (int)$orderId;
-        return $this->db->getRow(
+        return $this->dbTools->getRow(
             'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`, `po`.`is_carrier`,
                     `c`.`iso_code` AS `country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
@@ -170,15 +177,15 @@ class OrderRepository
     /**
      * @param int $orderId
      * @return array|bool|object|null
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function getById($orderId)
     {
         $orderId = (int)$orderId;
-        return $this->db->getRow('
+        return $this->dbTools->getRow('
             SELECT 
                    `id_branch`, 
-                   `name_branch`
+                   `name_branch`,
                    `id_carrier`, 
                    `is_cod`, 
                    `is_ad`, 
@@ -192,11 +199,11 @@ class OrderRepository
     /**
      * @param string $currencyIsoCode
      * @return false|string|null
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public function getConversionRate($currencyIsoCode)
     {
-        return $this->db->getValue(
+        return $this->dbTools->getValue(
             'SELECT `cs`.`conversion_rate`
                 FROM `' . _DB_PREFIX_ . 'currency_shop` `cs` 
                 INNER JOIN `' . _DB_PREFIX_ . 'currency` `c` ON `c`.`id_currency` = `cs`.`id_currency` 
@@ -207,12 +214,11 @@ class OrderRepository
     /**
      * @param string $orderIds comma separated integers
      * @return array|bool|\mysqli_result|\PDOStatement|resource|null
-     * @throws PrestaShopException
-     * @throws \PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function getTrackingNumbers($orderIds)
     {
-        return $this->db->executeS(
+        return $this->dbTools->getRows(
             'SELECT `tracking_number`
                 FROM `' . _DB_PREFIX_ . 'packetery_order` 
                 WHERE `id_order` IN(' . $this->db->escape($orderIds) . ') AND `tracking_number` != ""'
@@ -223,30 +229,24 @@ class OrderRepository
      * @param int $orderId
      * @param string $trackingNumber
      * @return bool
-     * @throws PrestaShopException
-     * @throws \PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function setTrackingNumber($orderId, $trackingNumber)
     {
         $orderId = (int)$orderId;
-        return $this->db->execute('UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-            SET `tracking_number` = "' . $this->db->escape($trackingNumber) . '"
-            WHERE `id_order` = ' . $orderId);
+        return $this->dbTools->update('packetery_order', ['tracking_number' => $this->db->escape($trackingNumber)], '`id_order` = ' . $orderId);
     }
 
     /**
      * @param int|bool $exported
      * @param int $orderId
      * @return bool
-     * @throws PrestaShopException
-     * @throws \PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     public function setExported($exported, $orderId)
     {
         $orderId = (int)$orderId;
-        return $this->db->execute('UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-            SET `exported` = ' . $exported . '
-            WHERE `id_order` = ' . $orderId );
+        return $this->dbTools->update('packetery_order', ['exported' => $exported], '`id_order` = ' . $orderId);
     }
 
 }

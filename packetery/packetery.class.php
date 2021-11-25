@@ -24,6 +24,7 @@
  */
 
 use Packetery\Carrier\CarrierRepository;
+use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Order\OrderRepository;
 use Packetery\Payment\PaymentRepository;
@@ -56,7 +57,7 @@ class Packeteryclass
      * @param float|int $total
      * @param OrderRepository $orderRepository
      * @return float|int
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public static function getRateTotal($order_currency_iso, $branch_currency_iso, $total, OrderRepository $orderRepository)
     {
@@ -164,6 +165,7 @@ class Packeteryclass
      * @param array $order_ids - IDs of orders to be exported
      * @param OrderRepository $orderRepository
      * @return array - Order data
+     * @throws DatabaseException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
@@ -241,8 +243,7 @@ class Packeteryclass
      * @param string $id_orders comma separated integers
      * @param OrderRepository $orderRepository
      * @return array
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public static function getTrackingFromOrders($id_orders, OrderRepository $orderRepository)
     {
@@ -262,8 +263,7 @@ class Packeteryclass
      * @param string $tracking_number numeric
      * @param OrderRepository $orderRepository
      * @return bool
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public static function updateOrderTrackingNumber($id_order, $tracking_number, OrderRepository $orderRepository)
     {
@@ -322,6 +322,10 @@ class Packeteryclass
 
     /**
      * Change COD for address delivery carriers - called by AJAX
+     * @throws DatabaseException
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
      */
     public static function changeAdCarrierCodAjax()
     {
@@ -339,8 +343,7 @@ class Packeteryclass
      * Change COD for address delivery carriers in DB
      * @param CarrierRepository $carrierRepository
      * @return bool|void
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public static function changeAdCarrierCod(CarrierRepository $carrierRepository)
     {
@@ -360,6 +363,7 @@ class Packeteryclass
     /**
      * Add address delivery to carrier - called by ajax
      * @param CarrierRepository $carrierRepository
+     * @throws DatabaseException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
@@ -377,8 +381,7 @@ class Packeteryclass
      * Add address delivery to carrier in DB
      * @param CarrierRepository $carrierRepository
      * @return bool
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     private static function setPacketeryCarrier(CarrierRepository $carrierRepository)
     {
@@ -431,8 +434,7 @@ class Packeteryclass
      * Get list of payments for configuration
      * @param PaymentRepository $paymentRepository
      * @return array
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public static function getListPayments(PaymentRepository $paymentRepository)
     {
@@ -466,6 +468,7 @@ class Packeteryclass
     /**
      * Change COD for payment - called by Ajax
      * @param PaymentRepository $paymentRepository
+     * @throws DatabaseException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
@@ -483,8 +486,7 @@ class Packeteryclass
      * Change COD for payment in DB
      * @param PaymentRepository $paymentRepository
      * @return bool
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws DatabaseException
      */
     public static function changePaymentCod(PaymentRepository $paymentRepository)
     {

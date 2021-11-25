@@ -5,16 +5,16 @@ if (!defined('_PS_VERSION_')) {
 }
 
 /**
- * @param Packetery $object
+ * @param Packetery $module
  * @return bool
  */
-function upgrade_module_2_1_6($object)
+function upgrade_module_2_1_6($module)
 {
     $hookName = 'displayAdminOrderMain';
     if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
         $hookName = 'displayAdminOrderLeft';
     }
-    $result =  $object->registerHook([
+    $result =  $module->registerHook([
         $hookName,
         'actionAdminControllerSetMedia',
         'displayOrderConfirmation',
@@ -26,7 +26,8 @@ function upgrade_module_2_1_6($object)
         return false;
     }
 
-    $result = Db::getInstance()->execute('
+    $dbTools = $module->diContainer->get(\Packetery\Tools\DbTools::class);
+    $result = $dbTools->execute('
         ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
         CHANGE `id_branch` `id_branch` int(11) NULL,
         CHANGE `name_branch` `name_branch` varchar(255) NULL,        
@@ -36,7 +37,7 @@ function upgrade_module_2_1_6($object)
         return false;
     }
 
-    $previousSettings = Db::getInstance()->executeS(
+    $previousSettings = $dbTools->getRows(
         'SELECT `option`, `value` FROM `' . _DB_PREFIX_ . 'packetery_settings`'
     );
     if ($previousSettings) {
@@ -60,5 +61,5 @@ function upgrade_module_2_1_6($object)
         }
     }
 
-    return Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_settings`');
+    return $dbTools->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_settings`');
 }
