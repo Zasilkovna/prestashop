@@ -325,9 +325,8 @@ class PacketeryOrderGridController extends ModuleAdminController
                 $iconClass = 'icon-send';
                 $title = $this->l('Export');
             }
-            $href = $this->context->link->getAdminLink('PacketeryOrderGrid') .
-                '&amp;id_order=' . $orderId . '&amp;action=' . $action;
-            $links[$action] = '<a href="' . $href . '"><i class="' . $iconClass . '"></i> ' . $title . '</a>';
+            $href = sprintf('%s&amp;id_order=%s&amp;action=%s', $this->context->link->getAdminLink('PacketeryOrderGrid'), $orderId, $action);
+            $links[$action] = sprintf('<a href="%s"><i class="%s"></i> %s</a>', $href, $iconClass, $title);;
         }
         return $links;
     }
