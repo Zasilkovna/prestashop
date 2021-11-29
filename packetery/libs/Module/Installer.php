@@ -53,7 +53,7 @@ class Installer
 
             $tab->id_parent = $parentId;
             $tab->module = 'packetery';
-            $tab->class_name = 'Adminpacketery';
+            $tab->class_name = 'PacketeryOrderGrid';
             $tab->name = $this->createMultiLangField($this->module->l('Packeta Orders', 'installer'));
             $tab->position = Tab::getNewLastPosition($parentId);
 
@@ -101,6 +101,7 @@ class Installer
             `is_ad` int DEFAULT 0,
             `is_carrier` tinyint(1) NOT NULL DEFAULT 0,
             `carrier_pickup_point` varchar(40) NULL,      
+            `weight` decimal(20,6) NULL,      
             UNIQUE(`id_order`),
             UNIQUE(`id_cart`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';

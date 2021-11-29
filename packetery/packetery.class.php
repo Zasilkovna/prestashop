@@ -107,59 +107,6 @@ class Packeteryclass
     }
 
     /*ORDERS*/
-
-    /**
-     * Outputs order rows for ajax
-     */
-    public static function getListOrdersAjax()
-    {
-        $page = Tools::getValue('page');
-        $rows = self::getListOrders($page);
-        echo json_encode($rows);
-    }
-
-    /**
-     * Get order data for datagrid
-     * TODO: will be removed by PES-113
-     * @param int $page
-     * @return array
-     * @throws PrestaShopDatabaseException
-     */
-    public static function getListOrders($page = 1)
-    {
-        $id_shop = Context::getContext()->shop->id;
-        $per_page = 50;
-        $orders_num_rows = Db::getInstance()->getValue(
-            'SELECT COUNT(*)
-            FROM `' . _DB_PREFIX_ . 'orders` o
-                JOIN `' . _DB_PREFIX_ . 'packetery_order` po ON po.id_order=o.id_order
-                LEFT JOIN `' . _DB_PREFIX_ . 'packetery_branch` pb ON pb.id_branch=po.id_branch
-                JOIN `' . _DB_PREFIX_ . 'customer` c on(c.id_customer=o.id_customer)
-            WHERE o.id_shop = ' . (int)$id_shop . ' 
-            ORDER BY o.date_add DESC'
-        );
-        $pages = ceil($orders_num_rows / $per_page);
-        $sql = 'SELECT 
-                    o.id_order,
-                    o.id_currency,
-                    o.id_lang,
-                    concat(c.firstname, " ", c.lastname) customer,
-                    o.total_paid total,
-                    o.date_add date,
-                    po.is_cod,
-                    po.name_branch,
-                    po.exported,
-                    po.tracking_number,
-                    po.is_ad
-                FROM `' . _DB_PREFIX_ . 'orders` o
-                    JOIN `' . _DB_PREFIX_ . 'packetery_order` po ON po.id_order=o.id_order
-                    JOIN `' . _DB_PREFIX_ . 'customer` c ON c.id_customer=o.id_customer
-                WHERE o.id_shop = ' . (int)$id_shop . ' 
-                ORDER BY o.date_add DESC LIMIT ' . (($page - 1) * $per_page) . ',' . $per_page;
-        $orders = Db::getInstance()->executeS($sql);
-        return array($orders, $pages);
-    }
-
     /**
      * Get data for CSV Export
      * @param array $order_ids - IDs of orders to be exported
@@ -239,8 +186,31 @@ class Packeteryclass
     }
 
     /**
+     * @param array $orders
+     * @param OrderRepository $orderRepository
+     * @throws DatabaseException
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public static function outputCsvExport(array $orders, OrderRepository $orderRepository)
+    {
+        $orderData = Packeteryclass::collectOrdersDataForCsvExport($orders, $orderRepository);
+        $date = date('Y-m-d');
+
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="export_' . $date . '.csv"');
+        $fp = fopen('php://output', 'wb');
+        fputcsv($fp, ['version 6']);
+        fputcsv($fp, []);
+        foreach ($orderData as $line) {
+            fputcsv($fp, $line);
+        }
+        fclose($fp);
+    }
+
+    /**
      * Returns packetery order tracking number
-     * @param string $id_orders comma separated integers
+     * @param string $id_orders Comma separated integers
      * @param OrderRepository $orderRepository
      * @return array
      * @throws DatabaseException
@@ -275,48 +245,6 @@ class Packeteryclass
         }
 
         return false;
-    }
-
-    /**
-     * Change order COD - Called by AJAX
-     */
-    public static function changeOrderCodAjax()
-    {
-        $result = self::changeOrderCod();
-        if ($result) {
-            echo 'ok';
-        } else {
-            $module = new Packetery();
-            echo $module->l('Error while trying to save the settings.', 'packetery.class');
-        }
-    }
-
-    /**
-     * Change order COD in DB
-     * TODO: will be removed by PES-113
-     * @return bool
-     */
-    public static function changeOrderCod()
-    {
-        $id_order = Tools::getValue('id_order');
-        $value = Tools::getValue('value');
-        if (!isset($id_order) || (!isset($value))) {
-            return false;
-        }
-        $db = Db::getInstance();
-        $sql_is_set_cod = 'SELECT 1 
-                            FROM `' . _DB_PREFIX_ . 'packetery_order` 
-                            WHERE id_order=' . (int)$id_order . ';';
-
-        if ($db->getValue($sql_is_set_cod) == 1) {
-            $sql_update_payment_cod = 'UPDATE `' . _DB_PREFIX_ . 'packetery_order` 
-                                        SET is_cod=' . ((int)$value) . ' 
-                                        WHERE id_order=' . (int)$id_order . ';';
-            $result = $db->execute($sql_update_payment_cod);
-        } else {
-            return false;
-        }
-        return $result;
     }
     /*END ORDERS*/
 

@@ -71,29 +71,6 @@ switch (Tools::getValue('action')) {
         Packeteryclass::setPacketeryCarrierAjax($carrierRepository);
         break;
     /*END SETTINGS*/
-    /*ORDERS*/
-    case 'get_orders_rows':
-        Packeteryclass::getListOrdersAjax();
-        break;
-    case 'change_order_cod':
-        Packeteryclass::changeOrderCodAjax();
-        break;
-    case 'prepare_order_export':
-        $module = new Packetery();
-        $orderRepository = $module->diContainer->get(OrderRepository::class);
-        PacketeryApi::prepareOrderExportAjax($orderRepository);
-        break;
-    case 'order_export':
-        $module = new Packetery();
-        $orderRepository = $module->diContainer->get(OrderRepository::class);
-        PacketeryApi::ordersExportAjax($orderRepository);
-        break;
-    case 'download_pdf':
-        $module = new Packetery();
-        $orderRepository = $module->diContainer->get(OrderRepository::class);
-        PacketeryApi::downloadPdfAjax($orderRepository);
-        break;
-    /*END ORDERS*/
     default:
         exit;
 }
