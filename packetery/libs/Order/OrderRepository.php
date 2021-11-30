@@ -76,24 +76,26 @@ class OrderRepository
 
     /**
      * @param array $fields
+     * @param bool $nullValues
      * @return bool
      * @throws DatabaseException
      */
-    public function insert(array $fields)
+    public function insert(array $fields, $nullValues = false)
     {
-        return $this->dbTools->insert('packetery_order', $fields);
+        return $this->dbTools->insert('packetery_order', $fields, $nullValues);
     }
 
     /**
      * @param array $fields
      * @param int $cartId
+     * @param bool $nullValues
      * @return bool
      * @throws DatabaseException
      */
-    public function updateByCart(array $fields, $cartId)
+    public function updateByCart(array $fields, $cartId, $nullValues = false)
     {
         $cartId = (int)$cartId;
-        return $this->dbTools->update('packetery_order', $fields, '`id_cart` = ' . $cartId);
+        return $this->dbTools->update('packetery_order', $fields, '`id_cart` = ' . $cartId, 0, $nullValues);
     }
 
     /**
@@ -148,7 +150,7 @@ class OrderRepository
     public function getByCart($cartId)
     {
         $cartId = (int)$cartId;
-        return $this->dbTools->getRow('SELECT `name_branch` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId);
+        return $this->dbTools->getRow('SELECT `is_ad`, `name_branch`, `id_carrier`, `zip` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId);
     }
 
     /**
@@ -173,8 +175,22 @@ class OrderRepository
     {
         $orderId = (int)$orderId;
         return $this->dbTools->getRow(
-            'SELECT `po`.`id_carrier`, `po`.`id_branch`, `po`.`name_branch`, `po`.`is_ad`, `po`.`is_carrier`,
-                    `c`.`iso_code` AS `country`
+            'SELECT 
+                   `po`.`id_order`, 
+                   `po`.`id_carrier`, 
+                   `po`.`id_branch`, 
+                   `po`.`name_branch`, 
+                   `po`.`is_ad`, 
+                   `po`.`is_carrier`,
+                   `po`.`country`, 
+                   `po`.`street`, 
+                   `po`.`house_number`, 
+                   `po`.`city`, 
+                   `po`.`zip`, 
+                   `po`.`county`, 
+                   `po`.`latitude`, 
+                   `po`.`longitude`,
+                    `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
             JOIN `' . _DB_PREFIX_ . 'address` `a` ON `a`.`id_address` = `o`.`id_address_delivery` 
@@ -192,17 +208,22 @@ class OrderRepository
     {
         $orderId = (int)$orderId;
         return $this->dbTools->getRow('
-            SELECT 
-                   `id_branch`, 
+            SELECT
+                   `id_branch`,
                    `name_branch`,
                    `id_carrier`, 
                    `is_cod`, 
-                   `is_ad`, 
+                   `is_ad`,
                    `currency_branch`, 
-                   `is_carrier`, 
+                   `is_carrier`,
                    `carrier_pickup_point`,
                    `tracking_number`,
-                   `weight`
+                   `carrier_pickup_point`,
+                   `weight`, 
+                   `zip`,
+                   `city`,
+                   `street`,
+                   `house_number`
             FROM `' . _DB_PREFIX_ . 'packetery_order` 
             WHERE id_order = ' . $orderId);
     }

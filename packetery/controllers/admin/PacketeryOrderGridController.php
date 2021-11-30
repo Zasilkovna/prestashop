@@ -51,6 +51,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             `a`.*,
             `po`.*,
             IF(`po`.`tracking_number` IS NOT NULL, `po`.`tracking_number`, \'\') AS `tracking_number`,
+            IF(`po`.`zip` IS NOT NULL, 1, 0) AS `validated`,
             CONCAT(`c`.`firstname`, " ", `c`.`lastname`) AS `customer`,
             IF(`a`.`valid`, 1, 0) AS `badge_success`,
             `osl`.`name` AS `osname`,
@@ -119,6 +120,7 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'title' => $this->l('Destination pickup point'),
                 'filter_key' => 'po!name_branch',
             ],
+            // todo 466 tyto sloupce budeme slucovat
             'is_ad' => [
                 'title' => $this->l('Address delivery'),
                 'type' => 'bool',
@@ -126,6 +128,13 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'callback' => 'getIconForBoolean',
                 'filter_key' => 'po!is_ad',
             ],
+            'validated' => [
+                'title' => $this->l('Address validated'),
+                'type' => 'bool',
+                'align' => 'center',
+                'callback' => 'getIconForBoolean',
+            ],
+
             'exported' => [
                 'title' => $this->l('Exported'),
                 'type' => 'bool',

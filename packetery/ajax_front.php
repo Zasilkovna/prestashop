@@ -45,6 +45,11 @@ switch (Tools::getValue('action')) {
     case 'fetchExtraContent':
         echo PacketeryApi::packeteryCreateExtraContent();
         break;
+    case 'saveAddressInCart':
+        $module = new Packetery();
+        $orderAjax = $module->diContainer->get(\Packetery\Order\Ajax::class);
+        $orderAjax->saveAddressInCart();
+        break;
     default:
         exit;
 }

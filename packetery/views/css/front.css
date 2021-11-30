@@ -106,3 +106,12 @@
 }
 
 /*END WIDGET*/
+
+.address-validation-result {
+    color: #aa0000;
+    font-size: small;
+}
+
+.address-validation-result.address-validated {
+    color: #00aa00;
+}

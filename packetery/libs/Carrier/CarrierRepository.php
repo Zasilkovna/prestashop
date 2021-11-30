@@ -71,6 +71,20 @@ class CarrierRepository
     }
 
     /**
+     * @return array|false
+     * @throws DatabaseException
+     */
+    public function getAddressValidationLevels()
+    {
+        $result = $this->dbTools->getRows(
+            'SELECT `id_carrier`, `address_validation` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
+            JOIN `' . _DB_PREFIX_ . 'carrier` USING(`id_carrier`)
+            WHERE `deleted` = 0 AND `pickup_point_type` IS NULL'
+        );
+        return $this->dbTools->getPairs($result, 'id_carrier', 'address_validation');
+    }
+
+    /**
      * @param int $carrierId
      * @return array|bool|object|null
      * @throws DatabaseException
@@ -79,7 +93,8 @@ class CarrierRepository
     {
         $carrierId = (int)$carrierId;
         return $this->dbTools->getRow('
-            SELECT `id_carrier`, `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`
+            SELECT `id_carrier`, `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`,
+                   `address_validation`
             FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
             WHERE `id_carrier` = ' . $carrierId);
     }
