@@ -32,7 +32,7 @@ class Installer
      */
     public function run(Packetery $module)
     {
-        $this->module = $module;
+        $this->setModule($module);
         return (
             $this->updateConfiguration() &&
             $this->installDatabase() &&
@@ -42,10 +42,18 @@ class Installer
     }
 
     /**
+     * @param Packetery $module
+     */
+    public function setModule(Packetery $module)
+    {
+        $this->module = $module;
+    }
+
+    /**
      * Creates packetery orders tab
      * @return bool
      */
-    private function insertTab()
+    public function insertTab()
     {
         try {
             $tab = new Tab;
