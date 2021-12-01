@@ -201,7 +201,8 @@ class OrderRepository
                    `currency_branch`, 
                    `is_carrier`, 
                    `carrier_pickup_point`,
-                   `tracking_number`
+                   `tracking_number`,
+                   `weight`
             FROM `' . _DB_PREFIX_ . 'packetery_order` 
             WHERE id_order = ' . $orderId);
     }

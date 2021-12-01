@@ -28,6 +28,7 @@ use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Order\OrderRepository;
 use Packetery\Payment\PaymentRepository;
+use Packetery\Weight\Converter;
 
 require_once(dirname(__FILE__) . '../../../config/config.inc.php');
 require_once(dirname(__FILE__) . '../../../classes/Cookie.php');
@@ -148,8 +149,13 @@ class Packeteryclass
             $currency = new Currency($order->id_currency);
 
             $weight = '';
-            if (Configuration::get('PS_WEIGHT_UNIT') === PacketeryApi::PACKET_WEIGHT_UNIT) {
-                $weight = $order->getTotalWeight();
+            if (Converter::isKgConvertionSupported()) {
+                if ($packeteryOrder['weight'] !== null) {
+                    // used saved if set
+                    $weight = $packeteryOrder['weight'];
+                } else {
+                    $weight = Converter::getKilograms($order->getTotalWeight());
+                }
             }
 
             $data[$order_id] = [
