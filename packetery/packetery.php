@@ -824,7 +824,7 @@ class Packetery extends CarrierModule
             return;
         }
         if ($isAddressDelivery) {
-            if (in_array($packeteryCarrier['address_validation'], ['optional', 'required'])) {
+            if (in_array($packeteryCarrier['address_validation'], ['required', 'optional'])) {
                 $validatedAddress = [
                     'street' => '',
                     'houseNumber' => '',
@@ -1209,6 +1209,10 @@ class Packetery extends CarrierModule
     /**
      * Adds computed weight to orders without saved weight
      * @param array $params Hook parameters
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function hookActionPacketeryOrderGridListingResultsModifier(&$params)
     {
@@ -1217,6 +1221,17 @@ class Packetery extends CarrierModule
                 if ($order['weight'] === null) {
                     $orderInstance = new \Order($order['id_order']);
                     $order['weight'] = \Packetery\Weight\Converter::getKilograms((float)$orderInstance->getTotalWeight());
+                }
+                if ((bool)$order['is_ad'] === true) {
+                    $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+                    $carrier = $carrierRepository->getPacketeryCarrierById($order['id_carrier']);
+                    if (in_array($carrier['address_validation'], ['required', 'optional'])) {
+                        if (Packetery\Address\AddressTools::hasValidatedAddress($order)) {
+                            $order['is_ad'] = 'HD-OK';
+                        } else {
+                            $order['is_ad'] = 'HD-KO';
+                        }
+                    }
                 }
             }
         }

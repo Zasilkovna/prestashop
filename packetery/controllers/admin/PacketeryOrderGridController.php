@@ -51,7 +51,6 @@ class PacketeryOrderGridController extends ModuleAdminController
             `a`.*,
             `po`.*,
             IF(`po`.`tracking_number` IS NOT NULL, `po`.`tracking_number`, \'\') AS `tracking_number`,
-            IF(`po`.`zip` IS NOT NULL, 1, 0) AS `validated`,
             CONCAT(`c`.`firstname`, " ", `c`.`lastname`) AS `customer`,
             IF(`a`.`valid`, 1, 0) AS `badge_success`,
             `osl`.`name` AS `osname`,
@@ -120,21 +119,15 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'title' => $this->l('Destination pickup point'),
                 'filter_key' => 'po!name_branch',
             ],
-            // todo 466 tyto sloupce budeme slucovat
             'is_ad' => [
-                'title' => $this->l('Address delivery'),
-                'type' => 'bool',
+                'title' => $this->l('Delivery type'),
                 'align' => 'center',
-                'callback' => 'getIconForBoolean',
+                'callback' => 'getDeliveryTypeHtml',
                 'filter_key' => 'po!is_ad',
+                'type' => 'select',
+                // it's a boolean column, depends on order
+                'list' => ['PP', 'HD'],
             ],
-            'validated' => [
-                'title' => $this->l('Address validated'),
-                'type' => 'bool',
-                'align' => 'center',
-                'callback' => 'getIconForBoolean',
-            ],
-
             'exported' => [
                 'title' => $this->l('Exported'),
                 'type' => 'bool',
@@ -379,6 +372,20 @@ class PacketeryOrderGridController extends ModuleAdminController
         }
 
         return '<span class="list-action-enable action-disabled"><i class="icon-remove"></i></span>';
+    }
+
+    public function getDeliveryTypeHtml($deliveryType)
+    {
+        if ($deliveryType === '1') {
+            return 'HD';
+        }
+        if ($deliveryType === '0') {
+            return 'PP';
+        }
+        if (strpos($deliveryType, '-KO') === false) {
+            return 'HD <span class="list-action-enable action-enabled"><i class="icon-check"></i></span>';
+        }
+        return 'HD <span class="list-action-enable action-disabled"><i class="icon-remove"></i></span>';
     }
 
     private function getActionLinks($orderId)

@@ -128,8 +128,7 @@ $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_ec53a8c4f07baed5d8
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_6fbc355a02359656f1e4540d58b784e1'] = 'Datum objednání';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_7798b7c45fa643a0169a3a9e8ba8a6f9'] = 'Je dobírka';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_e80d50c020e2486595c969fae46393d1'] = 'Cílové výdejní místo';
-$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_5ef3da0443efa6318d07751b9b680941'] = 'Doručení na adresu';
-$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_4c91fc457a26552d6a761ff623367d8f'] = 'Ověřená adresa';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_cf3e7360cfed1e0c6fdd0090bee0ea05'] = 'Typ doručení';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_0001316ad0c7eb0f1a8e298fd6e5d070'] = 'Exportováno';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_5068c162a60b5859f973f701333f45c5'] = 'Trasovací číslo';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_91721604210524b7051d99c4c8478715'] = 'Hmotnost (kg)';
