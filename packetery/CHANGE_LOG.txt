@@ -76,5 +76,5 @@
       - Fixed: functionality of KnowBand SuperCheckout when no shipping method is preselected
       - Updated: treated the situation when the country of the pickup point does not correspond to the customer's address
       - Updated: order administration realised using PrestaShop's native grid
-      - Added: Product weight in grams is now supported. If the weight of the products is in grams,
-        the module converts the weight of the shipment to kilograms before exporting it.
+      - Added: Product weight in grams, pounds and ounces is now supported. If the weight of the products is not
+        in kilograms, the module converts the weight of the shipment to kilograms before exporting it.

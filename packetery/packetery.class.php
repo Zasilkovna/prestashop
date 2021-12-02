@@ -149,13 +149,11 @@ class Packeteryclass
             $currency = new Currency($order->id_currency);
 
             $weight = '';
-            if (Converter::isKgConvertionSupported()) {
-                if ($packeteryOrder['weight'] !== null) {
-                    // used saved if set
-                    $weight = $packeteryOrder['weight'];
-                } else {
-                    $weight = Converter::getKilograms($order->getTotalWeight());
-                }
+            if ($packeteryOrder['weight'] !== null) {
+                // used saved if set
+                $weight = $packeteryOrder['weight'];
+            } else if (Converter::isKgConversionSupported()) {
+                $weight = Converter::getKilograms((float)$order->getTotalWeight());
             }
 
             $data[$order_id] = [

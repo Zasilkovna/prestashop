@@ -233,13 +233,11 @@ class PacketeryApi
             'eshop' => $shop_name,
         );
 
-        if (Converter::isKgConvertionSupported()) {
-            if ($packetery_order['weight'] !== null) {
-                // used saved if set
-                $packet_attributes['weight'] = $packetery_order['weight'];
-            } else {
-                $packet_attributes['weight'] = Converter::getKilograms($order->getTotalWeight());
-            }
+        if ($packetery_order['weight'] !== null) {
+            // used saved if set
+            $packet_attributes['weight'] = $packetery_order['weight'];
+        } else if (Converter::isKgConversionSupported()) {
+            $packet_attributes['weight'] = Converter::getKilograms((float)$order->getTotalWeight());
         }
 
         if ($packetery_order['is_carrier']) {
