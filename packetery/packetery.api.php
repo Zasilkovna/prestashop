@@ -39,10 +39,11 @@ class PacketeryApi
     /**
      * @param OrderRepository $orderRepository
      * @param string $id_orders Comma separated integers
+     * @param int $offset
      * @return string|false PDF contents
      * @throws DatabaseException
      */
-    public static function downloadPdf(OrderRepository $orderRepository, $id_orders)
+    public static function downloadPdf(OrderRepository $orderRepository, $id_orders, $offset)
     {
         if (!$id_orders) {
             $module = new Packetery;
@@ -51,15 +52,14 @@ class PacketeryApi
         }
         $packets = Packeteryclass::getTrackingFromOrders($id_orders, $orderRepository);
         $apiPassword = Configuration::get('PACKETERY_APIPASS');
-        $pdf_result = self::packetsLabelsPdf($packets, $apiPassword);
+        $pdf_result = self::packetsLabelsPdf($packets, $apiPassword, $offset);
         return $pdf_result;
     }
 
-    public static function packetsLabelsPdf($packets, $apiPassword)
+    public static function packetsLabelsPdf($packets, $apiPassword, $offset)
     {
         $client = new SoapClient("https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl");
         $format = Configuration::get('PACKETERY_LABEL_FORMAT');
-        $offset = 0;
         try {
             $pdf = $client->packetsLabelsPdf($apiPassword, $packets, $format, $offset);
             if ($pdf) {

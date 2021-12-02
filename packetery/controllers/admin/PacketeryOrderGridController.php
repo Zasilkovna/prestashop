@@ -33,6 +33,15 @@ class PacketeryOrderGridController extends ModuleAdminController
     /** @var Packetery */
     private $packetery;
 
+    private static $labelFormatMaxOffset = [
+        'A6 on A4' => 3,
+        'A6 on A6' => 0,
+        'A7 on A7' => 0,
+        'A7 on A4' => 7,
+        '105x35mm on A4' => 15,
+        'A8 on A8' => 0,
+    ];
+
     public function __construct()
     {
         $this->bootstrap = true;
@@ -207,14 +216,15 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     /**
      * @param array $ids
+     * @param int $offset
      * @throws ReflectionException
      * @throws \Packetery\Exceptions\DatabaseException
      */
-    private function prepareLabels(array $ids)
+    private function prepareLabels(array $ids, $offset = 0)
     {
         $module = $this->getModule();
         $orderRepository = $module->diContainer->get(OrderRepository::class);
-        $fileName = PacketeryApi::downloadPdf($orderRepository, implode(',', $ids));
+        $fileName = PacketeryApi::downloadPdf($orderRepository, implode(',', $ids), $offset);
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         echo file_get_contents(_PS_MODULE_DIR_ . 'packetery/labels/' . $fileName);
@@ -223,12 +233,9 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function processBulkLabelPdf()
     {
-        $ids = $this->boxes;
-        if (!$ids) {
-            $this->informations = $this->l('No orders were selected.');
-            return;
+        if (Tools::isSubmit('submitPrepareLabels')) {
+            $this->prepareLabels($this->boxes, (int)Tools::getValue('offset'));
         }
-        $this->prepareLabels($ids);
     }
 
     public function processPrint()
@@ -251,9 +258,30 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function renderList()
     {
+        if ($this->action === 'bulkLabelPdf') {
+            if (Tools::getIsset('cancel')) {
+                Tools::redirectAdmin(self::$currentIndex . '&token=' . $this->token);
+            }
+            $maxOffset = (int)self::$labelFormatMaxOffset[Configuration::get('PACKETERY_LABEL_FORMAT')];
+            if ($maxOffset !== 0) {
+                $this->tpl_list_vars['max_offset'] = $maxOffset;
+                $this->tpl_list_vars['prepareLabelsMode'] = true;
+                $this->tpl_list_vars['REQUEST_URI'] = $_SERVER['REQUEST_URI'];
+                $this->tpl_list_vars['POST'] = $_POST;
+            } else {
+                $ids = $this->boxes;
+                if (!$ids) {
+                    $this->informations = $this->l('No orders were selected.');
+                } else {
+                    $this->prepareLabels($ids);
+                }
+            }
+        }
+
         $this->addRowAction('edit');
         $this->addRowAction('submit');
         $this->addRowAction('print');
+
         return parent::renderList();
     }
 
