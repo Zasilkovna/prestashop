@@ -78,8 +78,7 @@ class CarrierRepository
     {
         $result = $this->dbTools->getRows(
             'SELECT `id_carrier`, `address_validation` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
-            JOIN `' . _DB_PREFIX_ . 'carrier` USING(`id_carrier`)
-            WHERE `deleted` = 0 AND `pickup_point_type` IS NULL'
+            WHERE `pickup_point_type` IS NULL'
         );
         return $this->dbTools->getPairs($result, 'id_carrier', 'address_validation');
     }

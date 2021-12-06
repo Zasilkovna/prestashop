@@ -1216,20 +1216,16 @@ class Packetery extends CarrierModule
      */
     public function hookActionPacketeryOrderGridListingResultsModifier(&$params)
     {
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        $addressValidationLevels = $carrierRepository->getAddressValidationLevels();
         if (isset($params['list']) && is_array($params['list'])) {
-            $carrierAddressValidationCache = [];
             foreach ($params['list'] as &$order) {
                 if ($order['weight'] === null) {
                     $orderInstance = new \Order($order['id_order']);
                     $order['weight'] = \Packetery\Weight\Converter::getKilograms((float)$orderInstance->getTotalWeight());
                 }
                 if ((bool)$order['is_ad'] === true) {
-                    if (!isset($carrierAddressValidationCache[$order['id_carrier']])) {
-                        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-                        $carrier = $carrierRepository->getPacketeryCarrierById($order['id_carrier']);
-                        $carrierAddressValidationCache[$order['id_carrier']] = $carrier['address_validation'];
-                    }
-                    if (in_array($carrierAddressValidationCache[$order['id_carrier']], ['required', 'optional'])) {
+                    if (isset($addressValidationLevels[$order['id_carrier']]) && in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])) {
                         if (Packetery\Address\AddressTools::hasValidatedAddress($order)) {
                             $order['is_ad'] = 'HD-OK';
                         } else {
