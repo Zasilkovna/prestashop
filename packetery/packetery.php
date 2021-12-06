@@ -362,16 +362,13 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('baseuri', $base_uri);
 
         $usedWeightUnit = Configuration::get('PS_WEIGHT_UNIT');
-        if ($usedWeightUnit !== PacketeryApi::PACKET_WEIGHT_UNIT) {
+        if (\Packetery\Weight\Converter::isKgConversionSupported() === false) {
             $messages = [
                 [
                     'text' => sprintf(
-                        $this->l(
-                            'The default weight unit for your store is: %s. 
-                            When exporting packets, the module will not state its weight for the packet. 
-                            If you want to export the weight of the packet, you need to set the default unit to kg.'
-                        ),
-                        $usedWeightUnit
+                        $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to one of: %s.'),
+                        $usedWeightUnit,
+                        implode(', ', array_keys(\Packetery\Weight\Converter::$mapping))
                     ),
                     'class' => 'info',
                 ],
@@ -952,8 +949,7 @@ class Packetery extends CarrierModule
             foreach ($params['list'] as &$order) {
                 if ($order['weight'] === null) {
                     $orderInstance = new \Order($order['id_order']);
-                    // TODO: use Converter::getKilograms later
-                    $order['weight'] = $orderInstance->getTotalWeight();
+                    $order['weight'] = \Packetery\Weight\Converter::getKilograms((float)$orderInstance->getTotalWeight());
                 }
             }
         }
