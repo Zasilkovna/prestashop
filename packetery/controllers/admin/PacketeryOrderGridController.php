@@ -224,7 +224,12 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $module = $this->getModule();
         $orderRepository = $module->diContainer->get(OrderRepository::class);
-        $fileName = PacketeryApi::downloadPdf($orderRepository, implode(',', $ids), $offset);
+        $packets = Packeteryclass::getTrackingFromOrders(implode(',', $ids), $orderRepository);
+        if (!$packets) {
+            $this->warnings[] = $this->l('Please submit selected orders first.');
+            return;
+        }
+        $fileName = PacketeryApi::packetsLabelsPdf($packets, Configuration::get('PACKETERY_APIPASS'), $offset);
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         echo file_get_contents(_PS_MODULE_DIR_ . 'packetery/labels/' . $fileName);
@@ -247,7 +252,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $ids = $this->boxes;
         if (!$ids) {
-            $this->informations = $this->l('No orders were selected.');
+            $this->informations = $this->l('Please choose orders first.');
             return;
         }
         $module = $this->getModule();
@@ -271,7 +276,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             } else {
                 $ids = $this->boxes;
                 if (!$ids) {
-                    $this->informations = $this->l('No orders were selected.');
+                    $this->informations = $this->l('Please choose orders first.');
                 } else {
                     $this->prepareLabels($ids);
                 }

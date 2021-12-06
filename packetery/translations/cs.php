@@ -90,8 +90,12 @@ $_MODULE['<{packetery}prestashop>tab_settings_2f5fdf39f1e94a9a62df58227b00845b']
 $_MODULE['<{packetery}prestashop>tab_settings_5ece607071fe59ddc4c88dc6abfe2310'] = 'Nenalezeny žádné položky';
 $_MODULE['<{packetery}prestashop>list_header_0b793858e33c336a5b1e2103ced04774'] = 'Vyberte offset';
 $_MODULE['<{packetery}prestashop>list_header_5182dfef2124178acde4250919ba2c4f'] = 'Přeskočit %s polí';
+$_MODULE['<{packetery}prestashop>list_header_36e5769d3d33717f601e1f1dc3409d11'] = 'Tisk štítků';
+$_MODULE['<{packetery}prestashop>list_header_910b7b9a83a45de4d15f9c5b141a087b'] = 'Nevynechávat žádné pole';
+$_MODULE['<{packetery}prestashop>list_header_bee548697b56304883fdbd8436000eb3'] = 'Vynechat 1 pole';
+$_MODULE['<{packetery}prestashop>list_header_5182dfef2124178acde4250919ba2c4f'] = 'Vynechat %s polí';
 $_MODULE['<{packetery}prestashop>list_header_ea4788705e6873b424c65e91c2846b19'] = 'Zrušit';
-$_MODULE['<{packetery}prestashop>list_header_02d236d48c37176a685a708b17a6d1b7'] = 'Připravit štítky';
+$_MODULE['<{packetery}prestashop>list_header_40cd014b7b6251e3a22e6a45a73a64e1'] = 'Provést';
 $_MODULE['<{packetery}prestashop>widget_422f03dbebc5e4e66d1d5b7e4564c355'] = 'Vybrat místo vyzvednutí:';
 $_MODULE['<{packetery}prestashop>widget_81bd9c17af94c31967cdb6870f154d83'] = 'Vybrané místo vyzvednutí:';
 $_MODULE['<{packetery}prestashop>widget_397164405b87202533b09fd47a137141'] = 'Vyberte prosím před potvrzením objednávky výdejní místo';
@@ -118,6 +122,8 @@ $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_346bb64d32d0b3222f
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_d6bd7c88c16b841e2fbb2d56ba501eac'] = 'CSV Export';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_ddd6dc80580e42e39480b99a2fd30e1e'] = 'Objednávky Zásilkovna';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_a649d29479834d551b83b533b7042ad3'] = 'Nebyly vybrány žádné objednávky.';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_e24ad57fb2f078979a7f5c9979e88d5f'] = 'Nejprve prosím podejte vybrané zásilky.';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_5552dc553d496d4b06866ca45b890b4a'] = 'Vyberte prosím nejdříve objednávky.';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_d5bced36fd88402506bdf9d99064697e'] = 'Hmotnosti objednávek byly uloženy.';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_13dba24862cf9128167a59100e154c8d'] = 'Tisknout';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_0095a9fa74d1713e43e370a7d7846224'] = 'Exportovat';

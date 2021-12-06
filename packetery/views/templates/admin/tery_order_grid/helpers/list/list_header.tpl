@@ -29,14 +29,21 @@
 {if isset($prepareLabelsMode) && $prepareLabelsMode}
 <div class="panel">
 	<div class="panel-heading">
-		{l s='Choose offset' mod='packetery'}
+		{l s='Label printing' mod='packetery'}
 	</div>
 	<form action="{$REQUEST_URI}" method="post">
 		<div class="radio">
 			<label for="offset">
 				<select id="offset" name="offset">
 					{for $var=0 to $max_offset}
-						<option value="{$var|intval}">{l s='Skip %s fields' mod='packetery' sprintf=[$var]}</option>
+						{if $var === 0}
+							<option value="{$var|intval}">{l s='Do not skip any fields' mod='packetery' sprintf=[$var]}</option>
+						{else if $var === 1}
+							<option value="{$var|intval}">{l s='Skip 1 field' mod='packetery' sprintf=[$var]}</option>
+						{else}
+							{* We do not fix range 2-4 - PrestaShop has no support: https://github.com/PrestaShop/PrestaShop/issues/15870 *}
+							<option value="{$var|intval}">{l s='Skip %s fields' mod='packetery' sprintf=[$var]}</option>
+						{/if}
 					{/for}
 				</select>
 			</label>
@@ -59,7 +66,7 @@
 			</button>
 			<button type="submit" class="btn btn-default" name="submitPrepareLabels">
 				<i class="icon-check"></i>
-				{l s='Prepare labels' mod='packetery'}
+				{l s='Execute' mod='packetery'}
 			</button>
 		</div>
 	</form>
