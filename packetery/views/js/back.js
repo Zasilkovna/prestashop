@@ -58,19 +58,6 @@ $(document).ready(function () {
             });
         },
 
-        payment_cod: function () {
-            $('#payment-list-table i.status').unbind();
-            $('#payment-list-table i.status').click(function () {
-                var module_name = $(this).parent().next().find('span').text();
-                if ($(this).hasClass('icon-remove')) {
-                    var value = 1;
-                } else {
-                    var value = 0;
-                }
-                ajaxs.change_payment_cod(module_name, value, this);
-            });
-        },
-
         ad_carrier_cod: function () {
             $('#ad-carriers-list-table i.status').unbind();
             $('#ad-carriers-list-table i.status').click(function () {
@@ -156,34 +143,6 @@ $(document).ready(function () {
             });
         },
 
-        change_payment_cod: function (module_name, value, container) {
-            $.ajax({
-                type: 'POST',
-                url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=change_payment_cod',
-                data: {'module_name':module_name, 'value':value},
-                container: container,
-                beforeSend: function () {
-                    $("body").toggleClass("wait");
-                },
-                success: function (msg) {
-                    if (msg == 'ok') {
-                        if (value == 1) {
-                            $(this.container).replaceWith('<i class="icon-check status"></i>');
-                        } else {
-                            $(this.container).replaceWith('<i class="icon-remove status"></i>');
-                        }
-                        binds.payment_cod();
-                        $('#payment-list-table .panel').notify(lang_pac.success, "success",{position:"top"});
-                    } else {
-                        $('#payment-list-table .panel').notify(lang_pac.error, "error",{position:"top"});
-                    }
-                },
-                complete: function () {
-                    $("body").toggleClass("wait");
-                },
-            });
-        },
-
         getCountBranches: function () {
             $.ajax({
                 type: 'POST',
@@ -257,56 +216,10 @@ $(document).ready(function () {
                 },
             });
         },
-
-        updateSettings: function (id, value) {
-            $.ajax({
-                type: 'POST',
-                url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=updatesettings',
-                data: {'value':value, 'id':id},
-                sid: id,
-                beforeSend: function () {
-                    $("body").toggleClass("wait");
-                },
-                success: function (msg) {
-                    if (msg != 'true') {
-                        var res = JSON.parse(msg);
-                        var id = res[0];
-                        var message = res[1];
-                        $('#packetery-form input[data-id="'+id+'"]').focus();
-                        $('#packetery-form input[data-id="'+id+'"]').notify(message, "error",{position:"top"});
-                        $('#packetery-form select[data-id="'+id+'"]').focus();
-                        $('#packetery-form select[data-id="'+id+'"]').notify(message, "error",{position:"top"});
-                    } else {
-                        var id = this.sid;
-                        $('#packetery-form input[data-id="'+id+'"]').notify(lang_pac.success, "success",{position:"r"});
-                        $('#packetery-form select[data-id="'+id+'"]').notify(lang_pac.success, "success",{position:"r"});
-                    }
-                },
-                complete: function () {
-                    $("body").toggleClass("wait");
-                },
-            });
-        },
     };
 
     binds.readAjaxFields();
-
-    /*SETTINGS ACTIONS*/
-    $('#tab-settings .settings-input input').change(function () {
-        var id = $(this).data('id');
-        var value = $(this).val();
-        ajaxs.updateSettings(id, value);
-    });
-    $('#tab-settings .settings-input select').change(function () {
-        var id = $(this).data('id');
-        var value = $(this).find('option:selected').val();
-        ajaxs.updateSettings(id, value);
-    });
-
-    /*Change cod payment*/
-    binds.payment_cod();
     binds.ad_carrier_cod();
-    /*End Change cod payment*/
     /*End SETTINGS ACTIONS*/
 
     $('#update-branches').click(function () {

@@ -255,8 +255,6 @@ class Packeteryclass
     /**
      * Change COD for address delivery carriers - called by AJAX
      * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
      * @throws ReflectionException
      */
     public static function changeAdCarrierCodAjax()
@@ -296,8 +294,6 @@ class Packeteryclass
      * Add address delivery to carrier - called by ajax
      * @param CarrierRepository $carrierRepository
      * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
      */
     public static function setPacketeryCarrierAjax(CarrierRepository $carrierRepository)
     {
@@ -396,66 +392,7 @@ class Packeteryclass
         }
         return $payments;
     }
-
-    /**
-     * Change COD for payment - called by Ajax
-     * @param PaymentRepository $paymentRepository
-     * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public static function changePaymentCodAjax(PaymentRepository $paymentRepository)
-    {
-        $result = self::changePaymentCod($paymentRepository);
-        if ($result) {
-            echo 'ok';
-        } else {
-            echo '';
-        }
-    }
-
-    /**
-     * Change COD for payment in DB
-     * @param PaymentRepository $paymentRepository
-     * @return bool
-     * @throws DatabaseException
-     */
-    public static function changePaymentCod(PaymentRepository $paymentRepository)
-    {
-        $module_name = Tools::getValue('module_name');
-        $value = Tools::getValue('value');
-        if (!isset($module_name) || (!isset($value))) {
-            return false;
-        }
-        if ($paymentRepository->existsByModuleName($module_name)) {
-            $result = $paymentRepository->setCod((int)$value, $module_name);
-        } else {
-            $result = $paymentRepository->insert((int)$value, $module_name);
-        }
-        return $result;
-    }
     /*END CARRIERS*/
-
-    /*COMMON FUNCTIONS*/
-    public static function updateSettings()
-    {
-        $module = new Packetery;
-        $id = Tools::getValue('id');
-        $value = Tools::getValue('value');
-        $validation = self::validateOptions($id, $value);
-        if (!$validation) {
-            $result = Configuration::updateValue($id, $value);
-            if ($result) {
-                echo 'true';
-            } else {
-                echo json_encode(array(9, $module->l('Can\'t update setting', 'packetery.class')));
-            }
-        } else {
-            $message = $validation;
-            $error = array($id, $message);
-            echo json_encode($error);
-        }
-    }
 
     /**
      * @param string $id from POST
@@ -499,5 +436,4 @@ class Packeteryclass
                 return false;
         }
     }
-    /*END COMMON FUNCTIONS*/
 }

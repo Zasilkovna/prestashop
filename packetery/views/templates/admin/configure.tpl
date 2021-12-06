@@ -21,9 +21,6 @@
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-{if $soap_disabled eq 1}
-	<ps-alert-error>{l s='Soap is disabled. You have to enable Soap on your server' mod='packetery'}</ps-alert-error>
-{/if}
 
 <input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
 <input type="hidden" name="ajaxfields" id="ajaxfields" value="{$ajaxfields}">

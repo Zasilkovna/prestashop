@@ -22,54 +22,6 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 
-{if isset($messages)}
-	<div class="col-lg-12">
-		{foreach from=$messages item=message}
-			<div class="alert alert-{$message.class}">{$message.text}</div>
-		{/foreach}
-	</div>
-{/if}
-
-<div class="settings-input">
-	<label class="control-label col-lg-3" for="apipass">
-		{l s='API password' mod='packetery'}
-	</label>
-	<input name="apipass" class="setting_input" type="text" data-id="PACKETERY_APIPASS" value="{$settings['PACKETERY_APIPASS']|escape:'htmlall':'UTF-8'}" />
-	<br>
-
-	<label class="control-label col-lg-3" for="eshop_id">
-		{l s='Sender indication' mod='packetery'}
-	</label>
-	<input name="eshop_id" class="setting_input" type="text" data-id="PACKETERY_ESHOP_ID" value="{$settings['PACKETERY_ESHOP_ID']|escape:'htmlall':'UTF-8'}" />
-
-	<label class="control-label col-lg-3"></label>
-	{assign 'clientSectionLink' 'https://client.packeta.com/senders/'}
-	<div class="help-block">{l s='You can find the sender indication in the client section: [1]%s[/1] in the "indication" field.' mod='packetery' tags=['<a href="%s">'|sprintf:$clientSectionLink] sprintf=[$clientSectionLink]}</div>
-
-	{assign 'labels_format' $settings['PACKETERY_LABEL_FORMAT']}
-	<label class="control-label col-lg-3" for="labels_format">
-		{l s='Labels format' mod='packetery'}
-	</label>
-	<select name="labels_format" class="setting_input labels_format" data-id="PACKETERY_LABEL_FORMAT" >
-		<option value="A7 on A4" {if $labels_format eq 'A7 on A4'}selected{/if}>
-			{l s='1/8 of A4, printed on A4, 8 labels per page' mod='packetery'}
-		</option>
-		<option value="105x35mm on A4" {if $labels_format eq '105x35mm on A4'}selected{/if}>
-			{l s='105x35mm, printed on A4, 16 labels per page' mod='packetery'}
-		</option>
-		<option value="A6 on A4" {if $labels_format eq 'A6 on A4'}selected{/if}>
-			{l s='1/4 of A4, printed on A4, 4 labels per page' mod='packetery'}
-		</option>
-		<option value="A7 on A7" {if $labels_format eq 'A7 on A7'}selected{/if}>
-			{l s='1/8 of A4, direct printing, 1 label per page' mod='packetery'}
-		</option>
-		<option value="A8 on A8" {if $labels_format eq 'A8 on A8'}selected{/if}>
-			{l s='1/16 of A4, direct printing, 1 label per page' mod='packetery'}
-		</option>
-	</select>
-	<br>
-</div>
-
 <!--Address Delivery Carriers List-->
 <input type="hidden" name="carriers_json" id="carriers_json" value='{$carriers_json}'>
 <input type="hidden" name="zpoint" id="zpoint" value='{$zpoint}'>
@@ -79,11 +31,3 @@
 <label class="control-label col-lg-3" for="ad-carriers-list-table">
 </label>
 <ps-table id="ad-carriers-list-table" header="{l s='Carriers List' mod='packetery'}" icon="icon-users" content="{$packetery_list_ad_carriers|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>
-<br><hr><br>
-
-<!--Payment list-->
-<label class="control-label col-lg-3" for="payment-list-table">
-</label>
-<ps-table id="payment-list-table" header="{l s='Payment List' mod='packetery'}" icon="icon-users" content="{$payment_list|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>
-<br><hr><br>
-

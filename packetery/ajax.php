@@ -43,9 +43,6 @@ if (!Context::getContext()->employee ||
 
 switch (Tools::getValue('action')) {
     /*BACK*/
-    case 'updatesettings':
-        Packeteryclass::updateSettings();
-        break;
     case 'getcountbranches':
         $module = new Packetery();
         $carrierRepository = $module->diContainer->get(CarrierRepository::class);
@@ -57,11 +54,6 @@ switch (Tools::getValue('action')) {
         PacketeryApi::updateBranchListAjax($carrierRepository);
         break;
     /*SETTINGS*/
-    case 'change_payment_cod':
-        $module = new Packetery();
-        $paymentRepository = $module->diContainer->get(PaymentRepository::class);
-        Packeteryclass::changePaymentCodAjax($paymentRepository);
-        break;
     case 'change_ad_carrier_cod':
         Packeteryclass::changeAdCarrierCodAjax();
         break;

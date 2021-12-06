@@ -197,30 +197,12 @@ class Packetery extends CarrierModule
      */
     public function getContent()
     {
-        $soap_disabled = 0;
-        if (!extension_loaded("soap")) {
-            $soap_disabled = 1;
+        $soapDisabled = 0;
+        if (!extension_loaded('soap')) {
+            $soapDisabled = 1;
         }
-        $this->context->smarty->assign(array('soap_disabled'=> $soap_disabled));
-
-        $langs = Language::getLanguages();
-        $this->context->smarty->assign('langs', $langs);
 
         $this->context->smarty->assign('module_dir', $this->_path);
-        $id_employee = $this->context->employee->id;
-        $settings = Configuration::getMultiple([
-            'PACKETERY_APIPASS',
-            'PACKETERY_ESHOP_ID',
-            'PACKETERY_LABEL_FORMAT',
-            'PACKETERY_LAST_BRANCHES_UPDATE',
-        ]);
-
-        $this->context->smarty->assign(array('ps_version'=> _PS_VERSION_));
-
-        $this->context->smarty->assign(array('settings'=> $settings));
-        $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-        $this->context->smarty->assign('module_dir', $this->_path);
-        $this->context->smarty->assign('baseuri', $base_uri);
         $active_tab = Tools::getValue('active_tab');
         $this->context->smarty->assign('active_tab', $active_tab);
 
@@ -280,33 +262,16 @@ class Packetery extends CarrierModule
         ));
         /*END AD CARRIER LIST*/
 
-        /*PAYMENT LIST*/
-        $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
-        $payment_list = Packeteryclass::getListPayments($paymentRepository);
-        $this->context->smarty->assign(array(
-            'payment_list' => Tools::jsonEncode(array(
-                'columns' => array(
-                    array('content' => $this->l('Module'), 'key' => 'name'),
-                    array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
-                    array('content' => $this->l('module_name'), 'key' => 'module_name', 'center' => true),
-                ),
-                'rows' => $payment_list,
-                'url_params' => array('configure' => $this->name),
-                'identifier' => 'id_branch'
-            ))
-        ));
-        /*END PAYMENT LIST*/
-
         /*BRANCHES*/
         $total_branches = $carrierRepository->getAdAndExternalCount();
-        $last_branches_update = '';
-        if ((string)$settings['PACKETERY_LAST_BRANCHES_UPDATE'] !== '') {
+        $lastBranchesUpdate = Configuration::get('PACKETERY_LAST_BRANCHES_UPDATE');
+        if ($lastBranchesUpdate !== '') {
             $date = new DateTime();
-            $date->setTimestamp($settings['PACKETERY_LAST_BRANCHES_UPDATE']);
-            $last_branches_update = $date->format('d.m.Y H:i:s');
+            $date->setTimestamp($lastBranchesUpdate);
+            $lastBranchesUpdate = $date->format('d.m.Y H:i:s');
         }
         $this->context->smarty->assign(
-            array('total_branches' => $total_branches, 'last_branches_update' => $last_branches_update)
+            array('total_branches' => $total_branches, 'last_branches_update' => $lastBranchesUpdate)
         );
         $packetery_branches = array();
         $this->context->smarty->assign(array(
@@ -361,24 +326,183 @@ class Packetery extends CarrierModule
         $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
         $this->context->smarty->assign('baseuri', $base_uri);
 
+        $output = '';
+
         $usedWeightUnit = Configuration::get('PS_WEIGHT_UNIT');
-        if (\Packetery\Weight\Converter::isKgConversionSupported() === false) {
-            $messages = [
-                [
-                    'text' => sprintf(
-                        $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to one of: %s.'),
-                        $usedWeightUnit,
-                        implode(', ', array_keys(\Packetery\Weight\Converter::$mapping))
-                    ),
-                    'class' => 'info',
-                ],
-            ];
-            $this->context->smarty->assign('messages', $messages);
+        if ($usedWeightUnit !== PacketeryApi::PACKET_WEIGHT_UNIT) {
+            $output .= $this->displayInformation(sprintf(
+                $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to one of: %s.'),
+                $usedWeightUnit,
+                implode(', ', array_keys(\Packetery\Weight\Converter::$mapping))
+            ));
         }
 
-        $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
+        if ($soapDisabled) {
+            $output .= $this->displayError($this->l('Soap is disabled. You have to enable Soap on your server'));
+        }
+        if (Tools::isSubmit('submit' . $this->name)) {
+            $confOptions = $this->getConfigurationOptions();
+            $error = false;
+            foreach ($confOptions as $option => $optionConf) {
+                $configValue = (string)Tools::getValue($option);
+                $errorMessage = Packeteryclass::validateOptions($option, $configValue);
+                if ($errorMessage !== false) {
+                    $output .= $this->displayError($errorMessage);
+                    $error = true;
+                } else {
+                    Configuration::updateValue($option, $configValue);
+                }
+            }
+            $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
+            if (Tools::getIsset('payment_cod')) {
+                $codPayments = Tools::getValue('payment_cod');
+                if (is_array($codPayments)) {
+                    $paymentRepository->clearCod();
+                    foreach ($codPayments as $moduleName) {
+                        if ($paymentRepository->existsByModuleName($moduleName)) {
+                            $paymentRepository->setCod(1, $moduleName);
+                        } else {
+                            $paymentRepository->insert(1, $moduleName);
+                        }
+                    }
+                }
+            } else {
+                $paymentRepository->clearCod();
+            }
+            if (!$error) {
+                $output .= $this->displayConfirmation($this->l('Settings updated'));
+            }
+        }
+        $output .= $this->displayForm();
+
+        $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
         $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/prestui/ps-tags.tpl');
         return $output;
+    }
+
+    /**
+     * Builds the configuration form
+     * @return string HTML code
+     * @throws PrestaShopException
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
+     */
+    public function displayForm()
+    {
+        $formInputs = [];
+        $confOptions = $this->getConfigurationOptions();
+        foreach ($confOptions as $option => $optionConf) {
+            $inputData = [
+                'type' => 'text',
+                'label' => $optionConf['title'],
+                'name' => $option,
+                'required' => $optionConf['required'],
+            ];
+            if (isset($optionConf['options'])) {
+                $inputData['type'] = 'select';
+                $inputData['size'] = count($optionConf['options']);
+                $options = [];
+                foreach ($optionConf['options'] as $id => $name) {
+                    $options[] = [
+                        'id' => $id,
+                        'name' => $name,
+                    ];
+                }
+                $inputData['options'] = [
+                    'query' => $options,
+                    'id' => 'id',
+                    'name' => 'name'
+                ];
+            }
+            if (isset($optionConf['desc'])) {
+                $inputData['desc'] = $optionConf['desc'];
+            }
+            $formInputs[] = $inputData;
+        }
+
+        $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
+        $paymentList = Packeteryclass::getListPayments($paymentRepository);
+        $codMethods = [];
+        $codOptions = [];
+        if ($paymentList) {
+            foreach ($paymentList as $payment) {
+                $codOptions[] = [
+                    'id' => $payment['module_name'],
+                    'name' => $payment['name'],
+                ];
+                if ((bool)$payment['is_cod'] === true) {
+                    $codMethods[] = $payment['module_name'];
+                }
+            }
+        }
+        $formInputs[] = [
+            'type' => 'select',
+            'label' => $this->l('Payment method representing COD'),
+            'name' => 'payment_cod[]',
+            'multiple' => true,
+            'options' => [
+                'query' => $codOptions,
+                'id' => 'id',
+                'name' => 'name'
+            ]
+        ];
+
+        $form = [
+            'form' => [
+                'legend' => [
+                    'title' => $this->l('Packeta settings'),
+                ],
+                'input' => $formInputs,
+                'submit' => [
+                    'title' => $this->l('Save'),
+                    'class' => 'btn btn-default pull-right',
+                ],
+            ],
+        ];
+
+        $helper = new HelperForm();
+        $helper->table = $this->table;
+        $helper->name_controller = $this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->currentIndex = AdminController::$currentIndex . '&' . http_build_query(['configure' => $this->name]);
+        $helper->submit_action = 'submit' . $this->name;
+        $helper->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
+
+        $confOptions = $this->getConfigurationOptions();
+        $packeterySettings = Configuration::getMultiple(array_keys($confOptions));
+        foreach ($confOptions as $option => $optionConf) {
+            $helper->fields_value[$option] = Tools::getValue($option, $packeterySettings[$option]);
+        }
+        $helper->fields_value ['payment_cod[]'] = $codMethods;
+
+        return $helper->generateForm([$form]);
+    }
+
+    private function getConfigurationOptions() {
+        return [
+            'PACKETERY_APIPASS' => [
+                'title' => $this->l('API password'),
+                'required' => true,
+            ],
+            'PACKETERY_ESHOP_ID' => [
+                'title' => $this->l('Sender indication'),
+                'desc' => $this->l('You can find the sender indication in the client section') .
+                    ': <a href="https://client.packeta.com/senders/">https://client.packeta.com/senders/</a> ' .
+                    $this->l('in the "indication" field.'),
+                'required' => true,
+            ],
+            'PACKETERY_LABEL_FORMAT' => [
+                'title' => $this->l('Labels format'),
+                'options' => [
+                    'A7 on A4' => $this->l('1/8 of A4, printed on A4, 8 labels per page'),
+                    '105x35mm on A4' => $this->l('105x35mm, printed on A4, 16 labels per page'),
+                    'A6 on A4' => $this->l('1/4 of A4, printed on A4, 4 labels per page'),
+                    'A7 on A7' => $this->l('1/8 of A4, direct printing, 1 label per page'),
+                    'A8 on A8' => $this->l('1/16 of A4, direct printing, 1 label per page'),
+                ],
+                'required' => false,
+            ],
+        ];
     }
 
     /**

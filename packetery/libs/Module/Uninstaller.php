@@ -115,7 +115,9 @@ class Uninstaller
             Configuration::deleteByName('PACKETERY_ESHOP_ID') &&
             Configuration::deleteByName('PACKETERY_LABEL_FORMAT') &&
             Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') &&
-            Configuration::deleteByName('PACKETERY_WIDGET_AUTOOPEN')
+            Configuration::deleteByName('PACKETERY_WIDGET_AUTOOPEN') &&
+            Configuration::deleteByName('PACKETERY_CRON_TOKEN') &&
+            Configuration::deleteByName('PACKETERY_LABEL_MAX_AGE_DAYS')
         );
     }
 

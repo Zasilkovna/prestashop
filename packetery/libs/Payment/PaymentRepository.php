@@ -93,4 +93,13 @@ class PaymentRepository
     {
         return $this->dbTools->getRows('SELECT DISTINCT `module_name`, `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_payment`');
     }
+
+    /**
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function clearCod()
+    {
+        return $this->dbTools->update('packetery_payment', ['is_cod' => false]);
+    }
 }
