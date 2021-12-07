@@ -828,7 +828,7 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $this->context->smarty->assign('pickupPointLabel', $this->l('Selected Packeta pickup point'));
+        $this->context->smarty->assign('pickupPointLabel', $this->l('Selected Packeta pickup point or carrier'));
         $this->context->smarty->assign('pickupPointName', $orderData['name_branch']);
 
         return $this->display(__FILE__, 'display_order_confirmation.tpl');

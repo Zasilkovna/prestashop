@@ -51,6 +51,7 @@ $_MODULE['<{packetery}prestashop>packetery_9aa49c5a01dab7e49c73343b47e995a2'] = 
 $_MODULE['<{packetery}prestashop>packetery_b18ce70ed15a7a117141d6ee14f9138c'] = 'Výdejní místo bylo úspěšně změněno.';
 $_MODULE['<{packetery}prestashop>packetery_f1111e5bc2fc07a2985e5273341fbd7b'] = 'Výdejní místo se nepodařilo změnit.';
 $_MODULE['<{packetery}prestashop>packetery_47838d234bae5339a17c704bb605d01a'] = 'U objednávky není vybrané žádné výdejní místo. Zásilku nebude možné exportovat do Zásilkovny.';
+$_MODULE['<{packetery}prestashop>packetery_5d1018958f219ffc9fe4500d4fde09b1'] = 'Vybrané výdejní místo nebo dopravce';
 $_MODULE['<{packetery}prestashop>packetery_6f95966a9adeb388ffaaa27ca7829365'] = 'Vybrané výdejní místo';
 $_MODULE['<{packetery}prestashop>packetery.class_8d826acd449cf54a4ddfd37819e728eb'] = 'Nejdříve prosím nastavte vazbu na dopravce';
 $_MODULE['<{packetery}prestashop>packetery.class_1097d15ac9e833bc9ee47161243ebc93'] = 'Nepodařilo se zaktualizovat nastavení';
