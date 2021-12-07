@@ -25,8 +25,7 @@ function upgrade_module_3_0_0($module)
         Configuration::updateValue('PACKETERY_CRON_TOKEN', Tools::passwdGen(32)) &&
         Configuration::updateValue('PACKETERY_LABEL_MAX_AGE_DAYS', 7) &&
         $uninstaller->deleteTab('Adminpacketery') &&
-        $installer->insertTab() &&
-        Db::getInstance()->execute('ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order` ADD `weight` decimal(20,6) NULL;')
+        $installer->insertTab()
     );
     if ($result === false) {
         return false;
@@ -49,7 +48,8 @@ function upgrade_module_3_0_0($module)
 
     return $dbTools->execute('
         ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
-        ADD `country` varchar(2) NULL,
+        ADD `weight` decimal(20,6) NULL,
+        ADD `country` varchar(2) NULL AFTER `weight`,
         ADD `county` varchar(255) NULL AFTER `country`,
         ADD `zip` varchar(255) NULL AFTER `county`,
         ADD `city` varchar(255) NULL AFTER `zip`,
