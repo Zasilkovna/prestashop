@@ -329,7 +329,7 @@ class Packetery extends CarrierModule
         $output = '';
 
         $usedWeightUnit = Configuration::get('PS_WEIGHT_UNIT');
-        if ($usedWeightUnit !== PacketeryApi::PACKET_WEIGHT_UNIT) {
+        if (\Packetery\Weight\Converter::isKgConversionSupported() === false) {
             $output .= $this->displayInformation(sprintf(
                 $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to one of: %s.'),
                 $usedWeightUnit,
