@@ -41,11 +41,15 @@ class Uninstaller
     }
 
     /**
+     * @param string $className
      * @return bool
+     * @throws PrestaShopException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShop\PrestaShop\Adapter\CoreException
      */
-    private function deleteTab()
+    public function deleteTab($className = 'PacketeryOrderGrid')
     {
-        $tabId = Tab::getIdFromClassName('PacketeryOrderGrid');
+        $tabId = Tab::getIdFromClassName($className);
         if ($tabId) {
             try {
                 $tab = new Tab($tabId);
