@@ -329,9 +329,10 @@ PacketaModule.ui = {
             }
             var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
             var widgetCarriers = $widgetParent.find('#widget_carriers').val();
-            var customerStreet = $('#customerStreet').val();
-            var customerCity = $('#customerCity').val();
-            var customerZip = $('#customerZip').val();
+            var customerStreet = $widgetParent.find('#customerStreet').val();
+            var customerHouseNumber = $widgetParent.find('#customerHouseNumber').val();
+            var customerCity = $widgetParent.find('#customerCity').val();
+            var customerZip = $widgetParent.find('#customerZip').val();
             var widgetOptions = {
                 layout: 'hd',
                 language: language,
@@ -341,6 +342,9 @@ PacketaModule.ui = {
             };
             if (customerStreet) {
                 widgetOptions.street = customerStreet;
+            }
+            if (customerHouseNumber) {
+                widgetOptions.houseNumber = customerHouseNumber;
             }
             if (customerCity) {
                 widgetOptions.city = customerCity;
@@ -424,14 +428,15 @@ PacketaModule.ui = {
     isAddressValidationSatisfied: function ($widgetParent, $selectedInput) {
         var prestashopCarrierId = packeteryModulesManager.getCarrierId($selectedInput);
         var addressValidationSetting = PacketaModule.config.addressValidationLevels[prestashopCarrierId];
-        return (addressValidationSetting === 'required' || addressValidationSetting === 'optional') &&
-            $widgetParent.find('#addressValidated').val() === true;
+        var addressValidated = !!($widgetParent.find('#addressValidated').val());
+        return (addressValidationSetting === 'required' || addressValidationSetting === 'optional') && addressValidated;
     },
 
     isAddressValidationUnsatisfied: function ($widgetParent, $selectedInput) {
         var prestashopCarrierId = packeteryModulesManager.getCarrierId($selectedInput);
         var addressValidationSetting = PacketaModule.config.addressValidationLevels[prestashopCarrierId];
-        return !!(this.isHdCarrier($widgetParent) && addressValidationSetting === 'required' && $widgetParent.find('#addressValidated').val() !== true);
+        var addressValidated = !!($widgetParent.find('#addressValidated').val());
+        return (this.isHdCarrier($widgetParent) && addressValidationSetting === 'required' && !addressValidated);
     }
 };
 

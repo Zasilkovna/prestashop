@@ -576,7 +576,7 @@ class Packetery extends CarrierModule
             $address = new AddressCore($cart->id_address_delivery);
             $customerStreet = $address->address1;
             $customerCity = $address->city;
-            $customerZip = $address->postcode;
+            $customerZip = str_replace(' ', '', $address->postcode);
         }
 
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
@@ -608,11 +608,13 @@ class Packetery extends CarrierModule
             $addressValidated = false;
             if ($orderData && \Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
                 $addressValidated = true;
-                $this->context->smarty->assign('customerStreet', ($orderData['street'] ?: $orderData['city']) . ' ' . $orderData['house_number']);
+                $this->context->smarty->assign('customerStreet', $orderData['street']);
+                $this->context->smarty->assign('customerHouseNumber', $orderData['house_number']);
                 $this->context->smarty->assign('customerCity', $orderData['city']);
-                $this->context->smarty->assign('customerZip', $orderData['zip']);
+                $this->context->smarty->assign('customerZip', str_replace(' ', '', $orderData['zip']));
             } else {
                 $this->context->smarty->assign('customerStreet', $customerStreet);
+                $this->context->smarty->assign('customerHouseNumber', '');
                 $this->context->smarty->assign('customerCity', $customerCity);
                 $this->context->smarty->assign('customerZip', $customerZip);
             }
@@ -884,7 +886,7 @@ class Packetery extends CarrierModule
             $widgetOptions['street'] = $packeteryOrder['street'];
             $widgetOptions['houseNumber'] = $packeteryOrder['house_number'];
             $widgetOptions['city'] = $packeteryOrder['city'];
-            $widgetOptions['zip'] = $packeteryOrder['zip'];
+            $widgetOptions['zip'] = str_replace(' ', '', $packeteryOrder['zip']);
             // Country of the validated address can differ from country of order. In that case, shop administrator is informed.
         } else {
             $order = new Order($packeteryOrder['id_order']);

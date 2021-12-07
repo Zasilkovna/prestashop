@@ -1,6 +1,7 @@
 <div id="packetery-carrier-{$carrier_id|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
     <input type="hidden" id="customerStreet" name="customerStreet" value="{$customerStreet|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="customerHouseNumber" name="customerHouseNumber" value="{$customerHouseNumber|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerCity" name="customerCity" value="{$customerCity|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerZip" name="customerZip" value="{$customerZip|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="addressValidated" name="addressValidated" value="{$addressValidated|escape:'htmlall':'UTF-8'}">
@@ -17,6 +18,7 @@
                             <span class="picked-delivery-place">
                                 {assign var=addressInfo value=[]}
                                 {if $customerStreet}{$addressInfo[]=$customerStreet}{/if}
+                                {if $customerHouseNumber}{$addressInfo[]=$customerHouseNumber}{/if}
                                 {if $customerCity}{$addressInfo[]=$customerCity}{/if}
                                 {if $customerZip}{$addressInfo[]=$customerZip}{/if}
                                 {', '|implode:$addressInfo}
