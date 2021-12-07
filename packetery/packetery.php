@@ -885,7 +885,7 @@ class Packetery extends CarrierModule
             $widgetOptions['houseNumber'] = $packeteryOrder['house_number'];
             $widgetOptions['city'] = $packeteryOrder['city'];
             $widgetOptions['zip'] = $packeteryOrder['zip'];
-            // TODO: country of the validated address can differ from country of order
+            // Country of the validated address can differ from country of order. In that case, shop administrator is informed.
         } else {
             $order = new Order($packeteryOrder['id_order']);
             $deliveryAddress = new Address($order->id_address_delivery);

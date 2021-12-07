@@ -232,7 +232,6 @@ $(document).ready(function () {
 $(document).ready(function () {
     var $widgetHdButton = $('.open-packeta-hd-widget');
     if ($widgetHdButton.length === 1) {
-        // TODO: add hd widget address
         $.getScript('https://widget-hd.packeta.com/www/js/library-hd.js').fail(function () {
             console.error('Unable to load Packeta home delivery widget.');
         });
