@@ -406,17 +406,11 @@ class Packeteryclass
             case 'PACKETERY_APIPASS':
                 if (Validate::isString($value)) {
                     if (Tools::strlen($value) !== 32) {
-                        return $packetery->l(
-                            'Api password is wrong. Pickup points will not be updated.',
-                            'packetery.class'
-                        );
-                    } else {
-                        return false;
+                        return $packetery->l('Api password is wrong.', 'packetery.class');
                     }
-                } else {
-                    return $packetery->l('Api password must be string', 'packetery.class');
+                    return false;
                 }
-                break;
+                return $packetery->l('Api password must be string', 'packetery.class');
             case 'PACKETERY_ESHOP_ID':
                 try {
                     PacketeryApi::senderGetReturnRouting($value);
@@ -431,7 +425,6 @@ class Packeteryclass
                         $e->getMessage()
                     );
                 }
-                break;
             default:
                 return false;
         }

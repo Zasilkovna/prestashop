@@ -326,7 +326,7 @@ class Packetery extends CarrierModule
         $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
         $this->context->smarty->assign('baseuri', $base_uri);
 
-        $output = '';
+        $output = '<div class="packetery">' . PHP_EOL;
 
         $usedWeightUnit = Configuration::get('PS_WEIGHT_UNIT');
         if (\Packetery\Weight\Converter::isKgConversionSupported() === false) {
@@ -374,6 +374,7 @@ class Packetery extends CarrierModule
             }
         }
         $output .= $this->displayForm();
+        $output .= PHP_EOL . '</div>';
 
         $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
         $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/prestui/ps-tags.tpl');
@@ -437,7 +438,7 @@ class Packetery extends CarrierModule
         }
         $formInputs[] = [
             'type' => 'select',
-            'label' => $this->l('Payment method representing COD'),
+            'label' => $this->l('Payment methods representing COD'),
             'name' => 'payment_cod[]',
             'multiple' => true,
             'options' => [
