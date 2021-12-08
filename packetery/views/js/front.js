@@ -99,16 +99,19 @@ PacketaModule.runner = {
             var pickupPointType = $widgetParent.find(".packeta-pickup-point-type").val();
             var widgetCarrierId = $widgetParent.find(".packeta-carrier-id").val();
             var carrierPickupPointId = $widgetParent.find(".packeta-carrier-pickup-point-id").val();
-
-            PacketaModule.ajax.savePickupPointInCart(
-                prestashopCarrierId,
-                branchId,
-                branchName,
-                pickupPointType,
-                widgetCarrierId,
-                carrierPickupPointId,
-                PacketaModule.ui.toggleSubmit
-            );
+            if (branchId) {
+                PacketaModule.ajax.savePickupPointInCart(
+                    prestashopCarrierId,
+                    branchId,
+                    branchName,
+                    pickupPointType,
+                    widgetCarrierId,
+                    carrierPickupPointId,
+                    PacketaModule.ui.toggleSubmit
+                );
+            } else {
+                PacketaModule.ui.toggleSubmit();
+            }
         } else if (PacketaModule.ui.isAddressValidationSatisfied($widgetParent, $selectedInput) && validatedAddress) {
             PacketaModule.ajax.saveAddressInCart(validatedAddress, PacketaModule.ui.toggleSubmit)
         } else {
@@ -312,6 +315,7 @@ PacketaModule.ui = {
                     pickupPoint.carrierPickupPointId,
                     function (jsonResponse) {
                         if (jsonResponse.result === true) {
+                            PacketaModule.ui.clearOtherWidgetResults(module, 'HD');
                             PacketaModule.ui.toggleSubmit();
                         } else {
                             console.error(jsonResponse.message);
@@ -367,6 +371,7 @@ PacketaModule.ui = {
                         $widgetParent.find('.picked-delivery-place').html(
                             address.street + ' ' + address.houseNumber + ', ' + address.city + ', ' + address.postcode
                         );
+                        PacketaModule.ui.clearOtherWidgetResults(module, 'PP');
                         PacketaModule.ui.toggleSubmit();
                     } else {
                         $widgetParent.find('#addressValidated').val(false);
@@ -437,6 +442,25 @@ PacketaModule.ui = {
         var addressValidationSetting = PacketaModule.config.addressValidationLevels[prestashopCarrierId];
         var addressValidated = !!($widgetParent.find('#addressValidated').val());
         return (this.isHdCarrier($widgetParent) && addressValidationSetting === 'required' && !addressValidated);
+    },
+
+    /**
+     * @param module
+     * @param widgetTypeToClear PP or HD
+     */
+    clearOtherWidgetResults: function (module, widgetTypeToClear) {
+        $(module.getExtraContentSelector()).each(function () {
+            if (widgetTypeToClear === 'PP' && $(this).find('#open-packeta-widget').length === 1) {
+                $(this).find('.packeta-branch-id').val('');
+                $(this).find('.picked-delivery-place').text('');
+            } else if (widgetTypeToClear === 'HD' && $(this).find('#open-packeta-widget-hd').length === 1) {
+                $(this).find('#addressValidated').val(false);
+                var $addressValidationResult = $(this).find('.address-validation-result');
+                $addressValidationResult.removeClass('address-validated');
+                $addressValidationResult.text(PacketaModule.config.addressNotValidatedMessage);
+                $(this).find('.picked-delivery-place').text('');
+            }
+        });
     }
 };
 
