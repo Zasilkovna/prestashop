@@ -656,6 +656,7 @@ class Packetery extends CarrierModule
         if (isset($params['packetery']['template'])) {
             $template = $params['packetery']['template'];
         }
+        $this->context->smarty->assign('localPath', $this->local_path);
         return $this->context->smarty->fetch($this->local_path . $template);
     }
 

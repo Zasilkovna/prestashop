@@ -49,4 +49,7 @@ var PacketeryCheckoutModuleOpcZelarg = {
         return $selectedInput.parent();
     },
 
+    getExtraContentSelector: function () {
+        return '.carrier-extra-content';
+    }
 };
