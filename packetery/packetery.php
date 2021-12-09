@@ -488,14 +488,42 @@ class Packetery extends CarrierModule
             ],
             'PACKETERY_LABEL_FORMAT' => [
                 'title' => $this->l('Labels format'),
-                'options' => [
-                    'A7 on A4' => $this->l('1/8 of A4, printed on A4, 8 labels per page'),
-                    '105x35mm on A4' => $this->l('105x35mm, printed on A4, 16 labels per page'),
-                    'A6 on A4' => $this->l('1/4 of A4, printed on A4, 4 labels per page'),
-                    'A7 on A7' => $this->l('1/8 of A4, direct printing, 1 label per page'),
-                    'A8 on A8' => $this->l('1/16 of A4, direct printing, 1 label per page'),
-                ],
+                'options' => array_combine(
+                    array_column($this->getAvailableLabelFormats(), 'id'),
+                    array_column($this->getAvailableLabelFormats(), 'name')
+                ),
                 'required' => false,
+            ],
+        ];
+    }
+
+    public function getAvailableLabelFormats()
+    {
+        return [
+            [
+                'id' => 'A7 on A4',
+                'name' => $this->l('1/8 of A4, printed on A4, 8 labels per page'),
+                'maxOffset' => 7,
+            ],
+            [
+                'id' => '105x35mm on A4',
+                'name' => $this->l('105x35mm, printed on A4, 16 labels per page'),
+                'maxOffset' => 15,
+            ],
+            [
+                'id' => 'A6 on A4',
+                'name' => $this->l('1/4 of A4, printed on A4, 4 labels per page'),
+                'maxOffset' => 3,
+            ],
+            [
+                'id' => 'A7 on A7',
+                'name' => $this->l('1/8 of A4, direct printing, 1 label per page'),
+                'maxOffset' => 0,
+            ],
+            [
+                'id' => 'A8 on A8',
+                'name' => $this->l('1/16 of A4, direct printing, 1 label per page'),
+                'maxOffset' => 0,
             ],
         ];
     }

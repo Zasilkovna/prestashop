@@ -34,15 +34,6 @@ class PacketeryOrderGridController extends ModuleAdminController
     /** @var Packetery */
     private $packetery;
 
-    private static $labelFormatMaxOffset = [
-        'A6 on A4' => 3,
-        'A6 on A6' => 0,
-        'A7 on A7' => 0,
-        'A7 on A4' => 7,
-        '105x35mm on A4' => 15,
-        'A8 on A8' => 0,
-    ];
-
     public function __construct()
     {
         $this->bootstrap = true;
@@ -299,7 +290,8 @@ class PacketeryOrderGridController extends ModuleAdminController
                 $packetNumbers = $this->preparePacketNumbers($ids);
                 if ($packetNumbers) {
                     // Offset setting form preparation.
-                    $maxOffset = (int)self::$labelFormatMaxOffset[Configuration::get('PACKETERY_LABEL_FORMAT')];
+                    $maxOffsets = $this->getMaxOffsets();
+                    $maxOffset = (int)$maxOffsets[Configuration::get('PACKETERY_LABEL_FORMAT')];
                     if ($maxOffset !== 0) {
                         $this->tpl_list_vars['max_offset'] = $maxOffset;
                         $this->tpl_list_vars['prepareLabelsMode'] = true;
@@ -317,6 +309,15 @@ class PacketeryOrderGridController extends ModuleAdminController
         $this->addRowAction('print');
 
         return parent::renderList();
+    }
+
+    private function getMaxOffsets()
+    {
+        $module = $this->getModule();
+        return array_combine(
+            array_column($module->getAvailableLabelFormats(), 'id'),
+            array_column($module->getAvailableLabelFormats(), 'maxOffset')
+        );
     }
 
     public function initToolbar()
