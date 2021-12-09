@@ -68,6 +68,20 @@ class PaymentRepository
     }
 
     /**
+     * @param int $value
+     * @param string $moduleName
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function setOrInsert($value, $moduleName)
+    {
+        if ($this->existsByModuleName($moduleName)) {
+            return $this->setCod($value, $moduleName);
+        }
+        return $this->insert($value, $moduleName);
+    }
+
+    /**
      * @param int $isCod
      * @param string $moduleName
      * @return bool
@@ -92,14 +106,5 @@ class PaymentRepository
     public function getAll()
     {
         return $this->dbTools->getRows('SELECT DISTINCT `module_name`, `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_payment`');
-    }
-
-    /**
-     * @return bool
-     * @throws DatabaseException
-     */
-    public function clearCod()
-    {
-        return $this->dbTools->update('packetery_payment', ['is_cod' => false]);
     }
 }

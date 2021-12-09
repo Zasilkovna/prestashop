@@ -354,20 +354,15 @@ class Packetery extends CarrierModule
                 }
             }
             $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
-            if (Tools::getIsset('payment_cod')) {
-                $codPayments = Tools::getValue('payment_cod');
-                if (is_array($codPayments)) {
-                    $paymentRepository->clearCod();
-                    foreach ($codPayments as $moduleName) {
-                        if ($paymentRepository->existsByModuleName($moduleName)) {
-                            $paymentRepository->setCod(1, $moduleName);
-                        } else {
-                            $paymentRepository->insert(1, $moduleName);
-                        }
+            $paymentList = Packeteryclass::getListPayments($paymentRepository);
+            if ($paymentList) {
+                foreach ($paymentList as $payment) {
+                    if (Tools::getIsset('payment_cod_' . $payment['module_name'])) {
+                        $paymentRepository->setOrInsert(1, $payment['module_name']);
+                    } else {
+                        $paymentRepository->setOrInsert(0, $payment['module_name']);
                     }
                 }
-            } else {
-                $paymentRepository->clearCod();
             }
             if (!$error) {
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
@@ -400,20 +395,17 @@ class Packetery extends CarrierModule
                 'required' => $optionConf['required'],
             ];
             if (isset($optionConf['options'])) {
-                $inputData['type'] = 'select';
+                $inputData['type'] = 'radio';
                 $inputData['size'] = count($optionConf['options']);
                 $options = [];
                 foreach ($optionConf['options'] as $id => $name) {
                     $options[] = [
                         'id' => $id,
-                        'name' => $name,
+                        'value' => $id,
+                        'label' => $name,
                     ];
                 }
-                $inputData['options'] = [
-                    'query' => $options,
-                    'id' => 'id',
-                    'name' => 'name'
-                ];
+                $inputData['values'] = $options;
             }
             if (isset($optionConf['desc'])) {
                 $inputData['desc'] = $optionConf['desc'];
@@ -423,7 +415,6 @@ class Packetery extends CarrierModule
 
         $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
         $paymentList = Packeteryclass::getListPayments($paymentRepository);
-        $codMethods = [];
         $codOptions = [];
         if ($paymentList) {
             foreach ($paymentList as $payment) {
@@ -431,17 +422,14 @@ class Packetery extends CarrierModule
                     'id' => $payment['module_name'],
                     'name' => $payment['name'],
                 ];
-                if ((bool)$payment['is_cod'] === true) {
-                    $codMethods[] = $payment['module_name'];
-                }
             }
         }
         $formInputs[] = [
-            'type' => 'select',
+            'type' => 'checkbox',
             'label' => $this->l('Payment methods representing COD'),
-            'name' => 'payment_cod[]',
+            'name' => 'payment_cod',
             'multiple' => true,
-            'options' => [
+            'values' => [
                 'query' => $codOptions,
                 'id' => 'id',
                 'name' => 'name'
@@ -474,7 +462,13 @@ class Packetery extends CarrierModule
         foreach ($confOptions as $option => $optionConf) {
             $helper->fields_value[$option] = Tools::getValue($option, $packeterySettings[$option]);
         }
-        $helper->fields_value ['payment_cod[]'] = $codMethods;
+        if ($paymentList) {
+            foreach ($paymentList as $payment) {
+                if ((bool)$payment['is_cod'] === true) {
+                    $helper->fields_value ['payment_cod_' . $payment['module_name']] = $payment['module_name'];
+                }
+            }
+        }
 
         return $helper->generateForm([$form]);
     }
