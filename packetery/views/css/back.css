@@ -77,3 +77,9 @@
     margin-top: 1em;
     padding-left: 3.5rem;
 }
+
+/* new settings form */
+
+.bootstrap .packetery select.fixed-width-xl {
+    width: 100% !important;
+}
