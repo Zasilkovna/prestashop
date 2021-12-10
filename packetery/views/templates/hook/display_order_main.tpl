@@ -5,10 +5,15 @@
         </h3>
     </div>
     <div class="card-body">
+        {if isset($messages)}
+            {foreach from=$messages item=message}
+                <div class="alert alert-{$message.class}">{$message.text}</div>
+            {/foreach}
+        {/if}
         {if $isAddressDelivery}
             <p>
                 {l s='Carrier' mod='packetery'}:
-                <strong class="picked-delivery-place">
+                <strong class="picked-delivery-place" data-validated="{$isAddressValidated}">
                     {if $pickupPointOrAddressDeliveryName}
                         {$pickupPointOrAddressDeliveryName}
                     {else}
@@ -17,7 +22,7 @@
                 </strong>
             </p>
             {if isset($validatedAddress)}
-            <p>
+            <p class="validatedAddress">
                 {l s='Delivery address verified for order' mod='packetery'}:<br>
                 {l s='Street' mod='packetery'}: <strong class="packetery-street">{$validatedAddress['street']} {$validatedAddress['houseNumber']}</strong><br>
                 {l s='City' mod='packetery'}: <strong class="packetery-city">{$validatedAddress['city']}</strong><br>
@@ -70,11 +75,6 @@
                     </div>
                 </form>
             {/if}
-        {/if}
-        {if isset($messages)}
-            {foreach from=$messages item=message}
-                <div class="alert alert-{$message.class}">{$message.text}</div>
-            {/foreach}
         {/if}
     </div>
 </div>

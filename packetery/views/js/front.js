@@ -315,7 +315,6 @@ PacketaModule.ui = {
                     pickupPoint.carrierPickupPointId,
                     function (jsonResponse) {
                         if (jsonResponse.result === true) {
-                            PacketaModule.ui.clearOtherWidgetResults(module, 'HD');
                             PacketaModule.ui.toggleSubmit();
                         } else {
                             console.error(jsonResponse.message);
@@ -364,14 +363,13 @@ PacketaModule.ui = {
                     if (address.country === country) {
                         PacketaModule.ajax.saveAddressInCart(address);
                         var prestashopCarrierId = packeteryModulesManager.getCarrierId($selectedInput);
-                        PacketaModule.storage.setAddress(prestashopCarrierId)
+                        PacketaModule.storage.setAddress(address, prestashopCarrierId)
                         $widgetParent.find('#addressValidated').val(true);
                         $addressValidationResult.addClass('address-validated');
                         $addressValidationResult.text(PacketaModule.config.addressValidatedMessage);
                         $widgetParent.find('.picked-delivery-place').html(
                             address.street + ' ' + address.houseNumber + ', ' + address.city + ', ' + address.postcode
                         );
-                        PacketaModule.ui.clearOtherWidgetResults(module, 'PP');
                         PacketaModule.ui.toggleSubmit();
                     } else {
                         $widgetParent.find('#addressValidated').val(false);
@@ -433,34 +431,22 @@ PacketaModule.ui = {
     isAddressValidationSatisfied: function ($widgetParent, $selectedInput) {
         var prestashopCarrierId = packeteryModulesManager.getCarrierId($selectedInput);
         var addressValidationSetting = PacketaModule.config.addressValidationLevels[prestashopCarrierId];
-        var addressValidated = !!($widgetParent.find('#addressValidated').val());
+        var addressValidated = PacketaModule.ui.makeBoolean($widgetParent.find('#addressValidated').val());
         return (addressValidationSetting === 'required' || addressValidationSetting === 'optional') && addressValidated;
     },
 
     isAddressValidationUnsatisfied: function ($widgetParent, $selectedInput) {
         var prestashopCarrierId = packeteryModulesManager.getCarrierId($selectedInput);
         var addressValidationSetting = PacketaModule.config.addressValidationLevels[prestashopCarrierId];
-        var addressValidated = !!($widgetParent.find('#addressValidated').val());
+        var addressValidated = PacketaModule.ui.makeBoolean($widgetParent.find('#addressValidated').val());
         return (this.isHdCarrier($widgetParent) && addressValidationSetting === 'required' && !addressValidated);
     },
 
-    /**
-     * @param module
-     * @param widgetTypeToClear PP or HD
-     */
-    clearOtherWidgetResults: function (module, widgetTypeToClear) {
-        $(module.getExtraContentSelector()).each(function () {
-            if (widgetTypeToClear === 'PP' && $(this).find('#open-packeta-widget').length === 1) {
-                $(this).find('.packeta-branch-id').val('');
-                $(this).find('.picked-delivery-place').text('');
-            } else if (widgetTypeToClear === 'HD' && $(this).find('#open-packeta-widget-hd').length === 1) {
-                $(this).find('#addressValidated').val(false);
-                var $addressValidationResult = $(this).find('.address-validation-result');
-                $addressValidationResult.removeClass('address-validated');
-                $addressValidationResult.text(PacketaModule.config.addressNotValidatedMessage);
-                $(this).find('.picked-delivery-place').text('');
-            }
-        });
+    makeBoolean: function (value) {
+        if (value === 'false') {
+            return false;
+        }
+        return !!value;
     }
 };
 

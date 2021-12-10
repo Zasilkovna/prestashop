@@ -236,6 +236,10 @@ $(document).ready(function () {
             console.error('Unable to load Packeta home delivery widget.');
         });
 
+        if ($('.picked-delivery-place').data('validated') === '') {
+            $('.validatedAddress').hide();
+        }
+
         var widgetHdOptionsData = $widgetHdButton.data('widget-options');
         var widgetHdOptions = {
             layout: 'hd',
@@ -255,9 +259,10 @@ $(document).ready(function () {
                     $('.packetery form input[name="address"]').val(JSON.stringify(address));
                     $('.packetery-street').text(address.street + ' ' + address.houseNumber);
                     $('.packetery-city').text(address.city);
-                    $('.packetery-zip').text(address.zip);
+                    $('.packetery-zip').text(address.postcode);
                     $('.packetery-county').text(address.county);
                     $('.packetery-gps').text(address.latitude + ', ' + address.longitude);
+                    $('.validatedAddress').show();
                 }
             }, widgetHdOptions);
         });
