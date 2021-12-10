@@ -23,6 +23,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Exceptions\DatabaseException;
 use Packetery\Order\OrderRepository;
 
 class PacketeryOrderGridController extends ModuleAdminController
@@ -170,7 +171,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws DatabaseException
      */
     private function createPackets(array $ids)
     {
@@ -207,40 +208,67 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     /**
      * @param array $ids
+     * @return array
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws DatabaseException
      */
-    private function prepareLabels(array $ids)
+    private function preparePacketNumbers(array $ids)
     {
         $module = $this->getModule();
         $orderRepository = $module->diContainer->get(OrderRepository::class);
-        $fileName = PacketeryApi::downloadPdf($orderRepository, implode(',', $ids));
+        $packetNumbers = Packeteryclass::getTrackingFromOrders(implode(',', $ids), $orderRepository);
+        if (!$packetNumbers) {
+            $this->warnings[] = $this->l('Please submit selected orders first.');
+        }
+        return $packetNumbers;
+    }
+
+    /**
+     * @param array $packetNumbers
+     * @param int $offset
+     */
+    private function prepareLabels(array $packetNumbers, $offset = 0)
+    {
+        $fileName = PacketeryApi::packetsLabelsPdf($packetNumbers, Configuration::get('PACKETERY_APIPASS'), $offset);
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         echo file_get_contents(_PS_MODULE_DIR_ . 'packetery/labels/' . $fileName);
         die();
     }
 
+    /**
+     * Used after offset setting form is processed.
+     * @throws ReflectionException
+     * @throws DatabaseException
+     */
     public function processBulkLabelPdf()
     {
-        $ids = $this->boxes;
-        if (!$ids) {
-            $this->informations = $this->l('No orders were selected.');
-            return;
+        if (Tools::isSubmit('submitPrepareLabels')) {
+            $packetNumbers = $this->preparePacketNumbers($this->boxes);
+            if ($packetNumbers) {
+                $this->prepareLabels($packetNumbers, (int)Tools::getValue('offset'));
+            }
         }
-        $this->prepareLabels($ids);
     }
 
+    /**
+     * Used after single order print is triggered.
+     * @throws ReflectionException
+     * @throws DatabaseException
+     */
     public function processPrint()
     {
-        $this->prepareLabels([Tools::getValue('id_order')]);
+        $packetNumbers = $this->preparePacketNumbers([Tools::getValue('id_order')]);
+        if ($packetNumbers) {
+            $this->prepareLabels($packetNumbers);
+        }
     }
 
     public function processBulkCsvExport()
     {
         $ids = $this->boxes;
         if (!$ids) {
-            $this->informations = $this->l('No orders were selected.');
+            $this->informations = $this->l('Please choose orders first.');
             return;
         }
         $module = $this->getModule();
@@ -251,10 +279,45 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function renderList()
     {
+        if ($this->action === 'bulkLabelPdf') {
+            if (Tools::getIsset('cancel')) {
+                Tools::redirectAdmin(self::$currentIndex . '&token=' . $this->token);
+            }
+            $ids = $this->boxes;
+            if (!$ids) {
+                $this->informations = $this->l('Please choose orders first.');
+            } else {
+                $packetNumbers = $this->preparePacketNumbers($ids);
+                if ($packetNumbers) {
+                    // Offset setting form preparation.
+                    $maxOffsets = $this->getMaxOffsets();
+                    $maxOffset = (int)$maxOffsets[Configuration::get('PACKETERY_LABEL_FORMAT')];
+                    if ($maxOffset !== 0) {
+                        $this->tpl_list_vars['max_offset'] = $maxOffset;
+                        $this->tpl_list_vars['prepareLabelsMode'] = true;
+                        $this->tpl_list_vars['REQUEST_URI'] = $_SERVER['REQUEST_URI'];
+                        $this->tpl_list_vars['POST'] = $_POST;
+                    } else {
+                        $this->prepareLabels($packetNumbers);
+                    }
+                }
+            }
+        }
+
         $this->addRowAction('edit');
         $this->addRowAction('submit');
         $this->addRowAction('print');
+
         return parent::renderList();
+    }
+
+    private function getMaxOffsets()
+    {
+        $module = $this->getModule();
+        return array_combine(
+            array_column($module->getAvailableLabelFormats(), 'id'),
+            array_column($module->getAvailableLabelFormats(), 'maxOffset')
+        );
     }
 
     public function initToolbar()

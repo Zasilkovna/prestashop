@@ -35,31 +35,10 @@ class PacketeryApi
 {
     const API_WSDL_URL = 'https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl';
 
-    /*LABELS*/
-    /**
-     * @param OrderRepository $orderRepository
-     * @param string $id_orders Comma separated integers
-     * @return string|false PDF contents
-     * @throws DatabaseException
-     */
-    public static function downloadPdf(OrderRepository $orderRepository, $id_orders)
-    {
-        if (!$id_orders) {
-            $module = new Packetery;
-            echo $module->l('Please choose orders first.', 'packetery.api');
-            return false;
-        }
-        $packets = Packeteryclass::getTrackingFromOrders($id_orders, $orderRepository);
-        $apiPassword = Configuration::get('PACKETERY_APIPASS');
-        $pdf_result = self::packetsLabelsPdf($packets, $apiPassword);
-        return $pdf_result;
-    }
-
-    public static function packetsLabelsPdf($packets, $apiPassword)
+    public static function packetsLabelsPdf($packets, $apiPassword, $offset)
     {
         $client = new SoapClient("https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl");
         $format = Configuration::get('PACKETERY_LABEL_FORMAT');
-        $offset = 0;
         try {
             $pdf = $client->packetsLabelsPdf($apiPassword, $packets, $format, $offset);
             if ($pdf) {
@@ -78,7 +57,6 @@ class PacketeryApi
             exit;
         }
     }
-    /*END LABELS*/
 
     /*ORDERS EXPORT*/
     /**
