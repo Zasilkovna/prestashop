@@ -435,7 +435,7 @@ class Packetery extends CarrierModule
     /**
     * Add the CSS & JavaScript files you want to be loaded in the BO.
     */
-    public function hookBackOfficeHeader()
+    public function hookDisplayBackOfficeHeader()
     {
         if ((Tools::getValue('module_name') == $this->name) || (Tools::getValue('configure') == $this->name)) {
             $this->context->controller->addjquery();
@@ -747,7 +747,7 @@ class Packetery extends CarrierModule
     {
         $hooks = [
             'actionOrderHistoryAddAfter',
-            'backOfficeHeader',
+            'displayBackOfficeHeader',
             'displayCarrierExtraContent',
             'displayHeader',
             'actionCarrierUpdate',
