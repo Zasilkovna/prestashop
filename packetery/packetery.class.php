@@ -23,6 +23,7 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Address\AddressTools;
 use Packetery\Carrier\CarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
@@ -172,16 +173,28 @@ class Packeteryclass
                 'SenderLabel' => $senderLabel,
                 'AdultContent' => "",
                 'DelayedDelivery' => "",
-                'Street' => $address['address1'],
+                'Street' => '',
                 'House Number' => '',
-                'City' => $address['city'],
-                'ZIP' => $address['postcode'],
+                'City' => '',
+                'ZIP' => '',
                 'CarrierPickupPoint' => $packeteryOrder['carrier_pickup_point'],
                 'Width' => "",
                 'Height' => "",
                 'Depth' => "",
                 'Note' => "",
             ];
+            if ($packeteryOrder['is_ad']) {
+                if (AddressTools::hasValidatedAddress($packeteryOrder)) {
+                    $data[$order_id]['ZIP'] = $packeteryOrder['zip'];
+                    $data[$order_id]['City'] = $packeteryOrder['city'];
+                    $data[$order_id]['Street'] = $packeteryOrder['street'];
+                    $data[$order_id]['House Number'] = $packeteryOrder['house_number'];
+                } else {
+                    $data[$order_id]['ZIP'] = str_replace(' ', '', $address['postcode']);
+                    $data[$order_id]['City'] = $address['city'];
+                    $data[$order_id]['Street'] = $address['address1'];
+                }
+            }
 
             $orderRepository->setExported(true, $order_id);
         }
@@ -340,11 +353,6 @@ class Packeteryclass
                 $fieldsToSet['name_branch'] = $carrierRepository->db->escape($branchName);
                 $fieldsToSet['currency_branch'] = $carrierRepository->db->escape($branchCurrency);
             }
-            if ($pickupPointType) {
-                $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
-            } else {
-                $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
-            }
             if ($isPacketeryCarrier) {
                 $result = $carrierRepository->updatePacketery($fieldsToSet, (int)$carrierId);
             } else {
@@ -352,6 +360,7 @@ class Packeteryclass
                 $fieldsToSet['id_carrier'] = (int)$carrierId;
                 $result = $carrierRepository->insertPacketery($fieldsToSet);
             }
+            $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
         }
         $carrierRepository->updatePresta($carrierUpdate, (int)$carrierId);
 

@@ -108,8 +108,16 @@ class Installer
             `id_carrier` int DEFAULT 0,
             `is_ad` int DEFAULT 0,
             `is_carrier` tinyint(1) NOT NULL DEFAULT 0,
-            `carrier_pickup_point` varchar(40) NULL,      
-            `weight` decimal(20,6) NULL,      
+            `carrier_pickup_point` varchar(40) NULL,
+            `weight` decimal(20,6) NULL,
+            `country` varchar(2) NULL,
+            `county` varchar(255) NULL,
+            `zip` varchar(255) NULL,
+            `city` varchar(255) NULL,
+            `street` varchar(255) NULL,
+            `house_number` varchar(255) NULL,
+            `latitude` varchar(255) NULL,
+            `longitude` varchar(255) NULL,
             UNIQUE(`id_order`),
             UNIQUE(`id_cart`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
@@ -127,7 +135,8 @@ class Installer
             `name_branch` varchar(255) NULL,
             `currency_branch` char(3) NULL,
             `is_cod` tinyint(1) NOT NULL DEFAULT 0,
-            `pickup_point_type` varchar(40) NULL
+            `pickup_point_type` varchar(40) NULL,
+            `address_validation` varchar(40) NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_branch`';

@@ -198,4 +198,16 @@ class DbTools
         $this->logAndThrow($queryForLog);
         return $result;
     }
+
+    /**
+     * @param array $result
+     * @param string $indexKey
+     * @param string $valueKey
+     * @return array|false
+     */
+    public function getPairs($result, $indexKey, $valueKey)
+    {
+        return array_combine(array_column($result, $indexKey), array_column($result, $valueKey));
+    }
+
 }

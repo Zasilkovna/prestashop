@@ -5,10 +5,15 @@
         </h3>
     </div>
     <div class="card-body">
+        {if isset($messages)}
+            {foreach from=$messages item=message}
+                <div class="alert alert-{$message.class}">{$message.text}</div>
+            {/foreach}
+        {/if}
         {if $isAddressDelivery}
             <p>
                 {l s='Carrier' mod='packetery'}:
-                <strong class="picked-delivery-place">
+                <strong class="picked-delivery-place" data-validated="{$isAddressValidated}">
                     {if $pickupPointOrAddressDeliveryName}
                         {$pickupPointOrAddressDeliveryName}
                     {else}
@@ -16,6 +21,36 @@
                     {/if}
                 </strong>
             </p>
+            {if isset($validatedAddress)}
+            <p class="validatedAddress">
+                {l s='Delivery address verified for order' mod='packetery'}:<br>
+                {l s='Street' mod='packetery'}: <strong class="packetery-street">{$validatedAddress['street']} {$validatedAddress['houseNumber']}</strong><br>
+                {l s='City' mod='packetery'}: <strong class="packetery-city">{$validatedAddress['city']}</strong><br>
+                {l s='Zip' mod='packetery'}: <strong class="packetery-zip">{$validatedAddress['zip']}</strong><br>
+                {l s='County' mod='packetery'}: <strong class="packetery-county">{$validatedAddress['county']}</strong><br>
+                {l s='GPS' mod='packetery'}: <strong class="packetery-gps">{$validatedAddress['latitude']}, {$validatedAddress['longitude']}</strong><br>
+            </p>
+            {/if}
+            {if isset($widgetOptions)}
+            <form action="{$returnUrl}" method="post">
+                <p>
+                    <a href="" class="btn btn-outline-secondary btn-default open-packeta-hd-widget"
+                       data-widget-options="{$widgetOptions|@json_encode|escape}">
+                        {if isset($validatedAddress) && $validatedAddress['zip']}
+                        {l s='Change validated delivery address' mod='packetery'}
+                        {else}
+                        {l s='Set validated delivery address' mod='packetery'}
+                        {/if}
+                    </a>
+
+                    <input type="hidden" name="order_id" value="{$orderId|intval}">
+                    <input type="hidden" name="address">
+                </p>
+                <div class="text-right">
+                    <button class="btn btn-primary" name="address_change">{l s='Save' mod='packetery'}</button>
+                </div>
+            </form>
+            {/if}
         {else}
             <p>{l s='Pickup point' mod='packetery'}:
                 <strong class="picked-delivery-place">
@@ -39,11 +74,6 @@
                         <button class="btn btn-primary" name="pickup_point_change">{l s='Save' mod='packetery'}</button>
                     </div>
                 </form>
-            {/if}
-            {if isset($messages)}
-                {foreach from=$messages item=message}
-                    <div class="alert alert-{$message.class}">{$message.text}</div>
-                {/foreach}
             {/if}
         {/if}
     </div>

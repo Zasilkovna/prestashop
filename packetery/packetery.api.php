@@ -23,6 +23,7 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Address\AddressTools;
 use Packetery\Carrier\CarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
@@ -143,7 +144,6 @@ class PacketeryApi
         }
         $id_address_delivery = $order->id_address_delivery;
         $address_delivery = new Address($id_address_delivery);
-        $is_packetery_ad = $packetery_order['is_ad'];
         $total = $order->total_paid;
 
         /*CURRENCY*/
@@ -226,10 +226,17 @@ class PacketeryApi
             return array(0, $module->l('No email assigned to customer.', 'packetery.api'));
         }
 
-        if ($is_packetery_ad) {
-            $packet_attributes['city'] = $address_delivery->city;
-            $packet_attributes['zip'] = str_replace(' ', '', $address_delivery->postcode);
-            $packet_attributes['street'] = $address_delivery->address1;
+        if ($packetery_order['is_ad']) {
+            if (AddressTools::hasValidatedAddress($packetery_order)) {
+                $packet_attributes['zip'] = $packetery_order['zip'];
+                $packet_attributes['city'] = $packetery_order['city'];
+                $packet_attributes['street'] = $packetery_order['street'];
+                $packet_attributes['houseNumber'] = $packetery_order['house_number'];
+            } else {
+                $packet_attributes['zip'] = str_replace(' ', '', $address_delivery->postcode);
+                $packet_attributes['city'] = $address_delivery->city;
+                $packet_attributes['street'] = $address_delivery->address1;
+            }
         }
         $customer_company ? $packet_attributes['company'] = "$customer_company" : false;
         $apiPassword = self::getApiPass();

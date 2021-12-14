@@ -80,3 +80,5 @@
         in kilograms, the module converts the weight of the shipment to kilograms before exporting it.
       - Updated: module settings page realised using standard PrestaShop's Helper
       - Added: possibility to set print offset when preparing packet labels
+      - Added: support for Packeta address validation widget in the cart
+      - Added: validated address is saved to db and used in exports

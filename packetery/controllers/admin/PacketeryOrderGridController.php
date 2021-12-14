@@ -120,11 +120,13 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'filter_key' => 'po!name_branch',
             ],
             'is_ad' => [
-                'title' => $this->l('Address delivery'),
-                'type' => 'bool',
+                'title' => $this->l('Delivery type'),
                 'align' => 'center',
-                'callback' => 'getIconForBoolean',
+                'callback' => 'getDeliveryTypeHtml',
                 'filter_key' => 'po!is_ad',
+                'type' => 'select',
+                // it's a boolean column, depends on order
+                'list' => ['PP', 'HD'],
             ],
             'exported' => [
                 'title' => $this->l('Exported'),
@@ -370,6 +372,20 @@ class PacketeryOrderGridController extends ModuleAdminController
         }
 
         return '<span class="list-action-enable action-disabled"><i class="icon-remove"></i></span>';
+    }
+
+    public function getDeliveryTypeHtml($deliveryType)
+    {
+        if ($deliveryType === '1') {
+            return 'HD';
+        }
+        if ($deliveryType === '0') {
+            return 'PP';
+        }
+        if (strpos($deliveryType, '-KO') === false) {
+            return 'HD <span class="list-action-enable action-enabled"><i class="icon-check"></i></span>';
+        }
+        return 'HD <span class="list-action-enable action-disabled"><i class="icon-remove"></i></span>';
     }
 
     private function getActionLinks($orderId)

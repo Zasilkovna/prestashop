@@ -57,4 +57,7 @@ var PacketeryCheckoutModulePs16 = {
         return $selectedInput.closest('tr').find('td:nth-child(3)');
     },
 
+    getExtraContentSelector: function () {
+        return '.carrier-extra-content';
+    }
 };

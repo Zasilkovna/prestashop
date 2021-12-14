@@ -151,6 +151,14 @@ class OrderSaver
             'id_carrier' => (int)$prestashopCarrierId,
             'is_cod' => (int)$isCod,
             'is_ad' => 0,
+            'country' => null,
+            'county' => null,
+            'zip' => null,
+            'city' => null,
+            'street' => null,
+            'house_number' => null,
+            'latitude' => null,
+            'longitude' => null,
         ];
         if ($pickupPointType === 'external') {
             $packeteryOrderFields['is_carrier'] = 1;
@@ -160,10 +168,10 @@ class OrderSaver
 
         $isOrderSaved = $this->orderRepository->existsByCart($cartId);
         if ($isOrderSaved) {
-            $result = $this->orderRepository->updateByCart($packeteryOrderFields, (int)$cartId);
+            $result = $this->orderRepository->updateByCart($packeteryOrderFields, (int)$cartId, true);
         } else {
             $packeteryOrderFields['id_cart'] = ((int)$cartId);
-            $result = $this->orderRepository->insert($packeteryOrderFields);
+            $result = $this->orderRepository->insert($packeteryOrderFields, true);
         }
 
         return [
