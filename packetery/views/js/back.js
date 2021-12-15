@@ -79,8 +79,9 @@ $(document).ready(function(){
 				} else {
 					html += '<td class="center"> <i class="icon-remove status"></i>  </td>';
 				}
-				if (orders[i].tracking_number.length > 0) {
-					html += '<td class="center">  <span><a href="https://www.zasilkovna.cz/Z'+orders[i].tracking_number+'" target="_blank">Z'+orders[i].tracking_number+'</a></span> </td>';
+				if (orders[i].tracking_number !== null && orders[i].tracking_number.length > 0) {
+					html += '<td class="center">  <span><a href="https://www.zasilkovna.cz/Z' + orders[i].tracking_number + '"' +
+						' target="_blank">Z' + orders[i].tracking_number + '</a></span> </td>';
 				} else {
 					html += '<td class="center"><span></span></td>';
 				}
