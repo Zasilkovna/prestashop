@@ -11,7 +11,7 @@ use PrestaShopLogger;
 class DbTools
 {
     /** @var Db */
-    private $db;
+    public $db;
 
     /** @var Logger */
     private $logger;

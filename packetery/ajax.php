@@ -23,9 +23,8 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Carrier\CarrierRepository;
-use Packetery\Order\OrderRepository;
-use Packetery\Payment\PaymentRepository;
 
 if (!defined('_PS_ADMIN_DIR_')) {
     define('_PS_ADMIN_DIR_', getcwd());
@@ -42,17 +41,6 @@ if (!Context::getContext()->employee ||
 }
 
 switch (Tools::getValue('action')) {
-    /*BACK*/
-    case 'getcountbranches':
-        $module = new Packetery();
-        $carrierRepository = $module->diContainer->get(CarrierRepository::class);
-        PacketeryApi::countBranchesAjax($carrierRepository);
-        break;
-    case 'updatebranches':
-        $module = new Packetery();
-        $carrierRepository = $module->diContainer->get(CarrierRepository::class);
-        PacketeryApi::updateBranchListAjax($carrierRepository);
-        break;
     /*SETTINGS*/
     case 'change_ad_carrier_cod':
         Packeteryclass::changeAdCarrierCodAjax();

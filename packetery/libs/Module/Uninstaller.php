@@ -29,6 +29,10 @@ class Uninstaller
 
     /**
      * @return bool
+     * @throws PrestaShopException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShop\PrestaShop\Adapter\CoreException
+     * @throws \ReflectionException
      */
     public function run()
     {
@@ -67,19 +71,25 @@ class Uninstaller
 
     /**
      * @return bool
+     * @throws \ReflectionException
      */
     private function uninstallDatabase()
     {
         $sql = [];
-        // remove payment and carrier table, keep order table for reinstall
+        // remove tables with payment and carrier settings, and with carriers
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';
+
         $sql[] =
             'UPDATE `' . _DB_PREFIX_ . 'carrier` SET `is_module` = 0, `external_module_name` = NULL, `need_range` = 0
                 WHERE `id_carrier` IN (
                     SELECT `id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
                 )';
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
-        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_branch`';
+
+        $apiCarrierRepository = $this->module->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
+        $sql[] = $apiCarrierRepository->getDropTableSql();
+
+        // keep order table backup
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_order_backup`';
         $sql[] = 'RENAME TABLE `' . _DB_PREFIX_ . 'packetery_order` TO `' . _DB_PREFIX_ . 'packetery_order_backup`';
 
@@ -113,7 +123,7 @@ class Uninstaller
             Configuration::deleteByName('PACKETERY_APIPASS') &&
             Configuration::deleteByName('PACKETERY_ESHOP_ID') &&
             Configuration::deleteByName('PACKETERY_LABEL_FORMAT') &&
-            Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') &&
+            Configuration::deleteByName('PACKETERY_LAST_CARRIERS_UPDATE') &&
             Configuration::deleteByName('PACKETERY_WIDGET_AUTOOPEN') &&
             Configuration::deleteByName('PACKETERY_CRON_TOKEN') &&
             Configuration::deleteByName('PACKETERY_LABEL_MAX_AGE_DAYS')

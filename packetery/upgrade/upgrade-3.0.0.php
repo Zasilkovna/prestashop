@@ -24,6 +24,7 @@ function upgrade_module_3_0_0($module)
         Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', 0) &&
         Configuration::updateValue('PACKETERY_CRON_TOKEN', Tools::passwdGen(32)) &&
         Configuration::updateValue('PACKETERY_LABEL_MAX_AGE_DAYS', 7) &&
+        Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') &&
         $uninstaller->deleteTab('Adminpacketery') &&
         $installer->insertTab()
     );
@@ -46,8 +47,8 @@ function upgrade_module_3_0_0($module)
         }
     }
 
-    return $dbTools->execute('
-        ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
+    $sql = [];
+    $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
         ADD `weight` decimal(20,6) NULL,
         ADD `country` varchar(2) NULL AFTER `weight`,
         ADD `county` varchar(255) NULL AFTER `country`,
@@ -56,12 +57,18 @@ function upgrade_module_3_0_0($module)
         ADD `street` varchar(255) NULL AFTER `city`,
         ADD `house_number` varchar(255) NULL AFTER `street`,
         ADD `latitude` varchar(255) NULL AFTER `house_number`,
-        ADD `longitude` varchar(255) NULL AFTER `latitude`;
-        
-        ALTER TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery`
-        ADD `address_validation` varchar(40) NULL;
-        
-        UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery`
-        SET `address_validation` = "none" WHERE `pickup_point_type` IS NULL;
-    ');
+        ADD `longitude` varchar(255) NULL AFTER `latitude`;';
+    $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery`
+        ADD `address_validation` varchar(40) NULL;';
+    $sql[] = 'UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery`
+        SET `address_validation` = "none" WHERE `pickup_point_type` IS NULL;';
+    $apiCarrierRepository = $module->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
+    $sql[] = $apiCarrierRepository->getCreateTableSql();
+    $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_branch`;';
+
+    if (!$dbTools->executeQueries($sql, $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.0.0'), true)) {
+        return false;
+    }
+
+    return true;
 }

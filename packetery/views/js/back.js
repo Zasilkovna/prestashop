@@ -52,11 +52,6 @@ $(document).ready(function () {
             var json = decodeURIComponent(raw);
             lang_pac = JSON.parse(json);
         },
-        tab_branch_list: function () {
-            $('a[href="#tab-branch"]').click(function () {
-                ajaxs.getCountBranches();
-            });
-        },
 
         ad_carrier_cod: function () {
             $('#ad-carriers-list-table i.status').unbind();
@@ -142,91 +137,13 @@ $(document).ready(function () {
                 },
             });
         },
-
-        getCountBranches: function () {
-            $.ajax({
-                type: 'POST',
-                url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=getcountbranches',
-                data: {},
-                beforeSend: function () {
-                    $("body").toggleClass("wait");
-                },
-                success: function (msg) {
-                    var res = JSON.parse(msg);
-                    var cnt = res[0];
-                    var last_update = res[1];
-                    $('.packetery-total-branches').html('<b>' + cnt + '</b>');
-                    $('.packetery-last-branches-update').html(last_update);
-                },
-                complete: function () {
-                    $("body").toggleClass("wait");
-                },
-            });
-        },
-
-        updateBranches: function (container, reload) {
-            $(container).notify(lang_pac.try_download_branches, "info",{position:"right"});
-            $.ajax({
-                type: 'POST',
-                url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=updatebranches',
-                data: {},
-                container: container,
-                beforeSend: function () {
-                    $("body").toggleClass("wait");
-                },
-                success: function (msg) {
-                    $(this.container).focus();
-
-                    if (msg != 'true') {
-                        /* TODO: Uncaught SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data
-                        loader stays shown, everything seems ok after reload */
-                        var res = JSON.parse(msg);
-                        var id = res[0];
-                        var message = res[1];
-
-                        if (message == "") {
-                            message = lang_pac.error_export_unknown;
-                        }
-
-                        $(this.container).notify(message, "error",{position:"top"});
-                    } else {
-                        if (reload) {
-                            var redirect_msg = ' ' + lang_pac.reload5sec;
-                        } else {
-                            var redirect_msg = '';
-                        }
-                        $(this.container).notify(lang_pac.success_download_branches + redirect_msg, "success",{position:"right"});
-
-                        if (reload) {
-                            setTimeout(function () {
-                                location.reload();
-                            }, 5000);
-                        } else {
-                            ajaxs.getCountBranches();
-                        }
-                    }
-
-                },
-                error: function () {
-                    // TODO: prepare message for user
-                    console.log('Branches update failed. Is API key provided?');
-                },
-                complete: function () {
-                    $("body").toggleClass("wait");
-                },
-            });
-        },
     };
 
     binds.readAjaxFields();
     binds.ad_carrier_cod();
     /*End SETTINGS ACTIONS*/
 
-    $('#update-branches').click(function () {
-        ajaxs.updateBranches('#update-branches', false);
-    });
     tools.ad_list_build();
-    binds.tab_branch_list();
 });
 
 $(document).ready(function () {

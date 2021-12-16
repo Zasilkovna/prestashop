@@ -90,6 +90,7 @@ class Installer
 
     /**
      * @return bool
+     * @throws \ReflectionException
      */
     private function installDatabase()
     {
@@ -170,6 +171,9 @@ class Installer
             `is_ad` int NOT NULL,
             `is_pickup_point` tinyint(1) NOT NULL DEFAULT 0
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+
+        $apiCarrierRepository = $this->module->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
+        $sql[] = $apiCarrierRepository->getCreateTableSql();
 
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText(), true)) {
             return false;

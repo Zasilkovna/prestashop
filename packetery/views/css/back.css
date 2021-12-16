@@ -25,13 +25,23 @@
  * to avoid any conflicts with others containers.
  */
 
-.packetery-total-branches, .packetery-last-branches-update{
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.packetery-carriers-right-column {
     padding-top: 7px;
     font-size: 13px;
 }
 
-#update-branches{
+.update-carriers {
+    padding: 0 10px;
     width: 400px !important;
+    display: inline-block !important;
+    position: relative;
+    top: -5px;
 }
 
 /*PAYMENTS*/
