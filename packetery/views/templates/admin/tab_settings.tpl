@@ -24,10 +24,6 @@
 
 <!--Address Delivery Carriers List-->
 <input type="hidden" name="carriers_json" id="carriers_json" value='{$carriers_json}'>
-<input type="hidden" name="zpoint" id="zpoint" value='{$zpoint}'>
-<input type="hidden" name="pp_all" id="pp_all" value='{$pp_all}'>
-<input type="hidden" name="packeta_pickup_points" id="packeta_pickup_points" value='{$packeta_pickup_points}'>
-<input type="hidden" name="all_packeta_pickup_points" id="all_packeta_pickup_points" value='{$all_packeta_pickup_points}'>
 <label class="control-label col-lg-3" for="ad-carriers-list-table">
 </label>
 <ps-table id="ad-carriers-list-table" header="{l s='Carriers List' mod='packetery'}" icon="icon-users" content="{$packetery_list_ad_carriers|escape:'htmlall':'UTF-8'}" no-items-text="{l s='No items found' mod='packetery'}"></ps-table>

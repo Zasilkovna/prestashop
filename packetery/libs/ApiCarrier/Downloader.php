@@ -76,7 +76,7 @@ class Downloader
                 'class' => 'danger',
             ];
         }
-        $this->apiCarrierRepository->save($carriers);
+        $this->apiCarrierRepository->save($carriers, $this->module);
         \Configuration::updateValue('PACKETERY_LAST_CARRIERS_UPDATE', time());
 
         return [

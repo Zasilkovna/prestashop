@@ -140,38 +140,6 @@ class Installer
             `address_validation` varchar(40) NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
-        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_branch`';
-        $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_branch` (
-            `id_branch` int NOT NULL PRIMARY KEY,
-            `name` varchar(255) NOT NULL,
-            `name_street` varchar(255) NOT NULL,
-            `place` varchar(255) NOT NULL,
-            `street` varchar(255) NOT NULL,
-            `city` varchar(255) NOT NULL,
-            `zip` varchar(255) NOT NULL,
-            `country` varchar(255) NOT NULL,
-            `currency` varchar(255) NOT NULL,
-            `wheelchair_accessible` varchar(255) NOT NULL,
-            `latitude` varchar(255) NOT NULL,
-            `longitude` varchar(255) NOT NULL,
-            `url` varchar(255) NOT NULL,
-            `dressing_room` integer NOT NULL,
-            `claim_assistant` integer NOT NULL,
-            `packet_consignment` integer NOT NULL,
-            `max_weight` integer NOT NULL,
-            `region` varchar(255) NOT NULL,
-            `district` varchar(255) NOT NULL,
-            `label_routing` varchar(255) NOT NULL,
-            `label_name` varchar(255) NOT NULL,
-            `opening_hours` text NOT NULL,
-            `img` text NOT NULL,
-            `opening_hours_short` text NOT NULL,
-            `opening_hours_long` text NOT NULL,
-            `opening_hours_regular` text NOT NULL,
-            `is_ad` int NOT NULL,
-            `is_pickup_point` tinyint(1) NOT NULL DEFAULT 0
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
-
         $apiCarrierRepository = $this->module->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
         $sql[] = $apiCarrierRepository->getCreateTableSql();
 

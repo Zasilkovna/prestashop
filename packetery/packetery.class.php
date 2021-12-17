@@ -343,14 +343,12 @@ class Packeteryclass
         } else {
             $fieldsToSet = [
                 'pickup_point_type' => $pickupPointType,
+                'id_branch' => $branchId,
+                'name_branch' => $carrierRepository->db->escape($branchName),
             ];
             if ($branchId === self::ZPOINT || $branchId === self::PP_ALL) {
-                $fieldsToSet['id_branch'] = null;
-                $fieldsToSet['name_branch'] = null;
                 $fieldsToSet['currency_branch'] = null;
             } else {
-                $fieldsToSet['id_branch'] = (int)$branchId;
-                $fieldsToSet['name_branch'] = $carrierRepository->db->escape($branchName);
                 $fieldsToSet['currency_branch'] = $carrierRepository->db->escape($branchCurrency);
             }
             if ($isPacketeryCarrier) {

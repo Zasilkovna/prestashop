@@ -212,13 +212,6 @@ class Packetery extends CarrierModule
             'carriers_json',
             rawurlencode(json_encode($apiCarrierRepository->getAdAndExternalCarriers()))
         );
-        $this->context->smarty->assign('zpoint', Packeteryclass::ZPOINT);
-        $this->context->smarty->assign('pp_all', Packeteryclass::PP_ALL);
-        $this->context->smarty->assign('packeta_pickup_points', $this->l('Packeta pickup points'));
-        $this->context->smarty->assign(
-            'all_packeta_pickup_points',
-            $this->l('Packeta pickup points (Packeta + carriers)')
-        );
 
         /*AD CARRIER LIST*/
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
@@ -250,6 +243,7 @@ class Packetery extends CarrierModule
                         'center' => true
                     ),
                     array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
+                    // is no longer needed:
                     array(
                         'content' => $this->l('Packeta pickup point'),
                         'key' => 'pickup_point_type',

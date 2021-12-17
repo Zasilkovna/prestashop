@@ -65,6 +65,8 @@ function upgrade_module_3_0_0($module)
     $apiCarrierRepository = $module->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
     $sql[] = $apiCarrierRepository->getCreateTableSql();
     $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_branch`;';
+    $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery`
+        CHANGE `id_branch` `id_branch` varchar(255) NOT NULL AFTER `id_carrier`;';
 
     if (!$dbTools->executeQueries($sql, $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.0.0'), true)) {
         return false;

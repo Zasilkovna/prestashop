@@ -9,28 +9,22 @@ $(document).ready(function () {
             var carriers_json = decodeURIComponent($('#carriers_json').val());
             $('#ad-carriers-list-table table tr td:nth-child(5)').each(function () {
                 var id_branch_chosen = $(this).find('span').text();
-                var zpoint = $('#zpoint').val();
-                var pp_all = $('#pp_all').val();
-                var packeta_pickup_points = $('#packeta_pickup_points').val();
-                var all_packeta_pickup_points = $('#all_packeta_pickup_points').val();
-                var pickup_point_type = $(this).parent().find('.hidden span').text();
-                var select = tools.buildselect(carriers_json, id_branch_chosen, zpoint, packeta_pickup_points, pp_all, all_packeta_pickup_points, pickup_point_type);
+
+                // is no longer needed:
+                //var pickup_point_type = $(this).parent().find('.hidden span').text();
+
+                var select = tools.buildselect(carriers_json, id_branch_chosen);
                 $(this).html(select);
             });
             binds.ad_carrier_select();
         },
-        buildselect: function (carriers_json, id_branch_chosen, zpoint, packeta_pickup_points, pp_all, all_packeta_pickup_points, pickup_point_type) {
+        buildselect: function (carriers_json, id_branch_chosen) {
             // TODO: show hint to update branches if no carriers available
             var carriers = JSON.parse(carriers_json);
             var cnt = carriers.length;
             var html = '';
             html+= '<select name="selected_ad_carrier" id="selected_ad_carrier">';
             html+= '<option value="">--</option>';
-            html+= '<option value="' + zpoint + '" data-pickup-point-type="internal"' +
-                (pickup_point_type === 'internal' ? ' selected' : '') + '>' + packeta_pickup_points + '</option>';
-            html+= '<option value="' + pp_all + '" data-pickup-point-type="external"' +
-                ((pickup_point_type === 'external' && id_branch_chosen === '') ? ' selected' : '') + '>' +
-                all_packeta_pickup_points + '</option>';
             for (var i = 0; i < cnt; i++) {
                 if (carriers[i]['id_branch'] == id_branch_chosen) {
                     var selected = 'selected';

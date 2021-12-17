@@ -2,15 +2,18 @@
 
 namespace Packetery\ApiCarrier;
 
-use Db;
+use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
-use Tools;
+use Packeteryclass;
 
 class ApiCarrierRepository
 {
     /** @var DbTools */
     private $dbTools;
+
+    /** @var Packetery|null */
+    private $module;
 
     private static $tableName = 'packetery_carriers';
 
@@ -66,14 +69,51 @@ class ApiCarrierRepository
         return $mappedData;
     }
 
+    private function addNonApiCarriers($mappedData) {
+        $mappedData[Packeteryclass::ZPOINT] = [
+            'name' => $this->module->l('Packeta pickup points', 'apicarrierrepository'),
+            'country' => '',
+            'currency' => '',
+            'max_weight' => 10,
+            'deleted' => false,
+            'is_pickup_points' => true,
+            'has_carrier_direct_label' => false,
+            'separate_house_number' => false,
+            'customs_declarations' => false,
+            'requires_email' => false,
+            'requires_phone' => false,
+            'requires_size' => false,
+            'disallows_cod' => false,
+        ];
+        $mappedData[Packeteryclass::PP_ALL] = [
+            'name' => $this->module->l('Packeta pickup points (Packeta + carriers)', 'apicarrierrepository'),
+            'country' => '',
+            'currency' => '',
+            'max_weight' => 10,
+            'deleted' => false,
+            'is_pickup_points' => true,
+            'has_carrier_direct_label' => false,
+            'separate_house_number' => false,
+            'customs_declarations' => false,
+            'requires_email' => false,
+            'requires_phone' => false,
+            'requires_size' => false,
+            'disallows_cod' => false,
+        ];
+
+        return $mappedData;
+    }
+
     /**
      * Saves carriers.
      * @param array $carriers Validated data retrieved from API.
      * @throws DatabaseException
      */
-    public function save(array $carriers)
+    public function save(array $carriers, Packetery $module)
     {
+        $this->module = $module;
         $mappedData = $this->carriersMapper($carriers);
+        $mappedData = $this->addNonApiCarriers($mappedData);
         $carriersInFeed = array();
 
         $carrierCheck = $this->getCarrierIds();
@@ -81,7 +121,7 @@ class ApiCarrierRepository
         foreach ($mappedData as $carrierId => $carrier) {
             $carriersInFeed[] = $carrierId;
             if (in_array((string)$carrierId, $carriersInDb, true)) {
-                $this->update($carrier, (int)$carrierId);
+                $this->update($carrier, (string)$carrierId);
             } else {
                 $carrier['id'] = $carrierId;
                 $this->insert($carrier);
@@ -94,7 +134,7 @@ class ApiCarrierRepository
     public function getCreateTableSql()
     {
         return 'CREATE TABLE `' . $this->getPrefixedTableName() . '` (
-            `id` int NOT NULL,
+            `id` varchar(255) NOT NULL,
             `name` varchar(255) NOT NULL,
             `is_pickup_points` boolean NOT NULL,
             `has_carrier_direct_label` boolean NOT NULL,
@@ -128,13 +168,13 @@ class ApiCarrierRepository
 
     /**
      * @param array $data
-     * @param int $carrierId
+     * @param string $carrierId
      * @throws DatabaseException
      */
     public function update(array $data, $carrierId)
     {
-        $carrierId = (int)$carrierId;
-        $this->dbTools->update(self::$tableName, $data, '`id` = ' . $carrierId);
+        $carrierId = (string)$carrierId;
+        $this->dbTools->update(self::$tableName, $data, '`id` = "' . $this->dbTools->db->escape($carrierId) . '"');
     }
 
     /**
@@ -152,7 +192,8 @@ class ApiCarrierRepository
      */
     public function setOthersAsDeleted(array $carriersInFeed)
     {
-        $this->dbTools->execute('UPDATE `' . $this->getPrefixedTableName() . '` SET `deleted` = 1 WHERE `id` NOT IN (' . implode(',', $carriersInFeed) . ')');
+        $carriersInFeedSql = '"' . implode('","', $carriersInFeed) . '"';
+        $this->dbTools->execute('UPDATE `' . $this->getPrefixedTableName() . '` SET `deleted` = 1 WHERE `id` NOT IN (' . $carriersInFeedSql . ')');
     }
 
     /**
@@ -177,27 +218,25 @@ class ApiCarrierRepository
     {
         $sql = 'SELECT `id`, `name`, `country`, `currency`, `is_pickup_points`
                 FROM `' . $this->getPrefixedTableName() . '`
+                WHERE `deleted` = 0
                 ORDER BY `country`, `name`';
         $result = $this->dbTools->getRows($sql);
         $carriers = [];
         if ($result) {
             foreach ($result as $carrier) {
+                if ($carrier['id'] === \Packeteryclass::ZPOINT) {
+                    $pickupPointType = 'internal';
+                } else {
+                    $pickupPointType = ($carrier['is_pickup_points'] ? 'external' : null);
+                }
                 $carriers[] = [
-                    'id_branch' => (int)$carrier['id'],
+                    'id_branch' => $carrier['id'],
                     'name' => $carrier['name'],
                     'currency' => $carrier['currency'],
-                    'pickup_point_type' => ($carrier['is_pickup_points'] ? 'external' : null),
+                    'pickup_point_type' => $pickupPointType,
                 ];
             }
         }
         return $carriers;
-    }
-
-    /**
-     * @throws DatabaseException
-     */
-    public function dropBranchList()
-    {
-        $this->dbTools->delete('packetery_branch');
     }
 }
