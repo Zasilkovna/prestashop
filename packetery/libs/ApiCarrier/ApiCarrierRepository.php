@@ -9,6 +9,53 @@ use Packeteryclass;
 
 class ApiCarrierRepository
 {
+    private static $columnDefinitions = [
+        'is_pickup_points' => [
+            'apiName' => 'pickupPoints',
+            'type' => 'bool',
+            'defaultPPValue' => true
+        ],
+        'has_carrier_direct_label' => [
+            'apiName' => 'apiAllowed',
+            'type' => 'bool',
+            'defaultPPValue' => false
+        ],
+        'separate_house_number' => [
+            'apiName' => 'separateHouseNumber',
+            'type' => 'bool',
+            'defaultPPValue' => false
+        ],
+        'customs_declarations' => [
+            'apiName' => 'customsDeclarations',
+            'type' => 'bool',
+            'defaultPPValue' => false
+        ],
+        'requires_email' => [
+            'apiName' => 'requiresEmail',
+            'type' => 'bool',
+            'defaultPPValue' => false
+        ],
+        'requires_phone' => [
+            'apiName' => 'requiresPhone',
+            'type' => 'bool',
+            'defaultPPValue' => false
+        ],
+        'requires_size' => [
+            'apiName' => 'requiresSize',
+            'type' => 'bool',
+            'defaultPPValue' => false
+        ],
+        'disallows_cod' => [
+            'apiName' => 'disallowsCod',
+            'type' => 'bool',
+            'defaultPPValue' => false
+        ],
+        'country' => ['defaultPPValue' => ''],
+        'currency' => ['defaultPPValue' => ''],
+        'max_weight' => ['defaultPPValue' => 10],
+        'deleted' => ['defaultPPValue' => false],
+    ];
+
     /** @var DbTools */
     private $dbTools;
 
@@ -38,30 +85,20 @@ class ApiCarrierRepository
      */
     private function carriersMapper(array $carriers)
     {
-        $mappedData = array();
-
-        $carrierBooleanParams = array(
-            'is_pickup_points' => 'pickupPoints',
-            'has_carrier_direct_label' => 'apiAllowed',
-            'separate_house_number' => 'separateHouseNumber',
-            'customs_declarations' => 'customsDeclarations',
-            'requires_email' => 'requiresEmail',
-            'requires_phone' => 'requiresPhone',
-            'requires_size' => 'requiresSize',
-            'disallows_cod' => 'disallowsCod',
-        );
-
+        $mappedData = [];
         foreach ($carriers as $carrier) {
             $carrierId = (int)$carrier['id'];
-            $carrierData = array(
+            $carrierData = [
                 'name' => $this->dbTools->db->escape($carrier['name']),
                 'country' => $this->dbTools->db->escape($carrier['country']),
                 'currency' => $this->dbTools->db->escape($carrier['currency']),
                 'max_weight' => (float)$carrier['maxWeight'],
                 'deleted' => false,
-            );
-            foreach ($carrierBooleanParams as $columnName => $paramName) {
-                $carrierData[$columnName] = ('true' === $carrier[$paramName]);
+            ];
+            foreach (self::$columnDefinitions as $columnName => $columnOptions) {
+                if (isset($columnOptions['type']) && $columnOptions['type'] === 'bool') {
+                    $carrierData[$columnName] = ('true' === $carrier[$columnOptions['apiName']]);
+                }
             }
             $mappedData[$carrierId] = $carrierData;
         }
@@ -74,20 +111,7 @@ class ApiCarrierRepository
      * @return array
      */
     private function addNonApiCarriers(array $mappedData) {
-        $defaultPickupPointsValues = [
-            'country' => '',
-            'currency' => '',
-            'max_weight' => 10,
-            'deleted' => false,
-            'is_pickup_points' => true,
-            'has_carrier_direct_label' => false,
-            'separate_house_number' => false,
-            'customs_declarations' => false,
-            'requires_email' => false,
-            'requires_phone' => false,
-            'requires_size' => false,
-            'disallows_cod' => false,
-        ];
+        $defaultPickupPointsValues = array_combine(array_keys(self::$columnDefinitions), array_column(self::$columnDefinitions, 'defaultPPValue'));
         $mappedData[Packeteryclass::ZPOINT] = $defaultPickupPointsValues;
         $mappedData[Packeteryclass::ZPOINT]['name'] = $this->module->l('Packeta pickup points', 'apicarrierrepository');
         $mappedData[Packeteryclass::PP_ALL] = $defaultPickupPointsValues;
@@ -106,7 +130,7 @@ class ApiCarrierRepository
         $this->module = $module;
         $mappedData = $this->carriersMapper($carriers);
         $mappedData = $this->addNonApiCarriers($mappedData);
-        $carriersInFeed = array();
+        $carriersInFeed = [];
 
         $carrierCheck = $this->getCarrierIds();
         $carriersInDb = array_column($carrierCheck, 'id');
