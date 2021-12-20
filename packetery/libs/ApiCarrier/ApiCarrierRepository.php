@@ -69,9 +69,12 @@ class ApiCarrierRepository
         return $mappedData;
     }
 
-    private function addNonApiCarriers($mappedData) {
-        $mappedData[Packeteryclass::ZPOINT] = [
-            'name' => $this->module->l('Packeta pickup points', 'apicarrierrepository'),
+    /**
+     * @param array $mappedData data to store in db
+     * @return array
+     */
+    private function addNonApiCarriers(array $mappedData) {
+        $defaultPickupPointsValues = [
             'country' => '',
             'currency' => '',
             'max_weight' => 10,
@@ -85,21 +88,10 @@ class ApiCarrierRepository
             'requires_size' => false,
             'disallows_cod' => false,
         ];
-        $mappedData[Packeteryclass::PP_ALL] = [
-            'name' => $this->module->l('Packeta pickup points (Packeta + carriers)', 'apicarrierrepository'),
-            'country' => '',
-            'currency' => '',
-            'max_weight' => 10,
-            'deleted' => false,
-            'is_pickup_points' => true,
-            'has_carrier_direct_label' => false,
-            'separate_house_number' => false,
-            'customs_declarations' => false,
-            'requires_email' => false,
-            'requires_phone' => false,
-            'requires_size' => false,
-            'disallows_cod' => false,
-        ];
+        $mappedData[Packeteryclass::ZPOINT] = $defaultPickupPointsValues;
+        $mappedData[Packeteryclass::ZPOINT]['name'] = $this->module->l('Packeta pickup points', 'apicarrierrepository');
+        $mappedData[Packeteryclass::PP_ALL] = $defaultPickupPointsValues;
+        $mappedData[Packeteryclass::PP_ALL]['name'] = $this->module->l('Packeta pickup points (Packeta + carriers)', 'apicarrierrepository');
 
         return $mappedData;
     }
@@ -193,7 +185,7 @@ class ApiCarrierRepository
     public function setOthersAsDeleted(array $carriersInFeed)
     {
         $carriersInFeedSql = '"' . implode('","', $carriersInFeed) . '"';
-        $this->dbTools->execute('UPDATE `' . $this->getPrefixedTableName() . '` SET `deleted` = 1 WHERE `id` NOT IN (' . $carriersInFeedSql . ')');
+        $this->dbTools->update(self::$tableName, ['deleted' => 1], '`id` NOT IN (' . $carriersInFeedSql . ')');
     }
 
     /**
