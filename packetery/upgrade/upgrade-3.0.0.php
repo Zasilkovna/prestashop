@@ -67,6 +67,14 @@ function upgrade_module_3_0_0($module)
     $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_branch`;';
     $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery`
         CHANGE `id_branch` `id_branch` varchar(255) NOT NULL AFTER `id_carrier`;';
+    $sql[] = 'UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery` SET
+        `id_branch` = "' . Packeteryclass::ZPOINT . '"
+        WHERE `pickup_point_type` = "internal" AND
+        `id_branch` = "";';
+    $sql[] = 'UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery` SET
+        `id_branch` = "' . Packeteryclass::PP_ALL . '"
+        WHERE `pickup_point_type` = "external" AND
+        `id_branch` = "";';
 
     if (!$dbTools->executeQueries($sql, $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.0.0'), true)) {
         return false;
