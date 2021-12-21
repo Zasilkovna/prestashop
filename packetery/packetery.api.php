@@ -24,6 +24,7 @@
  */
 
 use Packetery\Address\AddressTools;
+use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Carrier\CarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
@@ -351,139 +352,6 @@ class PacketeryApi
     {
         return Configuration::get('PACKETERY_APIPASS');
     }
-
-    /**
-     * @param CarrierRepository $carrierRepository
-     * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public static function updateBranchListAjax(CarrierRepository $carrierRepository)
-    {
-        $result = self::updateBranchList($carrierRepository);
-        if ($result === false) {
-            echo 'true';
-        } else {
-            echo json_encode([2, $result]);
-        }
-    }
-
-    /**
-     * @param CarrierRepository $carrierRepository
-     * @return false|string
-     * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public static function updateBranchList(CarrierRepository $carrierRepository)
-    {
-        $api_key = self::getApiKey();
-
-        $branch_new_url = 'https://www.zasilkovna.cz/api/v4/' . $api_key . '/branch.xml';
-        $branches = self::parseBranches($branch_new_url, $carrierRepository);
-        if (($countBranches = $carrierRepository->getAdAndExternalCount()) && (!$branches)) {
-            Configuration::updateValue('PACKETERY_LAST_BRANCHES_UPDATE', time());
-            return false;
-        } else {
-            return ($branches ? $branches : '') . ($countBranches ? $countBranches : '');
-        }
-    }
-
-    /**
-     * @param string $branch_url
-     * @param CarrierRepository $carrierRepository
-     * @return false|string
-     * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public static function parseBranches($branch_url, CarrierRepository $carrierRepository)
-    {
-        ignore_user_abort(true);
-        $module = new Packetery();
-
-        // changed timeout from default 5 to 30 secs, and try fopen fallback if cUrl fails
-        try {
-            $response = Tools::file_get_contents($branch_url, false, null, 30, true);
-        } catch (\Exception $e) {
-            // TODO: log using PrestaShopLogger
-            return $e->getMessage();
-        }
-
-        if (! $response) {
-            return $module->l('Can\'t download list of pickup points. Network error.', 'packetery.api');
-        }
-
-        if (Tools::strpos($response, 'invalid API key') !== false) {
-            return $module->l('Invalid API key', 'packetery.api');
-        }
-
-        $carrierRepository->dropBranchList();
-        $xml = simplexml_load_string($response);
-        foreach ($xml->branches->branch as $branch) {
-            self::addBranch($branch, $carrierRepository);
-        }
-        foreach ($xml->carriers->carrier as $carrier) {
-            $carrierRepository->addCarrier($carrier);
-        }
-
-        return false;
-    }
-
-    /**
-     * @param CarrierRepository $carrierRepository
-     * @throws DatabaseException
-     */
-    public static function countBranchesAjax(CarrierRepository $carrierRepository)
-    {
-        $cnt = $carrierRepository->getAdAndExternalCount();
-        $lastBranchesUpdate = '';
-        $lastUpdateUnix = Configuration::get('PACKETERY_LAST_BRANCHES_UPDATE');
-        if ($lastUpdateUnix != '') {
-            $date = new DateTime();
-            $date->setTimestamp($lastUpdateUnix);
-            $lastBranchesUpdate = $date->format('d.m.Y H:i:s');
-        }
-
-        if ($cnt) {
-            echo json_encode(array($cnt, $lastBranchesUpdate));
-        } else {
-            echo json_encode(array(0, $lastBranchesUpdate));
-        }
-    }
-
-    /**
-     * @param object $branch
-     * @param CarrierRepository $carrierRepository
-     * @throws DatabaseException
-     */
-    public static function addBranch($branch, CarrierRepository $carrierRepository)
-    {
-        $opening_hours_xml = $branch->openingHours;
-        if (isset($opening_hours_xml->compactShort)) {
-            $opening_hours_compact_short = (string)$opening_hours_xml->compactShort->asXML();
-        } else {
-            $opening_hours_compact_short = '';
-        }
-        if (isset($opening_hours_xml->compactLong)) {
-            $opening_hours_compact_long = (string)$opening_hours_xml->compactLong->asXML();
-        } else {
-            $opening_hours_compact_long = '';
-        }
-        if (isset($opening_hours_xml->tableLong)) {
-            $opening_hours_table_long = (string)$opening_hours_xml->tableLong->asXML();
-        } else {
-            $opening_hours_table_long = '';
-        }
-        if (isset($opening_hours_xml->regular)) {
-            $opening_hours_regular = (string)$opening_hours_xml->regular->asXML();
-        } else {
-            $opening_hours_regular = '';
-        }
-
-        $carrierRepository->addBranch($branch, $opening_hours_table_long, $opening_hours_compact_short, $opening_hours_compact_long, $opening_hours_regular);
-    }
-    /*END BRANCHES*/
 
     /** Endpoint is called in PS 1.6 only. PS 1.6 does not have hook for carrier extra content.
      * @return string

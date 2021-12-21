@@ -207,20 +207,14 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('active_tab', $active_tab);
 
         /*CARRIERS*/
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
         $this->context->smarty->assign(
             'carriers_json',
-            rawurlencode(json_encode($carrierRepository->getAdAndExternalCarriers()))
-        );
-        $this->context->smarty->assign('zpoint', Packeteryclass::ZPOINT);
-        $this->context->smarty->assign('pp_all', Packeteryclass::PP_ALL);
-        $this->context->smarty->assign('packeta_pickup_points', $this->l('Packeta pickup points'));
-        $this->context->smarty->assign(
-            'all_packeta_pickup_points',
-            $this->l('Packeta pickup points (Packeta + carriers)')
+            rawurlencode(json_encode($apiCarrierRepository->getAdAndExternalCarriers()))
         );
 
         /*AD CARRIER LIST*/
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryListAdCarriers = $carrierRepository->getPacketeryCarriersList();
         if ($packeteryListAdCarriers) {
             $carrierTools = $this->diContainer->get(\Packetery\Carrier\CarrierTools::class);
@@ -249,6 +243,7 @@ class Packetery extends CarrierModule
                         'center' => true
                     ),
                     array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
+                    // is no longer needed:
                     array(
                         'content' => $this->l('Packeta pickup point'),
                         'key' => 'pickup_point_type',
@@ -262,68 +257,39 @@ class Packetery extends CarrierModule
         ));
         /*END AD CARRIER LIST*/
 
-        /*BRANCHES*/
-        $total_branches = $carrierRepository->getAdAndExternalCount();
-        $lastBranchesUpdate = Configuration::get('PACKETERY_LAST_BRANCHES_UPDATE');
-        if ($lastBranchesUpdate !== '') {
-            $date = new DateTime();
-            $date->setTimestamp($lastBranchesUpdate);
-            $lastBranchesUpdate = $date->format('d.m.Y H:i:s');
+        /*CARRIERS*/
+        if (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') {
+            $downloader = $this->diContainer->get(\Packetery\ApiCarrier\Downloader::class);
+            $this->context->smarty->assign('messages', [$downloader->run()]);
         }
+        $lastCarriersUpdate = Configuration::get('PACKETERY_LAST_CARRIERS_UPDATE');
+        if ((bool)$lastCarriersUpdate !== false) {
+            $date = new DateTime();
+            $date->setTimestamp($lastCarriersUpdate);
+            $lastCarriersUpdate = $date->format('d.m.Y H:i:s');
+        }
+        $totalCarriers = $apiCarrierRepository->getAdAndExternalCount();
         $this->context->smarty->assign(
-            array('total_branches' => $total_branches, 'last_branches_update' => $lastBranchesUpdate)
+            ['totalCarriers' => $totalCarriers, 'lastCarriersUpdate' => $lastCarriersUpdate]
         );
-        $packetery_branches = array();
-        $this->context->smarty->assign(array(
-            'packetery_branches' => Tools::jsonEncode(array(
-                'columns' => array(
-                    array('content' => $this->l('ID'), 'key' => 'id_branch', 'center' => true),
-                    array('content' => $this->l('Name'), 'key' => 'name', 'center' => true),
-                    array('content' => $this->l('Country'), 'key' => 'country', 'center' => true),
-                    array('content' => $this->l('City'), 'key' => 'city', 'center' => true),
-                    array('content' => $this->l('Street'), 'key' => 'street', 'center' => true),
-                    array('content' => $this->l('Zip'), 'key' => 'zip', 'center' => true),
-                    array('content' => $this->l('Url'), 'key' => 'url', 'center' => true),
-                    array('content' => $this->l('Max weight'), 'key' => 'max_weight', 'center' => true),
-                ),
-                'rows' => $packetery_branches,
-                'rows_actions' => array(
-                    array('title' => 'Change', 'action' => 'remove'),
-                ),
-                'url_params' => array('configure' => $this->name),
-                'identifier' => 'id_branch'
-            ))
-        ));
+        $updateCarriersLink = $this->context->link->getAdminLink('AdminModules') . '&configure=packetery&action=updateCarriers';
+        $this->context->smarty->assign('updateCarriersLink', $updateCarriersLink);
+        $updateCarriersCronLink = $this->context->link->getModuleLink($this->name, 'cron',
+            ['token' => Configuration::get('PACKETERY_CRON_TOKEN'), 'task' => 'DownloadCarriers']);
+        $this->context->smarty->assign('updateCarriersCronLink', $updateCarriersCronLink);
         /*END CARRIERS*/
 
         /*FIELDS FOR AJAX*/
-        $ajaxfields = array(
-            'all' => $this->l('All'),
+        $ajaxfields = [
             'error' => $this->l('Error'),
             'success' => $this->l('Success'),
-            'success_export' => $this->l('Successfully exported'),
-            'success_download_branches' => $this->l('Pickup points successfully updated.'),
-            'reload5sec' => $this->l('Page will be reloaded in 5 seconds...'),
-            'try_download_branches' => $this->l(
-                'Trying to download pickup points. Please wait for download process end...'
-            ),
-            'confirm_tracking_exists' => $this->l(
-                'Tracking numbers of some selected orders already exist and will be rewritten by new ones. 
-                Do you want to continue?'
-            ),
-            'err_no_branch' => $this->l('Please select destination pickup point for order(s)'),
-            'error_export_unknown' => $this->l(
-                'There was an error trying to update list of pickup points, 
-                check if your API password is correct and try again.'
-            ),
-            'error_export' => $this->l('not exported. Error:'),
-        );
+        ];
         $ajaxfields_json = json_encode($ajaxfields);
         $ajaxfields_json = rawurlencode($ajaxfields_json);
         $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
         /*END FIELDS FOR AJAX*/
 
-        $base_uri = __PS_BASE_URI__ == '/'?'':Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
+        $base_uri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
         $this->context->smarty->assign('baseuri', $base_uri);
 
         $output = '<div class="packetery">' . PHP_EOL;

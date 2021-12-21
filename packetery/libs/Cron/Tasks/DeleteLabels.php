@@ -2,20 +2,22 @@
 
 namespace Packetery\Cron\Tasks;
 
+use Packetery;
+
 /**
  * Deletes labels if they are older than specified number of days.
  */
 class DeleteLabels extends Base
 {
-    /** @var \Module */
+    /** @var Packetery */
     public $module;
 
     /**
      * DeleteLabels constructor.
      *
-     * @param \Module $module
+     * @param Packetery $module
      */
-    public function __construct(\Module $module)
+    public function __construct(Packetery $module)
     {
         $this->module = $module;
     }

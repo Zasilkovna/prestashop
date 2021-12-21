@@ -9,28 +9,22 @@ $(document).ready(function () {
             var carriers_json = decodeURIComponent($('#carriers_json').val());
             $('#ad-carriers-list-table table tr td:nth-child(5)').each(function () {
                 var id_branch_chosen = $(this).find('span').text();
-                var zpoint = $('#zpoint').val();
-                var pp_all = $('#pp_all').val();
-                var packeta_pickup_points = $('#packeta_pickup_points').val();
-                var all_packeta_pickup_points = $('#all_packeta_pickup_points').val();
-                var pickup_point_type = $(this).parent().find('.hidden span').text();
-                var select = tools.buildselect(carriers_json, id_branch_chosen, zpoint, packeta_pickup_points, pp_all, all_packeta_pickup_points, pickup_point_type);
+
+                // is no longer needed:
+                //var pickup_point_type = $(this).parent().find('.hidden span').text();
+
+                var select = tools.buildselect(carriers_json, id_branch_chosen);
                 $(this).html(select);
             });
             binds.ad_carrier_select();
         },
-        buildselect: function (carriers_json, id_branch_chosen, zpoint, packeta_pickup_points, pp_all, all_packeta_pickup_points, pickup_point_type) {
+        buildselect: function (carriers_json, id_branch_chosen) {
             // TODO: show hint to update branches if no carriers available
             var carriers = JSON.parse(carriers_json);
             var cnt = carriers.length;
             var html = '';
             html+= '<select name="selected_ad_carrier" id="selected_ad_carrier">';
             html+= '<option value="">--</option>';
-            html+= '<option value="' + zpoint + '" data-pickup-point-type="internal"' +
-                (pickup_point_type === 'internal' ? ' selected' : '') + '>' + packeta_pickup_points + '</option>';
-            html+= '<option value="' + pp_all + '" data-pickup-point-type="external"' +
-                ((pickup_point_type === 'external' && id_branch_chosen === '') ? ' selected' : '') + '>' +
-                all_packeta_pickup_points + '</option>';
             for (var i = 0; i < cnt; i++) {
                 if (carriers[i]['id_branch'] == id_branch_chosen) {
                     var selected = 'selected';
@@ -51,11 +45,6 @@ $(document).ready(function () {
             var raw = $('#ajaxfields').val();
             var json = decodeURIComponent(raw);
             lang_pac = JSON.parse(json);
-        },
-        tab_branch_list: function () {
-            $('a[href="#tab-branch"]').click(function () {
-                ajaxs.getCountBranches();
-            });
         },
 
         ad_carrier_cod: function () {
@@ -142,91 +131,13 @@ $(document).ready(function () {
                 },
             });
         },
-
-        getCountBranches: function () {
-            $.ajax({
-                type: 'POST',
-                url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=getcountbranches',
-                data: {},
-                beforeSend: function () {
-                    $("body").toggleClass("wait");
-                },
-                success: function (msg) {
-                    var res = JSON.parse(msg);
-                    var cnt = res[0];
-                    var last_update = res[1];
-                    $('.packetery-total-branches').html('<b>' + cnt + '</b>');
-                    $('.packetery-last-branches-update').html(last_update);
-                },
-                complete: function () {
-                    $("body").toggleClass("wait");
-                },
-            });
-        },
-
-        updateBranches: function (container, reload) {
-            $(container).notify(lang_pac.try_download_branches, "info",{position:"right"});
-            $.ajax({
-                type: 'POST',
-                url: ajaxs.baseuri()+'/modules/packetery/ajax.php?action=updatebranches',
-                data: {},
-                container: container,
-                beforeSend: function () {
-                    $("body").toggleClass("wait");
-                },
-                success: function (msg) {
-                    $(this.container).focus();
-
-                    if (msg != 'true') {
-                        /* TODO: Uncaught SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data
-                        loader stays shown, everything seems ok after reload */
-                        var res = JSON.parse(msg);
-                        var id = res[0];
-                        var message = res[1];
-
-                        if (message == "") {
-                            message = lang_pac.error_export_unknown;
-                        }
-
-                        $(this.container).notify(message, "error",{position:"top"});
-                    } else {
-                        if (reload) {
-                            var redirect_msg = ' ' + lang_pac.reload5sec;
-                        } else {
-                            var redirect_msg = '';
-                        }
-                        $(this.container).notify(lang_pac.success_download_branches + redirect_msg, "success",{position:"right"});
-
-                        if (reload) {
-                            setTimeout(function () {
-                                location.reload();
-                            }, 5000);
-                        } else {
-                            ajaxs.getCountBranches();
-                        }
-                    }
-
-                },
-                error: function () {
-                    // TODO: prepare message for user
-                    console.log('Branches update failed. Is API key provided?');
-                },
-                complete: function () {
-                    $("body").toggleClass("wait");
-                },
-            });
-        },
     };
 
     binds.readAjaxFields();
     binds.ad_carrier_cod();
     /*End SETTINGS ACTIONS*/
 
-    $('#update-branches').click(function () {
-        ajaxs.updateBranches('#update-branches', false);
-    });
     tools.ad_list_build();
-    binds.tab_branch_list();
 });
 
 $(document).ready(function () {

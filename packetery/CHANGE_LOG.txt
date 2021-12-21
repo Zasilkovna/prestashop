@@ -82,3 +82,4 @@
       - Added: possibility to set print offset when preparing packet labels
       - Added: support for Packeta address validation widget in the cart
       - Added: validated address is saved to db and used in exports
+      - Updated: pickup point update changed to carrier update, improving speed and reliability

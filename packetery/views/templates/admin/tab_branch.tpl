@@ -21,20 +21,46 @@
 *  @copyright 2017 Zlab Solutions
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<!--Branches count-->
-<label class="control-label col-lg-3" for="packetery-total-branches">
-	{l s='Total pickup points' mod='packetery'}:
-</label>
-<div name="packetery-total-branches" class="packetery-total-branches"><b>{$total_branches|escape:'htmlall':'UTF-8'}</b></div>
-<br style="clear: both;">
-<label class="control-label col-lg-3" for="packetery-last-branches-update">
-	{l s='Last pickup points update' mod='packetery'}:
-</label>
-<div name="packetery-last-branches-update" class="packetery-last-branches-update">{$last_branches_update|escape:'htmlall':'UTF-8'}</div>
-<!--End Branches count-->
-<br>
-<br style="clear: both;">
-<label class="control-label col-lg-3" for="update-branches">
-	{l s='Manually update the list of pickup points' mod='packetery'}:
-</label>
-<p><input type="button" name="update-branches" class="btn btn-default btn-block" id="update-branches" value="{l s='Update pickup points'  mod='packetery'}" style="padding-left:10px;padding-right:10px;"></p>
+
+<div class="clearfix">
+    <label class="control-label col-lg-3">
+        {l s='Total carriers' mod='packetery'}:
+    </label>
+    <div class="packetery-carriers-right-column"><strong>{$totalCarriers|escape:'htmlall':'UTF-8'}</strong></div>
+</div>
+
+<div class="clearfix">
+    <label class="control-label col-lg-3">
+        {l s='Last carriers update' mod='packetery'}:
+    </label>
+    <div class="packetery-carriers-right-column">{$lastCarriersUpdate|escape:'htmlall':'UTF-8'}</div>
+</div>
+
+<div class="clearfix">
+    {if isset($messages)}
+        <div class="col-lg-12">
+            {foreach from=$messages item=message}
+                <div class="alert alert-{$message.class}">{$message.text}</div>
+            {/foreach}
+        </div>
+    {/if}
+</div>
+
+<div class="clearfix">
+    <label class="control-label col-lg-3">
+        {l s='Manually update the list of carriers' mod='packetery'}:
+    </label>
+    <div class="packetery-carriers-right-column">
+        <a href="{$updateCarriersLink}"
+           class="btn btn-default btn-block update-carriers">{l s='Update carriers'  mod='packetery'}</a>
+    </div>
+</div>
+
+<div class="clearfix">
+    <label class="control-label col-lg-3">
+        {l s='Link for updating carriers by cron' mod='packetery'}:
+    </label>
+    <div class="packetery-carriers-right-column">
+        {$updateCarriersCronLink}
+    </div>
+</div>

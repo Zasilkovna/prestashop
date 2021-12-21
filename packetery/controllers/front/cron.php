@@ -1,6 +1,7 @@
 <?php
 
 use Packetery\Cron\Tasks\DeleteLabels;
+use Packetery\Cron\Tasks\DownloadCarriers;
 
 class PacketeryCronModuleFrontController extends ModuleFrontController
 {
@@ -12,6 +13,9 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /** @var bool */
     private $hasError = false;
+
+    /** @var Packetery */
+    public $module;
 
     /**
      * @return void
@@ -43,6 +47,10 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
         switch ($task) {
             case DeleteLabels::getTaskName():
                 $errors = (new DeleteLabels($this->module))->execute();
+                $this->renderErrors($errors);
+                break;
+            case DownloadCarriers::getTaskName():
+                $errors = (new DownloadCarriers($this->module))->execute();
                 $this->renderErrors($errors);
                 break;
             default:
