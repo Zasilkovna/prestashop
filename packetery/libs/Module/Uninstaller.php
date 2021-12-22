@@ -37,11 +37,17 @@ class Uninstaller
     public function run()
     {
         return (
-            $this->deleteTab() &&
+            $this->deleteMenuItems() &&
             $this->uninstallDatabase() &&
             $this->unregisterHooks() &&
             $this->deleteConfiguration()
         );
+    }
+
+    private function deleteMenuItems() {
+        return $this->deleteTab('Packetery') &&
+            $this->deleteTab('PacketeryCarrierGrid') &&
+            $this->deleteTab('PacketeryOrderGrid');
     }
 
     /**
@@ -51,7 +57,7 @@ class Uninstaller
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShop\PrestaShop\Adapter\CoreException
      */
-    public function deleteTab($className = 'PacketeryOrderGrid')
+    public function deleteTab($className)
     {
         $tabId = Tab::getIdFromClassName($className);
         if ($tabId) {

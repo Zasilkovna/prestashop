@@ -11,7 +11,7 @@ class CarrierTools
 {
     /**
      * @param int $carrierId
-     * @param string $countryParam name or id_country
+     * @param string $countryParam name,id_country,iso_code
      * @return array
      */
     public function getZonesAndCountries($carrierId, $countryParam = 'name')

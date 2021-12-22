@@ -36,56 +36,25 @@
     font-size: 13px;
 }
 
-.update-carriers {
-    padding: 0 10px;
-    width: 400px !important;
-    display: inline-block !important;
-    position: relative;
-    top: -5px;
-}
-
-/*PAYMENTS*/
-#payment-list-table .table th:nth-child(3){
-    display: none;
-}
-
-#payment-list-table .table tr td:nth-child(3){
-    display: none;
-}
-/*END PAYMENTS*/
-
-#packetery-form input[type="radio"], #packetery-form input[type="checkbox"] {
-    margin-top: 7px;
-}
-
-#payment-list-table i.icon-check.status, #ad-carriers-list-table i.icon-check.status{
-    cursor: pointer;
-}
-#payment-list-table i.icon-remove.status, #ad-carriers-list-table i.icon-remove.status{
-    cursor: pointer;
-}
-
-#packetery-form input, #packetery-form select, #packetery-form textarea {
-    max-width: 550px;
-}
-
 #packetery-form label {
     text-align: right;
     padding-top: 7px;
 }
 
-#top_packetery_image{
-    float:left !important;
-    margin-top: 10px;
-}
-#top_packetery_text{
-    padding: 15px 50px;
-    font-size: 16px;
-}
-
 .packetery .alert {
     margin-top: 1em;
     padding-left: 3.5rem;
+}
+
+.packetery-button-container {
+    display: flex;
+}
+.packetery-button-container a {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    margin-left: 6px;
+    width: auto !important;
+    display: inline-block !important;
 }
 
 /* new settings form */

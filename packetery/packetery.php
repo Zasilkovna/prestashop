@@ -187,77 +187,17 @@ class Packetery extends CarrierModule
     }
 
     /**
-     * Load the configuration form
-     * @return string
+     * @return false|string
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
      * @throws SmartyException
      * @throws \Packetery\Exceptions\DatabaseException
      */
-    public function getContent()
+    public function getCarriersContent()
     {
-        $soapDisabled = 0;
-        if (!extension_loaded('soap')) {
-            $soapDisabled = 1;
-        }
-
         $this->context->smarty->assign('module_dir', $this->_path);
-        $active_tab = Tools::getValue('active_tab');
-        $this->context->smarty->assign('active_tab', $active_tab);
 
-        /*CARRIERS*/
-        $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
-        $this->context->smarty->assign(
-            'carriers_json',
-            rawurlencode(json_encode($apiCarrierRepository->getAdAndExternalCarriers()))
-        );
-
-        /*AD CARRIER LIST*/
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-        $packeteryListAdCarriers = $carrierRepository->getPacketeryCarriersList();
-        if ($packeteryListAdCarriers) {
-            $carrierTools = $this->diContainer->get(\Packetery\Carrier\CarrierTools::class);
-            foreach ($packeteryListAdCarriers as $index => $packeteryCarrier) {
-                list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
-                    $packeteryCarrier['id_carrier']
-                );
-                $packeteryListAdCarriers[$index]['zones'] = implode(', ', array_column($carrierZones, 'name'));
-                $packeteryListAdCarriers[$index]['countries'] = implode(', ', $carrierCountries);
-                // this is how PrestaShop does it, see classes/Carrier.php or replaceZeroByShopName methods for example
-                $packeteryListAdCarriers[$index]['name'] =
-                    ($packeteryCarrier['name'] === '0' ? Carrier::getCarrierNameFromShopName() : $packeteryCarrier['name']);
-            }
-        }
-
-        $this->context->smarty->assign(array(
-            'packetery_list_ad_carriers' => Tools::jsonEncode(array(
-                'columns' => array(
-                    array('content' => $this->l('ID'), 'key' => 'id_carrier', 'center' => true),
-                    array('content' => $this->l('Carrier'), 'key' => 'name'),
-                    array('content' => $this->l('Zones'), 'key' => 'zones'),
-                    array('content' => $this->l('Countries'), 'key' => 'countries'),
-                    array(
-                        'content' => $this->l('Is delivery via Packeta'),
-                        'key' => 'id_branch',
-                        'center' => true
-                    ),
-                    array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
-                    // is no longer needed:
-                    array(
-                        'content' => $this->l('Packeta pickup point'),
-                        'key' => 'pickup_point_type',
-                        'hidden' => true
-                    ),
-                ),
-                'rows' => $packeteryListAdCarriers,
-                'url_params' => array('configure' => $this->name),
-                'identifier' => 'id_carrier',
-            ))
-        ));
-        /*END AD CARRIER LIST*/
-
-        /*CARRIERS*/
         if (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') {
             $downloader = $this->diContainer->get(\Packetery\ApiCarrier\Downloader::class);
             $this->context->smarty->assign('messages', [$downloader->run()]);
@@ -268,29 +208,34 @@ class Packetery extends CarrierModule
             $date->setTimestamp($lastCarriersUpdate);
             $lastCarriersUpdate = $date->format('d.m.Y H:i:s');
         }
+        $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
         $totalCarriers = $apiCarrierRepository->getAdAndExternalCount();
         $this->context->smarty->assign(
             ['totalCarriers' => $totalCarriers, 'lastCarriersUpdate' => $lastCarriersUpdate]
         );
-        $updateCarriersLink = $this->context->link->getAdminLink('AdminModules') . '&configure=packetery&action=updateCarriers';
+        $updateCarriersLink = $this->context->link->getAdminLink('PacketeryCarrierGrid') . '&action=updateCarriers';
         $this->context->smarty->assign('updateCarriersLink', $updateCarriersLink);
         $updateCarriersCronLink = $this->context->link->getModuleLink($this->name, 'cron',
             ['token' => Configuration::get('PACKETERY_CRON_TOKEN'), 'task' => 'DownloadCarriers']);
         $this->context->smarty->assign('updateCarriersCronLink', $updateCarriersCronLink);
-        /*END CARRIERS*/
 
-        /*FIELDS FOR AJAX*/
-        $ajaxfields = [
-            'error' => $this->l('Error'),
-            'success' => $this->l('Success'),
-        ];
-        $ajaxfields_json = json_encode($ajaxfields);
-        $ajaxfields_json = rawurlencode($ajaxfields_json);
-        $this->context->smarty->assign('ajaxfields', $ajaxfields_json);
-        /*END FIELDS FOR AJAX*/
+        return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriers_info.tpl');
+    }
 
-        $base_uri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-        $this->context->smarty->assign('baseuri', $base_uri);
+    /**
+     * Load the configuration form
+     * @return string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
+     */
+    public function getContent()
+    {
+        $soapDisabled = 0;
+        if (!extension_loaded('soap')) {
+            $soapDisabled = 1;
+        }
 
         $output = '<div class="packetery">' . PHP_EOL;
 
@@ -337,8 +282,6 @@ class Packetery extends CarrierModule
         $output .= $this->displayForm();
         $output .= PHP_EOL . '</div>';
 
-        $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
-        $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/prestui/ps-tags.tpl');
         return $output;
     }
 
@@ -431,7 +374,7 @@ class Packetery extends CarrierModule
         if ($paymentList) {
             foreach ($paymentList as $payment) {
                 if ((bool)$payment['is_cod'] === true) {
-                    $helper->fields_value ['payment_cod_' . $payment['module_name']] = $payment['module_name'];
+                    $helper->fields_value['payment_cod_' . $payment['module_name']] = $payment['module_name'];
                 }
             }
         }
@@ -492,18 +435,6 @@ class Packetery extends CarrierModule
                 'maxOffset' => 0,
             ],
         ];
-    }
-
-    /**
-    * Add the CSS & JavaScript files you want to be loaded in the BO.
-    */
-    public function hookBackOfficeHeader()
-    {
-        if ((Tools::getValue('module_name') == $this->name) || (Tools::getValue('configure') == $this->name)) {
-            $this->context->controller->addjquery();
-            $this->context->controller->addJS('https://cdn.jsdelivr.net/riot/2.4.1/riot+compiler.min.js');
-            $this->context->controller->addJS($this->_path . 'views/js/notify.js');
-        }
     }
 
     public function getOrderShippingCost($params, $shipping_cost)
@@ -1008,7 +939,6 @@ class Packetery extends CarrierModule
         $hooks = [
             'displayBeforeCarrier',
             'actionValidateOrder',
-            'backOfficeHeader',
             'displayCarrierExtraContent',
             'displayHeader',
             'actionCarrierUpdate',
@@ -1021,6 +951,7 @@ class Packetery extends CarrierModule
             'displayPacketeryOrderGridListAfter',
             'actionPacketeryOrderGridListingResultsModifier',
             'actionValidateStepComplete',
+            'actionPacketeryCarrierGridListingResultsModifier',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -1168,7 +1099,7 @@ class Packetery extends CarrierModule
     }
 
     /**
-     * Displays save button after Packter orders list
+     * Displays save button after Packeta orders list
      * @return false|string
      */
     public function hookDisplayPacketeryOrderGridListAfter()
@@ -1312,4 +1243,38 @@ class Packetery extends CarrierModule
         }
     }
 
+    /**
+     * Loads zones and countries to carriers
+     * @param array $params Hook parameters
+     * @throws ReflectionException
+     */
+    public function hookActionPacketeryCarrierGridListingResultsModifier(&$params)
+    {
+        $carrierTools = $this->diContainer->get(\Packetery\Carrier\CarrierTools::class);
+        if (isset($params['list']) && is_array($params['list'])) {
+            foreach ($params['list'] as &$carrier) {
+                list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
+                    $carrier['id_carrier']
+                );
+                $carrier['zones'] = implode(', ', array_column($carrierZones, 'name'));
+                $carrier['countries'] = implode(', ', $carrierCountries);
+
+                if ($carrier['id_branch'] === null) {
+                    if ($carrier['pickup_point_type'] === 'internal') {
+                        $carrier['id_branch'] = Packeteryclass::ZPOINT;
+                    } elseif ($carrier['pickup_point_type'] === 'external') {
+                        $carrier['id_branch'] = Packeteryclass::PP_ALL;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @return Context
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
 }

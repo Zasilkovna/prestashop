@@ -15,18 +15,20 @@ function upgrade_module_3_0_0($module)
     $uninstaller = $module->diContainer->get(\Packetery\Module\Uninstaller::class);
     $result = (
         $module->unregisterHook('actionOrderHistoryAddAfter') &&
+        $module->unregisterHook('backOfficeHeader') &&
         $module->registerHook('actionValidateOrder') &&
         $module->registerHook('displayBeforeCarrier') &&
         $module->registerHook('actionObjectCartUpdateBefore') &&
         $module->registerHook('displayPacketeryOrderGridListAfter') &&
         $module->registerHook('actionPacketeryOrderGridListingResultsModifier') &&
         $module->registerHook('actionValidateStepComplete') &&
+        $module->registerHook('actionPacketeryCarrierGridListingResultsModifier') &&
         Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', 0) &&
         Configuration::updateValue('PACKETERY_CRON_TOKEN', Tools::passwdGen(32)) &&
         Configuration::updateValue('PACKETERY_LABEL_MAX_AGE_DAYS', 7) &&
         Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') &&
         $uninstaller->deleteTab('Adminpacketery') &&
-        $installer->insertTab()
+        $installer->insertMenuItems()
     );
     if ($result === false) {
         return false;

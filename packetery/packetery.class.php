@@ -266,106 +266,6 @@ class Packeteryclass
     /*END ORDERS*/
 
     /**
-     * Change COD for address delivery carriers - called by AJAX
-     * @throws DatabaseException
-     * @throws ReflectionException
-     */
-    public static function changeAdCarrierCodAjax()
-    {
-        $module = new Packetery;
-        $carrierRepository = $module->diContainer->get(CarrierRepository::class);
-        $result = self::changeAdCarrierCod($carrierRepository);
-        if ($result) {
-            echo 'ok';
-        } else {
-            echo $module->l('Please set carrier association first.', 'packetery.class');
-        }
-    }
-
-    /**
-     * Change COD for address delivery carriers in DB
-     * @param CarrierRepository $carrierRepository
-     * @return bool|void
-     * @throws DatabaseException
-     */
-    public static function changeAdCarrierCod(CarrierRepository $carrierRepository)
-    {
-        $id_carrier = Tools::getValue('id_carrier');
-        $is_cod = Tools::getValue('value');
-        if (!isset($id_carrier) || (!isset($is_cod))) {
-            return;
-        }
-        if ($carrierRepository->existsById((int)$id_carrier)) {
-            $result = $carrierRepository->setCodFlag((int)$id_carrier, (int)$is_cod);
-        } else {
-            $result = false;
-        }
-        return $result;
-    }
-
-    /**
-     * Add address delivery to carrier - called by ajax
-     * @param CarrierRepository $carrierRepository
-     * @throws DatabaseException
-     */
-    public static function setPacketeryCarrierAjax(CarrierRepository $carrierRepository)
-    {
-        $result = self::setPacketeryCarrier($carrierRepository);
-        if ($result) {
-            echo 'ok';
-        } else {
-            echo '';
-        }
-    }
-
-    /**
-     * Add address delivery to carrier in DB
-     * @param CarrierRepository $carrierRepository
-     * @return bool
-     * @throws DatabaseException
-     */
-    private static function setPacketeryCarrier(CarrierRepository $carrierRepository)
-    {
-        $branchName = Tools::getValue('branch_name');
-        $branchCurrency = Tools::getValue('currency_branch');
-        $pickupPointType = Tools::getValue('pickup_point_type');
-
-        if (!Tools::getIsset('id_carrier') || !Tools::getIsset('id_branch')) {
-            return false;
-        }
-        $carrierId = Tools::getValue('id_carrier');
-        $branchId = Tools::getValue('id_branch');
-
-        $isPacketeryCarrier = $carrierRepository->existsById((int)$carrierId);
-        if ($branchId === '' && $isPacketeryCarrier) {
-            $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
-            $result = $carrierRepository->deleteById((int)$carrierId);
-        } else {
-            $fieldsToSet = [
-                'pickup_point_type' => $pickupPointType,
-                'id_branch' => $branchId,
-                'name_branch' => $carrierRepository->db->escape($branchName),
-            ];
-            if ($branchId === self::ZPOINT || $branchId === self::PP_ALL) {
-                $fieldsToSet['currency_branch'] = null;
-            } else {
-                $fieldsToSet['currency_branch'] = $carrierRepository->db->escape($branchCurrency);
-            }
-            if ($isPacketeryCarrier) {
-                $result = $carrierRepository->updatePacketery($fieldsToSet, (int)$carrierId);
-            } else {
-                $fieldsToSet['is_cod'] = 0;
-                $fieldsToSet['id_carrier'] = (int)$carrierId;
-                $result = $carrierRepository->insertPacketery($fieldsToSet);
-            }
-            $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
-        }
-        $carrierRepository->updatePresta($carrierUpdate, (int)$carrierId);
-
-        return $result;
-    }
-
-    /**
      * Get list of payments for configuration
      * @param PaymentRepository $paymentRepository
      * @return array
@@ -399,7 +299,6 @@ class Packeteryclass
         }
         return $payments;
     }
-    /*END CARRIERS*/
 
     /**
      * @param string $id from POST

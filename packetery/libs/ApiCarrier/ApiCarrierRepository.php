@@ -62,7 +62,7 @@ class ApiCarrierRepository
     /** @var Packetery|null */
     private $module;
 
-    private static $tableName = 'packetery_carriers';
+    public static $tableName = 'packetery_carriers';
 
     /**
      * CarrierRepository constructor.
@@ -254,5 +254,31 @@ class ApiCarrierRepository
             }
         }
         return $carriers;
+    }
+
+    /**
+     * @param array $countryIsoCodes
+     * @return array|bool|\mysqli_result|\PDOStatement|resource|null
+     * @throws DatabaseException
+     */
+    public function getByCountries(array $countryIsoCodes)
+    {
+        $countryIsoCodesSql = '"' . implode('","', $countryIsoCodes) . '"';
+        return $this->dbTools->getRows('SELECT `id`, `name`
+            FROM `' . $this->getPrefixedTableName() . '`
+            WHERE `country` IN (' . $countryIsoCodesSql . ') OR `country` = ""
+            ORDER BY `country`, `name`');
+    }
+
+    /**
+     * @param string $id
+     * @return array|bool|object|null
+     * @throws DatabaseException
+     */
+    public function getById($id)
+    {
+        return $this->dbTools->getRow('SELECT `name`, `currency`, `is_pickup_points`
+            FROM `' . $this->getPrefixedTableName() . '`
+            WHERE `id` = "' . $this->dbTools->db->escape($id) . '"');
     }
 }
