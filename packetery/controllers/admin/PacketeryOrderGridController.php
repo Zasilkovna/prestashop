@@ -77,25 +77,25 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         $this->fields_list = [
             'id_order' => [
-                'title' => $this->l('ID'),
+                'title' => $this->l('ID', 'packeteryordergridcontroller'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
             ],
             'reference' => [
-                'title' => $this->l('Reference'),
+                'title' => $this->l('Reference', 'packeteryordergridcontroller'),
             ],
             'customer' => [
-                'title' => $this->l('Customer'),
+                'title' => $this->l('Customer', 'packeteryordergridcontroller'),
                 'havingFilter' => false,
             ],
             'total_paid' => [
-                'title' => $this->l('Total Price'),
+                'title' => $this->l('Total Price', 'packeteryordergridcontroller'),
                 'align' => 'text-right',
                 'type' => 'price',
                 'filter_key' => 'a!total_paid',
             ],
             'osname' => [
-                'title' => $this->l('Status'),
+                'title' => $this->l('Status', 'packeteryordergridcontroller'),
                 'type' => 'select',
                 'color' => 'color',
                 'list' => $this->statuses_array,
@@ -104,23 +104,23 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'order_key' => 'osname'
             ],
             'date_add' => [
-                'title' => $this->l('Order Date'),
+                'title' => $this->l('Order Date', 'packeteryordergridcontroller'),
                 'type' => 'datetime',
                 'filter_key' => 'a!date_add',
             ],
             'is_cod' => [
-                'title' => $this->l('Is COD'),
+                'title' => $this->l('Is COD', 'packeteryordergridcontroller'),
                 'type' => 'bool',
                 'align' => 'center',
                 'callback' => 'getIconForBoolean',
                 'filter_key' => 'po!is_cod',
             ],
             'name_branch' => [
-                'title' => $this->l('Destination pickup point'),
+                'title' => $this->l('Destination pickup point', 'packeteryordergridcontroller'),
                 'filter_key' => 'po!name_branch',
             ],
             'is_ad' => [
-                'title' => $this->l('Delivery type'),
+                'title' => $this->l('Delivery type', 'packeteryordergridcontroller'),
                 'align' => 'center',
                 'callback' => 'getDeliveryTypeHtml',
                 'filter_key' => 'po!is_ad',
@@ -129,19 +129,19 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'list' => ['PP', 'HD'],
             ],
             'exported' => [
-                'title' => $this->l('Exported'),
+                'title' => $this->l('Exported', 'packeteryordergridcontroller'),
                 'type' => 'bool',
                 'align' => 'center',
                 'callback' => 'getIconForBoolean',
                 'filter_key' => 'po!exported',
             ],
             'tracking_number' => [
-                'title' => $this->l('Tracking number'),
+                'title' => $this->l('Tracking number', 'packeteryordergridcontroller'),
                 'callback' => 'getTrackingLink',
                 'filter_key' => 'po!tracking_number',
             ],
             'weight' => [
-                'title' => $this->l('Weight (kg)'),
+                'title' => $this->l('Weight (kg)', 'packeteryordergridcontroller'),
                 'type' => 'editable',
                 'search' => false,
             ],
@@ -150,20 +150,20 @@ class PacketeryOrderGridController extends ModuleAdminController
         $this->bulk_actions = [
             // use 'confirm' key to require confirmation
             'CreatePacket' => [
-                'text' => $this->l('Send selected orders and create shipment'),
+                'text' => $this->l('Send selected orders and create shipment', 'packeteryordergridcontroller'),
                 'icon' => 'icon-send',
             ],
             'LabelPdf' => [
-                'text' => $this->l('Download pdf labels'),
+                'text' => $this->l('Download pdf labels', 'packeteryordergridcontroller'),
                 'icon' => 'icon-print',
             ],
             'CsvExport' => [
-                'text' => $this->l('CSV export'),
+                'text' => $this->l('CSV export', 'packeteryordergridcontroller'),
                 'icon' => 'icon-download',
             ],
         ];
 
-        $title = $this->l('Packeta Orders');
+        $title = $this->l('Packeta Orders', 'packeteryordergridcontroller');
         $this->meta_title = $title;
         $this->toolbar_title = $title;
     }
@@ -197,7 +197,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $ids = $this->boxes;
         if (!$ids) {
-            $this->informations = $this->l('No orders were selected.');
+            $this->informations = $this->l('No orders were selected.', 'packeteryordergridcontroller');
             return;
         }
         $this->createPackets($ids);
@@ -220,7 +220,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         $orderRepository = $module->diContainer->get(OrderRepository::class);
         $packetNumbers = Packeteryclass::getTrackingFromOrders(implode(',', $ids), $orderRepository);
         if (!$packetNumbers) {
-            $this->warnings[] = $this->l('Please submit selected orders first.');
+            $this->warnings[] = $this->l('Please submit selected orders first.', 'packeteryordergridcontroller');
         }
         return $packetNumbers;
     }
@@ -270,7 +270,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $ids = $this->boxes;
         if (!$ids) {
-            $this->informations = $this->l('Please choose orders first.');
+            $this->informations = $this->l('Please choose orders first.', 'packeteryordergridcontroller');
             return;
         }
         $module = $this->getModule();
@@ -287,7 +287,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             }
             $ids = $this->boxes;
             if (!$ids) {
-                $this->informations = $this->l('Please choose orders first.');
+                $this->informations = $this->l('Please choose orders first.', 'packeteryordergridcontroller');
             } else {
                 $packetNumbers = $this->preparePacketNumbers($ids);
                 if ($packetNumbers) {
@@ -351,7 +351,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             }
         }
         if ($change) {
-            $this->informations = $this->l('Order weights were saved.');
+            $this->informations = $this->l('Order weights were saved.', 'packeteryordergridcontroller');
         }
 
         parent::postProcess();
@@ -398,11 +398,11 @@ class PacketeryOrderGridController extends ModuleAdminController
             if ($orderData['tracking_number']) {
                 $action = 'print';
                 $iconClass = 'icon-print';
-                $title = $this->l('Print');
+                $title = $this->l('Print', 'packeteryordergridcontroller');
             } else {
                 $action = 'submit';
                 $iconClass = 'icon-send';
-                $title = $this->l('Export');
+                $title = $this->l('Export', 'packeteryordergridcontroller');
             }
             $href = sprintf('%s&amp;id_order=%s&amp;action=%s', $this->context->link->getAdminLink('PacketeryOrderGrid'), $orderId, $action);
             $links[$action] = sprintf('<a href="%s"><i class="%s"></i> %s</a>', $href, $iconClass, $title);;
@@ -421,7 +421,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     public function displayEditLink($token = null, $orderId, $name = null)
     {
         $link = $this->getModule()->getAdminLink($orderId, '');
-        return '<a class="edit btn btn-default" href="' . $link . '"><i class="icon-pencil"></i> ' . $this->l('Detail') . '</a>';
+        return '<a class="edit btn btn-default" href="' . $link . '"><i class="icon-pencil"></i> ' . $this->l('Detail', 'packeteryordergridcontroller') . '</a>';
     }
 
     public function displaySubmitLink($token = null, $orderId, $name = null)
