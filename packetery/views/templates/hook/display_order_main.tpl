@@ -5,11 +5,6 @@
         </h3>
     </div>
     <div class="card-body">
-        {if isset($messages)}
-            {foreach from=$messages item=message}
-                <div class="alert alert-{$message.class}">{$message.text}</div>
-            {/foreach}
-        {/if}
         {if $isAddressDelivery}
             <p>
                 {l s='Carrier' mod='packetery'}:
@@ -75,6 +70,11 @@
                     </div>
                 </form>
             {/if}
+        {/if}
+        {if isset($messages)}
+            {foreach from=$messages item=message}
+                <div class="alert alert-{$message.class}">{$message.text}</div>
+            {/foreach}
         {/if}
     </div>
 </div>
