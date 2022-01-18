@@ -70,7 +70,7 @@ class Installer
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryCarrierGrid',
-                'name' => $this->module->l('Carrier list', 'installer'),
+                'name' => $this->module->l('Carrier settings', 'installer'),
             ],
         ];
 
@@ -148,7 +148,7 @@ class Installer
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
         $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery` (
             `id_carrier` int NOT NULL PRIMARY KEY,
-            `id_branch` int NULL,
+            `id_branch` varchar(255) NOT NULL,
             `name_branch` varchar(255) NULL,
             `currency_branch` char(3) NULL,
             `is_cod` tinyint(1) NOT NULL DEFAULT 0,

@@ -188,11 +188,8 @@ class Packetery extends CarrierModule
 
     /**
      * @return false|string
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
      * @throws ReflectionException
      * @throws SmartyException
-     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function getCarriersContent()
     {

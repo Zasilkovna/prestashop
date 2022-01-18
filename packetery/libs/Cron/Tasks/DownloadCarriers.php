@@ -28,12 +28,13 @@ class DownloadCarriers extends Base
     /**
      * @return string[]
      * @throws DatabaseException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
     public function execute()
     {
         $result = $this->downloader->run();
-        return [$result['text']];
+        if ($result['class'] === 'danger') {
+            return [$result['text']];
+        }
+        return [];
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Carrier\CarrierAdminForm;
 use Packetery\Carrier\CarrierRepository;
 
@@ -88,6 +89,17 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $title = $this->l('Packeta carriers list', 'packeterycarriergridcontroller');
         $this->meta_title = $title;
         $this->toolbar_title = $title;
+
+        $info = $this->context->cookie->__get('packetery_info');
+        if ($info) {
+            $this->confirmations[] = $info;
+            $this->context->cookie->__unset('packetery_info');
+        }
+        $warning = $this->context->cookie->__get('packetery_warning');
+        if ($warning) {
+            $this->warnings[] = $warning;
+            $this->context->cookie->__unset('packetery_warning');
+        }
     }
 
     /**
@@ -101,6 +113,19 @@ class PacketeryCarrierGridController extends ModuleAdminController
     {
         $this->addRowAction('edit');
         $list = parent::renderList();
+
+        if ($this->_list) {
+            $module = $this->getModule();
+            $apiCarrierRepository = $module->diContainer->get(ApiCarrierRepository::class);
+            foreach ($this->_list as $carrierData) {
+                $carrierHelper = new CarrierAdminForm($carrierData['id_carrier'], $module);
+                list($availableCarriers, $warning) = $carrierHelper->getAvailableCarriers($apiCarrierRepository, $carrierData);
+                if ($warning) {
+                    $this->warnings[] = $warning;
+                }
+            }
+        }
+
         $module = $this->getModule();
         $carriersInformation = $module->getCarriersContent();
         return $list . $carriersInformation;

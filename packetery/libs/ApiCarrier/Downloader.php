@@ -41,8 +41,6 @@ class Downloader
      * Runs update and returns result.
      * @return array
      * @throws DatabaseException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
     public function run()
     {
@@ -83,15 +81,6 @@ class Downloader
             'text' => $this->module->l('Carriers were updated.', 'downloader'),
             'class' => 'success',
         ];
-    }
-
-    /**
-     * Cron job. No authorization needed - job is registered internally.
-     */
-    public function runAndRender()
-    {
-        $result = $this->run();
-        echo htmlspecialchars($result['text']);
     }
 
     /**

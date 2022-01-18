@@ -19,12 +19,15 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /**
      * @return void
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws SmartyException
      */
     public function display()
     {
         ignore_user_abort(true); // Ignore connection-closing by the client/user
-
-        $this->renderMessage($this->module->l('Cron started.', 'cron'));
 
         if ($this->validateToken() === false) {
             $this->renderError($this->module->l('Invalid packetery cron token.', 'cron'));
@@ -37,10 +40,22 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
             return;
         }
 
+        switch ($task) {
+            case DeleteLabels::getTaskName():
+                $taskName = $this->module->l('Deleting labels', 'cron');
+                break;
+            case DownloadCarriers::getTaskName():
+                $taskName = $this->module->l('Carrier list update', 'cron');
+                break;
+            default:
+                $taskName = $task;
+        }
+
         $this->renderMessage(
+            '[' . $this->module->l('BEGIN', 'cron') . ']: ' .
             sprintf(
                 $this->module->l('Task "%s" is about to be executed.', 'cron'),
-                $task
+                $taskName
             )
         );
 
@@ -58,15 +73,22 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
         }
 
         if ($this->hasError) {
-            $this->renderMessage($this->module->l('All rendered errors are persisted in Prestashop database.', 'cron'));
+            $this->renderMessage($this->module->l('All displayed errors are stored in the Prestashop database.', 'cron'));
         }
 
-        $this->renderMessage($this->module->l('Cron finished.', 'cron'));
+        $this->renderMessage(
+            '[' . $this->module->l('END', 'cron') . ']: ' .
+            sprintf(
+                $this->module->l('Task "%s" was finished.', 'cron'),
+                $taskName
+            )
+        );
     }
 
     /**
      * @param array $errors
      * @return void
+     * @throws SmartyException
      */
     public function renderErrors(array $errors)
     {
@@ -78,10 +100,11 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     /**
      * @param string $message
      * @return void
+     * @throws SmartyException
      */
     public function renderMessage($message)
     {
-        $templateFilePath = dirname(__FILE__) . '/../../views/templates/front/cron-message-row.tpl';
+        $templateFilePath = __DIR__ . '/../../views/templates/front/cron-message-row.tpl';
         $template = $this->context->smarty->createTemplate($templateFilePath, [
             'message' => $message
         ]);
@@ -93,11 +116,12 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     /**
      * @param string $message
      * @return void
+     * @throws SmartyException
      */
     public function renderError($message)
     {
         $this->hasError = true;
-        $this->renderMessage($message);
+        $this->renderMessage('[' . $this->module->l('ERROR', 'cron') . ']: ' . $message);
         PrestaShopLogger::addLog('[packetery:cron]: ' . $message, 3, null, null, null, true);
     }
 
