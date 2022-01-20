@@ -3,6 +3,7 @@
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Carrier\CarrierAdminForm;
 use Packetery\Carrier\CarrierRepository;
+use Packetery\Tools\MessageManager;
 
 class PacketeryCarrierGridController extends ModuleAdminController
 {
@@ -90,15 +91,14 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $this->meta_title = $title;
         $this->toolbar_title = $title;
 
-        $info = $this->context->cookie->__get('packetery_info');
+        $messageManager = $module->diContainer->get(MessageManager::class);
+        $info = $messageManager->getMessageClean('info');
         if ($info) {
             $this->confirmations[] = $info;
-            $this->context->cookie->__unset('packetery_info');
         }
-        $warning = $this->context->cookie->__get('packetery_warning');
+        $warning = $messageManager->getMessageClean('warning');
         if ($warning) {
             $this->warnings[] = $warning;
-            $this->context->cookie->__unset('packetery_warning');
         }
     }
 

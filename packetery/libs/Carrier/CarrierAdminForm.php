@@ -2,9 +2,9 @@
 
 namespace Packetery\Carrier;
 
-use Context;
 use HelperForm;
 use Packetery\ApiCarrier\ApiCarrierRepository;
+use Packetery\Tools\MessageManager;
 use Packeteryclass;
 use Tools;
 
@@ -39,6 +39,7 @@ class CarrierAdminForm
 
         if (Tools::isSubmit('submitCarrierAdminForm')) {
             $branchId = Tools::getValue('id_branch');
+            $messageManager = $this->module->diContainer->get(MessageManager::class);
             if ((string)$branchId === '') {
                 $carrierRepository->deleteById($this->carrierId);
             } else {
@@ -55,7 +56,7 @@ class CarrierAdminForm
                         $pickupPointType = 'external';
                     }
                     if ($addressValidation !== 'none') {
-                        $this->setWarning($this->module->l('Address validation setting is not applicable for pickup point carriers.', 'carrieradminform'));
+                        $messageManager->addMessage('warning', $this->module->l('Address validation setting is not applicable for pickup point carriers.', 'carrieradminform'));
                     }
                 } else {
                     $pickupPointType = null;
@@ -71,7 +72,7 @@ class CarrierAdminForm
                 );
             }
 
-            $this->setInfo($this->module->l('Carrier settings were saved.', 'carrieradminform'));
+            $messageManager->addMessage('info', $this->module->l('Carrier settings were saved.', 'carrieradminform'));
             Tools::redirectAdmin($this->module->getContext()->link->getAdminLink('PacketeryCarrierGrid'));
         }
 
@@ -183,30 +184,6 @@ class CarrierAdminForm
             }
         }
         return false;
-    }
-
-    /**
-     * @param string $message
-     * @throws \Exception
-     */
-    private function setWarning($message)
-    {
-        $context = Context::getContext();
-        if ($context) {
-            $context->cookie->__set('packetery_warning', $message);
-        }
-    }
-
-    /**
-     * @param string $message
-     * @throws \Exception
-     */
-    private function setInfo($message)
-    {
-        $context = Context::getContext();
-        if ($context) {
-            $context->cookie->__set('packetery_info', $message);
-        }
     }
 
     /**
