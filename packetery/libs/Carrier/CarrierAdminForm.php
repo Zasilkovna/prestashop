@@ -56,7 +56,7 @@ class CarrierAdminForm
                         $pickupPointType = 'external';
                     }
                     if ($addressValidation !== 'none') {
-                        $messageManager->addMessage('warning', $this->module->l('Address validation setting is not applicable for pickup point carriers.', 'carrieradminform'));
+                        $messageManager->setMessage('warning', $this->module->l('Address validation setting is not applicable for pickup point carriers.', 'carrieradminform'));
                     }
                 } else {
                     $pickupPointType = null;
@@ -72,7 +72,7 @@ class CarrierAdminForm
                 );
             }
 
-            $messageManager->addMessage('info', $this->module->l('Carrier settings were saved.', 'carrieradminform'));
+            $messageManager->setMessage('info', $this->module->l('Carrier settings were saved.', 'carrieradminform'));
             Tools::redirectAdmin($this->module->getContext()->link->getAdminLink('PacketeryCarrierGrid'));
         }
 
@@ -200,15 +200,8 @@ class CarrierAdminForm
             $this->carrierId, 'iso_code'
         );
         $availableCarriers = $apiCarrierRepository->getByCountries($carrierCountries);
-
         if (!$availableCarriers) {
             $warning = $this->module->l('There are no available carriers. If you haven\'t updated them yet, please do so.', 'carrieradminform');
-        } else if ($carrierData['id_branch'] && !in_array($carrierData['id_branch'], array_column($availableCarriers, 'id'))) {
-            $warning = sprintf($this->module->l('The Packeta carrier selected for method "%s" does not deliver to any of its active countries.', 'carrieradminform'), $carrierData['name']);
-            $orphanData = $apiCarrierRepository->getById($carrierData['id_branch']);
-            if ($orphanData) {
-                $availableCarriers[] = $orphanData;
-            }
         }
 
         array_unshift($availableCarriers, ['id' => null, 'name' => '--']);
@@ -221,6 +214,15 @@ class CarrierAdminForm
                 }
             }
         }
+
+        if ($availableCarriers && $carrierData['id_branch'] && !in_array($carrierData['id_branch'], array_column($availableCarriers, 'id'))) {
+            $warning = sprintf($this->module->l('The Packeta carrier selected for method "%s" does not deliver to any of its active countries.', 'carrieradminform'), $carrierData['name']);
+            $orphanData = $apiCarrierRepository->getById($carrierData['id_branch']);
+            if ($orphanData) {
+                $availableCarriers[] = $orphanData;
+            }
+        }
+
         return [$availableCarriers, $warning];
     }
 }
