@@ -25,6 +25,7 @@
 
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Order\OrderRepository;
+use Packetery\Tools\ConfigHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
 {
@@ -62,6 +63,17 @@ class PacketeryOrderGridController extends ModuleAdminController
             LEFT JOIN `' . _DB_PREFIX_ . 'order_state` `os` ON `os`.`id_order_state` = `a`.`current_state`
             LEFT JOIN `' . _DB_PREFIX_ . 'order_state_lang` `osl` ON (`os`.`id_order_state` = `osl`.`id_order_state` AND `osl`.`id_lang` = ' . (int)$this->context->language->id . ')
         ';
+
+        // Show and/or export only relevant orders from order list.
+        $groupId = Shop::getContextShopGroupID(true);
+        $shopId = Shop::getContextShopID(true);
+        if ($groupId) {
+            $this->_where = ' AND `a`.`id_shop_group` = ' . $groupId . ' ';
+        }
+        if ($shopId) {
+            $this->_where = ' AND `a`.`id_shop` = ' . $shopId . ' ';
+        }
+
         $this->_orderBy = 'id_order';
         $this->_orderWay = 'DESC';
         $this->_use_found_rows = true;
@@ -231,7 +243,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     private function prepareLabels(array $packetNumbers, $offset = 0)
     {
-        $fileName = PacketeryApi::packetsLabelsPdf($packetNumbers, Configuration::get('PACKETERY_APIPASS'), $offset);
+        $fileName = PacketeryApi::packetsLabelsPdf($packetNumbers, ConfigHelper::get('PACKETERY_APIPASS'), $offset);
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         echo file_get_contents(_PS_MODULE_DIR_ . 'packetery/labels/' . $fileName);
@@ -293,7 +305,7 @@ class PacketeryOrderGridController extends ModuleAdminController
                 if ($packetNumbers) {
                     // Offset setting form preparation.
                     $maxOffsets = $this->getMaxOffsets();
-                    $maxOffset = (int)$maxOffsets[Configuration::get('PACKETERY_LABEL_FORMAT')];
+                    $maxOffset = (int)$maxOffsets[ConfigHelper::get('PACKETERY_LABEL_FORMAT')];
                     if ($maxOffset !== 0) {
                         $this->tpl_list_vars['max_offset'] = $maxOffset;
                         $this->tpl_list_vars['prepareLabelsMode'] = true;

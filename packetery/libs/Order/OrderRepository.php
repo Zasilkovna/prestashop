@@ -229,6 +229,38 @@ class OrderRepository
     }
 
     /**
+     * @param int $orderId
+     * @return array|bool|object|null
+     * @throws DatabaseException
+     */
+    public function getWithShopById($orderId)
+    {
+        $orderId = (int)$orderId;
+        return $this->dbTools->getRow('
+            SELECT
+                   `po`.`id_branch`,
+                   `po`.`name_branch`,
+                   `po`.`id_carrier`, 
+                   `po`.`is_cod`, 
+                   `po`.`is_ad`,
+                   `po`.`currency_branch`, 
+                   `po`.`is_carrier`,
+                   `po`.`carrier_pickup_point`,
+                   `po`.`tracking_number`,
+                   `po`.`carrier_pickup_point`,
+                   `po`.`weight`, 
+                   `po`.`zip`,
+                   `po`.`city`,
+                   `po`.`street`,
+                   `po`.`house_number`,
+                   `o`.`id_shop_group`, 
+                   `o`.`id_shop` 
+            FROM `' . _DB_PREFIX_ . 'packetery_order` `po` 
+            JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
+            WHERE `po`.`id_order` = ' . $orderId);
+    }
+
+    /**
      * @param string $currencyIsoCode
      * @return false|string|null
      * @throws DatabaseException

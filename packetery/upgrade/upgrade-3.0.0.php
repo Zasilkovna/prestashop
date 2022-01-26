@@ -1,5 +1,7 @@
 <?php
 
+use Packetery\Tools\ConfigHelper;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -23,9 +25,9 @@ function upgrade_module_3_0_0($module)
         $module->registerHook('actionPacketeryOrderGridListingResultsModifier') &&
         $module->registerHook('actionValidateStepComplete') &&
         $module->registerHook('actionPacketeryCarrierGridListingResultsModifier') &&
-        Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', 0) &&
-        Configuration::updateValue('PACKETERY_CRON_TOKEN', Tools::passwdGen(32)) &&
-        Configuration::updateValue('PACKETERY_LABEL_MAX_AGE_DAYS', 7) &&
+        ConfigHelper::update('PACKETERY_WIDGET_AUTOOPEN', 0) &&
+        ConfigHelper::update('PACKETERY_CRON_TOKEN', Tools::passwdGen(32)) &&
+        ConfigHelper::update('PACKETERY_LABEL_MAX_AGE_DAYS', 7) &&
         Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') &&
         $uninstaller->deleteTab('Adminpacketery') &&
         $installer->insertMenuItems()

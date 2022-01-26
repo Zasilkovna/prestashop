@@ -24,11 +24,10 @@
  */
 
 use Packetery\Address\AddressTools;
-use Packetery\ApiCarrier\ApiCarrierRepository;
-use Packetery\Carrier\CarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Order\OrderRepository;
+use Packetery\Tools\ConfigHelper;
 use Packetery\Weight\Converter;
 
 include_once(dirname(__file__) . '/packetery.class.php');
@@ -40,7 +39,7 @@ class PacketeryApi
     public static function packetsLabelsPdf($packets, $apiPassword, $offset)
     {
         $client = new SoapClient("https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl");
-        $format = Configuration::get('PACKETERY_LABEL_FORMAT');
+        $format = ConfigHelper::get('PACKETERY_LABEL_FORMAT');
         try {
             $pdf = $client->packetsLabelsPdf($apiPassword, $packets, $format, $offset);
             if ($pdf) {
@@ -139,8 +138,8 @@ class PacketeryApi
     {
         $module = new Packetery;
         $id_order = $order->id;
-        $packetery_order = $orderRepository->getById($id_order);;
-        if (!$packetery_order) {
+        $packeteryOrder = $orderRepository->getWithShopById($id_order);
+        if (!$packeteryOrder) {
             return [0, $module->l('Can\'t load order to create packet.', 'packetery.api')];
         }
         $id_address_delivery = $order->id_address_delivery;
@@ -149,7 +148,7 @@ class PacketeryApi
 
         /*CURRENCY*/
         $currency = new Currency($order->id_currency);
-        $branch_currency_iso = $packetery_order['currency_branch'];
+        $branch_currency_iso = $packeteryOrder['currency_branch'];
         $order_currency_iso = $currency->iso_code;
         if ($order_currency_iso != $branch_currency_iso) {
             $total = Packeteryclass::getRateTotal($order_currency_iso, $branch_currency_iso, $total, $orderRepository);
@@ -178,7 +177,7 @@ class PacketeryApi
         }
         /*END PHONE*/
 
-        $is_cod = $packetery_order['is_cod'];
+        $is_cod = $packeteryOrder['is_cod'];
         if ($is_cod) {
             if ($branch_currency_iso == 'CZK') {
                 $cod = ceil($total);
@@ -191,7 +190,7 @@ class PacketeryApi
             $cod = 0;
         }
 
-        $shop_name = (Configuration::get('PACKETERY_ESHOP_ID') ?: '');
+        $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
         $id_customer = $order->id_customer;
         $customer = new Customer($id_customer);
         $customer_fname = $customer->firstname;
@@ -205,34 +204,34 @@ class PacketeryApi
             'surname' => empty($address_delivery->lastname) ? "$customer_lname" : $address_delivery->lastname,
             'email' => (string)$customer_email,
             'phone' => $customer_phone,
-            'addressId' => $packetery_order['id_branch'],
+            'addressId' => $packeteryOrder['id_branch'],
             'currency' => $branch_currency_iso,
             'cod' => $cod,
             'value' => $total,
-            'eshop' => $shop_name,
+            'eshop' => $senderLabel,
         );
 
-        if ($packetery_order['weight'] !== null) {
+        if ($packeteryOrder['weight'] !== null) {
             // used saved if set
-            $packet_attributes['weight'] = $packetery_order['weight'];
+            $packet_attributes['weight'] = $packeteryOrder['weight'];
         } else if (Converter::isKgConversionSupported()) {
             $packet_attributes['weight'] = Converter::getKilograms((float)$order->getTotalWeight());
         }
 
-        if ($packetery_order['is_carrier']) {
-            $packet_attributes['carrierPickupPoint'] = $packetery_order['carrier_pickup_point'];
+        if ($packeteryOrder['is_carrier']) {
+            $packet_attributes['carrierPickupPoint'] = $packeteryOrder['carrier_pickup_point'];
         }
 
         if (!(Tools::strlen($customer_email) > 1)) {
             return array(0, $module->l('No email assigned to customer.', 'packetery.api'));
         }
 
-        if ($packetery_order['is_ad']) {
-            if (AddressTools::hasValidatedAddress($packetery_order)) {
-                $packet_attributes['zip'] = $packetery_order['zip'];
-                $packet_attributes['city'] = $packetery_order['city'];
-                $packet_attributes['street'] = $packetery_order['street'];
-                $packet_attributes['houseNumber'] = $packetery_order['house_number'];
+        if ($packeteryOrder['is_ad']) {
+            if (AddressTools::hasValidatedAddress($packeteryOrder)) {
+                $packet_attributes['zip'] = $packeteryOrder['zip'];
+                $packet_attributes['city'] = $packeteryOrder['city'];
+                $packet_attributes['street'] = $packeteryOrder['street'];
+                $packet_attributes['houseNumber'] = $packeteryOrder['house_number'];
             } else {
                 $packet_attributes['zip'] = str_replace(' ', '', $address_delivery->postcode);
                 $packet_attributes['city'] = $address_delivery->city;
@@ -350,7 +349,7 @@ class PacketeryApi
      */
     public static function getApiPass()
     {
-        return Configuration::get('PACKETERY_APIPASS');
+        return ConfigHelper::get('PACKETERY_APIPASS');
     }
 
     /** Endpoint is called in PS 1.6 only. PS 1.6 does not have hook for carrier extra content.
