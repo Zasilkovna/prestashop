@@ -108,8 +108,8 @@ $_MODULE['<{packetery}prestashop>carrieradminform_1399f8fce27c5636684948807c9a28
 $_MODULE['<{packetery}prestashop>carrieradminform_307747191798efa983ed0748f83d0652'] = 'Jde o dobírku?';
 $_MODULE['<{packetery}prestashop>carrieradminform_37fc20ebfb7194883268f64cc5bcdbc8'] = 'ANO - všechny objednávky na tohoto dopravce budou do Zásilkovny exportovány jako dobírka, NE - nastavení dobírky se bude řídit podle nastavení dobírky u platební metody.';
 $_MODULE['<{packetery}prestashop>carrieradminform_7dce122004969d56ae2e0245cb754d35'] = 'Upravit';
-$_MODULE['<{packetery}prestashop>carrieradminform_0028b536db4083ae9741867a3b17c9af'] = 'Nejsou k dispozici žádní dopravci. Pokud jste je ještě neaktualizovali, učiňte tak prosím. ';
 $_MODULE['<{packetery}prestashop>carrieradminform_d96936da5cb766a1d3f03ee71b57d02a'] = 'Dopravce Zásilkovny vybraný u metody \"%s\" nedoručuje ani do jedné z jejích povolených zemí.';
+$_MODULE['<{packetery}prestashop>carrieradminform_6b2b1a2e9fc50ec3db40399344356351'] = 'Pro metodu \"%s\" nejsou dostupní žádní dopravci.';
 $_MODULE['<{packetery}prestashop>packeterycarriergridcontroller_b718adec73e04ce3ec720dd11a06a308'] = 'ID';
 $_MODULE['<{packetery}prestashop>packeterycarriergridcontroller_914419aa32f04011357d3b604a86d7eb'] = 'Dopravce';
 $_MODULE['<{packetery}prestashop>packeterycarriergridcontroller_dad1f8d794ee0dd7753fe75e73b78f31'] = 'Zóny';
@@ -118,6 +118,7 @@ $_MODULE['<{packetery}prestashop>packeterycarriergridcontroller_6f43f840bec2edba
 $_MODULE['<{packetery}prestashop>packeterycarriergridcontroller_4d3d769b812b6faa6b76e1a8abaece2d'] = 'Aktivní';
 $_MODULE['<{packetery}prestashop>packeterycarriergridcontroller_7798b7c45fa643a0169a3a9e8ba8a6f9'] = 'Dobírka';
 $_MODULE['<{packetery}prestashop>packeterycarriergridcontroller_37bd94f2e132fdf97716b180ddde437d'] = 'Seznam dopravců Zásilkovny';
+$_MODULE['<{packetery}prestashop>packeterycarriergridcontroller_1c3c535b10e0f1c6b2201c52dc89d706'] = 'Nejsou dostupní žádní dopravci Zásilkovny. Spusťte prosím nejprve aktualizaci.';
 $_MODULE['<{packetery}prestashop>packeterycarriergridcontroller_7dce122004969d56ae2e0245cb754d35'] = 'Upravit';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_b718adec73e04ce3ec720dd11a06a308'] = 'ID';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_63d5049791d9d79d86e9a108b0a999ca'] = 'Kód';

@@ -2,6 +2,7 @@
 
 namespace Packetery\Carrier;
 
+use CarrierCore;
 use HelperForm;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Tools\MessageManager;
@@ -74,6 +75,10 @@ class CarrierAdminForm
 
             $messageManager->setMessage('info', $this->module->l('Carrier settings were saved.', 'carrieradminform'));
             Tools::redirectAdmin($this->module->getContext()->link->getAdminLink('PacketeryCarrierGrid'));
+        }
+
+        if ($carrierData['name'] === '0') {
+            $carrierData['name'] = CarrierCore::getCarrierNameFromShopName();
         }
 
         list($availableCarriers, $warning) = $this->getAvailableCarriers($apiCarrierRepository, $carrierData);
@@ -187,6 +192,22 @@ class CarrierAdminForm
     }
 
     /**
+     * @param $carrierCountries
+     * @return bool
+     */
+    private function hasPickupPointCountry($carrierCountries)
+    {
+        $apiCarrierRepository = $this->module->diContainer->get(ApiCarrierRepository::class);
+        $countriesWithPickupPoints =  $apiCarrierRepository->getExternalPickupPointCountries();
+        foreach ($carrierCountries as $carrierCountry) {
+            if (in_array($carrierCountry, $countriesWithPickupPoints, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @param ApiCarrierRepository $apiCarrierRepository
      * @param array $carrierData
      * @return array
@@ -201,27 +222,34 @@ class CarrierAdminForm
         );
         $availableCarriers = $apiCarrierRepository->getByCountries($carrierCountries);
         if (!$availableCarriers) {
-            $warning = $this->module->l('There are no available carriers. If you haven\'t updated them yet, please do so.', 'carrieradminform');
+            $availableCarriers = [];
         }
 
-        array_unshift($availableCarriers, ['id' => null, 'name' => '--']);
-
         $hasInternalCountry = $this->hasInternalCountry($carrierCountries);
+        $hasPickupPointCountry = $this->hasPickupPointCountry($carrierCountries);
         if (!$hasInternalCountry) {
             foreach ($availableCarriers as $index => $carrier) {
-                if ($carrier['id'] === 'zpoint') {
+                if ($carrier['id'] === Packeteryclass::ZPOINT) {
+                    unset($availableCarriers[$index]);
+                } elseif (!$hasPickupPointCountry && $carrier['id'] === Packeteryclass::PP_ALL) {
                     unset($availableCarriers[$index]);
                 }
             }
         }
 
-        if ($availableCarriers && $carrierData['id_branch'] && !in_array($carrierData['id_branch'], array_column($availableCarriers, 'id'))) {
+        if ($carrierData['id_branch'] && !in_array($carrierData['id_branch'], array_column($availableCarriers, 'id'))) {
             $warning = sprintf($this->module->l('The Packeta carrier selected for method "%s" does not deliver to any of its active countries.', 'carrieradminform'), $carrierData['name']);
             $orphanData = $apiCarrierRepository->getById($carrierData['id_branch']);
             if ($orphanData) {
                 $availableCarriers[] = $orphanData;
             }
         }
+
+        if (!$availableCarriers) {
+            $warning = sprintf($this->module->l('There are no available carriers for method "%s".', 'carrieradminform'), $carrierData['name']);
+        }
+
+        array_unshift($availableCarriers, ['id' => null, 'name' => '--']);
 
         return [$availableCarriers, $warning];
     }

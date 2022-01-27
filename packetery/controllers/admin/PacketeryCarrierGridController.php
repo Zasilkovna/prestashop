@@ -111,12 +111,19 @@ class PacketeryCarrierGridController extends ModuleAdminController
      */
     public function renderList()
     {
+        $module = $this->getModule();
+        $carriersInformation = $module->getCarriersContent();
+
         $this->addRowAction('edit');
         $list = parent::renderList();
 
         if ($this->_list) {
             $module = $this->getModule();
             $apiCarrierRepository = $module->diContainer->get(ApiCarrierRepository::class);
+            $totalCarriers = $apiCarrierRepository->getAdAndExternalCount();
+            if ($totalCarriers === false) {
+                $this->warnings[] = $this->l('There are no available Packeta carriers. Please run the update first.', 'packeterycarriergridcontroller');
+            }
             foreach ($this->_list as $carrierData) {
                 $carrierHelper = new CarrierAdminForm($carrierData['id_carrier'], $module);
                 list($availableCarriers, $warning) = $carrierHelper->getAvailableCarriers($apiCarrierRepository, $carrierData);
@@ -126,8 +133,6 @@ class PacketeryCarrierGridController extends ModuleAdminController
             }
         }
 
-        $module = $this->getModule();
-        $carriersInformation = $module->getCarriersContent();
         return $list . $carriersInformation;
     }
 

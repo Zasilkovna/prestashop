@@ -281,4 +281,18 @@ class ApiCarrierRepository
             FROM `' . $this->getPrefixedTableName() . '`
             WHERE `id` = "' . $this->dbTools->db->escape($id) . '"');
     }
+
+    /**
+     * @return array|bool|\mysqli_result|\PDOStatement|resource|null
+     * @throws DatabaseException
+     */
+    public function getExternalPickupPointCountries()
+    {
+        $result = $this->dbTools->getRows(
+            'SELECT `country` FROM `' . $this->getPrefixedTableName() . '`
+            WHERE `deleted` = 0 AND `is_pickup_points` = 1 AND `country` != ""
+            GROUP BY `country`'
+        );
+        return array_column($result, 'country');
+    }
 }

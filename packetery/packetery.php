@@ -1250,6 +1250,9 @@ class Packetery extends CarrierModule
         $carrierTools = $this->diContainer->get(\Packetery\Carrier\CarrierTools::class);
         if (isset($params['list']) && is_array($params['list'])) {
             foreach ($params['list'] as &$carrier) {
+                if ($carrier['name'] === '0') {
+                    $carrier['name'] = CarrierCore::getCarrierNameFromShopName();
+                }
                 list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
                     $carrier['id_carrier']
                 );
