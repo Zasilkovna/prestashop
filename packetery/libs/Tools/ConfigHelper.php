@@ -69,7 +69,9 @@ class ConfigHelper
     public static function update($key, $values)
     {
         if (self::$configBehavior[$key] === 'all') {
-            return Configuration::updateValue($key, $values, false, null, null);
+            // Shop group id and shop id is 0, which is saved as null. Passing null makes PS load active ones,
+            // that is not desired. Empty string would work the same way.
+            return Configuration::updateValue($key, $values, false, 0, 0);
         }
 
         return Configuration::updateValue($key, $values);
