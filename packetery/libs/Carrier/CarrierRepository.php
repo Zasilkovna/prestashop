@@ -3,14 +3,15 @@
 namespace Packetery\Carrier;
 
 use Db;
+use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
-use Tools;
+use Packeteryclass;
 
 class CarrierRepository
 {
     /** @var Db $db */
-    public $db;
+    private $db;
 
     /** @var DbTools */
     private $dbTools;
@@ -42,18 +43,19 @@ class CarrierRepository
     }
 
     /**
-     * Get all active packetery AD carriers
+     * Get all active packetery carriers
      * @return array|false|\mysqli_result|null|\PDOStatement|resource
      * @throws DatabaseException
      */
     public function getPacketeryCarriersList()
     {
         return $this->dbTools->getRows('
-            SELECT `c`.`id_carrier`, `c`.`name`, `pad`.`id_branch`, `pad`.`is_cod`, `pad`.`pickup_point_type` 
+            SELECT `c`.`id_carrier`, `c`.`name`, `pad`.`id_branch`, `pad`.`name_branch`, `pad`.`is_cod`, `pad`.`pickup_point_type` 
             FROM `' . _DB_PREFIX_ . 'carrier` `c`
             LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` USING(`id_carrier`)
-            WHERE `c`.`deleted` = 0
-            AND `c`.`active` = 1
+            LEFT JOIN `' . _DB_PREFIX_ . ApiCarrierRepository::$tableName . '` `ac` ON `ac`.`id` = `pad`.`id_branch` 
+            WHERE `c`.`deleted` = 0 AND `c`.`active` = 1
+            ORDER BY `ac`.`country`, `ac`.`name`
         ');
     }
 
@@ -99,6 +101,21 @@ class CarrierRepository
     }
 
     /**
+     * @param int $carrierId
+     * @return array|bool|object|null
+     * @throws DatabaseException
+     */
+    public function getById($carrierId)
+    {
+        $carrierId = (int)$carrierId;
+        return $this->dbTools->getRow('
+            SELECT `c`.`id_carrier`, `name`, `id_branch`, `is_cod`, `address_validation`
+            FROM `' . _DB_PREFIX_ . 'carrier` `c`
+            LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` USING(`id_carrier`)
+            WHERE `c`.`id_carrier` = ' . $carrierId);
+    }
+
+    /**
      * @param int $oldId
      * @param int $newId
      * @throws DatabaseException
@@ -108,19 +125,6 @@ class CarrierRepository
         $oldId = (int)$oldId;
         $newId = (int)$newId;
         $this->dbTools->update('packetery_address_delivery', ['id_carrier' => $newId], '`id_carrier` = ' . $oldId);
-    }
-
-    /**
-     * @param int $carrierId
-     * @param int $isCod
-     * @return bool
-     * @throws DatabaseException
-     */
-    public function setCodFlag($carrierId, $isCod)
-    {
-        $carrierId = (int)$carrierId;
-        $isCod = (int)$isCod;
-        return $this->dbTools->update('packetery_address_delivery', ['is_cod' => $isCod], '`id_carrier` = ' . $carrierId);
     }
 
     /**
@@ -166,4 +170,61 @@ class CarrierRepository
         $carrierId = (int)$carrierId;
         return $this->dbTools->update('packetery_address_delivery', $carrierUpdate, '`id_carrier` = ' . $carrierId, 0, true);
     }
+
+    /**
+     * Add address delivery to carrier in DB
+     * @param int $carrierId
+     * @param string $branchId
+     * @param string $branchName
+     * @param string|null $branchCurrency
+     * @param string|null $pickupPointType
+     * @param bool $isCod
+     * @param string|null $addressValidation
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function setPacketeryCarrier($carrierId, $branchId, $branchName, $branchCurrency, $pickupPointType, $isCod, $addressValidation)
+    {
+        $carrierId = (int)$carrierId;
+        $branchId = (string)$branchId;
+        $branchName = (string)$branchName;
+        $isCod = (bool)$isCod;
+
+        $isPacketeryCarrier = $this->existsById($carrierId);
+        if ($branchId === '' && $isPacketeryCarrier) {
+            $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
+            $result = $this->deleteById($carrierId);
+        } else {
+            $fieldsToSet = [
+                'pickup_point_type' => $pickupPointType,
+                'id_branch' => $this->db->escape($branchId),
+                'name_branch' => $this->db->escape($branchName),
+                'is_cod' => $isCod,
+            ];
+            if ($pickupPointType === null) {
+                if (!$addressValidation) {
+                    $addressValidation = 'none';
+                }
+                $fieldsToSet['address_validation'] = $addressValidation;
+            } else {
+                $fieldsToSet['address_validation'] = null;
+            }
+            if ($branchId === Packeteryclass::ZPOINT || $branchId === Packeteryclass::PP_ALL) {
+                $fieldsToSet['currency_branch'] = null;
+            } else {
+                $fieldsToSet['currency_branch'] = $this->db->escape($branchCurrency);
+            }
+            if ($isPacketeryCarrier) {
+                $result = $this->updatePacketery($fieldsToSet, $carrierId);
+            } else {
+                $fieldsToSet['id_carrier'] = $carrierId;
+                $result = $this->insertPacketery($fieldsToSet);
+            }
+            $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
+        }
+        $this->updatePresta($carrierUpdate, $carrierId);
+
+        return $result;
+    }
+
 }

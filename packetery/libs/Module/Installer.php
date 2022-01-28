@@ -37,7 +37,7 @@ class Installer
             $this->updateConfiguration() &&
             $this->installDatabase() &&
             $this->module->registerHook($this->module->getModuleHooksList()) &&
-            $this->insertTab()
+            $this->insertMenuItems()
         );
     }
 
@@ -50,22 +50,38 @@ class Installer
     }
 
     /**
-     * Creates packetery orders tab
+     * Creates packetery menu items
      * @return bool
      */
-    public function insertTab()
+    public function insertMenuItems()
     {
+        // https://devdocs.prestashop.com/1.7/modules/concepts/controllers/admin-controllers/tabs/#which-parent-to-choose
+        $menuConfig = [
+            [
+                'parentClass' => 'SELL',
+                'class' => 'Packetery',
+                'name' => $this->module->l('Packeta', 'installer'),
+            ],
+            [
+                'parentClass' => 'Packetery',
+                'class' => 'PacketeryOrderGrid',
+                'name' => $this->module->l('Packeta Orders', 'installer'),
+            ],
+            [
+                'parentClass' => 'Packetery',
+                'class' => 'PacketeryCarrierGrid',
+                'name' => $this->module->l('Carrier settings', 'installer'),
+            ],
+        ];
+
         try {
-            $tab = new Tab;
-            $parentId = Tab::getIdFromClassName('AdminParentOrders');
-
-            $tab->id_parent = $parentId;
-            $tab->module = 'packetery';
-            $tab->class_name = 'PacketeryOrderGrid';
-            $tab->name = $this->createMultiLangField($this->module->l('Packeta Orders', 'installer'));
-            $tab->position = Tab::getNewLastPosition($parentId);
-
-            return $tab->add();
+            foreach ($menuConfig as $menuItem) {
+                $result = $this->addTab($menuItem['parentClass'], $menuItem['class'], $menuItem['name']);
+                if ($result === false) {
+                    return false;
+                }
+            }
+            return $result;
         } catch (PrestaShopException $exception) {
             PrestaShopLogger::addLog($this->getExceptionRaisedText() . ' ' .
                 $exception->getMessage(), 3, null, null, null, true);
@@ -132,7 +148,7 @@ class Installer
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
         $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery` (
             `id_carrier` int NOT NULL PRIMARY KEY,
-            `id_branch` int NULL,
+            `id_branch` varchar(255) NOT NULL,
             `name_branch` varchar(255) NULL,
             `currency_branch` char(3) NULL,
             `is_cod` tinyint(1) NOT NULL DEFAULT 0,
@@ -169,5 +185,29 @@ class Installer
     private function getExceptionRaisedText()
     {
         return $this->module->l('Exception raised during Packetery module install:', 'installer');
+    }
+
+    /**
+     * @param string $parentClassName
+     * @param string $className
+     * @param string $name
+     * @return bool
+     * @throws PrestaShopException
+     * @throws \PrestaShopDatabaseException
+     */
+    private function addTab($parentClassName, $className, $name)
+    {
+        $tab = new Tab;
+        $parentId = Tab::getIdFromClassName($parentClassName);
+        $tab->id_parent = $parentId;
+        $tab->module = 'packetery';
+        $tab->class_name = $className;
+        $tab->name = $this->createMultiLangField($name);
+        $tab->position = Tab::getNewLastPosition($parentId);
+        if ($parentClassName === 'SELL') {
+            $tab->icon = 'local_shipping';
+        }
+
+        return $tab->add();
     }
 }

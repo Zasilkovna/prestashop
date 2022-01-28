@@ -83,3 +83,4 @@
       - Added: support for Packeta address validation widget in the cart
       - Added: validated address is saved to db and used in exports
       - Updated: pickup point update changed to carrier update, improving speed and reliability
+      - Updated: carrier list in module administration realised using standard PrestaShop's controller.
