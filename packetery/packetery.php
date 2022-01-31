@@ -199,7 +199,7 @@ class Packetery extends CarrierModule
             $downloader = $this->diContainer->get(\Packetery\ApiCarrier\Downloader::class);
             $this->context->smarty->assign('messages', [$downloader->run()]);
         }
-        $lastCarriersUpdate = Configuration::get('PACKETERY_LAST_CARRIERS_UPDATE');
+        $lastCarriersUpdate = \Packetery\Tools\ConfigHelper::get('PACKETERY_LAST_CARRIERS_UPDATE');
         if ((bool)$lastCarriersUpdate !== false) {
             $date = new DateTime();
             $date->setTimestamp($lastCarriersUpdate);
@@ -213,7 +213,7 @@ class Packetery extends CarrierModule
         $updateCarriersLink = $this->context->link->getAdminLink('PacketeryCarrierGrid') . '&action=updateCarriers';
         $this->context->smarty->assign('updateCarriersLink', $updateCarriersLink);
         $updateCarriersCronLink = $this->context->link->getModuleLink($this->name, 'cron',
-            ['token' => Configuration::get('PACKETERY_CRON_TOKEN'), 'task' => 'DownloadCarriers']);
+            ['token' => \Packetery\Tools\ConfigHelper::get('PACKETERY_CRON_TOKEN'), 'task' => 'DownloadCarriers']);
         $this->context->smarty->assign('updateCarriersCronLink', $updateCarriersCronLink);
 
         return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriers_info.tpl');
@@ -258,7 +258,7 @@ class Packetery extends CarrierModule
                     $output .= $this->displayError($errorMessage);
                     $error = true;
                 } else {
-                    Configuration::updateValue($option, $configValue);
+                    \Packetery\Tools\ConfigHelper::update($option, $configValue);
                 }
             }
             $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
@@ -364,7 +364,7 @@ class Packetery extends CarrierModule
         $helper->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
 
         $confOptions = $this->getConfigurationOptions();
-        $packeterySettings = Configuration::getMultiple(array_keys($confOptions));
+        $packeterySettings = \Packetery\Tools\ConfigHelper::getMultiple(array_keys($confOptions));
         foreach ($confOptions as $option => $optionConf) {
             $helper->fields_value[$option] = Tools::getValue($option, $packeterySettings[$option]);
         }
@@ -611,8 +611,8 @@ class Packetery extends CarrierModule
              */
             'toggleExtraContentOnShippingChange' => ! ($isPS16 && $isOpcEnabled),
 
-            'widgetAutoOpen' => (bool) Configuration::get('PACKETERY_WIDGET_AUTOOPEN'),
-            'toggleExtraContent' => false, // (bool) Configuration::get('PACKETERY_TOGGLE_EXTRA_CONTENT'),
+            'widgetAutoOpen' => (bool)\Packetery\Tools\ConfigHelper::get('PACKETERY_WIDGET_AUTOOPEN'),
+            'toggleExtraContent' => false, // TODO: make configurable?
 
             'addressValidationLevels' => $carrierRepository->getAddressValidationLevels(),
             'addressValidatedMessage' => $this->l('Address is valid.'),

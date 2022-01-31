@@ -29,6 +29,7 @@ use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Order\OrderRepository;
 use Packetery\Payment\PaymentRepository;
+use Packetery\Tools\ConfigHelper;
 use Packetery\Weight\Converter;
 
 require_once(dirname(__FILE__) . '../../../config/config.inc.php');
@@ -132,7 +133,7 @@ class Packeteryclass
                 continue;
             }
 
-            $packeteryOrder = $orderRepository->getById($order_id);
+            $packeteryOrder = $orderRepository->getWithShopById($order_id);
 
             if (empty($packeteryOrder) || !isset($packeteryOrder['id_branch']) || empty($packeteryOrder['id_branch'])) {
                 continue;
@@ -145,7 +146,7 @@ class Packeteryclass
                 $order->total_discounts_tax_incl;
             $cod = $packeteryOrder['is_cod'] == 1 ? $total : 0;
 
-            $senderLabel = Configuration::get('PACKETERY_ESHOP_ID');
+            $senderLabel = ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']);
 
             $currency = new Currency($order->id_currency);
 

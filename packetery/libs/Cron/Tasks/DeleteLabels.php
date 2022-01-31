@@ -3,6 +3,7 @@
 namespace Packetery\Cron\Tasks;
 
 use Packetery;
+use Packetery\Tools\ConfigHelper;
 
 /**
  * Deletes labels if they are older than specified number of days.
@@ -29,7 +30,7 @@ class DeleteLabels extends Base
     {
         $errors = [];
         $files = glob(PACKETERY_PLUGIN_DIR . '/labels/*.pdf', GLOB_NOSORT);
-        $shiftDays = \Configuration::get('PACKETERY_LABEL_MAX_AGE_DAYS');
+        $shiftDays = ConfigHelper::get('PACKETERY_LABEL_MAX_AGE_DAYS');
         if ($shiftDays === false) {
             $errors[] = $this->module->l('Configuration can not be loaded.', 'DeleteLabels');
             return $errors;

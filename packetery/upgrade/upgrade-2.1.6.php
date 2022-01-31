@@ -1,5 +1,7 @@
 <?php
 
+use Packetery\Tools\ConfigHelper;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -44,16 +46,16 @@ function upgrade_module_2_1_6($module)
         foreach ($previousSettings as $previousSetting) {
             switch ($previousSetting['option']) {
                 case 'APIPASS':
-                    Configuration::updateValue('PACKETERY_APIPASS', $previousSetting['value']);
+                    ConfigHelper::update('PACKETERY_APIPASS', $previousSetting['value']);
                     break;
                 case 'ESHOP_ID':
-                    Configuration::updateValue('PACKETERY_ESHOP_ID', $previousSetting['value']);
+                    ConfigHelper::update('PACKETERY_ESHOP_ID', $previousSetting['value']);
                     break;
                 case 'LABEL_FORMAT':
-                    Configuration::updateValue('PACKETERY_LABEL_FORMAT', $previousSetting['value']);
+                    ConfigHelper::update('PACKETERY_LABEL_FORMAT', $previousSetting['value']);
                     break;
                 case 'LAST_BRANCHES_UPDATE':
-                    Configuration::updateValue('PACKETERY_LAST_BRANCHES_UPDATE', $previousSetting['value']);
+                    ConfigHelper::update('PACKETERY_LAST_BRANCHES_UPDATE', $previousSetting['value']);
                     break;
                 default:
                     break;

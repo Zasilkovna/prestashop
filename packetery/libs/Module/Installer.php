@@ -4,8 +4,8 @@ namespace Packetery\Module;
 
 use Packetery;
 use Packetery\Tools\DbTools;
-use Configuration;
 use Language;
+use Packetery\Tools\ConfigHelper;
 use PrestaShopException;
 use PrestaShopLogger;
 use Tab;
@@ -172,10 +172,10 @@ class Installer
     private function updateConfiguration()
     {
         return (
-            Configuration::updateValue('PACKETERY_LABEL_FORMAT', 'A7 on A4') &&
-            Configuration::updateValue('PACKETERY_WIDGET_AUTOOPEN', 0) &&
-            Configuration::updateValue('PACKETERY_CRON_TOKEN', \Tools::passwdGen(32)) &&
-            Configuration::updateValue('PACKETERY_LABEL_MAX_AGE_DAYS', 7)
+            ConfigHelper::update('PACKETERY_LABEL_FORMAT', 'A7 on A4') &&
+            ConfigHelper::update('PACKETERY_WIDGET_AUTOOPEN', 0) &&
+            ConfigHelper::update('PACKETERY_CRON_TOKEN', \Tools::passwdGen(32)) &&
+            ConfigHelper::update('PACKETERY_LABEL_MAX_AGE_DAYS', 7)
         );
     }
 

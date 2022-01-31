@@ -2,6 +2,7 @@
 
 use Packetery\Cron\Tasks\DeleteLabels;
 use Packetery\Cron\Tasks\DownloadCarriers;
+use Packetery\Tools\ConfigHelper;
 
 class PacketeryCronModuleFrontController extends ModuleFrontController
 {
@@ -135,7 +136,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
             return false;
         }
 
-        $storedToken = Configuration::get('PACKETERY_CRON_TOKEN');
+        $storedToken = ConfigHelper::get('PACKETERY_CRON_TOKEN');
         if ($storedToken === false) {
             return false;
         }

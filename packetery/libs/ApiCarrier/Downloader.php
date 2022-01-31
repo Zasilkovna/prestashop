@@ -8,6 +8,7 @@ use GuzzleHttp\Message\Response;
 use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\DownloadException;
+use Packetery\Tools\ConfigHelper;
 use PacketeryApi;
 
 /**
@@ -75,7 +76,7 @@ class Downloader
             ];
         }
         $this->apiCarrierRepository->save($carriers, $this->module);
-        \Configuration::updateValue('PACKETERY_LAST_CARRIERS_UPDATE', time());
+        ConfigHelper::update('PACKETERY_LAST_CARRIERS_UPDATE', time());
 
         return [
             'text' => $this->module->l('Carriers were updated.', 'downloader'),
