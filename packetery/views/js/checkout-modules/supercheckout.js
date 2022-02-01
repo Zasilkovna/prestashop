@@ -26,7 +26,7 @@ var PacketeryCheckoutModuleSupercheckout = {
 $(function () {
     if (typeof addSupercheckoutOrderValidator !== 'undefined') {
         addSupercheckoutOrderValidator(function() {
-
+            // TODO: Check address validation
             var $selectedInput = PacketeryCheckoutModuleSupercheckout.getSelectedInput(),
                 $extra = packeteryModulesManager.getWidgetParent($selectedInput),
                 selectedBranchId = $extra.find('.packeta-branch-id').val();

@@ -987,7 +987,9 @@ class Packetery extends CarrierModule
     }
 
     /**
+     * Is not called in SuperCheckout. Process all validations in addSupercheckoutOrderValidator.
      * @param array $params
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function hookActionValidateStepComplete(array &$params)
     {
@@ -1004,16 +1006,19 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $orderData = $this->orderRepository->getByCart((int)$params['cart']->id);
-        if (!$orderData) {
-            $this->context->controller->errors[] = $commonFailMessage;
-            PrestaShopLogger::addLog('Packeta order could not be loaded by cart id: ' . $params['cart']->id, 3, null, null, null, true);
-            $params['completed'] = false;
+        /** @var CartCore $cart */
+        $cart = $params['cart'];
+        $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$cart->id_carrier);
+        if ($packeteryCarrier['pickup_point_type'] !== null) {
+            $params['completed'] = true;
             return;
         }
 
-        if (!$orderData['is_ad']) {
-            $params['completed'] = true;
+        $orderData = $this->orderRepository->getByCart((int)$cart->id);
+        if (!$orderData) {
+            $this->context->controller->errors[] = $commonFailMessage;
+            PrestaShopLogger::addLog('Packeta order could not be loaded by cart id: ' . $cart->id, 3, null, null, null, true);
+            $params['completed'] = false;
             return;
         }
 
