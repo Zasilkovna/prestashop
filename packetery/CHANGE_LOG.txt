@@ -1,4 +1,4 @@
-2.1.14 - Added: support for Packeta address validation widget in the cart
+2.1.15 - Added: support for Packeta address validation widget in the cart
        - Added: Address validation setting with 'none', 'optional' and 'required' options
        - Added: validated address is saved to db and used in exports
        - Added: validated address flag in the list of Packeta orders
