@@ -195,7 +195,9 @@ class Packeteryclass
                 ORDER BY `o`.`date_add` DESC LIMIT ' . (($page - 1) * $per_page) . ',' . $per_page;
         $orders = Db::getInstance()->executeS($sql);
 
-        $orders = self::addDynamicDataToOrders($orders);
+        if (is_array($orders)) {
+            $orders = self::addDynamicDataToOrders($orders);
+        }
 
         return array($orders, $pages);
     }

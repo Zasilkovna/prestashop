@@ -500,7 +500,7 @@ class Packetery extends CarrierModule
             $customerCountry = strtolower($countryObj->iso_code);
             $customerStreet = $address->address1;
             $customerCity = $address->city;
-            $customerZip = $address->postcode;
+            $customerZip = str_replace(' ', '', $address->postcode);
         }
         $this->context->smarty->assign('customerCountry', $customerCountry);
         $packeteryCarrier = Packeteryclass::getPacketeryCarrierById((int)$id_carrier);
@@ -530,10 +530,12 @@ class Packetery extends CarrierModule
                 if ($orderData && AddressTools::hasValidatedAddress($orderData)) {
                     $addressValidated = true;
                     $this->context->smarty->assign('customerStreet', ($orderData['street'] ?: $orderData['city']) . ' ' . $orderData['house_number']);
+                    $this->context->smarty->assign('customerHouseNumber', $orderData['house_number']);
                     $this->context->smarty->assign('customerCity', $orderData['city']);
-                    $this->context->smarty->assign('customerZip', $orderData['zip']);
+                    $this->context->smarty->assign('customerZip', str_replace(' ', '', $orderData['zip']));
                 } else {
                     $this->context->smarty->assign('customerStreet', $customerStreet);
+                    $this->context->smarty->assign('customerHouseNumber', '');
                     $this->context->smarty->assign('customerCity', $customerCity);
                     $this->context->smarty->assign('customerZip', $customerZip);
                 }
@@ -669,7 +671,8 @@ class Packetery extends CarrierModule
 
         $addressValidationSetting = Configuration::get('PACKETERY_ADDRESS_VALIDATION');
         if ($isAddressDelivery) {
-            if(in_array($addressValidationSetting, ['optional', 'required'])) {
+            $isAddressValidated = false;
+            if (in_array($addressValidationSetting, ['optional', 'required'])) {
                 $validatedAddress = [
                     'street' => '',
                     'houseNumber' => '',
@@ -696,10 +699,12 @@ class Packetery extends CarrierModule
                             'class' => 'danger',
                         ];
                     }
+                    $isAddressValidated = true;
                 }
                 $this->context->smarty->assign('validatedAddress', $validatedAddress);
                 $this->prepareAddressChange($apiKey, $packeteryOrder, (int)$params['id_order']);
             }
+            $this->context->smarty->assign('isAddressValidated', $isAddressValidated);
         } else if ((int)$packeteryOrder['id_carrier'] !== 0) {
             $this->preparePickupPointChange($apiKey, $packeteryOrder, (int)$params['id_order']);
             $pickupPointChangeAllowed = true;

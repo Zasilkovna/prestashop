@@ -4,6 +4,7 @@
     <input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
     <input type="hidden" id="customerCountry" name="customerCountry" value="{$customerCountry|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerStreet" name="customerStreet" value="{$customerStreet|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="customerHouseNumber" name="customerHouseNumber" value="{$customerHouseNumber|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerCity" name="customerCity" value="{$customerCity|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerZip" name="customerZip" value="{$customerZip|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="addressValidationSetting" name="addressValidationSetting" value="{$addressValidationSetting|escape:'htmlall':'UTF-8'}">
@@ -24,6 +25,7 @@
                             <span class="picked-delivery-place">
                                 {assign var=addressInfo value=[]}
                                 {if $customerStreet}{$addressInfo[]=$customerStreet}{/if}
+                                {if $customerHouseNumber}{$addressInfo[]=$customerHouseNumber}{/if}
                                 {if $customerCity}{$addressInfo[]=$customerCity}{/if}
                                 {if $customerZip}{$addressInfo[]=$customerZip}{/if}
                                 {', '|implode:$addressInfo}
@@ -42,4 +44,5 @@
             </div>
         </div>
     </div>
+    <div class="packetery-address-not-validated-message" data-content="{l s='Address is not valid.' mod='packetery'}"></div>
 </div>

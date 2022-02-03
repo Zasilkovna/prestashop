@@ -93,7 +93,7 @@ class Ajax
             'name_branch' => $packeteryCarrier['name_branch'],
             'currency_branch' => $packeteryCarrier['currency_branch'],
             'country' => $address['country'],
-            'county' => $address['county'],
+            'county' => (isset($address['county']) ? $address['county'] : null),
             'zip' => $address['postcode'],
             'city' => $address['city'],
             'street' => $address['street'],
