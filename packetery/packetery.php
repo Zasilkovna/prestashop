@@ -22,6 +22,11 @@
  *  @copyright 2017 Zlab Solutions
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
+
+/*
+ * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
+ */
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -31,10 +36,6 @@ include_once(dirname(__file__).'/packetery.api.php');
 require_once __DIR__ . '/autoload.php';
 
 defined('PACKETERY_PLUGIN_DIR') || define('PACKETERY_PLUGIN_DIR', dirname(__FILE__));
-
-/*
- * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
- */
 
 class Packetery extends CarrierModule
 {
@@ -964,8 +965,13 @@ class Packetery extends CarrierModule
      */
     public function hookActionAdminControllerSetMedia()
     {
-        $this->context->controller->addCSS($this->_path . 'views/css/back.css?v=' . $this->version, 'all', null, false);
-        $this->context->controller->addJS($this->_path . 'views/js/back.js?v=' . $this->version);
+        $suffix = '?v=' . $this->version;
+        if (Tools::version_compare(_PS_VERSION_, '1.7.0.0', '<')) {
+            $suffix = '';
+        }
+
+        $this->context->controller->addCSS($this->_path . 'views/css/back.css' . $suffix, 'all', null, false);
+        $this->context->controller->addJS($this->_path . 'views/js/back.js' . $suffix);
     }
 
     /**
@@ -1251,7 +1257,7 @@ class Packetery extends CarrierModule
         if (isset($params['list']) && is_array($params['list'])) {
             foreach ($params['list'] as &$carrier) {
                 if ($carrier['name'] === '0') {
-                    $carrier['name'] = CarrierCore::getCarrierNameFromShopName();
+                    $carrier['name'] = \Packetery\Carrier\CarrierTools::getCarrierNameFromShopName();
                 }
                 list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
                     $carrier['id_carrier']

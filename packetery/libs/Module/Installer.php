@@ -3,9 +3,11 @@
 namespace Packetery\Module;
 
 use Packetery;
+use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
 use Language;
 use Packetery\Tools\ConfigHelper;
+use PrestaShopDatabaseException;
 use PrestaShopException;
 use PrestaShopLogger;
 use Tab;
@@ -93,11 +95,23 @@ class Installer
     /**
      * @param string $field
      * @return array
+     * @throws DatabaseException
      */
     private function createMultiLangField($field)
     {
+        $langIds = [];
+        if (method_exists('Language', 'getIDs')) {
+            $langIds = Language::getIDs(true);
+        } else {
+            // old PrestaShop 1.6
+            $activeLanguages = $this->dbTools->getRows('SELECT `id_lang` FROM `' . _DB_PREFIX_ . 'lang` WHERE `active` = 1');
+            if ($activeLanguages) {
+                $langIds = array_column($activeLanguages, 'id_lang');
+            }
+        }
+
         $multiLangField = [];
-        foreach (Language::getIDs(true) as $langId) {
+        foreach ($langIds as $langId) {
             $multiLangField[$langId] = $field;
         }
 
@@ -193,12 +207,17 @@ class Installer
      * @param string $name
      * @return bool
      * @throws PrestaShopException
-     * @throws \PrestaShopDatabaseException
+     * @throws PrestaShopDatabaseException
+     * @throws DatabaseException
      */
     private function addTab($parentClassName, $className, $name)
     {
         $tab = new Tab;
         $parentId = Tab::getIdFromClassName($parentClassName);
+        // PrestaShop 1.6 without the SELL tab group.
+        if ($parentId === false) {
+            $parentId = 0;
+        }
         $tab->id_parent = $parentId;
         $tab->module = 'packetery';
         $tab->class_name = $className;

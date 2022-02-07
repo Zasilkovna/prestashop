@@ -2,7 +2,6 @@
 
 namespace Packetery\Carrier;
 
-use CarrierCore;
 use HelperForm;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Tools\MessageManager;
@@ -78,7 +77,7 @@ class CarrierAdminForm
         }
 
         if ($carrierData['name'] === '0') {
-            $carrierData['name'] = CarrierCore::getCarrierNameFromShopName();
+            $carrierData['name'] = CarrierTools::getCarrierNameFromShopName();
         }
 
         list($availableCarriers, $warning) = $this->getAvailableCarriers($apiCarrierRepository, $carrierData);
