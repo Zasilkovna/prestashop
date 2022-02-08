@@ -334,8 +334,12 @@ tools = {
                     module.disableSubmitButton();
                 }
             }
-            if ($extra.find('#open-packeta-widget-hd').length && PacketaModule.ui.isAddressValidationUnsatisfied($extra)) {
-                module.disableSubmitButton();
+            if ($extra.find('#open-packeta-widget-hd').length) {
+                if (PacketaModule.ui.isAddressValidationUnsatisfied($extra)) {
+                    module.disableSubmitButton();
+                } else {
+                    module.enableSubmitButton();
+                }
             }
         });
     }
