@@ -529,7 +529,7 @@ class Packetery extends CarrierModule
                 $addressValidated = false;
                 if ($orderData && AddressTools::hasValidatedAddress($orderData)) {
                     $addressValidated = true;
-                    $this->context->smarty->assign('customerStreet', ($orderData['street'] ?: $orderData['city']) . ' ' . $orderData['house_number']);
+                    $this->context->smarty->assign('customerStreet', $orderData['street']);
                     $this->context->smarty->assign('customerHouseNumber', $orderData['house_number']);
                     $this->context->smarty->assign('customerCity', $orderData['city']);
                     $this->context->smarty->assign('customerZip', str_replace(' ', '', $orderData['zip']));

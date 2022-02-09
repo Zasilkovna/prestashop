@@ -9,7 +9,6 @@ $.getScript('https://widget-hd.packeta.com/www/js/library-hd.js').fail(function 
 });
 
 var country = 'cz,sk'; /* Default countries */
-var addressValidationSetting = $('#addressValidationSetting').val();
 
 function PacketeryCheckoutModulesManager() {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
@@ -240,6 +239,7 @@ PacketaModule.ui = {
 
     isAddressValidationUnsatisfied: function ($widgetParent) {
         var addressValidated = PacketaModule.ui.makeBoolean($widgetParent.find('#addressValidated').val());
+        var addressValidationSetting = $('#addressValidationSetting').val();
         return (this.isHdCarrier($widgetParent) && addressValidationSetting === 'required' && !addressValidated);
     },
 
