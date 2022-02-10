@@ -86,3 +86,4 @@
       - Updated: carrier list in module administration realised using standard PrestaShop's controller.
       - Added: in the case of a multistore, the list of orders and export in the administration
         takes into account the selected shop or shop group
+      - Updated: unification of data generation logic for shipment export (API + CSV)

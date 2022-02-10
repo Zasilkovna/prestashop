@@ -2,10 +2,6 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{packetery}prestashop>packetery.api_5552dc553d496d4b06866ca45b890b4a'] = 'Vyberte prosím nejdříve objednávky.';
-$_MODULE['<{packetery}prestashop>packetery.api_ffea7a72647ef53ba8cb26537a4bc2c0'] = 'Nepodařilo se načíst objednávku za účelem přípravy balíku.';
-$_MODULE['<{packetery}prestashop>packetery.api_40580ead2944ee1f216ef9be35c18eb4'] = 'Nepodařilo se nalézt směnný kurz mezi objednávkou a výdejním místem, objednávka';
-$_MODULE['<{packetery}prestashop>packetery.api_3593dc2dea08cf4567f70933c079f6a9'] = 'Zákazník nemá přiřazený email.';
 $_MODULE['<{packetery}prestashop>packetery_7e436ecba5095ef42cfeb5b696fbbdfd'] = 'Získejte zákazníkům přístup k vyzvedávacím bodům v síti Zásilkovny.';
 $_MODULE['<{packetery}prestashop>packetery_e35932e04a726a6aeaf748a6bb5d4267'] = 'Export objednávek do systému Zásilkovny.';
 $_MODULE['<{packetery}prestashop>packetery_4a93d9164aad959a6abc2de389170ac9'] = 'Zásilkovna';
@@ -83,6 +79,9 @@ $_MODULE['<{packetery}prestashop>widget-hd_d57ac83f33b2ef09dc08ec77e7e4f421'] = 
 $_MODULE['<{packetery}prestashop>deletelabels_c14077f78432a7944ec8c09566b5f25d'] = 'Konfiguraci nelze načíst.';
 $_MODULE['<{packetery}prestashop>deletelabels_79500929219856f7162cea4f4d85d9b7'] = 'Nepodařilo se získat čas vytvoření některých štítků. Zkontrolujte souborová oprávnění.';
 $_MODULE['<{packetery}prestashop>deletelabels_60abf2c345b55a7ed556d3293ea5c70c'] = 'Nepodařilo se odstranit některé štítky. Zkontrolujte souborová oprávnění.';
+$_MODULE['<{packetery}prestashop>orderexporter_4988c308d36d231707ae7e2d1e8d06b2'] = 'Nepodařilo se načíst údaje potřebné pro exportování objednávky';
+$_MODULE['<{packetery}prestashop>orderexporter_40580ead2944ee1f216ef9be35c18eb4'] = 'Nepodařilo se nalézt směnný kurz mezi objednávkou a výdejním místem, objednávka';
+$_MODULE['<{packetery}prestashop>packetsubmitter_5552dc553d496d4b06866ca45b890b4a'] = 'Vyberte prosím nejdříve objednávky.';
 $_MODULE['<{packetery}prestashop>uninstaller_e21a827831f90240feccbb1f8fd8c7e3'] = 'Při odinstalování modulu Zásilkovny nastala výjimka:';
 $_MODULE['<{packetery}prestashop>installer_4a93d9164aad959a6abc2de389170ac9'] = 'Zásilkovna';
 $_MODULE['<{packetery}prestashop>installer_ddd6dc80580e42e39480b99a2fd30e1e'] = 'Objednávky Zásilkovna';

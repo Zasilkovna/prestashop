@@ -24,7 +24,9 @@
  */
 
 use Packetery\Exceptions\DatabaseException;
+use Packetery\Order\CsvExporter;
 use Packetery\Order\OrderRepository;
+use Packetery\Order\PacketSubmitter;
 use Packetery\Tools\ConfigHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
@@ -190,8 +192,8 @@ class PacketeryOrderGridController extends ModuleAdminController
     private function createPackets(array $ids)
     {
         $module = $this->getModule();
-        $orderRepository = $module->diContainer->get(OrderRepository::class);
-        $exportResult = PacketeryApi::ordersExport($orderRepository, $ids);
+        $packetSubmitter = $module->diContainer->get(PacketSubmitter::class);
+        $exportResult = $packetSubmitter->ordersExport($ids);
         if (is_array($exportResult)) {
             foreach ($exportResult as $resultRow) {
                 if (!$resultRow[1]) {
@@ -286,8 +288,8 @@ class PacketeryOrderGridController extends ModuleAdminController
             return;
         }
         $module = $this->getModule();
-        $orderRepository = $module->diContainer->get(OrderRepository::class);
-        Packeteryclass::outputCsvExport($ids, $orderRepository);
+        $csvExporter = $module->diContainer->get(CsvExporter::class);
+        $csvExporter->outputCsvExport($ids);
         die();
     }
 

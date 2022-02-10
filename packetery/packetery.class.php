@@ -23,14 +23,10 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-use Packetery\Address\AddressTools;
-use Packetery\Carrier\CarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Order\OrderRepository;
 use Packetery\Payment\PaymentRepository;
-use Packetery\Tools\ConfigHelper;
-use Packetery\Weight\Converter;
 
 require_once(dirname(__FILE__) . '../../../config/config.inc.php');
 require_once(dirname(__FILE__) . '../../../classes/Cookie.php');
@@ -99,133 +95,7 @@ class Packeteryclass
         return $total;
     }
 
-    /**
-     * @param $n
-     * @param int $x
-     * @return float|int
-     */
-    public static function roundUpMultiples($n, $x = 5)
-    {
-        return (ceil($n) % $x === 0) ? ceil($n) : round(($n + $x / 2) / $x) * $x;
-    }
-
     /*ORDERS*/
-    /**
-     * Get data for CSV Export
-     * @param array $order_ids - IDs of orders to be exported
-     * @param OrderRepository $orderRepository
-     * @return array - Order data
-     * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public static function collectOrdersDataForCsvExport(array $order_ids, OrderRepository $orderRepository)
-    {
-        $data = [];
-        foreach ($order_ids as $order_id) {
-            $order = new Order($order_id);
-            $customer = $order->getCustomer();
-
-            /* Tried to use customer address before, but it's broken if the customer ever changes it */
-            $address = (array)new Address($order->id_address_delivery);
-
-            if (empty($address)) {
-                continue;
-            }
-
-            $packeteryOrder = $orderRepository->getWithShopById($order_id);
-
-            if (empty($packeteryOrder) || !isset($packeteryOrder['id_branch']) || empty($packeteryOrder['id_branch'])) {
-                continue;
-            }
-
-            $total =
-                $order->getTotalProductsWithTaxes() +
-                $order->total_shipping_tax_incl +
-                $order->total_wrapping_tax_incl -
-                $order->total_discounts_tax_incl;
-            $cod = $packeteryOrder['is_cod'] == 1 ? $total : 0;
-
-            $senderLabel = ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']);
-
-            $currency = new Currency($order->id_currency);
-
-            $weight = '';
-            if ($packeteryOrder['weight'] !== null) {
-                // used saved if set
-                $weight = $packeteryOrder['weight'];
-            } else if (Converter::isKgConversionSupported()) {
-                $weight = Converter::getKilograms((float)$order->getTotalWeight());
-            }
-
-            $data[$order_id] = [
-                'Reserved' => "",
-                'OrderNumber' => $order->id,
-                'Name' => !empty($address['firstname']) ? $address['firstname'] : $customer->firstname,
-                'Surname' => !empty($address['lastname']) ? $address['lastname'] : $customer->lastname,
-                'Company' => $customer->company,
-                'E-mail' => $customer->email,
-                'Phone' => !empty($address['phone_mobile']) ? $address['phone_mobile'] : $address['phone'],
-                'COD' => $cod,
-                'Currency' => $currency->iso_code,
-                'Value' => $total,
-                'Weight' => $weight,
-                'PickupPointOrCarrier' => $packeteryOrder['id_branch'],
-                'SenderLabel' => $senderLabel,
-                'AdultContent' => "",
-                'DelayedDelivery' => "",
-                'Street' => '',
-                'House Number' => '',
-                'City' => '',
-                'ZIP' => '',
-                'CarrierPickupPoint' => $packeteryOrder['carrier_pickup_point'],
-                'Width' => "",
-                'Height' => "",
-                'Depth' => "",
-                'Note' => "",
-            ];
-            if ($packeteryOrder['is_ad']) {
-                if (AddressTools::hasValidatedAddress($packeteryOrder)) {
-                    $data[$order_id]['ZIP'] = $packeteryOrder['zip'];
-                    $data[$order_id]['City'] = $packeteryOrder['city'];
-                    $data[$order_id]['Street'] = $packeteryOrder['street'];
-                    $data[$order_id]['House Number'] = $packeteryOrder['house_number'];
-                } else {
-                    $data[$order_id]['ZIP'] = str_replace(' ', '', $address['postcode']);
-                    $data[$order_id]['City'] = $address['city'];
-                    $data[$order_id]['Street'] = $address['address1'];
-                }
-            }
-
-            $orderRepository->setExported(true, $order_id);
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param array $orders
-     * @param OrderRepository $orderRepository
-     * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public static function outputCsvExport(array $orders, OrderRepository $orderRepository)
-    {
-        $orderData = Packeteryclass::collectOrdersDataForCsvExport($orders, $orderRepository);
-        $date = date('Y-m-d');
-
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="export_' . $date . '.csv"');
-        $fp = fopen('php://output', 'wb');
-        fputcsv($fp, ['version 6']);
-        fputcsv($fp, []);
-        foreach ($orderData as $line) {
-            fputcsv($fp, $line);
-        }
-        fclose($fp);
-    }
-
     /**
      * Returns packetery order tracking number
      * @param string $id_orders Comma separated integers
