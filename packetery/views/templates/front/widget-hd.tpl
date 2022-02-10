@@ -44,5 +44,5 @@
             </div>
         </div>
     </div>
-    <div class="packetery-address-not-validated-message" data-content="{l s='Address is not valid.' mod='packetery'}"></div>
+    <div class="packetery-address-not-validated-message" data-content="{l s='Address was not validated.' mod='packetery'}"></div>
 </div>

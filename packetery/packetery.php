@@ -542,7 +542,7 @@ class Packetery extends CarrierModule
                 $this->context->smarty->assign('addressValidationSetting', $addressValidationSetting);
                 $this->context->smarty->assign('addressValidated', $addressValidated);
                 $this->context->smarty->assign('addressValidatedMessage', $this->l('Address is valid.'));
-                $this->context->smarty->assign('addressNotValidatedMessage', $this->l('Address is not valid.'));
+                $this->context->smarty->assign('addressNotValidatedMessage', $this->l('Address was not validated.'));
                 $this->context->smarty->assign('countryDiffersMessage',
                     $this->l('The selected delivery address is in a country other than the country of delivery of the order.'));
 
