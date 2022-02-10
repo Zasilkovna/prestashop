@@ -32,4 +32,18 @@ class CarrierTools
         }
         return array($carrierZones, $carrierCountries);
     }
+
+    /**
+     * @return string
+     */
+    public static function getCarrierNameFromShopName()
+    {
+        // in old PrestaShop 1.6 method does not exist
+        // cannot use CarrierCore, causes "Fatal error: Cannot redeclare class CarrierCore"
+        if (method_exists('Carrier', 'getCarrierNameFromShopName')) {
+            return Carrier::getCarrierNameFromShopName();
+        }
+
+        return str_replace(['#', ';'], '', Configuration::get('PS_SHOP_NAME'));
+    }
 }

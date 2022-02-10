@@ -58,7 +58,11 @@
 }
 
 /* new settings form */
-
 .bootstrap .packetery select.fixed-width-xl {
     width: 100% !important;
+}
+
+/* main menu item */
+.icon-Packetery:before {
+    content: "\f0d1";
 }
