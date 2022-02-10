@@ -137,7 +137,7 @@ class Packeteryclass
     public static function getPacketeryOrderRow($id_order)
     {
         $sql = 'SELECT `id_branch`, `id_carrier`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`,
-                    `carrier_pickup_point`, `weight`, `zip`, `city`, `street` 
+                    `carrier_pickup_point`, `weight`, `zip`, `city`, `street`, `house_number`
                     FROM `' . _DB_PREFIX_ . 'packetery_order` 
                     WHERE id_order = ' . (int)$id_order;
 
@@ -195,7 +195,9 @@ class Packeteryclass
                 ORDER BY `o`.`date_add` DESC LIMIT ' . (($page - 1) * $per_page) . ',' . $per_page;
         $orders = Db::getInstance()->executeS($sql);
 
-        $orders = self::addDynamicDataToOrders($orders);
+        if (is_array($orders)) {
+            $orders = self::addDynamicDataToOrders($orders);
+        }
 
         return array($orders, $pages);
     }

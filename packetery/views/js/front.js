@@ -9,7 +9,6 @@ $.getScript('https://widget-hd.packeta.com/www/js/library-hd.js').fail(function 
 });
 
 var country = 'cz,sk'; /* Default countries */
-var addressValidationSetting = $('#addressValidationSetting').val();
 
 function PacketeryCheckoutModulesManager() {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
@@ -169,9 +168,10 @@ window.initializePacketaWidget = function ()
         e.preventDefault();
         var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
         var widgetCarriers = $widgetParent.find('#widget_carriers').val();
-        var customerStreet = $('#customerStreet').val();
-        var customerCity = $('#customerCity').val();
-        var customerZip = $('#customerZip').val();
+        var customerStreet = $widgetParent.find('#customerStreet').val();
+        var customerHouseNumber = $widgetParent.find('#customerHouseNumber').val();
+        var customerCity = $widgetParent.find('#customerCity').val();
+        var customerZip = $widgetParent.find('#customerZip').val();
         var widgetOptions = {
             layout: 'hd',
             language: language,
@@ -181,6 +181,9 @@ window.initializePacketaWidget = function ()
         };
         if (customerStreet) {
             widgetOptions.street = customerStreet;
+        }
+        if (customerHouseNumber) {
+            widgetOptions.houseNumber = customerHouseNumber;
         }
         if (customerCity) {
             widgetOptions.city = customerCity;
@@ -209,13 +212,43 @@ window.initializePacketaWidget = function ()
                     $widgetParent.find('#addressValidated').val(false);
                     $addressValidationResult.removeClass('address-validated');
                     $addressValidationResult.text($widgetParent.find('#countryDiffersMessage').val());
-                    if (tools.isAddressValidationUnsatisfied($widgetParent)) {
+                    if (PacketaModule.ui.isAddressValidationUnsatisfied($widgetParent)) {
                         module.disableSubmitButton();
                     }
                 }
             }
         }, widgetOptions);
     });
+};
+
+PacketaModule = window.PacketaModule || {};
+
+PacketaModule.ui = {
+    isHdCarrier: function ($widgetParent) {
+        return !!$widgetParent.find('#open-packeta-widget-hd').length;
+    },
+
+    isPpCarrier: function ($widgetParent) {
+        return !!$widgetParent.find('#open-packeta-widget').length;
+    },
+
+    isPickupPointInvalid: function ($widgetParent) {
+        var selectedBranchId = $widgetParent.find('.packeta-branch-id').val();
+        return this.isPpCarrier($widgetParent) && !selectedBranchId;
+    },
+
+    isAddressValidationUnsatisfied: function ($widgetParent) {
+        var addressValidated = PacketaModule.ui.makeBoolean($widgetParent.find('#addressValidated').val());
+        var addressValidationSetting = $('#addressValidationSetting').val();
+        return (this.isHdCarrier($widgetParent) && addressValidationSetting === 'required' && !addressValidated);
+    },
+
+    makeBoolean: function (value) {
+        if (value === 'false') {
+            return false;
+        }
+        return !!value;
+    }
 };
 
 tools = {
@@ -254,7 +287,7 @@ tools = {
             }
             if ($extra.is(':visible') &&
                 $extra.find('#open-packeta-widget-hd').length &&
-                tools.isAddressValidationUnsatisfied($extra)
+                PacketaModule.ui.isAddressValidationUnsatisfied($extra)
             ) {
                 module.disableSubmitButton();
             }
@@ -301,13 +334,14 @@ tools = {
                     module.disableSubmitButton();
                 }
             }
-            if ($extra.find('#open-packeta-widget-hd').length && tools.isAddressValidationUnsatisfied($extra)) {
-                module.disableSubmitButton();
+            if ($extra.find('#open-packeta-widget-hd').length) {
+                if (PacketaModule.ui.isAddressValidationUnsatisfied($extra)) {
+                    module.disableSubmitButton();
+                } else {
+                    module.enableSubmitButton();
+                }
             }
         });
-    },
-    isAddressValidationUnsatisfied: function($widgetParent) {
-        return addressValidationSetting === 'required' && $widgetParent.find('#addressValidated').val() !== true;
     }
 }
 

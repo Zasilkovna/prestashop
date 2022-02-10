@@ -793,10 +793,13 @@ $(document).ready(function(){
 $(document).ready(function () {
 	var $widgetHdButton = $('.open-packeta-hd-widget');
 	if ($widgetHdButton.length === 1) {
-		// TODO: add hd widget address
-		$.getScript('...').fail(function () {
+		$.getScript('https://widget-hd.packeta.com/www/js/library-hd.js').fail(function () {
 			console.error('Unable to load Packeta home delivery widget.');
 		});
+
+		if ($('.picked-delivery-place').data('validated') === '') {
+			$('.validatedAddress').hide();
+		}
 
 		var widgetHdOptionsData = $widgetHdButton.data('widget-options');
 		var widgetHdOptions = {
@@ -817,9 +820,10 @@ $(document).ready(function () {
 					$('.packetery form input[name="address"]').val(JSON.stringify(address));
 					$('.packetery-street').text(address.street + ' ' + address.houseNumber);
 					$('.packetery-city').text(address.city);
-					$('.packetery-zip').text(address.zip);
+					$('.packetery-zip').text(address.postcode);
 					$('.packetery-county').text(address.county);
 					$('.packetery-gps').text(address.latitude + ', ' + address.longitude);
+					$('.validatedAddress').show();
 				}
 			}, widgetHdOptions);
 		});

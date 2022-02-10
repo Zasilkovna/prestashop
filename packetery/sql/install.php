@@ -42,7 +42,15 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_order` (
             `is_ad` int DEFAULT 0,
             `is_carrier` tinyint(1) NOT NULL DEFAULT 0,
             `carrier_pickup_point` varchar(40) NULL,      
-            `weight` decimal(20,6) NULL,      
+            `weight` decimal(20,6) NULL,
+            `country` varchar(2) NULL,
+            `county` varchar(255) NULL,
+            `zip` varchar(255) NULL,
+            `city` varchar(255) NULL,
+            `street` varchar(255) NULL,
+            `house_number` varchar(255) NULL,
+            `latitude` varchar(255) NULL,
+            `longitude` varchar(255) NULL,
             UNIQUE(`id_order`),
             UNIQUE(`id_cart`)
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
