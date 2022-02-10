@@ -498,8 +498,8 @@ class Packetery extends CarrierModule
             $address = new AddressCore($cart->id_address_delivery);
             $countryObj = new CountryCore($address->id_country);
             $customerCountry = strtolower($countryObj->iso_code);
-            $customerStreet = $address->address1;
-            $customerCity = $address->city;
+            $customerStreet = trim($address->address1);
+            $customerCity = trim($address->city);
             $customerZip = str_replace(' ', '', $address->postcode);
         }
         $this->context->smarty->assign('customerCountry', $customerCountry);
