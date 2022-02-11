@@ -48,6 +48,8 @@
                            value="{$packeta_api_key}">
                     <input type="hidden" id="packeta-branch-name" class="packeta-branch-name" name="packeta-branch-name"
                            value="{$name_branch}">
+                    <input type="hidden" id="packeta-branch-currency" class="packeta-branch-currency" name="packeta-branch-currency"
+                           value="{$currency_branch}">
                     <input type="hidden" id="packeta-pickup-point-type" class="packeta-pickup-point-type" name="packeta-pickup-point-type"
                            value="{$pickup_point_type}">
                     <input type="hidden" id="packeta-carrier-id" class="packeta-carrier-id" name="packeta-carrier-id"

@@ -128,6 +128,7 @@ window.initializePacketaWidget = function ()
                 /* Save needed pickup point attributes to inputs */
                 $widgetParent.find('.packeta-branch-id').val(pickupPoint.id);
                 $widgetParent.find('.packeta-branch-name').val(pickupPoint.name);
+                $widgetParent.find('.packeta-branch-currency').val(pickupPoint.currency);
                 $widgetParent.find('.packeta-pickup-point-type').val(pickupPoint.pickupPointType);
                 $widgetParent.find('.packeta-carrier-id').val(pickupPoint.carrierId);
                 $widgetParent.find('.packeta-carrier-pickup-point-id').val(pickupPoint.carrierPickupPointId);
@@ -147,7 +148,8 @@ window.initializePacketaWidget = function ()
                     pickupPoint.name,
                     pickupPoint.pickupPointType,
                     pickupPoint.carrierId,
-                    pickupPoint.carrierPickupPointId
+                    pickupPoint.carrierPickupPointId,
+                    pickupPoint.currency
                 );
 
                 if (module !== null) {
@@ -325,11 +327,12 @@ tools = {
                 var id_branch = $extra.find(".packeta-branch-id").val();
                 if (id_branch !== '') {
                     var name_branch = $extra.find(".packeta-branch-name").val();
+                    var currency_branch = $extra.find(".packeta-branch-currency").val();
                     var pickup_point_type = $extra.find(".packeta-pickup-point-type").val();
                     var widget_carrier_id = $extra.find(".packeta-carrier-id").val();
                     var carrier_pickup_point_id = $extra.find(".packeta-carrier-pickup-point-id").val();
                     module.enableSubmitButton();
-                    packetery.widgetSaveOrderBranch(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id);
+                    packetery.widgetSaveOrderBranch(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id, currency_branch);
                 } else {
                     module.disableSubmitButton();
                 }
@@ -346,7 +349,7 @@ tools = {
 }
 
 packetery = {
-    widgetSaveOrderBranch: function (prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id)
+    widgetSaveOrderBranch: function (prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id, currency_branch)
     {
         $.ajax({
             type: 'POST',
@@ -355,6 +358,7 @@ packetery = {
                 'prestashop_carrier_id': prestashop_carrier_id,
                 'id_branch': id_branch,
                 'name_branch': name_branch,
+                'currency_branch': currency_branch,
                 'pickup_point_type': pickup_point_type,
                 'widget_carrier_id': widget_carrier_id,
                 'carrier_pickup_point_id': carrier_pickup_point_id
