@@ -2,9 +2,9 @@
 
 use Packetery\Order\CsvExporter;
 
-require_once __DIR__ . '/../../config/config.inc.php';
-require_once __DIR__ . '/../../init.php';
-require_once __DIR__ . '/packetery.class.php';
+require_once dirname(__FILE__) . '/../../config/config.inc.php';
+require_once dirname(__FILE__) . '/../../init.php';
+require_once dirname(__FILE__) . '/packetery.class.php';
 
 $orders = Tools::getValue('orders');
 $orders = explode(',', $orders);
