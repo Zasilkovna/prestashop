@@ -110,6 +110,7 @@ class OrderSaver
         if (!isset($cartId) ||
             !Tools::getIsset('id_branch') ||
             !Tools::getIsset('name_branch') ||
+            !Tools::getIsset('currency_branch') ||
             !Tools::getIsset('prestashop_carrier_id')
         ) {
             return [
@@ -123,6 +124,7 @@ class OrderSaver
 
         $branchId = Tools::getValue('id_branch');
         $branchName = Tools::getValue('name_branch');
+        $branchCurrency = Tools::getValue('currency_branch');
         $prestashopCarrierId = Tools::getValue('prestashop_carrier_id');
         $pickupPointType = (Tools::getIsset('pickup_point_type') ? Tools::getValue('pickup_point_type') : 'internal');
         $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
@@ -130,17 +132,10 @@ class OrderSaver
 
         $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int)$prestashopCarrierId);
         $isCod = $packeteryCarrier['is_cod'];
-
-        $currency = CurrencyCore::getCurrency(Context::getContext()->cart->id_currency);
-        $branchCurrency = $currency['iso_code'];
-
         if (!isset($branchCurrency, $isCod)) {
             return [
                 'result' => false,
-                'message' => 'Currency or COD setting could not be obtained: ' . serialize([
-                        'branchCurrency' => $branchCurrency,
-                        'isCod' => $isCod,
-                    ]),
+                'message' => 'COD setting could not be obtained.',
             ];
         }
 

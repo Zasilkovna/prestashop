@@ -87,3 +87,4 @@
       - Added: in the case of a multistore, the list of orders and export in the administration
         takes into account the selected shop or shop group
       - Updated: unification of data generation logic for shipment export (API + CSV)
+      - Fixed: correct storage of chosen pickup point's currency
