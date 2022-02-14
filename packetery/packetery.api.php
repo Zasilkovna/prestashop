@@ -645,6 +645,7 @@ class PacketeryApi
         if (!isset($id_cart) ||
             !Tools::getIsset('id_branch') ||
             !Tools::getIsset('name_branch') ||
+            !Tools::getIsset('currency_branch') ||
             !Tools::getIsset('prestashop_carrier_id')
         ) {
             return false;
@@ -652,6 +653,7 @@ class PacketeryApi
 
         $id_branch = Tools::getValue('id_branch');
         $name_branch = Tools::getValue('name_branch');
+        $currency_branch = Tools::getValue('currency_branch');
         $prestashopCarrierId = Tools::getValue('prestashop_carrier_id');
         $pickupPointType = (Tools::getIsset('pickup_point_type') ? Tools::getValue('pickup_point_type') : 'internal');
         $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
@@ -662,13 +664,7 @@ class PacketeryApi
             return false;
         }
         $is_cod = $packetery_carrier_row['is_cod'];
-
-        $currency = CurrencyCore::getCurrency(Context::getContext()->cart->id_currency);
-        $currency_branch = $currency['iso_code'];
-
-        if (!isset($currency_branch) ||
-            !isset($is_cod)
-        ) {
+        if (!isset($is_cod)) {
             return false;
         }
 
