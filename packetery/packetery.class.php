@@ -23,6 +23,7 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Address\AddressTools;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Weight\Converter;
 
@@ -135,7 +136,8 @@ class Packeteryclass
      */
     public static function getPacketeryOrderRow($id_order)
     {
-        $sql = 'SELECT `id_branch`, `id_carrier`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`, `carrier_pickup_point`, `weight` 
+        $sql = 'SELECT `id_branch`, `id_carrier`, `is_cod`, `is_ad`, `currency_branch`, `is_carrier`,
+                    `carrier_pickup_point`, `weight`, `zip`, `city`, `street`, `house_number`
                     FROM `' . _DB_PREFIX_ . 'packetery_order` 
                     WHERE id_order = ' . (int)$id_order;
 
@@ -184,7 +186,8 @@ class Packeteryclass
                     `po`.`exported`,
                     `po`.`tracking_number`,
                     `po`.`is_ad`,
-                    `po`.`weight`
+                    `po`.`weight`,
+                    `po`.`zip`
                 FROM `' . _DB_PREFIX_ . 'orders` `o`
                     JOIN `' . _DB_PREFIX_ . 'packetery_order` `po` ON `po`.`id_order` = `o`.`id_order`
                     JOIN `' . _DB_PREFIX_ . 'customer` `c` ON `c`.`id_customer` = `o`.`id_customer`
@@ -192,7 +195,9 @@ class Packeteryclass
                 ORDER BY `o`.`date_add` DESC LIMIT ' . (($page - 1) * $per_page) . ',' . $per_page;
         $orders = Db::getInstance()->executeS($sql);
 
-        $orders = self::loadWeightToOrders($orders);
+        if (is_array($orders)) {
+            $orders = self::addDynamicDataToOrders($orders);
+        }
 
         return array($orders, $pages);
     }
@@ -203,15 +208,16 @@ class Packeteryclass
      * @param array $orders
      * @return array
      */
-    public static function loadWeightToOrders(array $orders)
+    public static function addDynamicDataToOrders(array $orders)
     {
         if ($orders) {
             foreach ($orders as $index => $order) {
                 if ($order['weight'] === null) {
                     $orderInstance = new \Order($order['id_order']);
                     $order['weight'] = Converter::getKilograms($orderInstance->getTotalWeight());
-                    $orders[$index] = $order;
                 }
+                $order['address_validated'] = AddressTools::hasValidatedAddress($order);
+                $orders[$index] = $order;
             }
         }
         return $orders;
@@ -280,16 +286,28 @@ class Packeteryclass
                 'SenderLabel' => $senderLabel,
                 'AdultContent' => "",
                 'DelayedDelivery' => "",
-                'Street' => $address['address1'],
+                'Street' => '',
                 'House Number' => '',
-                'City' => $address['city'],
-                'ZIP' => $address['postcode'],
+                'City' => '',
+                'ZIP' => '',
                 'CarrierPickupPoint' => $packeteryOrder['carrier_pickup_point'],
                 'Width' => "",
                 'Height' => "",
                 'Depth' => "",
                 'Note' => "",
             ];
+            if ($packeteryOrder['is_ad']) {
+                if (AddressTools::hasValidatedAddress($packeteryOrder)) {
+                    $data[$order_id]['ZIP'] = $packeteryOrder['zip'];
+                    $data[$order_id]['City'] = $packeteryOrder['city'];
+                    $data[$order_id]['Street'] = $packeteryOrder['street'];
+                    $data[$order_id]['House Number'] = $packeteryOrder['house_number'];
+                } else {
+                    $data[$order_id]['ZIP'] = str_replace(' ', '', $address['postcode']);
+                    $data[$order_id]['City'] = $address['city'];
+                    $data[$order_id]['Street'] = $address['address1'];
+                }
+            }
 
             self::setPacketeryExport($order_id, TRUE);
         }
@@ -594,11 +612,6 @@ class Packeteryclass
                 $fieldsToSet['name_branch'] = pSQL($branchName);
                 $fieldsToSet['currency_branch'] = pSQL($branchCurrency);
             }
-            if ($pickupPointType) {
-                $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
-            } else {
-                $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
-            }
             if ($isPacketeryCarrier) {
                 $result = $db->update('packetery_address_delivery', $fieldsToSet, '`id_carrier` = ' . ((int)$carrierId), 0, true);
             } else {
@@ -606,6 +619,7 @@ class Packeteryclass
                 $fieldsToSet['id_carrier'] = (int)$carrierId;
                 $result = $db->insert('packetery_address_delivery', $fieldsToSet, true);
             }
+            $carrierUpdate = ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1];
         }
         $db->update('carrier', $carrierUpdate, '`id_carrier` = ' . ((int)$carrierId), 0, true);
 

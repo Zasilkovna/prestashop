@@ -4,8 +4,11 @@ $.getScript("https://widget.packeta.com/v6/www/js/library.js")
         console.error('Unable to load Packeta Widget.');
     });
 
-var country = 'cz,sk'; /* Default countries */
+$.getScript('https://widget-hd.packeta.com/www/js/library-hd.js').fail(function () {
+    console.error('Unable to load Packeta home delivery widget.');
+});
 
+var country = 'cz,sk'; /* Default countries */
 
 function PacketeryCheckoutModulesManager() {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
@@ -57,8 +60,8 @@ function PacketeryCheckoutModulesManager() {
     }
 }
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
-var widgetCarriers;
 var widgetInitialized = false;
+var $selectedInput;
 
 $(document).ready(function () {
     if ($('.zas-box').length) {
@@ -84,38 +87,34 @@ window.initializePacketaWidget = function ()
         return;
     }
 
-    // parameters
-
-    var customerCountry = $('#customer_country').val();
+    // parameters common to all carriers
+    var customerCountry = $('#customerCountry').val();
     if (customerCountry !== '') {
         country = customerCountry;
     }
-
     var language = 'en';
-
     var shopLanguage = $('#shop-language').val();
     if (shopLanguage !== '') {
         language = shopLanguage;
     }
+    var app_identity = $('#app_identity').val(); // Get module version for widgets
 
     var module = packeteryModulesManager.detectModule();
-    var $selectedInput = module.getSelectedInput();
+    $selectedInput = module.getSelectedInput();
     if ($selectedInput.length === 0) {
         $(module.getExtraContentSelector()).hide();
         return;
     }
 
-    var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
-    widgetCarriers = $widgetParent.find('#widget_carriers').val();
-
     $('.open-packeta-widget').click(function (e) {
         e.preventDefault();
-        var app_identity = $('#app_identity').val(); // Get module version for widget
         var widgetOptions = {
             appIdentity: app_identity,
             country: country,
             language: language,
         };
+        var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
+        var widgetCarriers = $widgetParent.find('#widget_carriers').val();
         if (widgetCarriers !== '') {
             widgetOptions.carriers = widgetCarriers;
         }
@@ -164,6 +163,92 @@ window.initializePacketaWidget = function ()
             }
         }, widgetOptions);
     });
+
+    $('.open-packeta-widget-hd').click(function (e) {
+        e.preventDefault();
+        var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
+        var widgetCarriers = $widgetParent.find('#widget_carriers').val();
+        var customerStreet = $widgetParent.find('#customerStreet').val();
+        var customerHouseNumber = $widgetParent.find('#customerHouseNumber').val();
+        var customerCity = $widgetParent.find('#customerCity').val();
+        var customerZip = $widgetParent.find('#customerZip').val();
+        var widgetOptions = {
+            layout: 'hd',
+            language: language,
+            country: country,
+            // in this case, there will always be one carrier
+            carrierId: widgetCarriers,
+        };
+        if (customerStreet) {
+            widgetOptions.street = customerStreet;
+        }
+        if (customerHouseNumber) {
+            widgetOptions.houseNumber = customerHouseNumber;
+        }
+        if (customerCity) {
+            widgetOptions.city = customerCity;
+        }
+        if (customerZip) {
+            widgetOptions.postCode = customerZip;
+        }
+        PacketaHD.Widget.pick(packetaApiKey, function (result) {
+            var $selectedDeliveryOption = module.getSelectedInput();
+            $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
+
+            if (result != null && result.address != null) {
+                // there is also property packetaWidgetMessage which is true
+                var address = result.address;
+                var $addressValidationResult = $widgetParent.find('.address-validation-result');
+                if (address.country === country) {
+                    packetery.widgetSaveOrderAddress(address);
+                    $widgetParent.find('#addressValidated').val(true);
+                    $addressValidationResult.addClass('address-validated');
+                    $addressValidationResult.text($widgetParent.find('#addressValidatedMessage').val());
+                    $widgetParent.find('.picked-delivery-place').html(
+                        address.street + ' ' + address.houseNumber + ', ' + address.city + ', ' + address.postcode
+                    );
+                    module.enableSubmitButton();
+                } else {
+                    $widgetParent.find('#addressValidated').val(false);
+                    $addressValidationResult.removeClass('address-validated');
+                    $addressValidationResult.text($widgetParent.find('#countryDiffersMessage').val());
+                    if (PacketaModule.ui.isAddressValidationUnsatisfied($widgetParent)) {
+                        module.disableSubmitButton();
+                    }
+                }
+            }
+        }, widgetOptions);
+    });
+};
+
+PacketaModule = window.PacketaModule || {};
+
+PacketaModule.ui = {
+    isHdCarrier: function ($widgetParent) {
+        return !!$widgetParent.find('#open-packeta-widget-hd').length;
+    },
+
+    isPpCarrier: function ($widgetParent) {
+        return !!$widgetParent.find('#open-packeta-widget').length;
+    },
+
+    isPickupPointInvalid: function ($widgetParent) {
+        var selectedBranchId = $widgetParent.find('.packeta-branch-id').val();
+        return this.isPpCarrier($widgetParent) && !selectedBranchId;
+    },
+
+    isAddressValidationUnsatisfied: function ($widgetParent) {
+        var addressValidated = PacketaModule.ui.makeBoolean($widgetParent.find('#addressValidated').val());
+        var addressValidationSetting = $('#addressValidationSetting').val();
+        return (this.isHdCarrier($widgetParent) && addressValidationSetting === 'required' && !addressValidated);
+    },
+
+    makeBoolean: function (value) {
+        if (value === 'false') {
+            return false;
+        }
+        return !!value;
+    }
 };
 
 tools = {
@@ -178,25 +263,33 @@ tools = {
         $(module.getExtraContentSelector()).each(function ()
         {
             var $extra = $(this);
-            if (! $extra.find('#packetery-widget').length) {
+            if (!$extra.find('#open-packeta-widget').length && !$extra.find('#open-packeta-widget-hd').length) {
                 return;
             }
 
-            var carrierId = String($extra.find('#carrier_id').val());
-            var zpointCarriers = $extra.find('#zpoint_carriers').val();
-            zpointCarriers = JSON.parse(zpointCarriers);
-            if (!zpointCarriers.includes(carrierId)) {
-                $extra.find('#open-packeta-widget').hide();
-                $extra.find('#selected-branch').hide();
-            }
-
-            /* Only displayed extra content */
-            if ($extra.is(':visible')) {
-                /* And branch is not set, disable */
-                var id_branch = $extra.find(".packeta-branch-id").val();
-                if (id_branch <= 0) {
-                    module.disableSubmitButton();
+            if ($extra.find('#open-packeta-widget').length) {
+                var carrierId = String($extra.find('#carrier_id').val());
+                var zpointCarriers = $extra.find('#zpoint_carriers').val();
+                zpointCarriers = JSON.parse(zpointCarriers);
+                if (!zpointCarriers.includes(carrierId)) {
+                    $extra.find('#open-packeta-widget').hide();
+                    $extra.find('#selected-branch').hide();
                 }
+
+                /* Only displayed extra content */
+                if ($extra.is(':visible')) {
+                    /* And branch is not set, disable */
+                    var id_branch = $extra.find(".packeta-branch-id").val();
+                    if (id_branch <= 0) {
+                        module.disableSubmitButton();
+                    }
+                }
+            }
+            if ($extra.is(':visible') &&
+                $extra.find('#open-packeta-widget-hd').length &&
+                PacketaModule.ui.isAddressValidationUnsatisfied($extra)
+            ) {
+                module.disableSubmitButton();
             }
         });
 
@@ -212,13 +305,14 @@ tools = {
 
             $extra.closest(module.getExtraContentSelector()).show();
 
-            // if selected carrier is not Packetery then enable Continue button and we're done here
-            if (! $extra.find('#packetery-widget').length) {
+            // if selected carrier has no Packeta widget then enable Continue button and we're done here
+            if (!$extra.find('#open-packeta-widget').length && !$extra.find('#open-packeta-widget-hd').length) {
                 module.enableSubmitButton();
                 return;
             }
 
             if ($this.is(':checked')) {
+                $selectedInput = $this;
                 var $wrapper = $extra.closest(module.getExtraContentSelector());
                 setTimeout(function () {
                     if ($wrapper.is(':hidden')) {
@@ -227,18 +321,25 @@ tools = {
                 }, 500);
             }
 
-            widgetCarriers = $extra.find("#widget_carriers").val();
-
-            var id_branch = $extra.find(".packeta-branch-id").val();
-            if (id_branch !== '') {
-                var name_branch = $extra.find(".packeta-branch-name").val();
-                var pickup_point_type = $extra.find(".packeta-pickup-point-type").val();
-                var widget_carrier_id = $extra.find(".packeta-carrier-id").val();
-                var carrier_pickup_point_id = $extra.find(".packeta-carrier-pickup-point-id").val();
-                module.enableSubmitButton();
-                packetery.widgetSaveOrderBranch(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id);
-            } else {
-                module.disableSubmitButton();
+            if ($extra.find('#open-packeta-widget').length) {
+                var id_branch = $extra.find(".packeta-branch-id").val();
+                if (id_branch !== '') {
+                    var name_branch = $extra.find(".packeta-branch-name").val();
+                    var pickup_point_type = $extra.find(".packeta-pickup-point-type").val();
+                    var widget_carrier_id = $extra.find(".packeta-carrier-id").val();
+                    var carrier_pickup_point_id = $extra.find(".packeta-carrier-pickup-point-id").val();
+                    module.enableSubmitButton();
+                    packetery.widgetSaveOrderBranch(prestashop_carrier_id, id_branch, name_branch, pickup_point_type, widget_carrier_id, carrier_pickup_point_id);
+                } else {
+                    module.disableSubmitButton();
+                }
+            }
+            if ($extra.find('#open-packeta-widget-hd').length) {
+                if (PacketaModule.ui.isAddressValidationUnsatisfied($extra)) {
+                    module.disableSubmitButton();
+                } else {
+                    module.enableSubmitButton();
+                }
             }
         });
     }
@@ -267,6 +368,21 @@ packetery = {
             complete: function () {
                 $("body").toggleClass("wait");
             },
+        });
+    },
+    widgetSaveOrderAddress: function (address) {
+        $.ajax({
+            type: 'POST',
+            url: ajaxs.baseuri() + '/modules/packetery/ajax_front.php?action=widgetSaveOrderAddress' + ajaxs.checkToken(),
+            data: {
+                'address': address
+            },
+            beforeSend: function () {
+                $("body").toggleClass("wait");
+            },
+            complete: function () {
+                $("body").toggleClass("wait");
+            }
         });
     }
 }

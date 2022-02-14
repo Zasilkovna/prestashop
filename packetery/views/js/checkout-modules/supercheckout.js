@@ -25,15 +25,17 @@ var PacketeryCheckoutModuleSupercheckout = {
 
 $(function () {
     if (typeof addSupercheckoutOrderValidator !== 'undefined') {
-        addSupercheckoutOrderValidator(function() {
-
+        addSupercheckoutOrderValidator(function () {
             var $selectedInput = PacketeryCheckoutModuleSupercheckout.getSelectedInput(),
-                $extra = packeteryModulesManager.getWidgetParent($selectedInput),
-                selectedBranchId = $extra.find('.packeta-branch-id').val();
+                $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
 
-            if ($extra.length === 1 && !selectedBranchId) {
-                var error_text = $('.packetery-message-pickup-point-not-selected-error').data('content');
-                throw { message: error_text };
+            if ($widgetParent.length === 1) {
+                if (PacketaModule.ui.isPickupPointInvalid($widgetParent)) {
+                    throw {message: $('.packetery-message-pickup-point-not-selected-error').data('content')};
+                }
+                if (PacketaModule.ui.isAddressValidationUnsatisfied($widgetParent)) {
+                    throw {message: $('.packetery-address-not-validated-message').data('content')};
+                }
             }
         });
     }

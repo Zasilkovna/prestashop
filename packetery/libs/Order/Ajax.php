@@ -73,4 +73,41 @@ class Ajax
 
         return json_encode($result);
     }
+
+    public function widgetSaveOrderAddress()
+    {
+        $cart = \Context::getContext()->cart;
+        $cartId = $cart->id;
+
+        if (!isset($cartId) || !\Tools::getIsset('address')) {
+            return;
+        }
+
+        $address = \Tools::getValue('address');
+        $carrierId = (int)$cart->id_carrier;
+        $packeteryCarrier = \Packeteryclass::getPacketeryCarrierById($carrierId);
+        $packeteryOrderFields = [
+            'is_ad' => 1,
+            'id_carrier' => $carrierId,
+            'id_branch' => $packeteryCarrier['id_branch'],
+            'name_branch' => $packeteryCarrier['name_branch'],
+            'currency_branch' => $packeteryCarrier['currency_branch'],
+            'country' => $address['country'],
+            'county' => (isset($address['county']) ? $address['county'] : null),
+            'zip' => $address['postcode'],
+            'city' => $address['city'],
+            'street' => $address['street'],
+            'house_number' => $address['houseNumber'],
+            'latitude' => $address['latitude'],
+            'longitude' => $address['longitude'],
+        ];
+        $db = \Db::getInstance();
+        $isOrderSaved = (new OrderRepository($db))->existsByCart($cartId);
+        if ($isOrderSaved) {
+            $db->update('packetery_order', $packeteryOrderFields, '`id_cart` = ' . ((int)$cartId));
+        } else {
+            $packeteryOrderFields['id_cart'] = ((int)$cartId);
+            $db->insert('packetery_order', $packeteryOrderFields);
+        }
+    }
 }
