@@ -96,6 +96,7 @@ PacketaModule.runner = {
         if (PacketaModule.ui.isPickupPointValid($widgetParent)) {
             var branchId = $widgetParent.find(".packeta-branch-id").val();
             var branchName = $widgetParent.find(".packeta-branch-name").val();
+            var branchCurrency = $widgetParent.find(".packeta-branch-currency").val();
             var pickupPointType = $widgetParent.find(".packeta-pickup-point-type").val();
             var widgetCarrierId = $widgetParent.find(".packeta-carrier-id").val();
             var carrierPickupPointId = $widgetParent.find(".packeta-carrier-pickup-point-id").val();
@@ -107,6 +108,7 @@ PacketaModule.runner = {
                     pickupPointType,
                     widgetCarrierId,
                     carrierPickupPointId,
+                    branchCurrency,
                     PacketaModule.ui.toggleSubmit
                 );
             } else {
@@ -296,6 +298,7 @@ PacketaModule.ui = {
 
                 $widgetParent.find('.packeta-branch-id').val(pickupPoint.id);
                 $widgetParent.find('.packeta-branch-name').val(pickupPoint.name);
+                $widgetParent.find('.packeta-branch-currency').val(pickupPoint.currency);
                 $widgetParent.find('.packeta-pickup-point-type').val(pickupPoint.pickupPointType);
                 $widgetParent.find('.packeta-carrier-id').val(pickupPoint.carrierId);
                 $widgetParent.find('.packeta-carrier-pickup-point-id').val(pickupPoint.carrierPickupPointId);
@@ -313,6 +316,7 @@ PacketaModule.ui = {
                     pickupPoint.pickupPointType,
                     pickupPoint.carrierId,
                     pickupPoint.carrierPickupPointId,
+                    pickupPoint.currency,
                     function (jsonResponse) {
                         if (jsonResponse.result === true) {
                             PacketaModule.ui.toggleSubmit();
@@ -476,11 +480,12 @@ PacketaModule.ajax = {
         });
     },
 
-    savePickupPointInCart: function (prestashopCarrierId, branchId, branchName, pickupPointType, widgetCarrierId, carrierPickupPointId, onSuccess) {
+    savePickupPointInCart: function (prestashopCarrierId, branchId, branchName, pickupPointType, widgetCarrierId, carrierPickupPointId, branchCurrency, onSuccess) {
         return PacketaModule.ajax.post('savePickupPointInCart', {
             'prestashop_carrier_id': prestashopCarrierId,
             'id_branch': branchId,
             'name_branch': branchName,
+            'currency_branch': branchCurrency,
             'pickup_point_type': pickupPointType,
             'widget_carrier_id': widgetCarrierId,
             'carrier_pickup_point_id': carrierPickupPointId
