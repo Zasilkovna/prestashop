@@ -47,7 +47,7 @@ class PacketSubmitter
         }
 
         $packetAttributes = [
-            'number' => (string)$order->id,
+            'number' => $exportData['number'],
             'name' => $exportData['firstName'],
             'surname' => $exportData['lastName'],
             'email' => $exportData['email'],

@@ -39,6 +39,9 @@ defined('PACKETERY_PLUGIN_DIR') || define('PACKETERY_PLUGIN_DIR', dirname(__FILE
 
 class Packetery extends CarrierModule
 {
+    const ID_PREF_ID = 'id';
+    const ID_PREF_REF = 'reference';
+
     protected $config_form = false;
 
     /** @var \Packetery\DI\Container */
@@ -399,6 +402,14 @@ class Packetery extends CarrierModule
                     array_column($this->getAvailableLabelFormats(), 'id'),
                     array_column($this->getAvailableLabelFormats(), 'name')
                 ),
+                'required' => false,
+            ],
+            'PACKETERY_ID_PREFERENCE' => [
+                'title' => $this->l('As the order ID, use'),
+                'options' => [
+                    self::ID_PREF_ID => $this->l('Order ID'),
+                    self::ID_PREF_REF => $this->l('Order Reference'),
+                ],
                 'required' => false,
             ],
         ];

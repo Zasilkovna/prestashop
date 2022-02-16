@@ -28,6 +28,7 @@ function upgrade_module_3_0_0($module)
         ConfigHelper::update('PACKETERY_WIDGET_AUTOOPEN', 0) &&
         ConfigHelper::update('PACKETERY_CRON_TOKEN', Tools::passwdGen(32)) &&
         ConfigHelper::update('PACKETERY_LABEL_MAX_AGE_DAYS', 7) &&
+        ConfigHelper::update('PACKETERY_ID_PREFERENCE', Packetery::ID_PREF_ID) &&
         Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') &&
         $uninstaller->deleteTab('Adminpacketery') &&
         $installer->insertMenuItems()
