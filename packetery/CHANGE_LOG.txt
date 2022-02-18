@@ -1,6 +1,7 @@
 2.1.15 - Added: support for Packeta address validation widget in the cart with 'none', 'optional' and 'required'
          modes of operation. Validated address is saved and used in exports.
-         Fixed: correct storage of chosen pickup point's currency
+       - Fixed: correct storage of chosen pickup point's currency
+       - Fixed: type error raised after SQL error in Packeta orders list
 2.1.14 - Fixed: treated a rare situation where the payment module cannot be instantiated
        - Fixed: functionality of Packeta widget button in KnowBand SuperCheckout when no shipping method is preselected
        - Fixed: deprecated hook backOfficeHeader replaced by displayBackOfficeHeader
