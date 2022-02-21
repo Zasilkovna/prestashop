@@ -88,3 +88,4 @@
         takes into account the selected shop or shop group
       - Updated: unification of data generation logic for shipment export (API + CSV)
       - Fixed: correct storage of chosen pickup point's currency
+      - Added: possibility of using either ID or Reference as order ID in export

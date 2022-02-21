@@ -44,7 +44,7 @@ class CsvExporter
 
             $data[$order_id] = [
                 'reserved' => '',
-                'orderNumber' => $order->id,
+                'orderNumber' => $exportData['number'],
                 'firstName' => $exportData['firstName'],
                 'lastName' => $exportData['lastName'],
                 'company' => $exportData['company'],
