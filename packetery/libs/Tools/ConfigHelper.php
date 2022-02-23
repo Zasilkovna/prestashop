@@ -16,6 +16,7 @@ class ConfigHelper
         'PACKETERY_WIDGET_AUTOOPEN' => 'all',
         'PACKETERY_CRON_TOKEN' => 'all',
         'PACKETERY_LABEL_MAX_AGE_DAYS' => 'all',
+        'PACKETERY_ID_PREFERENCE' => 'all',
     ];
 
     /**

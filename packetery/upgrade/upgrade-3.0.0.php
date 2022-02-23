@@ -73,11 +73,11 @@ function upgrade_module_3_0_0($module)
     $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery`
         CHANGE `id_branch` `id_branch` varchar(255) NOT NULL AFTER `id_carrier`;';
     $sql[] = 'UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery` SET
-        `id_branch` = "' . Packeteryclass::ZPOINT . '"
+        `id_branch` = "' . Packetery::ZPOINT . '"
         WHERE `pickup_point_type` = "internal" AND
         `id_branch` = "";';
     $sql[] = 'UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery` SET
-        `id_branch` = "' . Packeteryclass::PP_ALL . '"
+        `id_branch` = "' . Packetery::PP_ALL . '"
         WHERE `pickup_point_type` = "external" AND
         `id_branch` = "";';
 

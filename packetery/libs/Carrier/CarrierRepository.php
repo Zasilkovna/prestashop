@@ -3,10 +3,10 @@
 namespace Packetery\Carrier;
 
 use Db;
+use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
-use Packeteryclass;
 
 class CarrierRepository
 {
@@ -209,7 +209,7 @@ class CarrierRepository
             } else {
                 $fieldsToSet['address_validation'] = null;
             }
-            if ($branchId === Packeteryclass::ZPOINT || $branchId === Packeteryclass::PP_ALL) {
+            if ($branchId === Packetery::ZPOINT || $branchId === Packetery::PP_ALL) {
                 $fieldsToSet['currency_branch'] = null;
             } else {
                 $fieldsToSet['currency_branch'] = $this->db->escape($branchCurrency);

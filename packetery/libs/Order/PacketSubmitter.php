@@ -6,8 +6,7 @@ use Order;
 use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
-use PacketeryApi;
-use Packeteryclass;
+use Packetery\Module\SoapApi;
 use PrestaShopDatabaseException;
 use PrestaShopException;
 use ReflectionException;
@@ -22,12 +21,15 @@ class PacketSubmitter
     private $orderRepository;
     /** @var Packetery */
     private $module;
+    /** @var SoapApi */
+    private $soapApi;
 
-    public function __construct(OrderRepository $orderRepository, Packetery $module)
+    public function __construct(OrderRepository $orderRepository, Packetery $module, SoapApi $soapApi)
     {
-        $this->apiPassword = PacketeryApi::getApiPass();
         $this->orderRepository = $orderRepository;
         $this->module = $module;
+        $this->soapApi = $soapApi;
+        $this->apiPassword = $soapApi->getApiPass();
     }
 
     /**
@@ -82,7 +84,7 @@ class PacketSubmitter
      */
     private function createShipmentSoap($packets)
     {
-        $client = new SoapClient(PacketeryApi::API_WSDL_URL);
+        $client = new SoapClient(SoapApi::API_WSDL_URL);
         try {
             $shipment = $client->createShipment($this->apiPassword, $packets);
             if ($shipment) {
@@ -117,6 +119,7 @@ class PacketSubmitter
 
         $packets_row = [];
         $packets = [];
+        $packeteryTracking = $this->module->diContainer->get(Tracking::class);
         // CREATE PACKET
         foreach ($id_orders as $id_order) {
             $this->orderRepository->setExported(0, $id_order);
@@ -124,7 +127,7 @@ class PacketSubmitter
             $packet_response = $this->createPacket($order, $this->module);
             if ($packet_response[0] === 1) {
                 $tracking_number = $packet_response[1];
-                $tracking_update = Packeteryclass::updateOrderTrackingNumber($id_order, $tracking_number, $this->orderRepository);
+                $tracking_update = $packeteryTracking->updateOrderTrackingNumber($id_order, $tracking_number);
                 if ($tracking_update) {
                     $packets_row[] = [$id_order, 1, $tracking_number];
                     $packets[] = $tracking_number;
@@ -151,7 +154,7 @@ class PacketSubmitter
      */
     private function validatePacketSoap(array $packetAttributes)
     {
-        $client = new SoapClient(PacketeryApi::API_WSDL_URL);
+        $client = new SoapClient(SoapApi::API_WSDL_URL);
 
         try {
             $validate = $client->packetAttributesValid($this->apiPassword, $packetAttributes);
@@ -171,7 +174,7 @@ class PacketSubmitter
      */
     private function createPacketSoap(array $packetAttributes)
     {
-        $client = new SoapClient(PacketeryApi::API_WSDL_URL);
+        $client = new SoapClient(SoapApi::API_WSDL_URL);
         try {
             $trackingNumber = $client->createPacket($this->apiPassword, $packetAttributes);
             if ($trackingNumber->id) {

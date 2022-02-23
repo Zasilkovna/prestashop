@@ -31,9 +31,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-include_once(dirname(__file__).'/packetery.class.php');
-include_once(dirname(__file__).'/packetery.api.php');
-require_once __DIR__ . '/autoload.php';
+require_once dirname(__FILE__) . '/autoload.php';
 
 defined('PACKETERY_PLUGIN_DIR') || define('PACKETERY_PLUGIN_DIR', dirname(__FILE__));
 
@@ -41,6 +39,9 @@ class Packetery extends CarrierModule
 {
     const ID_PREF_ID = 'id';
     const ID_PREF_REF = 'reference';
+    // used only for mixing with carrier ids
+    const ZPOINT = 'zpoint';
+    const PP_ALL = 'pp_all';
 
     protected $config_form = false;
 
@@ -56,6 +57,8 @@ class Packetery extends CarrierModule
         $this->need_instance = 0;
         $this->is_configurable = 1;
 
+        $this->diContainer = \Packetery\DI\ContainerFactory::create();
+
         if (Module::isInstalled($this->name)) {
             $errors = [];
             $this->configurationErrors($errors);
@@ -70,8 +73,6 @@ class Packetery extends CarrierModule
         $this->bootstrap = true;
 
         parent::__construct();
-
-        $this->diContainer = \Packetery\DI\ContainerFactory::create();
 
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
         $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
@@ -115,6 +116,14 @@ class Packetery extends CarrierModule
         }
 
         return parent::uninstall();
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppIdentity()
+    {
+        return sprintf('prestashop-%s-packeta-%s', _PS_VERSION_, $this->version);
     }
 
     /**
@@ -170,7 +179,8 @@ class Packetery extends CarrierModule
             $have_error = true;
         }
 
-        $key = PacketeryApi::getApiKey();
+        $soapApi = $this->diContainer->get(\Packetery\Module\SoapApi::class);
+        $key = $soapApi->getApiKey();
         if (Tools::strlen($key) < 5) {
             $key = false;
         }
@@ -255,9 +265,10 @@ class Packetery extends CarrierModule
         if (Tools::isSubmit('submit' . $this->name)) {
             $confOptions = $this->getConfigurationOptions();
             $error = false;
+            $packeteryOptions = $this->diContainer->get(\Packetery\Module\Options::class);
             foreach ($confOptions as $option => $optionConf) {
                 $configValue = (string)Tools::getValue($option);
-                $errorMessage = Packeteryclass::validateOptions($option, $configValue);
+                $errorMessage = $packeteryOptions->validate($option, $configValue);
                 if ($errorMessage !== false) {
                     $output .= $this->displayError($errorMessage);
                     $error = true;
@@ -266,7 +277,7 @@ class Packetery extends CarrierModule
                 }
             }
             $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
-            $paymentList = Packeteryclass::getListPayments($paymentRepository);
+            $paymentList = $paymentRepository->getListPayments();
             if ($paymentList) {
                 foreach ($paymentList as $payment) {
                     if (Tools::getIsset('payment_cod_' . $payment['module_name'])) {
@@ -324,7 +335,7 @@ class Packetery extends CarrierModule
         }
 
         $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
-        $paymentList = Packeteryclass::getListPayments($paymentRepository);
+        $paymentList = $paymentRepository->getListPayments();
         $codOptions = [];
         if ($paymentList) {
             foreach ($paymentList as $payment) {
@@ -557,7 +568,8 @@ class Packetery extends CarrierModule
 
             $base_uri = __PS_BASE_URI__ === '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
             $this->context->smarty->assign('baseuri', $base_uri);
-            $this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
+            $soapApi = $this->diContainer->get(\Packetery\Module\SoapApi::class);
+            $this->context->smarty->assign('packeta_api_key', $soapApi->getApiKey());
         }
         if (isset($params['packetery']['template'])) {
             $template = $params['packetery']['template'];
@@ -604,11 +616,12 @@ class Packetery extends CarrierModule
         $isPS16 = strpos(_PS_VERSION_, '1.6') === 0;
         $isOpcEnabled = (bool) Configuration::get('PS_ORDER_PROCESS_TYPE');
 
+        $soapApi = $this->diContainer->get(\Packetery\Module\SoapApi::class);
         $this->context->smarty->assign('packetaModuleConfig', [
             'baseUri' => $baseUri,
-            'apiKey' => PacketeryApi::getApiKey(),
+            'apiKey' => $soapApi->getApiKey(),
             'frontAjaxToken' => Tools::getToken('ajax_front'),
-            'appIdentity' => Packeteryclass::getAppIdentity($this->version),
+            'appIdentity' => $this->getAppIdentity(),
             'prestashopVersion' => _PS_VERSION_,
             'shopLanguage' => $shopLanguage,
             'customerCountry' => $customerCountry,
@@ -704,7 +717,8 @@ class Packetery extends CarrierModule
         $messages = [];
         $this->processPickupPointChange($messages);
 
-        $apiKey = PacketeryApi::getApiKey();
+        $soapApi = $this->diContainer->get(\Packetery\Module\SoapApi::class);
+        $apiKey = $soapApi->getApiKey();
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         $orderId = (int)$params['id_order'];
         $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
@@ -827,7 +841,7 @@ class Packetery extends CarrierModule
         $employee = Context::getContext()->employee;
         $widgetOptions = [
             'api_key' => $apiKey,
-            'app_identity' => Packeteryclass::getAppIdentity($this->version),
+            'app_identity' => $this->getAppIdentity(),
             'country' => strtolower($packeteryOrder['country']),
             'module_dir' => _MODULE_DIR_,
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
@@ -1278,9 +1292,9 @@ class Packetery extends CarrierModule
 
                 if ($carrier['id_branch'] === null) {
                     if ($carrier['pickup_point_type'] === 'internal') {
-                        $carrier['id_branch'] = Packeteryclass::ZPOINT;
+                        $carrier['id_branch'] = Packetery::ZPOINT;
                     } elseif ($carrier['pickup_point_type'] === 'external') {
-                        $carrier['id_branch'] = Packeteryclass::PP_ALL;
+                        $carrier['id_branch'] = Packetery::PP_ALL;
                     }
                 }
             }

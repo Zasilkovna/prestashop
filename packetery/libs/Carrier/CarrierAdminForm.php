@@ -3,9 +3,9 @@
 namespace Packetery\Carrier;
 
 use HelperForm;
+use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Tools\MessageManager;
-use Packeteryclass;
 use Tools;
 
 class CarrierAdminForm
@@ -50,7 +50,7 @@ class CarrierAdminForm
                 }
                 $addressValidation = Tools::getValue('address_validation');
                 if ($apiCarrier['is_pickup_points']) {
-                    if ($branchId === Packeteryclass::ZPOINT) {
+                    if ($branchId === Packetery::ZPOINT) {
                         $pickupPointType = 'internal';
                     } else {
                         $pickupPointType = 'external';
@@ -228,9 +228,9 @@ class CarrierAdminForm
         $hasPickupPointCountry = $this->hasPickupPointCountry($carrierCountries);
         if (!$hasInternalCountry) {
             foreach ($availableCarriers as $index => $carrier) {
-                if ($carrier['id'] === Packeteryclass::ZPOINT) {
+                if ($carrier['id'] === Packetery::ZPOINT) {
                     unset($availableCarriers[$index]);
-                } elseif (!$hasPickupPointCountry && $carrier['id'] === Packeteryclass::PP_ALL) {
+                } elseif (!$hasPickupPointCountry && $carrier['id'] === Packetery::PP_ALL) {
                     unset($availableCarriers[$index]);
                 }
             }

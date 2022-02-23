@@ -25,8 +25,10 @@
 
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Order\CsvExporter;
+use Packetery\Order\Labels;
 use Packetery\Order\OrderRepository;
 use Packetery\Order\PacketSubmitter;
+use Packetery\Order\Tracking;
 use Packetery\Tools\ConfigHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
@@ -231,8 +233,8 @@ class PacketeryOrderGridController extends ModuleAdminController
     private function preparePacketNumbers(array $ids)
     {
         $module = $this->getModule();
-        $orderRepository = $module->diContainer->get(OrderRepository::class);
-        $packetNumbers = Packeteryclass::getTrackingFromOrders(implode(',', $ids), $orderRepository);
+        $packeteryTracking = $module->diContainer->get(Tracking::class);
+        $packetNumbers = $packeteryTracking->getTrackingFromOrders(implode(',', $ids));
         if (!$packetNumbers) {
             $this->warnings[] = $this->l('Please submit selected orders first.', 'packeteryordergridcontroller');
         }
@@ -245,7 +247,9 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     private function prepareLabels(array $packetNumbers, $offset = 0)
     {
-        $fileName = PacketeryApi::packetsLabelsPdf($packetNumbers, ConfigHelper::get('PACKETERY_APIPASS'), $offset);
+        $module = $this->getModule();
+        $packeteryLabels = $module->diContainer->get(Labels::class);
+        $fileName = $packeteryLabels->packetsLabelsPdf($packetNumbers, ConfigHelper::get('PACKETERY_APIPASS'), $offset);
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         echo file_get_contents(_PS_MODULE_DIR_ . 'packetery/labels/' . $fileName);
