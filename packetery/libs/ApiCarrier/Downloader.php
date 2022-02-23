@@ -32,7 +32,8 @@ class Downloader
     /**
      * Downloader constructor.
      * @param Packetery $module
-     * @throws \ReflectionException
+     * @param ApiCarrierRepository $apiCarrierRepository
+     * @param SoapApi $soapApi
      */
     public function __construct(Packetery $module, ApiCarrierRepository $apiCarrierRepository, SoapApi $soapApi)
     {

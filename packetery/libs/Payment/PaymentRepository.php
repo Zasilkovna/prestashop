@@ -25,6 +25,7 @@ class PaymentRepository
      * PaymentRepository constructor.
      * @param Db $db
      * @param DbTools $dbTools
+     * @param OrderRepository $orderRepository
      */
     public function __construct(Db $db, DbTools $dbTools, OrderRepository $orderRepository)
     {
