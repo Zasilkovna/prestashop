@@ -5,7 +5,6 @@ namespace Packetery\ApiCarrier;
 use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
-use Packeteryclass;
 
 class ApiCarrierRepository
 {
@@ -112,10 +111,10 @@ class ApiCarrierRepository
      */
     private function addNonApiCarriers(array $mappedData) {
         $defaultPickupPointsValues = array_combine(array_keys(self::$columnDefinitions), array_column(self::$columnDefinitions, 'defaultPPValue'));
-        $mappedData[Packeteryclass::ZPOINT] = $defaultPickupPointsValues;
-        $mappedData[Packeteryclass::ZPOINT]['name'] = $this->module->l('Packeta pickup points', 'apicarrierrepository');
-        $mappedData[Packeteryclass::PP_ALL] = $defaultPickupPointsValues;
-        $mappedData[Packeteryclass::PP_ALL]['name'] = $this->module->l('Packeta pickup points (Packeta + carriers)', 'apicarrierrepository');
+        $mappedData[Packetery::ZPOINT] = $defaultPickupPointsValues;
+        $mappedData[Packetery::ZPOINT]['name'] = $this->module->l('Packeta pickup points', 'apicarrierrepository');
+        $mappedData[Packetery::PP_ALL] = $defaultPickupPointsValues;
+        $mappedData[Packetery::PP_ALL]['name'] = $this->module->l('Packeta pickup points (Packeta + carriers)', 'apicarrierrepository');
 
         return $mappedData;
     }
@@ -240,7 +239,7 @@ class ApiCarrierRepository
         $carriers = [];
         if ($result) {
             foreach ($result as $carrier) {
-                if ($carrier['id'] === \Packeteryclass::ZPOINT) {
+                if ($carrier['id'] === Packetery::ZPOINT) {
                     $pickupPointType = 'internal';
                 } else {
                     $pickupPointType = ($carrier['is_pickup_points'] ? 'external' : null);

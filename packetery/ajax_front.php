@@ -23,9 +23,9 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-include_once(dirname(__file__).'/packetery.class.php');
-include_once(dirname(__file__).'/packetery.api.php');
-require_once(dirname(__FILE__) . '../../../init.php');
+require_once dirname(__FILE__) . '/../../config/config.inc.php';
+require_once dirname(__FILE__) . '/../../init.php';
+require_once dirname(__FILE__) . '/packetery.php';
 
 // TODO: use Context::getContext()->customer->isLogged() instead?
 $token = Tools::getValue('token');
@@ -43,7 +43,9 @@ switch (Tools::getValue('action')) {
         echo $orderSaver->savePickupPointInCartGetJson();
         break;
     case 'fetchExtraContent':
-        echo PacketeryApi::packeteryCreateExtraContent();
+        $module = new Packetery();
+        $packeteryCart = $module->diContainer->get(\Packetery\Module\Cart::class);
+        echo $packeteryCart->packeteryCreateExtraContent();
         break;
     case 'saveAddressInCart':
         $module = new Packetery();

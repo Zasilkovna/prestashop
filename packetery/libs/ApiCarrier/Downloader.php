@@ -8,8 +8,8 @@ use GuzzleHttp\Message\Response;
 use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\DownloadException;
+use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
-use PacketeryApi;
 
 /**
  * Class Downloader
@@ -26,16 +26,20 @@ class Downloader
     /** @var ApiCarrierRepository */
     private $apiCarrierRepository;
 
+    /** @var SoapApi */
+    private $soapApi;
+
     /**
      * Downloader constructor.
      * @param Packetery $module
-     * @throws \ReflectionException
+     * @param ApiCarrierRepository $apiCarrierRepository
+     * @param SoapApi $soapApi
      */
-    public function __construct(Packetery $module)
+    public function __construct(Packetery $module, ApiCarrierRepository $apiCarrierRepository, SoapApi $soapApi)
     {
         $this->module = $module;
-        $apiCarrierRepository = $this->module->diContainer->get(ApiCarrierRepository::class);
         $this->apiCarrierRepository = $apiCarrierRepository;
+        $this->soapApi = $soapApi;
     }
 
     /**
@@ -105,7 +109,7 @@ class Downloader
      */
     private function downloadJson()
     {
-        $url = sprintf(self::API_URL, PacketeryApi::getApiKey());
+        $url = sprintf(self::API_URL, $this->soapApi->getApiKey());
 
         // Guzzle version 5 is included from PrestaShop 1.7.0
         if (class_exists('GuzzleHttp\Client')) {

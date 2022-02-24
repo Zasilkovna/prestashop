@@ -9,9 +9,9 @@ use Packetery;
 use Packetery\Address\AddressTools;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
+use Packetery\Payment\PaymentRepository;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Weight\Converter;
-use Packeteryclass;
 use ReflectionException;
 use Tools;
 
@@ -50,7 +50,8 @@ class OrderExporter
         $orderCurrency = new Currency($order->id_currency);
         $targetCurrency = $packeteryOrder['currency_branch'];
         if ($orderCurrency->iso_code !== $targetCurrency) {
-            $total = Packeteryclass::getRateTotal($orderCurrency->iso_code, $targetCurrency, $total, $orderRepository);
+            $paymentRepository = $this->module->diContainer->get(PaymentRepository::class);
+            $total = $paymentRepository->getRateTotal($orderCurrency->iso_code, $targetCurrency, $total);
             if (!$total) {
                 throw new ExportException(
                     $this->module->l(
