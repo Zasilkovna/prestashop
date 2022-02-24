@@ -44,8 +44,10 @@ class Uninstaller
         );
     }
 
-    private function deleteMenuItems() {
+    private function deleteMenuItems()
+    {
         return $this->deleteTab('Packetery') &&
+            $this->deleteTab('PacketerySetting') &&
             $this->deleteTab('PacketeryCarrierGrid') &&
             $this->deleteTab('PacketeryOrderGrid');
     }

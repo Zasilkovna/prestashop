@@ -87,6 +87,7 @@ $_MODULE['<{packetery}prestashop>options_d2cfd13754957b947b1fb129f7f00c4b'] = 'Z
 $_MODULE['<{packetery}prestashop>options_1e55c11920d6ebc07255263ae03d4974'] = 'Ověření označení odesílatele selhalo';
 $_MODULE['<{packetery}prestashop>uninstaller_e21a827831f90240feccbb1f8fd8c7e3'] = 'Při odinstalování modulu Zásilkovny nastala výjimka:';
 $_MODULE['<{packetery}prestashop>installer_4a93d9164aad959a6abc2de389170ac9'] = 'Zásilkovna';
+$_MODULE['<{packetery}prestashop>installer_254f642527b45bc260048e30704edb39'] = 'Konfigurácia';
 $_MODULE['<{packetery}prestashop>installer_ddd6dc80580e42e39480b99a2fd30e1e'] = 'Objednávky Zásilkovna';
 $_MODULE['<{packetery}prestashop>installer_1f42d6d2b28ad239bda96a9771dfd977'] = 'Nastavení dopravců';
 $_MODULE['<{packetery}prestashop>installer_eabcd81deb732e90093180b9eba3320a'] = 'Při instalování modulu Zásilkovny nastala výjimka:';
