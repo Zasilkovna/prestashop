@@ -1153,6 +1153,9 @@ class Packetery extends CarrierModule
                     $orderInstance = new \Order($order['id_order']);
                     $order['weight'] = \Packetery\Weight\Converter::getKilograms((float)$orderInstance->getTotalWeight());
                 }
+                if ($order['tracking_number']) {
+                    $order['weight'] .= 'disabled';
+                }
                 if ((bool)$order['is_ad'] === true) {
                     if (isset($addressValidationLevels[$order['id_carrier']]) && in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])) {
                         if (Packetery\Address\AddressTools::hasValidatedAddress($order)) {
