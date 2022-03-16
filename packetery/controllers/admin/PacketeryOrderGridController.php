@@ -402,11 +402,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         }
         $smarty = new Smarty();
         $smarty->assign('prependText', 'HD');
-        if (strpos($deliveryType, '-KO') === false) {
-            $smarty->assign('value', true);
-        } else {
-            $smarty->assign('value', false);
-        }
+        $smarty->assign('value', (strpos($deliveryType, '-KO') === false));
         return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/booleanIcon.tpl');
     }
 
