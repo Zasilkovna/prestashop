@@ -379,18 +379,18 @@ class PacketeryOrderGridController extends ModuleAdminController
     public function getTrackingLink($trackingNumber)
     {
         if ($trackingNumber) {
-            return "<a href='https://tracking.packeta.com/?id={$trackingNumber}' target='_blank'>{$trackingNumber}</a>";
+            $smarty = new Smarty();
+            $smarty->assign('trackingNumber', $trackingNumber);
+            return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
         }
         return '';
     }
 
     public function getIconForBoolean($booleanValue)
     {
-        if ($booleanValue) {
-            return '<span class="list-action-enable action-enabled"><i class="icon-check"></i></span>';
-        }
-
-        return '<span class="list-action-enable action-disabled"><i class="icon-remove"></i></span>';
+        $smarty = new Smarty();
+        $smarty->assign('value', $booleanValue);
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/booleanIcon.tpl');
     }
 
     public function getDeliveryTypeHtml($deliveryType)
@@ -401,10 +401,14 @@ class PacketeryOrderGridController extends ModuleAdminController
         if ($deliveryType === '0') {
             return 'PP';
         }
+        $smarty = new Smarty();
+        $smarty->assign('prependText', 'HD');
         if (strpos($deliveryType, '-KO') === false) {
-            return 'HD <span class="list-action-enable action-enabled"><i class="icon-check"></i></span>';
+            $smarty->assign('value', true);
+        } else {
+            $smarty->assign('value', false);
         }
-        return 'HD <span class="list-action-enable action-disabled"><i class="icon-remove"></i></span>';
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/booleanIcon.tpl');
     }
 
     public function getWeightHtml($weight, $row)
@@ -412,7 +416,10 @@ class PacketeryOrderGridController extends ModuleAdminController
         if (strpos($weight, 'disabled') !== false) {
             return str_replace('disabled', '', $weight);
         }
-        return '<input type="text" name="weight_' . $row['id_order'] . '" value="' . $weight . '" class="weight">';
+        $smarty = new Smarty();
+        $smarty->assign('orderId', $row['id_order']);
+        $smarty->assign('weight', $weight);
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/weightInput.tpl');
     }
 
     private function getActionLinks($orderId)
@@ -432,7 +439,11 @@ class PacketeryOrderGridController extends ModuleAdminController
                 $title = $this->l('Export', 'packeteryordergridcontroller');
             }
             $href = sprintf('%s&amp;id_order=%s&amp;action=%s', $this->context->link->getAdminLink('PacketeryOrderGrid'), $orderId, $action);
-            $links[$action] = sprintf('<a href="%s"><i class="%s"></i> %s</a>', $href, $iconClass, $title);
+            $smarty = new Smarty();
+            $smarty->assign('link', $href);
+            $smarty->assign('title', $title);
+            $smarty->assign('icon', $iconClass);
+            $links[$action] = $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/link.tpl');
         }
         return $links;
     }
@@ -447,8 +458,12 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function displayEditLink($token = null, $orderId, $name = null)
     {
-        $link = $this->getModule()->getAdminLink($orderId, '');
-        return '<a class="edit btn btn-default" href="' . $link . '"><i class="icon-pencil"></i> ' . $this->l('Detail', 'packeteryordergridcontroller') . '</a>';
+        $smarty = new Smarty();
+        $smarty->assign('link', $this->getModule()->getAdminLink($orderId, ''));
+        $smarty->assign('title', $this->l('Detail', 'packeteryordergridcontroller'));
+        $smarty->assign('class', 'edit btn btn-default');
+        $smarty->assign('icon', 'icon-pencil');
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/link.tpl');
     }
 
     public function displaySubmitLink($token = null, $orderId, $name = null)
