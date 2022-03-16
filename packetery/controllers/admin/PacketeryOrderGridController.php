@@ -160,7 +160,6 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'title' => $this->l('Weight (kg)', 'packeteryordergridcontroller'),
                 'type' => 'editable',
                 'search' => false,
-                'callback' => 'getWeightHtml',
             ],
         ];
 
@@ -409,17 +408,6 @@ class PacketeryOrderGridController extends ModuleAdminController
             $smarty->assign('value', false);
         }
         return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/booleanIcon.tpl');
-    }
-
-    public function getWeightHtml($weight, $row)
-    {
-        if (strpos($weight, 'disabled') !== false) {
-            return str_replace('disabled', '', $weight);
-        }
-        $smarty = new Smarty();
-        $smarty->assign('orderId', $row['id_order']);
-        $smarty->assign('weight', $weight);
-        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/weightInput.tpl');
     }
 
     private function getActionLinks($orderId)
