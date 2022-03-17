@@ -194,6 +194,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     private function createPackets(array $ids)
     {
         $module = $this->getModule();
+        /** @var PacketSubmitter $packetSubmitter */
         $packetSubmitter = $module->diContainer->get(PacketSubmitter::class);
         $exportResult = $packetSubmitter->ordersExport($ids);
         if (is_array($exportResult)) {
@@ -233,6 +234,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     private function preparePacketNumbers(array $ids)
     {
         $module = $this->getModule();
+        /** @var Tracking $packeteryTracking */
         $packeteryTracking = $module->diContainer->get(Tracking::class);
         $packetNumbers = $packeteryTracking->getTrackingFromOrders(implode(',', $ids));
         if (!$packetNumbers) {
@@ -249,6 +251,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     private function prepareLabels(array $packetNumbers, $offset = 0)
     {
         $module = $this->getModule();
+        /** @var Labels $packeteryLabels */
         $packeteryLabels = $module->diContainer->get(Labels::class);
         $fileName = $packeteryLabels->packetsLabelsPdf($packetNumbers, ConfigHelper::get('PACKETERY_APIPASS'), $offset);
         header('Content-Type: application/pdf');
@@ -293,6 +296,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             return;
         }
         $module = $this->getModule();
+        /** @var CsvExporter $csvExporter */
         $csvExporter = $module->diContainer->get(CsvExporter::class);
         $csvExporter->outputCsvExport($ids);
         die();
@@ -350,14 +354,12 @@ class PacketeryOrderGridController extends ModuleAdminController
     public function postProcess()
     {
         $change = false;
+        /** @var OrderRepository $orderRepo */
+        $orderRepo = $this->getModule()->diContainer->get(OrderRepository::class);
         // there is no condition on submitPacketeryOrderGrid, so values are saved even before bulk actions
-        $orderRepo = null;
         foreach ($_POST as $key => $value) {
             if (preg_match('/^weight_(\d+)$/', $key, $matches)) {
                 $orderId = (int)$matches[1];
-                if (!$orderRepo) {
-                    $orderRepo = $this->getModule()->diContainer->get(OrderRepository::class);
-                }
                 if ($value === '') {
                     $value = null;
                 } else {
@@ -410,6 +412,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $links = [];
         $module = $this->getModule();
+        /** @var OrderRepository $orderRepository */
         $orderRepository = $module->diContainer->get(OrderRepository::class);
         $orderData = $orderRepository->getById($orderId);
         if ($orderData) {

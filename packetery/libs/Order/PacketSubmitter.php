@@ -36,6 +36,7 @@ class PacketSubmitter
      */
     private function createPacket(Order $order)
     {
+        /** @var OrderExporter $orderExporter */
         $orderExporter = $this->module->diContainer->get(OrderExporter::class);
         try {
             $exportData = $orderExporter->prepareData($order);
@@ -89,6 +90,7 @@ class PacketSubmitter
         }
 
         $packets = [];
+        /** @var Tracking $packeteryTracking */
         $packeteryTracking = $this->module->diContainer->get(Tracking::class);
         foreach ($orderIds as $orderId) {
             $packeteryOrder = $this->orderRepository->getById($orderId);
