@@ -298,7 +298,11 @@ class OrderRepository
     public function setTrackingNumber($orderId, $trackingNumber)
     {
         $orderId = (int)$orderId;
-        return $this->dbTools->update('packetery_order', ['tracking_number' => $this->db->escape($trackingNumber)], '`id_order` = ' . $orderId);
+        return $this->dbTools->update(
+            'packetery_order',
+            ['tracking_number' => $this->db->escape($trackingNumber), 'exported' => 1],
+            '`id_order` = ' . $orderId
+        );
     }
 
     /**

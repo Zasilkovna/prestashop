@@ -37,7 +37,7 @@ class CsvExporter
         foreach ($order_ids as $order_id) {
             $order = new Order($order_id);
             try {
-                $exportData = $orderExporter->prepareData($order, $this->module);
+                $exportData = $orderExporter->prepareData($order);
             } catch (ExportException $exception) {
                 continue;
             }

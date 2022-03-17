@@ -21,29 +21,25 @@ class PacketSubmitter
     private $orderRepository;
     /** @var Packetery */
     private $module;
-    /** @var SoapApi */
-    private $soapApi;
 
     public function __construct(OrderRepository $orderRepository, Packetery $module, SoapApi $soapApi)
     {
         $this->orderRepository = $orderRepository;
         $this->module = $module;
-        $this->soapApi = $soapApi;
         $this->apiPassword = $soapApi->getApiPass();
     }
 
     /**
      * @param Order $order
-     * @param Packetery $module
      * @return array
-     * @throws DatabaseException
      * @throws ReflectionException
      */
     private function createPacket(Order $order)
     {
+        /** @var OrderExporter $orderExporter */
         $orderExporter = $this->module->diContainer->get(OrderExporter::class);
         try {
-            $exportData = $orderExporter->prepareData($order, $this->module);
+            $exportData = $orderExporter->prepareData($order);
         } catch (ExportException $exception) {
             return [0, $exception->getMessage()];
         }
@@ -79,73 +75,43 @@ class PacketSubmitter
     }
 
     /**
-     * @param array $packets
-     * @return array
-     */
-    private function createShipmentSoap($packets)
-    {
-        $client = new SoapClient(SoapApi::API_WSDL_URL);
-        try {
-            $shipment = $client->createShipment($this->apiPassword, $packets);
-            if ($shipment) {
-                return [1];
-            }
-            return [0, "\n error creating Shipment \n"];
-        } catch (SoapFault $e) {
-            if (isset($e->faultstring)) {
-                $errorMessage = $e->faultstring;
-                return [0, "\n$errorMessage\n"];
-            }
-            return [0, 'unexpected SoapFault'];
-        }
-    }
-
-    /**
-     * @param OrderRepository $orderRepository
-     * @param array $id_orders Comma separated integers
-     * @param Packetery $module
+     * @param array $orderIds Comma separated integers
      * @return array|false
      * @throws DatabaseException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
      */
-    public function ordersExport(array $id_orders)
+    public function ordersExport(array $orderIds)
     {
-        if (!$id_orders) {
+        if (!$orderIds) {
             echo $this->module->l('Please choose orders first.', 'packetsubmitter');
             return false;
         }
 
-        $packets_row = [];
         $packets = [];
+        /** @var Tracking $packeteryTracking */
         $packeteryTracking = $this->module->diContainer->get(Tracking::class);
-        // CREATE PACKET
-        foreach ($id_orders as $id_order) {
-            $this->orderRepository->setExported(0, $id_order);
-            $order = new Order($id_order);
-            $packet_response = $this->createPacket($order, $this->module);
-            if ($packet_response[0] === 1) {
-                $tracking_number = $packet_response[1];
-                $tracking_update = $packeteryTracking->updateOrderTrackingNumber($id_order, $tracking_number);
-                if ($tracking_update) {
-                    $packets_row[] = [$id_order, 1, $tracking_number];
-                    $packets[] = $tracking_number;
+        foreach ($orderIds as $orderId) {
+            $packeteryOrder = $this->orderRepository->getById($orderId);
+            if ($packeteryOrder && $packeteryOrder['tracking_number']) {
+                continue;
+            }
+
+            $order = new Order($orderId);
+            $packetResponse = $this->createPacket($order);
+            if ($packetResponse[0] === 1) {
+                $trackingNumber = $packetResponse[1];
+                $trackingUpdate = $packeteryTracking->updateOrderTrackingNumber($orderId, $trackingNumber);
+                if ($trackingUpdate) {
+                    $packets[] = [1, $trackingNumber];
                 }
             } else {
-                $packets_row[] = [$id_order, 0, $packet_response[1]];
+                $packets[] = [0, $packetResponse[1]];
             }
         }
-        // CREATE SHIPMENT
-        $shipment = $this->createShipmentSoap($packets);
-        if ($shipment[0]) {
-            foreach ($id_orders as $id_order) {
-                $this->orderRepository->setExported(1, $id_order);
-            }
-        } else {
-            $packets_row[] = [null, 0, $shipment[1]];
-        }
-        return $packets_row;
+
+        return $packets;
     }
 
     /**

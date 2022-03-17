@@ -194,12 +194,13 @@ class PacketeryOrderGridController extends ModuleAdminController
     private function createPackets(array $ids)
     {
         $module = $this->getModule();
+        /** @var PacketSubmitter $packetSubmitter */
         $packetSubmitter = $module->diContainer->get(PacketSubmitter::class);
         $exportResult = $packetSubmitter->ordersExport($ids);
         if (is_array($exportResult)) {
             foreach ($exportResult as $resultRow) {
-                if (!$resultRow[1]) {
-                    $this->errors[] = $resultRow[2];
+                if (!$resultRow[0]) {
+                    $this->errors[] = $resultRow[1];
                 }
             }
         }
@@ -233,6 +234,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     private function preparePacketNumbers(array $ids)
     {
         $module = $this->getModule();
+        /** @var Tracking $packeteryTracking */
         $packeteryTracking = $module->diContainer->get(Tracking::class);
         $packetNumbers = $packeteryTracking->getTrackingFromOrders(implode(',', $ids));
         if (!$packetNumbers) {
@@ -244,10 +246,12 @@ class PacketeryOrderGridController extends ModuleAdminController
     /**
      * @param array $packetNumbers
      * @param int $offset
+     * @throws ReflectionException
      */
     private function prepareLabels(array $packetNumbers, $offset = 0)
     {
         $module = $this->getModule();
+        /** @var Labels $packeteryLabels */
         $packeteryLabels = $module->diContainer->get(Labels::class);
         $fileName = $packeteryLabels->packetsLabelsPdf($packetNumbers, ConfigHelper::get('PACKETERY_APIPASS'), $offset);
         header('Content-Type: application/pdf');
@@ -292,6 +296,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             return;
         }
         $module = $this->getModule();
+        /** @var CsvExporter $csvExporter */
         $csvExporter = $module->diContainer->get(CsvExporter::class);
         $csvExporter->outputCsvExport($ids);
         die();
@@ -349,23 +354,20 @@ class PacketeryOrderGridController extends ModuleAdminController
     public function postProcess()
     {
         $change = false;
-        if (Tools::getIsset('submitPacketeryOrderGrid')) {
-            $orderRepo = null;
-            foreach ($_POST as $key => $value) {
-                if (preg_match('/^weight_(\d+)$/', $key, $matches)) {
-                    $orderId = (int)$matches[1];
-                    if (!$orderRepo) {
-                        $orderRepo = $this->getModule()->diContainer->get(OrderRepository::class);
-                    }
-                    if ($value === '') {
-                        $value = null;
-                    } else {
-                        $value = str_replace([',', ' '], ['.', ''], $value);
-                        $value = (float)$value;
-                    }
-                    $orderRepo->setWeight($orderId, $value);
-                    $change = true;
+        /** @var OrderRepository $orderRepo */
+        $orderRepo = $this->getModule()->diContainer->get(OrderRepository::class);
+        // there is no condition on submitPacketeryOrderGrid, so values are saved even before bulk actions
+        foreach ($_POST as $key => $value) {
+            if (preg_match('/^weight_(\d+)$/', $key, $matches)) {
+                $orderId = (int)$matches[1];
+                if ($value === '') {
+                    $value = null;
+                } else {
+                    $value = str_replace([',', ' '], ['.', ''], $value);
+                    $value = (float)$value;
                 }
+                $orderRepo->setWeight($orderId, $value);
+                $change = true;
             }
         }
         if ($change) {
@@ -378,18 +380,18 @@ class PacketeryOrderGridController extends ModuleAdminController
     public function getTrackingLink($trackingNumber)
     {
         if ($trackingNumber) {
-            return "<a href='https://tracking.packeta.com/?id={$trackingNumber}' target='_blank'>{$trackingNumber}</a>";
+            $smarty = new Smarty();
+            $smarty->assign('trackingNumber', $trackingNumber);
+            return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
         }
         return '';
     }
 
     public function getIconForBoolean($booleanValue)
     {
-        if ($booleanValue) {
-            return '<span class="list-action-enable action-enabled"><i class="icon-check"></i></span>';
-        }
-
-        return '<span class="list-action-enable action-disabled"><i class="icon-remove"></i></span>';
+        $smarty = new Smarty();
+        $smarty->assign('value', $booleanValue);
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/booleanIcon.tpl');
     }
 
     public function getDeliveryTypeHtml($deliveryType)
@@ -400,16 +402,17 @@ class PacketeryOrderGridController extends ModuleAdminController
         if ($deliveryType === '0') {
             return 'PP';
         }
-        if (strpos($deliveryType, '-KO') === false) {
-            return 'HD <span class="list-action-enable action-enabled"><i class="icon-check"></i></span>';
-        }
-        return 'HD <span class="list-action-enable action-disabled"><i class="icon-remove"></i></span>';
+        $smarty = new Smarty();
+        $smarty->assign('prependText', 'HD');
+        $smarty->assign('value', ($deliveryType === 'HD-OK'));
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/booleanIcon.tpl');
     }
 
     private function getActionLinks($orderId)
     {
         $links = [];
         $module = $this->getModule();
+        /** @var OrderRepository $orderRepository */
         $orderRepository = $module->diContainer->get(OrderRepository::class);
         $orderData = $orderRepository->getById($orderId);
         if ($orderData) {
@@ -423,7 +426,11 @@ class PacketeryOrderGridController extends ModuleAdminController
                 $title = $this->l('Export', 'packeteryordergridcontroller');
             }
             $href = sprintf('%s&amp;id_order=%s&amp;action=%s', $this->context->link->getAdminLink('PacketeryOrderGrid'), $orderId, $action);
-            $links[$action] = sprintf('<a href="%s"><i class="%s"></i> %s</a>', $href, $iconClass, $title);;
+            $smarty = new Smarty();
+            $smarty->assign('link', $href);
+            $smarty->assign('title', $title);
+            $smarty->assign('icon', $iconClass);
+            $links[$action] = $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/link.tpl');
         }
         return $links;
     }
@@ -438,8 +445,12 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function displayEditLink($token = null, $orderId, $name = null)
     {
-        $link = $this->getModule()->getAdminLink($orderId, '');
-        return '<a class="edit btn btn-default" href="' . $link . '"><i class="icon-pencil"></i> ' . $this->l('Detail', 'packeteryordergridcontroller') . '</a>';
+        $smarty = new Smarty();
+        $smarty->assign('link', $this->getModule()->getAdminLink($orderId, ''));
+        $smarty->assign('title', $this->l('Detail', 'packeteryordergridcontroller'));
+        $smarty->assign('class', 'edit btn btn-default');
+        $smarty->assign('icon', 'icon-pencil');
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/link.tpl');
     }
 
     public function displaySubmitLink($token = null, $orderId, $name = null)
