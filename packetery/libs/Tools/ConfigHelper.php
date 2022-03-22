@@ -12,6 +12,7 @@ class ConfigHelper
         // It is possible to have multiple senders for one set of credentials.
         'PACKETERY_ESHOP_ID' => 'separate',
         'PACKETERY_LABEL_FORMAT' => 'all',
+        'PACKETERY_CARRIER_LABEL_FORMAT' => 'all',
         'PACKETERY_LAST_CARRIERS_UPDATE' => 'all',
         'PACKETERY_WIDGET_AUTOOPEN' => 'all',
         'PACKETERY_CRON_TOKEN' => 'all',
@@ -76,6 +77,27 @@ class ConfigHelper
         }
 
         return Configuration::updateValue($key, $values);
+    }
+
+    /**
+     * @return false|string
+     */
+    public function getApiPass()
+    {
+        return self::get('PACKETERY_APIPASS');
+    }
+
+    /**
+     * @return false|string
+     */
+    public function getApiKey()
+    {
+        $apiPass = $this->getApiPass();
+        if ($apiPass === false) {
+            return false;
+        }
+
+        return substr($apiPass, 0, 16);
     }
 
 }

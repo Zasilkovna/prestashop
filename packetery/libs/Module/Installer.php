@@ -154,6 +154,7 @@ class Installer
             `house_number` varchar(255) NULL,
             `latitude` varchar(255) NULL,
             `longitude` varchar(255) NULL,
+            `carrier_number` varchar(255) NULL,
             UNIQUE(`id_order`),
             UNIQUE(`id_cart`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
@@ -192,6 +193,7 @@ class Installer
     {
         return (
             ConfigHelper::update('PACKETERY_LABEL_FORMAT', 'A7 on A4') &&
+            ConfigHelper::update('PACKETERY_CARRIER_LABEL_FORMAT', 'A6 on A4') &&
             ConfigHelper::update('PACKETERY_WIDGET_AUTOOPEN', 0) &&
             ConfigHelper::update('PACKETERY_CRON_TOKEN', \Tools::passwdGen(32)) &&
             ConfigHelper::update('PACKETERY_LABEL_MAX_AGE_DAYS', 7) &&
