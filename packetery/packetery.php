@@ -476,7 +476,7 @@ class Packetery extends CarrierModule
         $availableFormats = $this->getAvailableLabelFormats();
         $carrierLabelFormats = [];
         foreach ($availableFormats as $format => $formatData) {
-            if (true === $formatData['directLabels']) {
+            if ($formatData['directLabels'] === true) {
                 $carrierLabelFormats[$format] = $formatData[$valueKey];
             }
         }

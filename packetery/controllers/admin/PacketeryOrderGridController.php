@@ -430,7 +430,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             try {
                 list($carrierNumber, $trackingLink) = $soapApi->getTrackingUrl($trackingNumber);
             } catch (PacketInfoException $e) {
-                $this->warnings = $this->l('Packet info reading from API failed', 'packeteryordergridcontroller') . ': ' . $trackingNumber;
+                $this->warnings = $this->l('Retrieving shipment information failed', 'packeteryordergridcontroller') . ': ' . $trackingNumber;
             }
 
             $smarty = new Smarty();

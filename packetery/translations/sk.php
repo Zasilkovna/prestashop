@@ -146,9 +146,9 @@ $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_ddd6dc80580e42e394
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_a649d29479834d551b83b533b7042ad3'] = 'Nebyly vybrány žádné objednávky.';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_e24ad57fb2f078979a7f5c9979e88d5f'] = 'Nejprve prosím podejte vybrané zásilky.';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_5552dc553d496d4b06866ca45b890b4a'] = 'Najprv vyberte objednávky.';
-$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_b0e18fd5958d01d019dac2d4eb98a23e'] = 'Žádné štítky neomohou být připraveny jako štítky dopravce.';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_b0e18fd5958d01d019dac2d4eb98a23e'] = 'Žádné štítky nemohou být připraveny jako štítky dopravce.';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_d5bced36fd88402506bdf9d99064697e'] = 'Hmotnosti objednávek byly uloženy.';
-$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_cf080fc3877bf3ea2c50b53a5950f0bf'] = 'Načtení informací o zásilce z API selhalo.';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_68f67fbc8133ab594663600a2d8eda09'] = 'Načtení informací o zásilce selhalo';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_13dba24862cf9128167a59100e154c8d'] = 'Tisknout';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_0095a9fa74d1713e43e370a7d7846224'] = 'Exportovat';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_a254c25adc7d10d7e9c4889484f875a5'] = 'Detail';
