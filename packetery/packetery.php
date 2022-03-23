@@ -432,6 +432,9 @@ class Packetery extends CarrierModule
         ];
     }
 
+    /**
+     * @return array[]
+     */
     public function getAvailableLabelFormats()
     {
         return [
@@ -469,6 +472,7 @@ class Packetery extends CarrierModule
     }
 
     /**
+     * @param string $valueKey carrier label property to get
      * @return array
      */
     public function getCarrierLabelFormats($valueKey)

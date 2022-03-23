@@ -24,6 +24,11 @@ class PacketSubmitter
     /** @var ConfigHelper */
     private $configHelper;
 
+    /**
+     * @param OrderRepository $orderRepository
+     * @param Packetery $module
+     * @param ConfigHelper $configHelper
+     */
     public function __construct(OrderRepository $orderRepository, Packetery $module, ConfigHelper $configHelper)
     {
         $this->orderRepository = $orderRepository;

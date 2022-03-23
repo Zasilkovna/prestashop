@@ -3,13 +3,14 @@
 namespace Packetery\Module;
 
 use Packetery;
-use Packetery\Exceptions\PacketInfoException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Order\OrderRepository;
 use Packetery\Response\PacketCarrierNumber;
+use Packetery\Response\PacketInfo;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\Logger;
 use Packetery\Tools\MessageManager;
+use ReflectionException;
 use SoapClient;
 use SoapFault;
 
@@ -26,6 +27,10 @@ class SoapApi
      */
     private $configHelper;
 
+    /**
+     * @param Packetery $module
+     * @param ConfigHelper $configHelper
+     */
     public function __construct(Packetery $module, ConfigHelper $configHelper)
     {
         $this->module = $module;
@@ -50,28 +55,27 @@ class SoapApi
 
     /**
      * @param string $packetId
-     * @return array
-     * @throws PacketInfoException
+     * @return PacketInfo
      */
-    public function getTrackingUrl($packetId)
+    public function getPacketInfo($packetId)
     {
-        $client = new SoapClient(self::API_WSDL_URL);
+        $packetInfo = new PacketInfo();
         try {
+            $client = new SoapClient(self::API_WSDL_URL);
             // get PacketInfoResult
             $response = $client->packetInfo($this->configHelper->getApiPass(), $packetId);
             if (
                 !empty($response->courierInfo) &&
                 isset($response->courierInfo->courierInfoItem, $response->courierInfo->courierInfoItem->courierTrackingUrls)
             ) {
-                return [
-                    $response->courierInfo->courierInfoItem->courierNumbers->courierNumber,
-                    $response->courierInfo->courierInfoItem->courierTrackingUrls->courierTrackingUrl->url,
-                ];
+                $packetInfo->setNumber($response->courierInfo->courierInfoItem->courierNumbers->courierNumber);
+                $packetInfo->setTrackingLink($response->courierInfo->courierInfoItem->courierTrackingUrls->courierTrackingUrl->url);
             }
-            return [null, null];
-        } catch (SoapFault $e) {
-            throw new PacketInfoException($e->getMessage(), isset($e->detail->SenderNotExists));
+        } catch (SoapFault $exception) {
+            $packetInfo->setFault($this->getFaultIdentifier($exception));
+            $packetInfo->setFaultString($exception->faultstring);
         }
+        return $packetInfo;
     }
 
     /**
@@ -95,8 +99,10 @@ class SoapApi
     }
 
     /**
-     * @throws \ReflectionException
+     * @param array $packets
+     * @return array
      * @throws Packetery\Exceptions\DatabaseException
+     * @throws ReflectionException
      */
     public function getPacketIdsWithCarrierNumbers($packets)
     {
@@ -113,7 +119,7 @@ class SoapApi
                 $response = $this->packetCarrierNumber($packetId);
                 if ($response->hasFault()) {
                     if ($response->hasWrongPassword()) {
-                        $messageManager->setMessage('warning', $this->module->l('Packeta API password is not set.', 'soapapi'));
+                        $messageManager->setMessage('warning', $this->module->l('Used API password is not valid.', 'soapapi'));
                         return $result;
                     }
                     $logger->logToFile(sprintf('Error while retrieving carrier number for order %s: %s', $packetId, $response->getFaultString()));

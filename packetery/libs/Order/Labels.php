@@ -17,6 +17,9 @@ class Labels
      */
     private $configHelper;
 
+    /**
+     * @param ConfigHelper $configHelper
+     */
     public function __construct(ConfigHelper $configHelper)
     {
         $this->configHelper = $configHelper;
