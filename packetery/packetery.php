@@ -838,11 +838,12 @@ class Packetery extends CarrierModule
      */
     private function prepareAddressChange($apiKey, array $packeteryOrder, $orderId)
     {
-        $employee = Context::getContext()->employee;
+        /** @var \Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $widgetOptions = [
             'apiKey' => $apiKey,
             'country' => strtolower($packeteryOrder['ps_country']),
-            'language' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
+            'language' => $configHelper->getBackendLanguage(),
             'carrierId' => $packeteryOrder['id_branch'],
         ];
         if (\Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
@@ -872,13 +873,14 @@ class Packetery extends CarrierModule
      */
     private function preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier)
     {
-        $employee = Context::getContext()->employee;
+        /** @var \Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $widgetOptions = [
             'api_key' => $apiKey,
             'app_identity' => $this->getAppIdentity(),
             'country' => strtolower($packeteryOrder['country']),
             'module_dir' => _MODULE_DIR_,
-            'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
+            'lang' => $configHelper->getBackendLanguage(),
         ];
         if (
             $packeteryCarrier['pickup_point_type'] === 'external' &&

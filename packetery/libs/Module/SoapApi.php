@@ -69,13 +69,47 @@ class SoapApi
                 isset($response->courierInfo->courierInfoItem, $response->courierInfo->courierInfoItem->courierTrackingUrls)
             ) {
                 $packetInfo->setNumber($response->courierInfo->courierInfoItem->courierNumbers->courierNumber);
-                $packetInfo->setTrackingLink($response->courierInfo->courierInfoItem->courierTrackingUrls->courierTrackingUrl->url);
+                $packetInfo->setTrackingLink($this->getTrackingUrlInProperLanguage(
+                    $response->courierInfo->courierInfoItem->courierTrackingUrls->courierTrackingUrl
+                ));
             }
         } catch (SoapFault $exception) {
             $packetInfo->setFault($this->getFaultIdentifier($exception));
             $packetInfo->setFaultString($exception->faultstring);
         }
         return $packetInfo;
+    }
+
+    /**
+     * @param object|array $courierTrackingUrl
+     * @return string|null
+     */
+    public function getTrackingUrlInProperLanguage($courierTrackingUrl)
+    {
+        if (is_object($courierTrackingUrl)) {
+            return $courierTrackingUrl->url;
+        }
+        if (is_array($courierTrackingUrl)) {
+            $urlPreferred = null;
+            $urlEn = null;
+            $preferredLang = $this->configHelper->getBackendLanguage();
+            foreach ($courierTrackingUrl as $courierTrackingUrlObject) {
+                if ($courierTrackingUrlObject->lang === $preferredLang) {
+                    $urlPreferred = $courierTrackingUrlObject->url;
+                }
+                if ($courierTrackingUrlObject->lang === 'en') {
+                    $urlEn = $courierTrackingUrlObject->url;
+                }
+            }
+            if ($urlPreferred) {
+                return $urlPreferred;
+            }
+            if ($urlEn) {
+                return $urlEn;
+            }
+            return $courierTrackingUrl[0]->url;
+        }
+        return null;
     }
 
     /**
