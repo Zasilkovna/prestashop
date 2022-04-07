@@ -32,10 +32,8 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once dirname(__FILE__) . '/autoload.php';
-use Packetery\Order\PacketSubmitter;
 
 defined('PACKETERY_PLUGIN_DIR') || define('PACKETERY_PLUGIN_DIR', dirname(__FILE__));
-
 
 class Packetery extends CarrierModule
 {
@@ -1291,7 +1289,7 @@ class Packetery extends CarrierModule
             $id_order = array(Tools::getValue('order_id'));
 
             /** @var PacketSubmitter $packetSubmitter */
-            $packetSubmitter = $this->diContainer->get(PacketSubmitter::class);
+            $packetSubmitter = $this->diContainer->get(Packetery\Order\PacketSubmitter::class);
             $exportResult = $packetSubmitter->ordersExport($id_order);
             if (is_array($exportResult)) {
                 foreach ($exportResult as $resultRow) {
