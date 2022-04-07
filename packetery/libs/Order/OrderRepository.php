@@ -6,6 +6,8 @@ use Db;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
 use PrestaShopLoggerCore as PrestaShopLogger;
+use Packetery\Weight\Converter;
+use Module;
 
 class OrderRepository
 {
@@ -14,6 +16,9 @@ class OrderRepository
 
     /** @var DbTools */
     private $dbTools;
+
+    /** @var \Packetery\DI\Container */
+    public $diContainer;
 
     /**
      * OrderRepository constructor.
@@ -24,6 +29,7 @@ class OrderRepository
     {
         $this->db = $db;
         $this->dbTools = $dbTools;
+        $this->diContainer = \Packetery\DI\ContainerFactory::create();
     }
 
     /**
@@ -190,6 +196,8 @@ class OrderRepository
                    `po`.`county`, 
                    `po`.`latitude`, 
                    `po`.`longitude`,
+                   `po`.`weight`,
+                   `po`.`tracking_number`,
                     `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
@@ -342,6 +350,38 @@ class OrderRepository
     {
         $orderId = (int)$orderId;
         return $this->dbTools->update('packetery_order', ['exported' => $exported], '`id_order` = ' . $orderId);
+    }
+
+    /**
+     * @param int $orderId
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function getExported($orderId)
+    {
+        $orderId = (int)$orderId;
+        return (bool)$this->dbTools->getValue(
+            'SELECT `exported` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . $orderId
+        );
+    }
+
+    /**
+     * @param int $orderId
+     * @return float|null
+     * @throws DatabaseException
+     */
+    public function getOrderWeight($orderId)
+    {
+        $order = new \Order($orderId);
+        $packeteryOrder = $this->getOrderWithCountry($orderId);
+        $orderWeight = 0;
+        if ($packeteryOrder['weight'] !== null) {
+            // used saved if set
+            $orderWeight = $packeteryOrder['weight'];
+        } else if (Converter::isKgConversionSupported()) {
+            $orderWeight = Converter::getKilograms((float)$order->getTotalWeight());
+        }
+        return (float)$orderWeight;
     }
 
     /**

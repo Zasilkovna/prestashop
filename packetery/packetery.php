@@ -32,8 +32,10 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once dirname(__FILE__) . '/autoload.php';
+use Packetery\Order\PacketSubmitter;
 
 defined('PACKETERY_PLUGIN_DIR') || define('PACKETERY_PLUGIN_DIR', dirname(__FILE__));
+
 
 class Packetery extends CarrierModule
 {
@@ -749,6 +751,7 @@ class Packetery extends CarrierModule
     {
         $messages = [];
         $this->processPickupPointChange($messages);
+        $this->processPostParcel($messages);
 
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
@@ -779,7 +782,8 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
         $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $packeteryOrder['name_branch']);
         $pickupPointChangeAllowed = false;
-
+        $postParcelAllowed = false;
+        $trackingId = false;
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
         if (!$packeteryCarrier) {
@@ -824,8 +828,16 @@ class Packetery extends CarrierModule
             $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
             $pickupPointChangeAllowed = true;
         }
+        if ((bool)$orderRepository->getExported($orderId) === false && $orderRepository->getOrderWeight($orderId) > 0) {
+            $postParcelAllowed = true;
+        }
+        if ($packeteryOrder['tracking_number'] !== '' && (bool)$orderRepository->getExported($orderId) === true) {
+            $trackingId = $packeteryOrder['tracking_number'];
+        }
         $this->context->smarty->assign('messages', $messages);
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
+        $this->context->smarty->assign('postParcelAllowed', $postParcelAllowed);
+        $this->context->smarty->assign('trackingId', $trackingId);
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
@@ -1183,11 +1195,11 @@ class Packetery extends CarrierModule
     {
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $addressValidationLevels = $carrierRepository->getAddressValidationLevels();
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         if (isset($params['list']) && is_array($params['list'])) {
             foreach ($params['list'] as &$order) {
                 if ($order['weight'] === null) {
-                    $orderInstance = new \Order($order['id_order']);
-                    $order['weight'] = \Packetery\Weight\Converter::getKilograms((float)$orderInstance->getTotalWeight());
+                    $order['weight'] = $orderRepository->getOrderWeight($order['id_order']);
                 }
                 if ((bool)$order['is_ad'] === true) {
                     if (isset($addressValidationLevels[$order['id_carrier']]) && in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])) {
@@ -1260,6 +1272,38 @@ class Packetery extends CarrierModule
                     'text' => $this->l('Pickup point could not be changed.'),
                     'class' => 'danger',
                 ];
+            }
+        }
+    }
+
+    /**
+     * @param array $messages
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
+     */
+    private function processPostParcel(array &$messages)
+    {
+        if (
+            Tools::isSubmit('process_post_parcel') &&
+            Tools::getIsset('order_id') &&
+            Tools::getValue('order_id') > 0
+        ) {
+            $id_order = array(Tools::getValue('order_id'));
+
+            /** @var PacketSubmitter $packetSubmitter */
+            $packetSubmitter = $this->diContainer->get(PacketSubmitter::class);
+            $exportResult = $packetSubmitter->ordersExport($id_order);
+            if (is_array($exportResult)) {
+                foreach ($exportResult as $resultRow) {
+                    if (!$resultRow[0]) {
+                        $messages[] = [
+                            'text' => $resultRow[1],
+                            'class' => 'danger',
+                        ];
+                    } else if ($resultRow[0]) {
+                        // Success. Message with package link is visible via display_order_main.tpl.
+                    }
+                }
             }
         }
     }

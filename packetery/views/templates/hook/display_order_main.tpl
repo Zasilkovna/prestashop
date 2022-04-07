@@ -61,7 +61,11 @@
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-widget"
                            data-widget-options="{$widgetOptions|@json_encode|escape}">{l s='Change pickup point' mod='packetery'}</a>
-
+                        {if $postParcelAllowed}
+                            <button class="btn btn-outline-secondary btn-default" type="submit" name="process_post_parcel">
+                                {l s='Post parcel' mod='packetery'}
+                            </button>
+                        {/if}
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="pickup_point">
                     </p>
@@ -69,6 +73,12 @@
                         <button class="btn btn-primary" name="pickup_point_change">{l s='Save' mod='packetery'}</button>
                     </div>
                 </form>
+            {/if}
+            {if !$postParcelAllowed && {!empty($trackingId)}}
+                <div class="alert alert-success">
+                    {l s='The shipment was successfully submitted under shipment number' mod='packetery'}:
+                    <a href="https://tracking.packeta.com/?id={$trackingId}" target="_blank">{$trackingId}</a>
+                </div>
             {/if}
         {/if}
         {if isset($messages)}

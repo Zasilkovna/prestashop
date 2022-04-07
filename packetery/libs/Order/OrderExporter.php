@@ -84,13 +84,7 @@ class OrderExporter
             $phone = trim($address->phone_mobile);
         }
 
-        $weight = '';
-        if ($packeteryOrder['weight'] !== null) {
-            // used saved if set
-            $weight = $packeteryOrder['weight'];
-        } else if (Converter::isKgConversionSupported()) {
-            $weight = Converter::getKilograms((float)$order->getTotalWeight());
-        }
+        $weight = $orderRepository->getOrderWeight($order->id);
 
         $number = (string)(Packetery::ID_PREF_REF === ConfigHelper::get('PACKETERY_ID_PREFERENCE') ? $order->reference : $order->id);
         $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
