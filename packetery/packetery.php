@@ -780,10 +780,10 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
         $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $packeteryOrder['name_branch']);
         $pickupPointChangeAllowed = false;
-        $postParcelAllowed = false;
-        $trackingId = false;
+        $postParcelButtonAllowed = false;
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
+        $showHrActionButtons = false;
         if (!$packeteryCarrier) {
             return;
         }
@@ -827,12 +827,14 @@ class Packetery extends CarrierModule
             $pickupPointChangeAllowed = true;
         }
         if (!(bool)$orderRepository->getExported($orderId)) {
-            $postParcelAllowed = true;
+            $postParcelButtonAllowed = true;
+            $showHrActionButtons = true;
         }
         $this->context->smarty->assign('messages', $messages);
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
-        $this->context->smarty->assign('postParcelAllowed', $postParcelAllowed);
+        $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
         $this->context->smarty->assign('trackingId', $packeteryOrder['tracking_number']);
+        $this->context->smarty->assign('showHrActionButtons', $showHrActionButtons);
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
@@ -1297,8 +1299,11 @@ class Packetery extends CarrierModule
                             'class' => 'danger',
                         ];
                     } elseif ($resultRow[0]) {
-                        // Success. Message with package link is visible via display_order_main.tpl.
-                        continue;
+                        $packeta_url = '<a href="https://tracking.packeta.com/?id='.$resultRow[1].'" target="_blank">'.$resultRow[1].'</a>';
+                        $messages[] = [
+                            'text' => $this->l('The shipment was successfully submitted under shipment number:').$packeta_url,
+                            'class' => 'success',
+                        ];
                     }
 
                 }

@@ -61,11 +61,6 @@
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-widget"
                            data-widget-options="{$widgetOptions|@json_encode|escape}">{l s='Change pickup point' mod='packetery'}</a>
-                        {if $postParcelAllowed}
-                            <button class="btn btn-outline-secondary btn-default" type="submit" name="process_post_parcel">
-                                {l s='Post parcel' mod='packetery'}
-                            </button>
-                        {/if}
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="pickup_point">
                     </p>
@@ -74,11 +69,24 @@
                     </div>
                 </form>
             {/if}
-            {if !$postParcelAllowed && {!empty($trackingId)}}
-                <div class="alert alert-success">
-                    {l s='The shipment was successfully submitted under shipment number' mod='packetery'}:
-                    <a href="https://tracking.packeta.com/?id={$trackingId}" target="_blank">{$trackingId}</a>
-                </div>
+            {* There will be more buttons aka more actions in future. If there is no button hide the divider *}
+            {if $showHrActionButtons}
+                <hr />
+            {/if}
+            {if $postParcelButtonAllowed}
+                <form action="{$returnUrl}" method="post">
+                    <p>
+                        <button class="btn btn-outline-secondary btn-default"
+                                type="submit"
+                                name="process_post_parcel"
+                                id="process_post_parcel"
+                        >
+                            <i class="material-icons" aria-hidden="true">send</i>
+                            {l s='Post parcel' mod='packetery'}
+                        </button>
+                        <input type="hidden" name="order_id" value="{$orderId|intval}">
+                    </p>
+                </form>
             {/if}
         {/if}
         {if isset($messages)}
@@ -88,3 +96,6 @@
         {/if}
     </div>
 </div>
+<script type="application/javascript">
+    var process_post_parcel_confirmation = "{l s='Do you really wish to post the parcel?' mod='packetery'}";
+</script>
