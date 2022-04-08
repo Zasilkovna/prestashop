@@ -7,7 +7,6 @@ use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
 use PrestaShopLoggerCore as PrestaShopLogger;
 use Packetery\Weight\Converter;
-use Module;
 
 class OrderRepository
 {
@@ -16,9 +15,6 @@ class OrderRepository
 
     /** @var DbTools */
     private $dbTools;
-
-    /** @var \Packetery\DI\Container */
-    public $diContainer;
 
     /**
      * OrderRepository constructor.
@@ -29,7 +25,6 @@ class OrderRepository
     {
         $this->db = $db;
         $this->dbTools = $dbTools;
-        $this->diContainer = \Packetery\DI\ContainerFactory::create();
     }
 
     /**
@@ -366,14 +361,13 @@ class OrderRepository
     }
 
     /**
-     * @param int $orderId
+     * @param object $order
      * @return float|null
      * @throws DatabaseException
      */
-    public function getOrderWeight($orderId)
+    public function getOrderWeight($order)
     {
-        $order = new \Order($orderId);
-        $packeteryOrder = $this->getOrderWithCountry($orderId);
+        $packeteryOrder = $this->getOrderWithCountry($order->id);
         $orderWeight = 0;
         if ($packeteryOrder['weight'] !== null) {
             // used saved if set

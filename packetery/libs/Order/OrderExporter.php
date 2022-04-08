@@ -84,7 +84,7 @@ class OrderExporter
             $phone = trim($address->phone_mobile);
         }
 
-        $weight = $orderRepository->getOrderWeight($order->id);
+        $weight = $orderRepository->getOrderWeight($order);
 
         $number = (string)(Packetery::ID_PREF_REF === ConfigHelper::get('PACKETERY_ID_PREFERENCE') ? $order->reference : $order->id);
         $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');

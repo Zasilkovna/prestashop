@@ -826,16 +826,13 @@ class Packetery extends CarrierModule
             $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
             $pickupPointChangeAllowed = true;
         }
-        if ((bool)$orderRepository->getExported($orderId) === false && $orderRepository->getOrderWeight($orderId) > 0) {
+        if (!(bool)$orderRepository->getExported($orderId)) {
             $postParcelAllowed = true;
-        }
-        if ($packeteryOrder['tracking_number'] !== '' && (bool)$orderRepository->getExported($orderId) === true) {
-            $trackingId = $packeteryOrder['tracking_number'];
         }
         $this->context->smarty->assign('messages', $messages);
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
         $this->context->smarty->assign('postParcelAllowed', $postParcelAllowed);
-        $this->context->smarty->assign('trackingId', $trackingId);
+        $this->context->smarty->assign('trackingId', $packeteryOrder['tracking_number']);
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
@@ -1197,7 +1194,8 @@ class Packetery extends CarrierModule
         if (isset($params['list']) && is_array($params['list'])) {
             foreach ($params['list'] as &$order) {
                 if ($order['weight'] === null) {
-                    $order['weight'] = $orderRepository->getOrderWeight($order['id_order']);
+                    $orderInstance = new \Order($order['id_order']);
+                    $order['weight'] = $orderRepository->getOrderWeight($orderInstance);
                 }
                 if ((bool)$order['is_ad'] === true) {
                     if (isset($addressValidationLevels[$order['id_carrier']]) && in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])) {
@@ -1298,9 +1296,11 @@ class Packetery extends CarrierModule
                             'text' => $resultRow[1],
                             'class' => 'danger',
                         ];
-                    } else if ($resultRow[0]) {
+                    } elseif ($resultRow[0]) {
                         // Success. Message with package link is visible via display_order_main.tpl.
+                        continue;
                     }
+
                 }
             }
         }
