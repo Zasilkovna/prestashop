@@ -29,6 +29,7 @@ function upgrade_module_3_0_0($module)
         ConfigHelper::update('PACKETERY_CRON_TOKEN', Tools::passwdGen(32)) &&
         ConfigHelper::update('PACKETERY_LABEL_MAX_AGE_DAYS', 7) &&
         ConfigHelper::update('PACKETERY_ID_PREFERENCE', Packetery::ID_PREF_ID) &&
+        ConfigHelper::update('PACKETERY_CARRIER_LABEL_FORMAT', 'A6 on A4') &&
         Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') &&
         $uninstaller->deleteTab('Adminpacketery') &&
         $installer->insertMenuItems()
@@ -62,7 +63,8 @@ function upgrade_module_3_0_0($module)
         ADD `street` varchar(255) NULL AFTER `city`,
         ADD `house_number` varchar(255) NULL AFTER `street`,
         ADD `latitude` varchar(255) NULL AFTER `house_number`,
-        ADD `longitude` varchar(255) NULL AFTER `latitude`;';
+        ADD `longitude` varchar(255) NULL AFTER `latitude`,
+        ADD `carrier_number` varchar(255) NULL AFTER `longitude`;';
     $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery`
         ADD `address_validation` varchar(40) NULL;';
     $sql[] = 'UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery`

@@ -179,8 +179,9 @@ class Packetery extends CarrierModule
             $have_error = true;
         }
 
-        $soapApi = $this->diContainer->get(\Packetery\Module\SoapApi::class);
-        $key = $soapApi->getApiKey();
+        /** @var \Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+        $key = $configHelper->getApiKey();
         if (Tools::strlen($key) < 5) {
             $key = false;
         }
@@ -408,11 +409,16 @@ class Packetery extends CarrierModule
                 'required' => true,
             ],
             'PACKETERY_LABEL_FORMAT' => [
-                'title' => $this->l('Labels format'),
+                'title' => $this->l('Packeta label format'),
                 'options' => array_combine(
-                    array_column($this->getAvailableLabelFormats(), 'id'),
+                    array_keys($this->getAvailableLabelFormats()),
                     array_column($this->getAvailableLabelFormats(), 'name')
                 ),
+                'required' => false,
+            ],
+            'PACKETERY_CARRIER_LABEL_FORMAT' => [
+                'title' => $this->l('Carrier label format'),
+                'options' => $this->getCarrierLabelFormats('name'),
                 'required' => false,
             ],
             'PACKETERY_ID_PREFERENCE' => [
@@ -426,35 +432,60 @@ class Packetery extends CarrierModule
         ];
     }
 
+    /**
+     * @return array[]
+     */
     public function getAvailableLabelFormats()
     {
         return [
-            [
-                'id' => 'A7 on A4',
+            'A7 on A4' => [
                 'name' => $this->l('1/8 of A4, printed on A4, 8 labels per page'),
                 'maxOffset' => 7,
+                'directLabels' => false,
             ],
-            [
-                'id' => '105x35mm on A4',
+            '105x35mm on A4' => [
                 'name' => $this->l('105x35mm, printed on A4, 16 labels per page'),
                 'maxOffset' => 15,
+                'directLabels' => false,
             ],
-            [
-                'id' => 'A6 on A4',
+            'A6 on A4' => [
                 'name' => $this->l('1/4 of A4, printed on A4, 4 labels per page'),
                 'maxOffset' => 3,
+                'directLabels' => true,
             ],
-            [
-                'id' => 'A7 on A7',
+            'A6 on A6' => [
+                'name' => $this->l('1/4 of A4, direct printing, 1 label per page'),
+                'maxOffset' => 0,
+                'directLabels' => true,
+            ],
+            'A7 on A7' => [
                 'name' => $this->l('1/8 of A4, direct printing, 1 label per page'),
                 'maxOffset' => 0,
+                'directLabels' => false,
             ],
-            [
-                'id' => 'A8 on A8',
+            'A8 on A8' => [
                 'name' => $this->l('1/16 of A4, direct printing, 1 label per page'),
                 'maxOffset' => 0,
+                'directLabels' => false,
             ],
         ];
+    }
+
+    /**
+     * @param string $valueKey carrier label property to get
+     * @return array
+     */
+    public function getCarrierLabelFormats($valueKey)
+    {
+        $availableFormats = $this->getAvailableLabelFormats();
+        $carrierLabelFormats = [];
+        foreach ($availableFormats as $format => $formatData) {
+            if ($formatData['directLabels'] === true) {
+                $carrierLabelFormats[$format] = $formatData[$valueKey];
+            }
+        }
+
+        return $carrierLabelFormats;
     }
 
     public function getOrderShippingCost($params, $shipping_cost)
@@ -568,8 +599,9 @@ class Packetery extends CarrierModule
 
             $base_uri = __PS_BASE_URI__ === '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
             $this->context->smarty->assign('baseuri', $base_uri);
-            $soapApi = $this->diContainer->get(\Packetery\Module\SoapApi::class);
-            $this->context->smarty->assign('packeta_api_key', $soapApi->getApiKey());
+            /** @var \Packetery\Tools\ConfigHelper $configHelper */
+            $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+            $this->context->smarty->assign('packeta_api_key', $configHelper->getApiKey());
         }
         if (isset($params['packetery']['template'])) {
             $template = $params['packetery']['template'];
@@ -616,10 +648,11 @@ class Packetery extends CarrierModule
         $isPS16 = strpos(_PS_VERSION_, '1.6') === 0;
         $isOpcEnabled = (bool) Configuration::get('PS_ORDER_PROCESS_TYPE');
 
-        $soapApi = $this->diContainer->get(\Packetery\Module\SoapApi::class);
+        /** @var \Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $this->context->smarty->assign('packetaModuleConfig', [
             'baseUri' => $baseUri,
-            'apiKey' => $soapApi->getApiKey(),
+            'apiKey' => $configHelper->getApiKey(),
             'frontAjaxToken' => Tools::getToken('ajax_front'),
             'appIdentity' => $this->getAppIdentity(),
             'prestashopVersion' => _PS_VERSION_,
@@ -717,8 +750,9 @@ class Packetery extends CarrierModule
         $messages = [];
         $this->processPickupPointChange($messages);
 
-        $soapApi = $this->diContainer->get(\Packetery\Module\SoapApi::class);
-        $apiKey = $soapApi->getApiKey();
+        /** @var \Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+        $apiKey = $configHelper->getApiKey();
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         $orderId = (int)$params['id_order'];
         $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
@@ -804,11 +838,12 @@ class Packetery extends CarrierModule
      */
     private function prepareAddressChange($apiKey, array $packeteryOrder, $orderId)
     {
-        $employee = Context::getContext()->employee;
+        /** @var \Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $widgetOptions = [
             'apiKey' => $apiKey,
             'country' => strtolower($packeteryOrder['ps_country']),
-            'language' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
+            'language' => $configHelper->getBackendLanguage(),
             'carrierId' => $packeteryOrder['id_branch'],
         ];
         if (\Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
@@ -838,13 +873,14 @@ class Packetery extends CarrierModule
      */
     private function preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier)
     {
-        $employee = Context::getContext()->employee;
+        /** @var \Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $widgetOptions = [
             'api_key' => $apiKey,
             'app_identity' => $this->getAppIdentity(),
             'country' => strtolower($packeteryOrder['country']),
             'module_dir' => _MODULE_DIR_,
-            'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
+            'lang' => $configHelper->getBackendLanguage(),
         ];
         if (
             $packeteryCarrier['pickup_point_type'] === 'external' &&

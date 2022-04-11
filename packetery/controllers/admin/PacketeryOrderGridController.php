@@ -24,6 +24,7 @@
  */
 
 use Packetery\Exceptions\DatabaseException;
+use Packetery\Module\SoapApi;
 use Packetery\Order\CsvExporter;
 use Packetery\Order\Labels;
 use Packetery\Order\OrderRepository;
@@ -33,6 +34,8 @@ use Packetery\Tools\ConfigHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
 {
+
+    const ACTION_BULK_CARRIER_LABEL_PDF = 'bulkCarrierLabelPdf';
 
     protected $statuses_array = array();
 
@@ -155,6 +158,8 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'title' => $this->l('Tracking number', 'packeteryordergridcontroller'),
                 'callback' => 'getTrackingLink',
                 'filter_key' => 'po!tracking_number',
+                'search' => false,
+                'orderby' => false,
             ],
             'weight' => [
                 'title' => $this->l('Weight (kg)', 'packeteryordergridcontroller'),
@@ -170,7 +175,11 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'icon' => 'icon-send',
             ],
             'LabelPdf' => [
-                'text' => $this->l('Download pdf labels', 'packeteryordergridcontroller'),
+                'text' => $this->l('Download Packeta labels', 'packeteryordergridcontroller'),
+                'icon' => 'icon-print',
+            ],
+            'CarrierLabelPdf' => [
+                'text' => $this->l('Download carrier labels', 'packeteryordergridcontroller'),
                 'icon' => 'icon-print',
             ],
             'CsvExport' => [
@@ -245,15 +254,17 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     /**
      * @param array $packetNumbers
+     * @param string $type
+     * @param array|null $packetsEnhanced
      * @param int $offset
      * @throws ReflectionException
      */
-    private function prepareLabels(array $packetNumbers, $offset = 0)
+    private function prepareLabels(array $packetNumbers, $type, $packetsEnhanced = null, $offset = 0)
     {
         $module = $this->getModule();
         /** @var Labels $packeteryLabels */
         $packeteryLabels = $module->diContainer->get(Labels::class);
-        $fileName = $packeteryLabels->packetsLabelsPdf($packetNumbers, ConfigHelper::get('PACKETERY_APIPASS'), $offset);
+        $fileName = $packeteryLabels->packetsLabelsPdf($packetNumbers, $type, $offset, $packetsEnhanced);
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         echo file_get_contents(_PS_MODULE_DIR_ . 'packetery/labels/' . $fileName);
@@ -270,7 +281,26 @@ class PacketeryOrderGridController extends ModuleAdminController
         if (Tools::isSubmit('submitPrepareLabels')) {
             $packetNumbers = $this->preparePacketNumbers($this->boxes);
             if ($packetNumbers) {
-                $this->prepareLabels($packetNumbers, (int)Tools::getValue('offset'));
+                $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA, (int)Tools::getValue('offset'));
+            }
+        }
+    }
+
+    /**
+     * Used after offset setting form is processed.
+     * @return void
+     * @throws DatabaseException
+     * @throws ReflectionException
+     */
+    public function processBulkCarrierLabelPdf()
+    {
+        if (Tools::isSubmit('submitPrepareLabels')) {
+            $packetNumbers = $this->preparePacketNumbers($this->boxes);
+            if ($packetNumbers) {
+                /** @var SoapApi $soapApi */
+                $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
+                $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
+                $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, $packetsEnhanced, (int)Tools::getValue('offset'));
             }
         }
     }
@@ -284,7 +314,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $packetNumbers = $this->preparePacketNumbers([Tools::getValue('id_order')]);
         if ($packetNumbers) {
-            $this->prepareLabels($packetNumbers);
+            $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA);
         }
     }
 
@@ -304,7 +334,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function renderList()
     {
-        if ($this->action === 'bulkLabelPdf') {
+        if ($this->action === 'bulkLabelPdf' || $this->action === self::ACTION_BULK_CARRIER_LABEL_PDF) {
             if (Tools::getIsset('cancel')) {
                 Tools::redirectAdmin(self::$currentIndex . '&token=' . $this->token);
             }
@@ -315,15 +345,31 @@ class PacketeryOrderGridController extends ModuleAdminController
                 $packetNumbers = $this->preparePacketNumbers($ids);
                 if ($packetNumbers) {
                     // Offset setting form preparation.
-                    $maxOffsets = $this->getMaxOffsets();
-                    $maxOffset = (int)$maxOffsets[ConfigHelper::get('PACKETERY_LABEL_FORMAT')];
-                    if ($maxOffset !== 0) {
-                        $this->tpl_list_vars['max_offset'] = $maxOffset;
-                        $this->tpl_list_vars['prepareLabelsMode'] = true;
-                        $this->tpl_list_vars['REQUEST_URI'] = $_SERVER['REQUEST_URI'];
-                        $this->tpl_list_vars['POST'] = $_POST;
+                    $packetsEnhanced = null;
+                    if ($this->action === self::ACTION_BULK_CARRIER_LABEL_PDF) {
+                        $type = Labels::TYPE_CARRIER;
+                        $maxOffsets = $this->getModule()->getCarrierLabelFormats('maxOffset');
+                        $maxOffset = (int)$maxOffsets[ConfigHelper::get('PACKETERY_CARRIER_LABEL_FORMAT')];
+                        /** @var SoapApi $soapApi */
+                        $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
+                        $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
+                        if (empty($packetsEnhanced)) {
+                            $this->warnings[] = $this->l('No labels can be printed as carrier labels.', 'packeteryordergridcontroller');
+                        }
                     } else {
-                        $this->prepareLabels($packetNumbers);
+                        $type = Labels::TYPE_PACKETA;
+                        $maxOffsets = $this->getMaxOffsets();
+                        $maxOffset = (int)$maxOffsets[ConfigHelper::get('PACKETERY_LABEL_FORMAT')];
+                    }
+                    if ($maxOffset !== 0) {
+                        if (empty($this->warnings)) {
+                            $this->tpl_list_vars['max_offset'] = $maxOffset;
+                            $this->tpl_list_vars['prepareLabelsMode'] = true;
+                            $this->tpl_list_vars['REQUEST_URI'] = $_SERVER['REQUEST_URI'];
+                            $this->tpl_list_vars['POST'] = $_POST;
+                        }
+                    } else {
+                        $this->prepareLabels($packetNumbers, $type, $packetsEnhanced);
                     }
                 }
             }
@@ -340,7 +386,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $module = $this->getModule();
         return array_combine(
-            array_column($module->getAvailableLabelFormats(), 'id'),
+            array_keys($module->getAvailableLabelFormats()),
             array_column($module->getAvailableLabelFormats(), 'maxOffset')
         );
     }
@@ -377,14 +423,35 @@ class PacketeryOrderGridController extends ModuleAdminController
         parent::postProcess();
     }
 
+    /**
+     * @param string $trackingNumber
+     * @return false|string
+     * @throws ReflectionException
+     * @throws SmartyException
+     */
     public function getTrackingLink($trackingNumber)
     {
-        if ($trackingNumber) {
-            $smarty = new Smarty();
-            $smarty->assign('trackingNumber', $trackingNumber);
-            return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
+        if (empty($trackingNumber)) {
+            return '';
         }
-        return '';
+        $smarty = new Smarty();
+        $smarty->assign('trackingNumber', $trackingNumber);
+        /** @var SoapApi $soapApi */
+        $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
+        $packetInfo = $soapApi->getPacketInfo($trackingNumber);
+        if ($packetInfo->hasFault()) {
+            $this->warnings = sprintf(
+                '%s: %s',
+                $this->l('Retrieving shipment information failed', 'packeteryordergridcontroller'),
+                $trackingNumber
+            );
+        } else {
+            $smarty->assign([
+                'carrierNumber' => $packetInfo->getNumber(),
+                'carrierTrackingUrl' => $packetInfo->getTrackingLink(),
+            ]);
+        }
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
     }
 
     public function getIconForBoolean($booleanValue)

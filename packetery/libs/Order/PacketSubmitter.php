@@ -7,6 +7,7 @@ use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
 use Packetery\Module\SoapApi;
+use Packetery\Tools\ConfigHelper;
 use PrestaShopDatabaseException;
 use PrestaShopException;
 use ReflectionException;
@@ -16,17 +17,23 @@ use Tools;
 
 class PacketSubmitter
 {
-    private $apiPassword;
     /** @var OrderRepository */
     private $orderRepository;
     /** @var Packetery */
     private $module;
+    /** @var ConfigHelper */
+    private $configHelper;
 
-    public function __construct(OrderRepository $orderRepository, Packetery $module, SoapApi $soapApi)
+    /**
+     * @param OrderRepository $orderRepository
+     * @param Packetery $module
+     * @param ConfigHelper $configHelper
+     */
+    public function __construct(OrderRepository $orderRepository, Packetery $module, ConfigHelper $configHelper)
     {
         $this->orderRepository = $orderRepository;
         $this->module = $module;
-        $this->apiPassword = $soapApi->getApiPass();
+        $this->configHelper = $configHelper;
     }
 
     /**
@@ -123,7 +130,7 @@ class PacketSubmitter
         $client = new SoapClient(SoapApi::API_WSDL_URL);
 
         try {
-            $validate = $client->packetAttributesValid($this->apiPassword, $packetAttributes);
+            $validate = $client->packetAttributesValid($this->configHelper->getApiPass(), $packetAttributes);
             if (!$validate) {
                 return [1];
             }
@@ -142,7 +149,7 @@ class PacketSubmitter
     {
         $client = new SoapClient(SoapApi::API_WSDL_URL);
         try {
-            $trackingNumber = $client->createPacket($this->apiPassword, $packetAttributes);
+            $trackingNumber = $client->createPacket($this->configHelper->getApiPass(), $packetAttributes);
             if ($trackingNumber->id) {
                 return [1, $trackingNumber->id];
             }

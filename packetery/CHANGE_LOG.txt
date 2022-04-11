@@ -91,3 +91,4 @@
       - Added: possibility of using either ID or Reference as order ID in export
       - Updated: internal refactoring - removal of static classess Packeteryclass and PacketeryApi
       - Added: Packeta submenu added to main menu
+      - Added: possibility to prepare carrier labels

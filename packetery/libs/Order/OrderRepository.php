@@ -306,6 +306,33 @@ class OrderRepository
     }
 
     /**
+     * @param int $orderId
+     * @return false|string|null
+     * @throws DatabaseException
+     */
+    public function getCarrierNumber($orderId)
+    {
+        $orderId = (int)$orderId;
+        return $this->dbTools->getValue('SELECT `carrier_number` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . $orderId);
+    }
+
+    /**
+     * @param int $orderId
+     * @param string $carrierNumber
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function setCarrierNumber($orderId, $carrierNumber)
+    {
+        $orderId = (int)$orderId;
+        return $this->dbTools->update(
+            'packetery_order',
+            ['carrier_number' => $this->db->escape($carrierNumber)],
+            '`id_order` = ' . $orderId
+        );
+    }
+
+    /**
      * @param int|bool $exported
      * @param int $orderId
      * @return bool
