@@ -70,7 +70,7 @@
                 </form>
             {/if}
             {* There will be more buttons aka more actions in future. If there is no button hide the divider *}
-            {if $showHrActionButtons}
+            {if $showActionButtonsDividers}
                 <hr />
             {/if}
             {if $postParcelButtonAllowed}

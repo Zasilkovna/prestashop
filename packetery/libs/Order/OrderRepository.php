@@ -6,7 +6,6 @@ use Db;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
 use PrestaShopLoggerCore as PrestaShopLogger;
-use Packetery\Weight\Converter;
 
 class OrderRepository
 {
@@ -345,37 +344,6 @@ class OrderRepository
     {
         $orderId = (int)$orderId;
         return $this->dbTools->update('packetery_order', ['exported' => $exported], '`id_order` = ' . $orderId);
-    }
-
-    /**
-     * @param int $orderId
-     * @return bool
-     * @throws DatabaseException
-     */
-    public function getExported($orderId)
-    {
-        $orderId = (int)$orderId;
-        return (bool)$this->dbTools->getValue(
-            'SELECT `exported` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_order` = ' . $orderId
-        );
-    }
-
-    /**
-     * @param object $order
-     * @return float|null
-     * @throws DatabaseException
-     */
-    public function getOrderWeight($order)
-    {
-        $packeteryOrder = $this->getOrderWithCountry($order->id);
-        $orderWeight = 0;
-        if ($packeteryOrder['weight'] !== null) {
-            // used saved if set
-            $orderWeight = $packeteryOrder['weight'];
-        } else if (Converter::isKgConversionSupported()) {
-            $orderWeight = Converter::getKilograms((float)$order->getTotalWeight());
-        }
-        return (float)$orderWeight;
     }
 
     /**

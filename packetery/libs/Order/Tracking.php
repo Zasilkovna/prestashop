@@ -50,4 +50,18 @@ class Tracking
 
         return false;
     }
+
+    /**
+     * @param $trackingNumber
+     * @return false|string
+     */
+    public function getTrackingLink($trackingNumber)
+    {
+        if ($trackingNumber) {
+            $smarty = new \Smarty();
+            $smarty->assign('trackingNumber', $trackingNumber);
+            return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
+        }
+        return '';
+    }
 }

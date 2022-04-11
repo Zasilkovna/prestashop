@@ -754,6 +754,8 @@ class Packetery extends CarrierModule
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $apiKey = $configHelper->getApiKey();
+
+        /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         $orderId = (int)$params['id_order'];
         $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
@@ -781,9 +783,12 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $packeteryOrder['name_branch']);
         $pickupPointChangeAllowed = false;
         $postParcelButtonAllowed = false;
+
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
-        $showHrActionButtons = false;
+        $showActionButtonsDividers = false;
         if (!$packeteryCarrier) {
             return;
         }
@@ -826,15 +831,16 @@ class Packetery extends CarrierModule
             $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
             $pickupPointChangeAllowed = true;
         }
-        if (!(bool)$orderRepository->getExported($orderId)) {
+        /** @var \Packetery\Weight\Converter $converter */
+        $converter = $this->diContainer->get(\Packetery\Weight\Converter::class);
+        if (!(bool)$packeteryOrder['exported'] && $converter->getConvertedOrderWeight($packeteryOrder) > 0) {
             $postParcelButtonAllowed = true;
-            $showHrActionButtons = true;
+            $showActionButtonsDividers = true;
         }
         $this->context->smarty->assign('messages', $messages);
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
-        $this->context->smarty->assign('trackingId', $packeteryOrder['tracking_number']);
-        $this->context->smarty->assign('showHrActionButtons', $showHrActionButtons);
+        $this->context->smarty->assign('showActionButtonsDividers', $showActionButtonsDividers);
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
@@ -949,6 +955,7 @@ class Packetery extends CarrierModule
             'latitude' => $address['latitude'],
             'longitude' => $address['longitude'],
         ];
+
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         return $orderRepository->updateByOrder($packeteryOrderFields, $orderId);
     }
@@ -1190,14 +1197,15 @@ class Packetery extends CarrierModule
      */
     public function hookActionPacketeryOrderGridListingResultsModifier(&$params)
     {
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $addressValidationLevels = $carrierRepository->getAddressValidationLevels();
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         if (isset($params['list']) && is_array($params['list'])) {
             foreach ($params['list'] as &$order) {
                 if ($order['weight'] === null) {
-                    $orderInstance = new \Order($order['id_order']);
-                    $order['weight'] = $orderRepository->getOrderWeight($orderInstance);
+                    /** @var \Packetery\Weight\Converter $converter */
+                    $converter = $this->diContainer->get(\Packetery\Weight\Converter::class);
+                    $order['weight'] = $converter->getConvertedOrderWeight($order);
                 }
                 if ((bool)$order['is_ad'] === true) {
                     if (isset($addressValidationLevels[$order['id_carrier']]) && in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])) {
@@ -1278,17 +1286,17 @@ class Packetery extends CarrierModule
      * @param array $messages
      * @throws ReflectionException
      * @throws \Packetery\Exceptions\DatabaseException
+     * @throws \SmartyException tracking link related exception
      */
     private function processPostParcel(array &$messages)
     {
         if (
             Tools::isSubmit('process_post_parcel') &&
-            Tools::getIsset('order_id') &&
-            Tools::getValue('order_id') > 0
+            Tools::getIsset('order_id')
         ) {
             $id_order = array(Tools::getValue('order_id'));
 
-            /** @var PacketSubmitter $packetSubmitter */
+            /** @var Packetery\Order\PacketSubmitter $packetSubmitter */
             $packetSubmitter = $this->diContainer->get(Packetery\Order\PacketSubmitter::class);
             $exportResult = $packetSubmitter->ordersExport($id_order);
             if (is_array($exportResult)) {
@@ -1299,9 +1307,11 @@ class Packetery extends CarrierModule
                             'class' => 'danger',
                         ];
                     } elseif ($resultRow[0]) {
-                        $packeta_url = '<a href="https://tracking.packeta.com/?id='.$resultRow[1].'" target="_blank">'.$resultRow[1].'</a>';
+                        /** @var Packetery\Order\Tracking $packeteryTracking */
+                        $packeteryTracking = $this->diContainer->get(Packetery\Order\Tracking::class);
+                        $packeteryUrl = $packeteryTracking->getTrackingLink($resultRow[1]);
                         $messages[] = [
-                            'text' => $this->l('The shipment was successfully submitted under shipment number:').$packeta_url,
+                            'text' => $this->l('The shipment was successfully submitted under shipment number:').$packeteryUrl,
                             'class' => 'success',
                         ];
                     }

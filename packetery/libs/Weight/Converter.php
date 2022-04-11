@@ -35,4 +35,23 @@ class Converter
         $unit = strtolower(\Configuration::get('PS_WEIGHT_UNIT'));
         return isset(self::$mapping[$unit]);
     }
+
+    /**
+     * @param array $packeteryOrder
+     * @param object $order
+     * @return float|null
+     */
+    public static function getConvertedOrderWeight($packeteryOrder, $order = null)
+    {
+        $orderWeight = 0.0;
+        if ($packeteryOrder['weight'] !== null) {
+            $orderWeight = $packeteryOrder['weight'];
+        } else if (self::isKgConversionSupported()) {
+            if($order === null) {
+                $order = new \Order($packeteryOrder['id_order']);
+                $orderWeight = self::getKilograms($order->getTotalWeight());
+            }
+        }
+        return $orderWeight;
+    }
 }
