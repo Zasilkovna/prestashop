@@ -52,8 +52,9 @@ class Tracking
     }
 
     /**
-     * @param $trackingNumber
+     * @param false|string $trackingNumber
      * @return false|string
+     * @throws \SmartyException tracking link related exception
      */
     public function getTrackingLink($trackingNumber)
     {

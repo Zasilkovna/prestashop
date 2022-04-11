@@ -46,11 +46,9 @@ class Converter
         $orderWeight = 0.0;
         if ($packeteryOrder['weight'] !== null) {
             $orderWeight = $packeteryOrder['weight'];
-        } else if (self::isKgConversionSupported()) {
-            if($order === null) {
-                $order = new \Order($packeteryOrder['id_order']);
-                $orderWeight = self::getKilograms($order->getTotalWeight());
-            }
+        } else if (self::isKgConversionSupported() && $order === null) {
+            $order = new \Order($packeteryOrder['id_order']);
+            $orderWeight = self::getKilograms($order->getTotalWeight());
         }
         return $orderWeight;
     }

@@ -788,7 +788,7 @@ class Packetery extends CarrierModule
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
 
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
-        $showActionButtonsDividers = false;
+        $showActionButtonsDivider = false;
         if (!$packeteryCarrier) {
             return;
         }
@@ -835,12 +835,12 @@ class Packetery extends CarrierModule
         $converter = $this->diContainer->get(\Packetery\Weight\Converter::class);
         if (!(bool)$packeteryOrder['exported'] && $converter->getConvertedOrderWeight($packeteryOrder) > 0) {
             $postParcelButtonAllowed = true;
-            $showActionButtonsDividers = true;
+            $showActionButtonsDivider = true;
         }
         $this->context->smarty->assign('messages', $messages);
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
-        $this->context->smarty->assign('showActionButtonsDividers', $showActionButtonsDividers);
+        $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider);
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
@@ -1311,7 +1311,7 @@ class Packetery extends CarrierModule
                         $packeteryTracking = $this->diContainer->get(Packetery\Order\Tracking::class);
                         $packeteryUrl = $packeteryTracking->getTrackingLink($resultRow[1]);
                         $messages[] = [
-                            'text' => $this->l('The shipment was successfully submitted under shipment number:').$packeteryUrl,
+                            'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryUrl,
                             'class' => 'success',
                         ];
                     }
