@@ -431,27 +431,9 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function getTrackingLink($trackingNumber)
     {
-        if (empty($trackingNumber)) {
-            return '';
-        }
-        $smarty = new Smarty();
-        $smarty->assign('trackingNumber', $trackingNumber);
-        /** @var SoapApi $soapApi */
-        $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
-        $packetInfo = $soapApi->getPacketInfo($trackingNumber);
-        if ($packetInfo->hasFault()) {
-            $this->warnings = sprintf(
-                '%s: %s',
-                $this->l('Retrieving shipment information failed', 'packeteryordergridcontroller'),
-                $trackingNumber
-            );
-        } else {
-            $smarty->assign([
-                'carrierNumber' => $packetInfo->getNumber(),
-                'carrierTrackingUrl' => $packetInfo->getTrackingLink(),
-            ]);
-        }
-        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
+        /** @var \Packetery\Order\Tracking $orderRepo */
+        $tracking = $this->getModule()->diContainer->get(Tracking::class);
+        return $tracking->getTrackingLink($trackingNumber);
     }
 
     public function getIconForBoolean($booleanValue)

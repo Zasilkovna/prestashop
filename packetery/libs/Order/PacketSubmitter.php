@@ -32,8 +32,8 @@ class PacketSubmitter
     public function __construct(OrderRepository $orderRepository, Packetery $module, ConfigHelper $configHelper)
     {
         $this->orderRepository = $orderRepository;
-        $this->module = $module;
         $this->configHelper = $configHelper;
+        $this->module = $module;
     }
 
     /**

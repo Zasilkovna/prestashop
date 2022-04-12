@@ -3,6 +3,7 @@
 namespace Packetery\Order;
 
 use Packetery\Exceptions\DatabaseException;
+use Packetery;
 
 class Tracking
 {
@@ -58,11 +59,27 @@ class Tracking
      */
     public function getTrackingLink($trackingNumber)
     {
-        if ($trackingNumber) {
-            $smarty = new \Smarty();
-            $smarty->assign('trackingNumber', $trackingNumber);
-            return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
+        if (empty($trackingNumber)) {
+            return '';
         }
-        return '';
+        $smarty = new \Smarty();
+        $packetery = new Packetery();
+        $smarty->assign('trackingNumber', $trackingNumber);
+        /** @var Packetery\Module\SoapApi $soapApi */
+        $soapApi = $packetery->diContainer->get(Packetery\Module\SoapApi::class);
+        $packetInfo = $soapApi->getPacketInfo($trackingNumber);
+        if ($packetInfo->hasFault()) {
+            $this->warnings = sprintf(
+                '%s: %s',
+                $this->l('Retrieving shipment information failed', 'packeteryordergridcontroller'),
+                $trackingNumber
+            );
+        } else {
+            $smarty->assign([
+                'carrierNumber' => $packetInfo->getNumber(),
+                'carrierTrackingUrl' => $packetInfo->getTrackingLink(),
+            ]);
+        }
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
     }
 }
