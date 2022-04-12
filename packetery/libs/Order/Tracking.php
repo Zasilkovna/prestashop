@@ -63,8 +63,8 @@ class Tracking
             return '';
         }
         $smarty = new \Smarty();
-        $packetery = new Packetery();
         $smarty->assign('trackingNumber', $trackingNumber);
+        $packetery = new Packetery();
         /** @var Packetery\Module\SoapApi $soapApi */
         $soapApi = $packetery->diContainer->get(Packetery\Module\SoapApi::class);
         $packetInfo = $soapApi->getPacketInfo($trackingNumber);

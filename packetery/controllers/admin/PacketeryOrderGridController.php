@@ -424,14 +424,14 @@ class PacketeryOrderGridController extends ModuleAdminController
     }
 
     /**
-     * @param string $trackingNumber
+     * @param false|string $trackingNumber
      * @return false|string
      * @throws ReflectionException
      * @throws SmartyException
      */
     public function getTrackingLink($trackingNumber)
     {
-        /** @var \Packetery\Order\Tracking $orderRepo */
+        /** @var \Packetery\Order\Tracking $tracking */
         $tracking = $this->getModule()->diContainer->get(Tracking::class);
         return $tracking->getTrackingLink($trackingNumber);
     }

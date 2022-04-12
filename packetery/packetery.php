@@ -786,7 +786,6 @@ class Packetery extends CarrierModule
 
         /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
         $showActionButtonsDivider = false;
         if (!$packeteryCarrier) {
@@ -955,7 +954,7 @@ class Packetery extends CarrierModule
             'latitude' => $address['latitude'],
             'longitude' => $address['longitude'],
         ];
-
+        /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         return $orderRepository->updateByOrder($packeteryOrderFields, $orderId);
     }
