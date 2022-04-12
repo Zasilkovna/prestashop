@@ -43,6 +43,7 @@ $_MODULE['<{packetery}prestashop>packetery_c094942e6862342615ed2c1b6e2ee311'] = 
 $_MODULE['<{packetery}prestashop>packetery_492bd00238d3ccba86931c7d815092be'] = 'Pro ověření adresy použijte prosím widget.';
 $_MODULE['<{packetery}prestashop>packetery_b18ce70ed15a7a117141d6ee14f9138c'] = 'Výdejní místo bylo úspěšně změněno.';
 $_MODULE['<{packetery}prestashop>packetery_f1111e5bc2fc07a2985e5273341fbd7b'] = 'Výdejní místo se nepodařilo změnit.';
+$_MODULE['<{packetery}prestashop>packetery_3bbd0c26a030a37f3aa35043965f9df1'] = 'Zásielka bola úspešne podaná pod číslom zásielky:';
 $_MODULE['<{packetery}prestashop>packetery_21994b64705fb9bda8ac23e018d36dd1'] = 'Adresa byla úspěšně změněna.';
 $_MODULE['<{packetery}prestashop>packetery_9adba94d0538aa24decee46ce7511368'] = 'Adresu se nepodařilo změnit.';
 $_MODULE['<{packetery}prestashop>display_order_list_footer_c9cc8cce247e49bae79f15173ce97354'] = 'Uložit';
@@ -61,6 +62,8 @@ $_MODULE['<{packetery}prestashop>display_order_main_c9cc8cce247e49bae79f15173ce9
 $_MODULE['<{packetery}prestashop>display_order_main_ee5c5839980b47f1893220655a3de0fb'] = 'Výdejní místo';
 $_MODULE['<{packetery}prestashop>display_order_main_9aa49c5a01dab7e49c73343b47e995a2'] = 'Vyberte prosím výdejní místo';
 $_MODULE['<{packetery}prestashop>display_order_main_128ca07a3ac6521356117915e983660d'] = 'Změnit výdejní místo';
+$_MODULE['<{packetery}prestashop>display_order_main_786313e610ded09bcd936c2b4ebde6ad'] = 'Podať zásielku';
+$_MODULE['<{packetery}prestashop>display_order_main_5606d6f39713e37807ff75042e1ae324'] = 'Naozaj si prajete podať zásielku?';
 $_MODULE['<{packetery}prestashop>carriers_info_83da76284b32119b3e3833c8d8a74392'] = 'Aktualizace dopravců Zásilkovny';
 $_MODULE['<{packetery}prestashop>carriers_info_57d41df11d9a0c7512e13b58daea48f7'] = 'Celkom dopravcov';
 $_MODULE['<{packetery}prestashop>carriers_info_ad26b2c4320499b7daf5b347dec3ef27'] = 'Posledná aktualizácia dopravcov';
@@ -82,6 +85,7 @@ $_MODULE['<{packetery}prestashop>deletelabels_79500929219856f7162cea4f4d85d9b7']
 $_MODULE['<{packetery}prestashop>deletelabels_60abf2c345b55a7ed556d3293ea5c70c'] = 'Nepodařilo se odstranit některé štítky. Zkontrolujte souborová oprávnění.';
 $_MODULE['<{packetery}prestashop>orderexporter_4988c308d36d231707ae7e2d1e8d06b2'] = 'Nepodařilo se načíst údaje potřebné pro exportování objednávky';
 $_MODULE['<{packetery}prestashop>orderexporter_40580ead2944ee1f216ef9be35c18eb4'] = 'Nepodařilo se nalézt směnný kurz mezi objednávkou a pobočkou, objednávka';
+$_MODULE['<{packetery}prestashop>tracking_68f67fbc8133ab594663600a2d8eda09'] = 'Načítanie informácií o zásielke zlyhalo';
 $_MODULE['<{packetery}prestashop>packetsubmitter_5552dc553d496d4b06866ca45b890b4a'] = 'Najprv vyberte objednávky.';
 $_MODULE['<{packetery}prestashop>options_a8aadecdc79bcce492c6b27b78077b02'] = 'Nesprávne API heslo.';
 $_MODULE['<{packetery}prestashop>options_3a2f7eb090541a1fffae68f276e8d62e'] = 'Api heslo musí byť reťazec';
@@ -148,7 +152,6 @@ $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_e24ad57fb2f078979a
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_5552dc553d496d4b06866ca45b890b4a'] = 'Najprv vyberte objednávky.';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_b0e18fd5958d01d019dac2d4eb98a23e'] = 'Žádné štítky nemohou být připraveny jako štítky dopravce.';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_d5bced36fd88402506bdf9d99064697e'] = 'Hmotnosti objednávek byly uloženy.';
-$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_68f67fbc8133ab594663600a2d8eda09'] = 'Načtení informací o zásilce selhalo';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_13dba24862cf9128167a59100e154c8d'] = 'Tisknout';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_0095a9fa74d1713e43e370a7d7846224'] = 'Exportovat';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_a254c25adc7d10d7e9c4889484f875a5'] = 'Detail';

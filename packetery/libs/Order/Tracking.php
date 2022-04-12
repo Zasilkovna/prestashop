@@ -71,7 +71,7 @@ class Tracking
         if ($packetInfo->hasFault()) {
             $this->warnings = sprintf(
                 '%s: %s',
-                $this->l('Retrieving shipment information failed', 'packeteryordergridcontroller'),
+                $this->l('Retrieving shipment information failed', 'tracking'),
                 $trackingNumber
             );
         } else {
