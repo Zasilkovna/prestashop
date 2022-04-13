@@ -124,7 +124,7 @@ class OrderSaver
 
         $branchId = Tools::getValue('id_branch');
         $branchName = Tools::getValue('name_branch');
-        $branchCurrency = strtoupper(Tools::getValue('currency_branch'));
+        $branchCurrency = Tools::getValue('currency_branch');
         $prestashopCarrierId = Tools::getValue('prestashop_carrier_id');
         $pickupPointType = (Tools::getIsset('pickup_point_type') ? Tools::getValue('pickup_point_type') : 'internal');
         $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
