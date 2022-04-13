@@ -64,4 +64,9 @@ $(document).ready(function () {
             }, widgetOptions);
         });
     }
+
+    //
+
+    $('#PACKETERY_DEFAULT_PACKAGE_PRICE').attr('type', 'number');
+    $('#PACKETERY_DEFAULT_PACKAGE_PRICE').attr('min', '0');
 });

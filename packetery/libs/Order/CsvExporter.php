@@ -42,6 +42,15 @@ class CsvExporter
                 continue;
             }
 
+            //TODO: Do as a method. Same functionality is used in OrderExporter.php
+            $defaultPackagePrice = \Configuration::get('PACKETERY_DEFAULT_PACKAGE_PRICE');
+            $orderValue = $exportData['value'];
+            $codValue = $exportData['codValue'];
+            if ($defaultPackagePrice > 0 && $orderValue == 0) {
+                $orderValue = number_format($defaultPackagePrice,6);
+                $codValue = number_format(0,6);
+            }
+
             $data[$order_id] = [
                 'reserved' => '',
                 'orderNumber' => $exportData['number'],
@@ -50,9 +59,9 @@ class CsvExporter
                 'company' => $exportData['company'],
                 'email' => $exportData['email'],
                 'phone' => $exportData['phone'],
-                'codValue' => $exportData['codValue'],
+                'codValue' => $codValue,
                 'currency' => $exportData['currency'],
-                'value' => $exportData['value'],
+                'value' => $orderValue,
                 'weight' => $exportData['weight'],
                 'pickupPointOrCarrier' => $exportData['pickupPointOrCarrier'],
                 'senderLabel' => $exportData['senderLabel'],
