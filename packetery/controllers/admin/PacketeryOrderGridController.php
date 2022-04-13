@@ -433,7 +433,13 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         /** @var \Packetery\Order\Tracking $tracking */
         $tracking = $this->getModule()->diContainer->get(Tracking::class);
-        return $tracking->getTrackingLink($trackingNumber);
+        $response =  $tracking->getTrackingLink($trackingNumber);
+        if (isset($response['warning'])) {
+            $this->warnings = $response['warning'];
+        }
+        if (isset($response['trackingLink'])) {
+            return $response['trackingLink'];
+        }
     }
 
     public function getIconForBoolean($booleanValue)

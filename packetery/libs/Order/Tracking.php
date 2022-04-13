@@ -68,18 +68,21 @@ class Tracking
         /** @var Packetery\Module\SoapApi $soapApi */
         $soapApi = $packetery->diContainer->get(Packetery\Module\SoapApi::class);
         $packetInfo = $soapApi->getPacketInfo($trackingNumber);
+        $response = [];
         if ($packetInfo->hasFault()) {
-            $this->warnings = sprintf(
+            $response['warning'] = sprintf(
                 '%s: %s',
                 $this->l('Retrieving shipment information failed', 'tracking'),
                 $trackingNumber
             );
+
         } else {
             $smarty->assign([
                 'carrierNumber' => $packetInfo->getNumber(),
                 'carrierTrackingUrl' => $packetInfo->getTrackingLink(),
             ]);
         }
-        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
+        $response['trackingLink'] = $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
+        return $response;
     }
 }

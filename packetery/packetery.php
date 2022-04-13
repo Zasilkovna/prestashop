@@ -1308,9 +1308,10 @@ class Packetery extends CarrierModule
                     } elseif ($resultRow[0]) {
                         /** @var Packetery\Order\Tracking $packeteryTracking */
                         $packeteryTracking = $this->diContainer->get(Packetery\Order\Tracking::class);
-                        $packeteryUrl = $packeteryTracking->getTrackingLink($resultRow[1]);
+                        $response = $packeteryTracking->getTrackingLink($resultRow[1]);
+                        $trackingLink = $response['trackingLink'];
                         $messages[] = [
-                            'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryUrl,
+                            'text' => $this->l('The shipment was successfully submitted under shipment number:') . $trackingLink,
                             'class' => 'success',
                         ];
                     }
