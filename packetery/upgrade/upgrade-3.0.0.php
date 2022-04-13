@@ -30,6 +30,7 @@ function upgrade_module_3_0_0($module)
         ConfigHelper::update('PACKETERY_LABEL_MAX_AGE_DAYS', 7) &&
         ConfigHelper::update('PACKETERY_ID_PREFERENCE', Packetery::ID_PREF_ID) &&
         ConfigHelper::update('PACKETERY_CARRIER_LABEL_FORMAT', 'A6 on A4') &&
+        ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0) &&
         Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') &&
         $uninstaller->deleteTab('Adminpacketery') &&
         $installer->insertMenuItems()
