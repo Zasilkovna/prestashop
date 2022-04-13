@@ -54,13 +54,13 @@ class Tracking
 
     /**
      * @param string|null $trackingNumber
-     * @return false|string
+     * @return array|false
      * @throws \SmartyException tracking link related exception
      */
     public function getTrackingLink($trackingNumber)
     {
         if (empty($trackingNumber)) {
-            return '';
+            return false;
         }
         $smarty = new \Smarty();
         $smarty->assign('trackingNumber', $trackingNumber);
@@ -72,10 +72,9 @@ class Tracking
         if ($packetInfo->hasFault()) {
             $response['warning'] = sprintf(
                 '%s: %s',
-                $this->l('Retrieving shipment information failed', 'tracking'),
+                $packetery->l('Retrieving shipment information failed', 'tracking'),
                 $trackingNumber
             );
-
         } else {
             $smarty->assign([
                 'carrierNumber' => $packetInfo->getNumber(),

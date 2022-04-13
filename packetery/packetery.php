@@ -27,6 +27,8 @@
  * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
  */
 
+use Packetery\Weight\Converter;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -252,11 +254,11 @@ class Packetery extends CarrierModule
         $output = '<div class="packetery">' . PHP_EOL;
 
         $usedWeightUnit = Configuration::get('PS_WEIGHT_UNIT');
-        if (\Packetery\Weight\Converter::isKgConversionSupported() === false) {
+        if (Converter::isKgConversionSupported() === false) {
             $output .= $this->displayInformation(sprintf(
                 $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to one of: %s.'),
                 $usedWeightUnit,
-                implode(', ', array_keys(\Packetery\Weight\Converter::$mapping))
+                implode(', ', array_keys(Converter::$mapping))
             ));
         }
 
@@ -831,17 +833,15 @@ class Packetery extends CarrierModule
             $pickupPointChangeAllowed = true;
         }
         // TODO find proper class and create new method to return order weight, convert if needed
-        $orderWeight = 0.0;
         if ($packeteryOrder['weight'] !== null) {
             $orderWeight = $packeteryOrder['weight'];
-        }
-        $order = new \Order($packeteryOrder['id_order']);
-        /** @var \Packetery\Weight\Converter $carrierRepository */
-        $converter = $this->diContainer->get(\Packetery\Weight\Converter::class);
-        if ($converter->isKgConversionSupported()) {
-            $orderWeight = $converter->getKilograms($order->getTotalWeight());
         } else {
-            $orderWeight = $order->getTotalWeight();
+            $order = new \Order($packeteryOrder['id_order']);
+            if (Converter::isKgConversionSupported()) {
+                $orderWeight = Converter::getKilograms($order->getTotalWeight());
+            } else {
+                $orderWeight = Converter::getTotalWeight();
+            }
         }
 
         if (!(bool)$packeteryOrder['exported'] && $orderWeight > 0) {
@@ -1216,7 +1216,7 @@ class Packetery extends CarrierModule
                 if ($order['weight'] === null) {
                     // TODO find proper class and create new method to return order weight, convert if needed
                     $orderInstance = new \Order($order['id_order']);
-                    $order['weight'] = \Packetery\Weight\Converter::getKilograms((float)$orderInstance->getTotalWeight());
+                    $order['weight'] = Converter::getKilograms((float)$orderInstance->getTotalWeight());
                 }
                 if ((bool)$order['is_ad'] === true) {
                     if (isset($addressValidationLevels[$order['id_carrier']]) && in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])) {
@@ -1321,13 +1321,17 @@ class Packetery extends CarrierModule
                         /** @var Packetery\Order\Tracking $packeteryTracking */
                         $packeteryTracking = $this->diContainer->get(Packetery\Order\Tracking::class);
                         $response = $packeteryTracking->getTrackingLink($resultRow[1]);
-                        $trackingLink = $response['trackingLink'];
+                        if (isset($response['warning'])) {
+                            $messages[] = [
+                                'text' => $response['warning'],
+                                'class' => 'danger',
+                            ];
+                        }
                         $messages[] = [
-                            'text' => $this->l('The shipment was successfully submitted under shipment number:') . $trackingLink,
+                            'text' => $this->l('The shipment was successfully submitted under shipment number:') . $response['trackingLink'],
                             'class' => 'success',
                         ];
                     }
-
                 }
             }
         }
