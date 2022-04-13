@@ -192,6 +192,7 @@ class OrderRepository
                    `po`.`longitude`,
                    `po`.`weight`,
                    `po`.`tracking_number`,
+                   `po`.`exported`,
                     `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`

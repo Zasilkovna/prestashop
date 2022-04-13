@@ -830,9 +830,21 @@ class Packetery extends CarrierModule
             $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
             $pickupPointChangeAllowed = true;
         }
-        /** @var \Packetery\Weight\Converter $converter */
+        // TODO find proper class and create new method to return order weight, convert if needed
+        $orderWeight = 0.0;
+        if ($packeteryOrder['weight'] !== null) {
+            $orderWeight = $packeteryOrder['weight'];
+        }
+        $order = new \Order($packeteryOrder['id_order']);
+        /** @var \Packetery\Weight\Converter $carrierRepository */
         $converter = $this->diContainer->get(\Packetery\Weight\Converter::class);
-        if (!(bool)$packeteryOrder['exported'] && $converter->getConvertedOrderWeight($packeteryOrder) > 0) {
+        if ($converter->isKgConversionSupported()) {
+            $orderWeight = $converter->getKilograms($order->getTotalWeight());
+        } else {
+            $orderWeight = $order->getTotalWeight();
+        }
+
+        if (!(bool)$packeteryOrder['exported'] && $orderWeight > 0) {
             $postParcelButtonAllowed = true;
             $showActionButtonsDivider = true;
         }
@@ -1202,9 +1214,9 @@ class Packetery extends CarrierModule
         if (isset($params['list']) && is_array($params['list'])) {
             foreach ($params['list'] as &$order) {
                 if ($order['weight'] === null) {
-                    /** @var \Packetery\Weight\Converter $converter */
-                    $converter = $this->diContainer->get(\Packetery\Weight\Converter::class);
-                    $order['weight'] = $converter->getConvertedOrderWeight($order);
+                    // TODO find proper class and create new method to return order weight, convert if needed
+                    $orderInstance = new \Order($order['id_order']);
+                    $order['weight'] = \Packetery\Weight\Converter::getKilograms((float)$orderInstance->getTotalWeight());
                 }
                 if ((bool)$order['is_ad'] === true) {
                     if (isset($addressValidationLevels[$order['id_carrier']]) && in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])) {
