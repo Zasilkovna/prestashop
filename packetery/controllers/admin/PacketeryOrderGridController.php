@@ -425,7 +425,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     /**
      * @param string|null $trackingNumber
-     * @return string|null
+     * @return string
      * @throws ReflectionException
      * @throws SmartyException
      */
@@ -440,6 +440,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         if (isset($response['trackingLink'])) {
             return $response['trackingLink'];
         }
+        return '';
     }
 
     public function getIconForBoolean($booleanValue)

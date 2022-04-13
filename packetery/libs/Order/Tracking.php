@@ -54,13 +54,13 @@ class Tracking
 
     /**
      * @param string|null $trackingNumber
-     * @return array|false
+     * @return array|null
      * @throws \SmartyException tracking link related exception
      */
     public function getTrackingLink($trackingNumber)
     {
         if (empty($trackingNumber)) {
-            return false;
+            return null;
         }
         $smarty = new \Smarty();
         $smarty->assign('trackingNumber', $trackingNumber);
