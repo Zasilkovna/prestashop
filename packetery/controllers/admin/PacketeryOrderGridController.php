@@ -425,14 +425,14 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     /**
      * @param string|null $trackingNumber
-     * @return string|false
+     * @return string|null
      * @throws ReflectionException
      * @throws SmartyException
      */
     public function getTrackingLink($trackingNumber)
     {
-        /** @var \Packetery\Order\Tracking $tracking */
-        $tracking = $this->getModule()->diContainer->get(\Packetery\Order\Tracking::class);
+        /** @var Tracking $tracking */
+        $tracking = $this->getModule()->diContainer->get(Tracking::class);
         $response =  $tracking->getTrackingLink($trackingNumber);
         if (isset($response['warning'])) {
             $this->warnings = $response['warning'];
@@ -440,7 +440,6 @@ class PacketeryOrderGridController extends ModuleAdminController
         if (isset($response['trackingLink'])) {
             return $response['trackingLink'];
         }
-        return false;
     }
 
     public function getIconForBoolean($booleanValue)

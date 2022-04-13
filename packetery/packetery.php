@@ -27,8 +27,6 @@
  * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
  */
 
-use Packetery\Weight\Converter;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -254,11 +252,13 @@ class Packetery extends CarrierModule
         $output = '<div class="packetery">' . PHP_EOL;
 
         $usedWeightUnit = Configuration::get('PS_WEIGHT_UNIT');
-        if (Converter::isKgConversionSupported() === false) {
+        /** @var \Packetery\Weight\Converter $converter */
+        $converter = $this->diContainer->get(\Packetery\Weight\Converter::class);
+        if ($converter::isKgConversionSupported() === false) {
             $output .= $this->displayInformation(sprintf(
                 $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to one of: %s.'),
                 $usedWeightUnit,
-                implode(', ', array_keys(Converter::$mapping))
+                implode(', ', array_keys($converter::$mapping))
             ));
         }
 
@@ -836,11 +836,13 @@ class Packetery extends CarrierModule
         if ($packeteryOrder['weight'] !== null) {
             $orderWeight = $packeteryOrder['weight'];
         } else {
+            /** @var \Packetery\Weight\Converter $converter */
+            $converter = $this->diContainer->get(\Packetery\Weight\Converter::class);
             $order = new \Order($packeteryOrder['id_order']);
-            if (Converter::isKgConversionSupported()) {
-                $orderWeight = Converter::getKilograms($order->getTotalWeight());
+            if ($converter::isKgConversionSupported()) {
+                $orderWeight = $converter::getKilograms($order->getTotalWeight());
             } else {
-                $orderWeight = Converter::getTotalWeight();
+                $orderWeight = $order->getTotalWeight();
             }
         }
 
@@ -1216,7 +1218,9 @@ class Packetery extends CarrierModule
                 if ($order['weight'] === null) {
                     // TODO find proper class and create new method to return order weight, convert if needed
                     $orderInstance = new \Order($order['id_order']);
-                    $order['weight'] = Converter::getKilograms((float)$orderInstance->getTotalWeight());
+                    /** @var Packetery\Weight\Converter $converter */
+                    $converter = $this->diContainer->get(Packetery\Weight\Converter::class);
+                    $order['weight'] = $converter::getKilograms($orderInstance->getTotalWeight());
                 }
                 if ((bool)$order['is_ad'] === true) {
                     if (isset($addressValidationLevels[$order['id_carrier']]) && in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])) {
