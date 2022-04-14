@@ -69,25 +69,25 @@
                     </div>
                 </form>
             {/if}
-            {* There will be more buttons aka more actions in future. If there is no button hide the divider *}
-            {if $showActionButtonsDivider}
-                <hr />
-            {/if}
-            {if $postParcelButtonAllowed}
-                <form action="{$returnUrl}" method="post">
-                    <p>
-                        <button class="btn btn-outline-secondary btn-default"
-                                type="submit"
-                                name="process_post_parcel"
-                                id="process_post_parcel"
-                        >
-                            <i class="material-icons" aria-hidden="true">send</i>
-                            {l s='Post parcel' mod='packetery'}
-                        </button>
-                        <input type="hidden" name="order_id" value="{$orderId|intval}">
-                    </p>
-                </form>
-            {/if}
+        {/if}
+        {* There will be more buttons aka more actions in future. If there is no button hide the divider *}
+        {if $showActionButtonsDivider}
+            <hr />
+        {/if}
+        {if $postParcelButtonAllowed}
+            <form action="{$returnUrl}" method="post">
+                <p>
+                    <button class="btn btn-outline-secondary btn-default"
+                            type="submit"
+                            name="process_post_parcel"
+                            id="process_post_parcel"
+                    >
+                        <i class="material-icons" aria-hidden="true">send</i>
+                        {l s='Post parcel' mod='packetery'}
+                    </button>
+                    <input type="hidden" name="order_id" value="{$orderId|intval}">
+                </p>
+            </form>
         {/if}
         {if isset($messages)}
             {foreach from=$messages item=message}

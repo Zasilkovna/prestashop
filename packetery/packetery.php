@@ -748,8 +748,9 @@ class Packetery extends CarrierModule
     public function packeteryHookDisplayAdminOrder($params)
     {
         $messages = [];
+        $orderId = (int)$params['id_order'];
         $this->processPickupPointChange($messages);
-        $this->processPostParcel($messages);
+        $this->processPostParcel($messages, $orderId);
 
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
@@ -757,7 +758,6 @@ class Packetery extends CarrierModule
 
         /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderId = (int)$params['id_order'];
         $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
         if (!$apiKey || !$packeteryOrder) {
             return;
@@ -1293,20 +1293,18 @@ class Packetery extends CarrierModule
 
     /**
      * @param array $messages
+     * @param int $orderId
      * @throws ReflectionException
      * @throws \Packetery\Exceptions\DatabaseException
      * @throws \SmartyException tracking link related exception
      */
-    private function processPostParcel(array &$messages)
+    private function processPostParcel(array &$messages, $orderId)
     {
-        if (
-            Tools::isSubmit('process_post_parcel') &&
-            Tools::getIsset('order_id')
-        ) {
-            $orderId = array(Tools::getValue('order_id'));
+        if ( Tools::isSubmit('process_post_parcel')) {
+            $orderIds = [$orderId];
             /** @var Packetery\Order\PacketSubmitter $packetSubmitter */
             $packetSubmitter = $this->diContainer->get(Packetery\Order\PacketSubmitter::class);
-            $exportResult = $packetSubmitter->ordersExport($orderId);
+            $exportResult = $packetSubmitter->ordersExport($orderIds);
             if (is_array($exportResult)) {
                 foreach ($exportResult as $resultRow) {
                     if (!$resultRow[0]) {
