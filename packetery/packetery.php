@@ -264,7 +264,6 @@ class Packetery extends CarrierModule
             $output .= $this->displayError($this->l('Soap is disabled. You have to enable Soap on your server'));
         }
         if (Tools::isSubmit('submit' . $this->name)) {
-            //$_POST['PACKETERY_DEFAULT_PACKAGE_PRICE'] = str_replace([',', ' '], ['.', ''], $_POST['PACKETERY_DEFAULT_PACKAGE_PRICE']);
             $confOptions = $this->getConfigurationOptions();
             $error = false;
             /** @var \Packetery\Module\Options $packeteryOptions */
