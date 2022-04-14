@@ -62,6 +62,11 @@ class OrderExporter
             }
         }
 
+        $defaultPackagePrice = \Configuration::get('PACKETERY_DEFAULT_PACKAGE_PRICE');
+        if ($defaultPackagePrice > 0 && $total <= 0) {
+            $total = number_format($defaultPackagePrice,6);
+        }
+
         $isCod = $packeteryOrder['is_cod'];
         if ($isCod) {
             if ($targetCurrency === 'CZK') {
@@ -95,13 +100,6 @@ class OrderExporter
         $number = (string)(Packetery::ID_PREF_REF === ConfigHelper::get('PACKETERY_ID_PREFERENCE') ? $order->reference : $order->id);
         $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
         $customer = $order->getCustomer();
-
-        //TODO: Do as a method. Same functionality is used in CsvExporter.php
-        $defaultPackagePrice = \Configuration::get('PACKETERY_DEFAULT_PACKAGE_PRICE');
-        if ($defaultPackagePrice > 0 && $total == 0) {
-            $total = number_format($defaultPackagePrice,6);
-        }
-
         $data = [
             'number' => $number,
             'currency' => $targetCurrency,
