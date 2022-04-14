@@ -85,7 +85,6 @@ $_MODULE['<{packetery}prestashop>deletelabels_79500929219856f7162cea4f4d85d9b7']
 $_MODULE['<{packetery}prestashop>deletelabels_60abf2c345b55a7ed556d3293ea5c70c'] = 'Nepodařilo se odstranit některé štítky. Zkontrolujte souborová oprávnění.';
 $_MODULE['<{packetery}prestashop>orderexporter_4988c308d36d231707ae7e2d1e8d06b2'] = 'Nepodařilo se načíst údaje potřebné pro exportování objednávky';
 $_MODULE['<{packetery}prestashop>orderexporter_40580ead2944ee1f216ef9be35c18eb4'] = 'Nepodařilo se nalézt směnný kurz mezi objednávkou a pobočkou, objednávka';
-$_MODULE['<{packetery}prestashop>tracking_68f67fbc8133ab594663600a2d8eda09'] = 'Načítanie informácií o zásielke zlyhalo';
 $_MODULE['<{packetery}prestashop>packetsubmitter_5552dc553d496d4b06866ca45b890b4a'] = 'Najprv vyberte objednávky.';
 $_MODULE['<{packetery}prestashop>options_a8aadecdc79bcce492c6b27b78077b02'] = 'Nesprávne API heslo.';
 $_MODULE['<{packetery}prestashop>options_3a2f7eb090541a1fffae68f276e8d62e'] = 'Api heslo musí byť reťazec';
@@ -152,6 +151,7 @@ $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_e24ad57fb2f078979a
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_5552dc553d496d4b06866ca45b890b4a'] = 'Najprv vyberte objednávky.';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_b0e18fd5958d01d019dac2d4eb98a23e'] = 'Žádné štítky nemohou být připraveny jako štítky dopravce.';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_d5bced36fd88402506bdf9d99064697e'] = 'Hmotnosti objednávek byly uloženy.';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_68f67fbc8133ab594663600a2d8eda09'] = 'Načítanie informácií o zásielke zlyhalo';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_13dba24862cf9128167a59100e154c8d'] = 'Tisknout';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_0095a9fa74d1713e43e370a7d7846224'] = 'Exportovat';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_a254c25adc7d10d7e9c4889484f875a5'] = 'Detail';
