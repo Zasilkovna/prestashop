@@ -264,11 +264,14 @@ class Packetery extends CarrierModule
             $output .= $this->displayError($this->l('Soap is disabled. You have to enable Soap on your server'));
         }
         if (Tools::isSubmit('submit' . $this->name)) {
+            //$_POST['PACKETERY_DEFAULT_PACKAGE_PRICE'] = str_replace([',', ' '], ['.', ''], $_POST['PACKETERY_DEFAULT_PACKAGE_PRICE']);
             $confOptions = $this->getConfigurationOptions();
             $error = false;
+            /** @var \Packetery\Module\Options $packeteryOptions */
             $packeteryOptions = $this->diContainer->get(\Packetery\Module\Options::class);
             foreach ($confOptions as $option => $optionConf) {
-                $configValue = (string)Tools::getValue($option);
+                $value = (string)Tools::getValue($option);
+                $configValue = $packeteryOptions->formatOption($option, $value);
                 $errorMessage = $packeteryOptions->validate($option, $configValue);
                 if ($errorMessage !== false) {
                     $output .= $this->displayError($errorMessage);
@@ -401,11 +404,6 @@ class Packetery extends CarrierModule
                 'title' => $this->l('API password'),
                 'required' => true,
             ],
-            'PACKETERY_DEFAULT_PACKAGE_PRICE' => [
-                'title' => $this->l('Default package price'),
-                'required' => false,
-                'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
-            ],
             'PACKETERY_ESHOP_ID' => [
                 'title' => $this->l('Sender indication'),
                 'desc' => $this->l('You can find the sender indication in the client section') .
@@ -441,6 +439,11 @@ class Packetery extends CarrierModule
                     0 => $this->l('No'),
                 ],
                 'required' => false,
+            ],
+            'PACKETERY_DEFAULT_PACKAGE_PRICE' => [
+                'title' => $this->l('Default package price'),
+                'required' => false,
+                'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
             ],
         ];
     }

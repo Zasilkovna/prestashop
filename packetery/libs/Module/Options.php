@@ -63,4 +63,19 @@ class Options
         }
     }
 
+    /**
+     * @param Packetery $module
+     * @param string $option
+     * @param string $value
+     * @return string
+     */
+    public function formatOption($option, $value)
+    {
+        switch ($option) {
+            case 'PACKETERY_DEFAULT_PACKAGE_PRICE':
+                return str_replace([',', ' '], ['.', ''], $value);
+            default:
+                return $value;
+        }
+    }
 }
