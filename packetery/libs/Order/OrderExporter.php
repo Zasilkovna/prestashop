@@ -47,6 +47,13 @@ class OrderExporter
 
         $total = $order->total_paid;
 
+        /** @var ConfigHelper $configHelper */
+        $configHelper = $this->module->diContainer->get(ConfigHelper::class);
+        $defaultPackagePrice = $configHelper->get('PACKETERY_DEFAULT_PACKAGE_PRICE');
+        if ($defaultPackagePrice > 0 && $total <= 0) {
+            $total = $defaultPackagePrice;
+        }
+
         $orderCurrency = new Currency($order->id_currency);
         $targetCurrency = $packeteryOrder['currency_branch'];
         if ($orderCurrency->iso_code !== $targetCurrency) {
@@ -60,11 +67,6 @@ class OrderExporter
                     ) . ' - ' . $order->id
                 );
             }
-        }
-
-        $defaultPackagePrice = \Configuration::get('PACKETERY_DEFAULT_PACKAGE_PRICE');
-        if ($defaultPackagePrice > 0 && $total <= 0) {
-            $total = number_format($defaultPackagePrice,6);
         }
 
         $isCod = $packeteryOrder['is_cod'];
@@ -94,7 +96,7 @@ class OrderExporter
             // used saved if set
             $weight = $packeteryOrder['weight'];
         } else if (Converter::isKgConversionSupported()) {
-            $weight = Converter::getKilograms((float)$order->getTotalWeight());
+            $weight = Converter::getKilograms($order->getTotalWeight());
         }
 
         $number = (string)(Packetery::ID_PREF_REF === ConfigHelper::get('PACKETERY_ID_PREFERENCE') ? $order->reference : $order->id);

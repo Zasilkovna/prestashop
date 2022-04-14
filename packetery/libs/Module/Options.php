@@ -53,6 +53,11 @@ class Options
                         $e->getMessage()
                     );
                 }
+            case 'PACKETERY_DEFAULT_PACKAGE_PRICE':
+                if (Validate::isUnsignedInt($value) || $value === 0 || (Validate::isFloat($value) && $value >= 0)) {
+                    return false;
+                }
+                return $this->module->l('Please insert default package price', 'options');
             default:
                 return false;
         }

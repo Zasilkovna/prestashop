@@ -66,31 +66,3 @@
 .icon-Packetery:before {
     content: "\f0d1";
 }
-
-#PACKETERY_DEFAULT_PACKAGE_PRICE {
-    display: table-cell;
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 0;
-    float: left;
-    margin-bottom: 0;
-    position: relative;
-    width: 100%;
-    z-index: 2;
-    font-family: Open Sans,Helvetica,Arial,FontAwesome,sans-serif!important;
-    -webkit-transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-    -webkit-transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
-    background-color: #f5f8f9;
-    background-image: none;
-    border: 1px solid #c7d6db;
-    border-radius: 3px;
-    color: #555;
-    display: block;
-    font-size: 12px;
-    height: 31px;
-    line-height: 1.42857;
-    padding: 6px 8px;
-    transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
-    width: 100%;
-}

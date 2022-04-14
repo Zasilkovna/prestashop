@@ -332,9 +332,6 @@ class Packetery extends CarrierModule
             if (isset($optionConf['desc'])) {
                 $inputData['desc'] = $optionConf['desc'];
             }
-            if (isset($optionConf['suffix'])) {
-                $inputData['suffix'] = $optionConf['suffix'];
-            }
             $formInputs[] = $inputData;
         }
 
@@ -407,7 +404,7 @@ class Packetery extends CarrierModule
             'PACKETERY_DEFAULT_PACKAGE_PRICE' => [
                 'title' => $this->l('Default package price'),
                 'required' => false,
-                'desc' => $this->l('Fill out the default package price in case the order is free'),
+                'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
             ],
             'PACKETERY_ESHOP_ID' => [
                 'title' => $this->l('Sender indication'),
