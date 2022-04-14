@@ -3,7 +3,6 @@
 namespace Packetery\Order;
 
 use Packetery\Exceptions\DatabaseException;
-use Packetery;
 
 class Tracking
 {
