@@ -429,6 +429,14 @@ class Packetery extends CarrierModule
                 ],
                 'required' => false,
             ],
+            'PACKETERY_WIDGET_AUTOOPEN' => [
+                'title' => $this->l('Automatically open widget in cart'),
+                'options' => [
+                    1 => $this->l('Yes'),
+                    0 => $this->l('No'),
+                ],
+                'required' => false,
+            ],
         ];
     }
 
