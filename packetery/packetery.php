@@ -1303,11 +1303,10 @@ class Packetery extends CarrierModule
             Tools::isSubmit('process_post_parcel') &&
             Tools::getIsset('order_id')
         ) {
-            $id_order = array(Tools::getValue('order_id'));
-
+            $idOrder = array(Tools::getValue('order_id'));
             /** @var Packetery\Order\PacketSubmitter $packetSubmitter */
             $packetSubmitter = $this->diContainer->get(Packetery\Order\PacketSubmitter::class);
-            $exportResult = $packetSubmitter->ordersExport($id_order);
+            $exportResult = $packetSubmitter->ordersExport($idOrder);
             if (is_array($exportResult)) {
                 foreach ($exportResult as $resultRow) {
                     if (!$resultRow[0]) {
@@ -1318,15 +1317,9 @@ class Packetery extends CarrierModule
                     } elseif ($resultRow[0]) {
                         /** @var Packetery\Order\Tracking $packeteryTracking */
                         $packeteryTracking = $this->diContainer->get(Packetery\Order\Tracking::class);
-                        $response = $packeteryTracking->getTrackingLink($resultRow[1]);
-                        if (isset($response['warning'])) {
-                            $messages[] = [
-                                'text' => $response['warning'],
-                                'class' => 'danger',
-                            ];
-                        }
+                        $getTrackingLink = $packeteryTracking->getTrackingLink($resultRow[1]);
                         $messages[] = [
-                            'text' => $this->l('The shipment was successfully submitted under shipment number:') . $response['trackingLink'],
+                            'text' => $this->l('The shipment was successfully submitted under shipment number:') . $getTrackingLink,
                             'class' => 'success',
                         ];
                     }

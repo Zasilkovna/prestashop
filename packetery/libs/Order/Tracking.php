@@ -54,34 +54,16 @@ class Tracking
 
     /**
      * @param string|null $trackingNumber
-     * @return array|null
+     * @return string|false
      * @throws \SmartyException tracking link related exception
      */
     public function getTrackingLink($trackingNumber)
     {
         if (empty($trackingNumber)) {
-            return null;
+            return '';
         }
         $smarty = new \Smarty();
         $smarty->assign('trackingNumber', $trackingNumber);
-        $packetery = new Packetery();
-        /** @var Packetery\Module\SoapApi $soapApi */
-        $soapApi = $packetery->diContainer->get(Packetery\Module\SoapApi::class);
-        $packetInfo = $soapApi->getPacketInfo($trackingNumber);
-        $response = [];
-        if ($packetInfo->hasFault()) {
-            $response['warning'] = sprintf(
-                '%s: %s',
-                $packetery->l('Retrieving shipment information failed', 'tracking'),
-                $trackingNumber
-            );
-        } else {
-            $smarty->assign([
-                'carrierNumber' => $packetInfo->getNumber(),
-                'carrierTrackingUrl' => $packetInfo->getTrackingLink(),
-            ]);
-        }
-        $response['trackingLink'] = $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
-        return $response;
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
     }
 }
