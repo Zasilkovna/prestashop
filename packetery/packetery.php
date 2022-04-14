@@ -1292,7 +1292,6 @@ class Packetery extends CarrierModule
 
     /**
      * @param array $messages
-     * @param int $orderId
      * @throws ReflectionException
      * @throws \Packetery\Exceptions\DatabaseException
      * @throws \SmartyException tracking link related exception
