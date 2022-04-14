@@ -407,7 +407,6 @@ class Packetery extends CarrierModule
             'PACKETERY_DEFAULT_PACKAGE_PRICE' => [
                 'title' => $this->l('Default package price'),
                 'required' => false,
-                'suffix' => 'currency',
                 'desc' => $this->l('Fill out the default package price in case the order is free'),
             ],
             'PACKETERY_ESHOP_ID' => [
