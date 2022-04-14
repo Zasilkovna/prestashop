@@ -69,11 +69,6 @@ class OrderExporter
             }
         }
 
-        $defaultPackagePrice = \Configuration::get('PACKETERY_DEFAULT_PACKAGE_PRICE');
-        if ($defaultPackagePrice > 0 && $total <= 0) {
-            $total = number_format($defaultPackagePrice,6);
-        }
-
         $isCod = $packeteryOrder['is_cod'];
         if ($isCod) {
             if ($targetCurrency === 'CZK') {
