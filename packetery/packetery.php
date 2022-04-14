@@ -749,8 +749,9 @@ class Packetery extends CarrierModule
     {
         $messages = [];
         $orderId = (int)$params['id_order'];
+        $this->context->smarty->assign('orderId', $orderId);
         $this->processPickupPointChange($messages);
-        $this->processPostParcel($messages, $orderId);
+        $this->processPostParcel($messages);
 
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
@@ -884,7 +885,6 @@ class Packetery extends CarrierModule
             $widgetOptions['street'] = $deliveryAddress->address1;
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
-        $this->context->smarty->assign('orderId', $orderId);
         $this->context->smarty->assign('returnUrl', $this->getAdminLink($orderId));
     }
 
@@ -916,7 +916,6 @@ class Packetery extends CarrierModule
             $widgetOptions['carriers'] = 'packeta';
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
-        $this->context->smarty->assign('orderId', $orderId);
         $this->context->smarty->assign('returnUrl', $this->getAdminLink($orderId));
     }
 
@@ -1298,10 +1297,13 @@ class Packetery extends CarrierModule
      * @throws \Packetery\Exceptions\DatabaseException
      * @throws \SmartyException tracking link related exception
      */
-    private function processPostParcel(array &$messages, $orderId)
+    private function processPostParcel(array &$messages)
     {
-        if ( Tools::isSubmit('process_post_parcel')) {
-            $orderIds = [$orderId];
+        if (
+            Tools::isSubmit('process_post_parcel') &&
+            Tools::getIsset('order_id')
+        ) {
+            $orderIds = [Tools::getValue('order_id')];
             /** @var Packetery\Order\PacketSubmitter $packetSubmitter */
             $packetSubmitter = $this->diContainer->get(Packetery\Order\PacketSubmitter::class);
             $exportResult = $packetSubmitter->ordersExport($orderIds);
