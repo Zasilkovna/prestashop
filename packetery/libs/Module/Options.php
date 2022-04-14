@@ -64,7 +64,6 @@ class Options
     }
 
     /**
-     * @param Packetery $module
      * @param string $option
      * @param string $value
      * @return string
