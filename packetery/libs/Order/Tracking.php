@@ -50,19 +50,4 @@ class Tracking
 
         return false;
     }
-
-    /**
-     * @param string|null $trackingNumber
-     * @return string|false
-     * @throws \SmartyException tracking link related exception
-     */
-    public function getTrackingLink($trackingNumber)
-    {
-        if (empty($trackingNumber)) {
-            return '';
-        }
-        $smarty = new \Smarty();
-        $smarty->assign('trackingNumber', $trackingNumber);
-        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
-    }
 }
