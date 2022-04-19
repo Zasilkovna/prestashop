@@ -334,6 +334,10 @@ class Packetery extends CarrierModule
             if (isset($optionConf['desc'])) {
                 $inputData['desc'] = $optionConf['desc'];
             }
+            if (isset($optionConf['html_content'])) {
+                $inputData['type'] = $optionConf['type'];
+                $inputData['html_content'] = $optionConf['html_content'];
+            }
             $formInputs[] = $inputData;
         }
 
@@ -443,6 +447,12 @@ class Packetery extends CarrierModule
                 'title' => $this->l('Default package price'),
                 'required' => false,
                 'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
+            ],
+            'PACKETERY_CRON_LINK_LABEL_DELETION' => [
+                'title' => $this->l('Automatical label deletion'),
+                'required' => false,
+                'type' => 'html',
+                'html_content' => '<br>'.$this->l('explain URLS params'),
             ],
         ];
     }
