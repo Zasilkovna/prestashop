@@ -403,11 +403,6 @@ class Packetery extends CarrierModule
                 'title' => $this->l('API password'),
                 'required' => true,
             ],
-            'PACKETERY_DEFAULT_PACKAGE_PRICE' => [
-                'title' => $this->l('Default package price'),
-                'required' => false,
-                'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
-            ],
             'PACKETERY_ESHOP_ID' => [
                 'title' => $this->l('Sender indication'),
                 'desc' => $this->l('You can find the sender indication in the client section') .
