@@ -266,9 +266,11 @@ class Packetery extends CarrierModule
         if (Tools::isSubmit('submit' . $this->name)) {
             $confOptions = $this->getConfigurationOptions();
             $error = false;
+            /** @var \Packetery\Module\Options $packeteryOptions */
             $packeteryOptions = $this->diContainer->get(\Packetery\Module\Options::class);
             foreach ($confOptions as $option => $optionConf) {
-                $configValue = (string)Tools::getValue($option);
+                $value = (string)Tools::getValue($option);
+                $configValue = $packeteryOptions->formatOption($option, $value);
                 $errorMessage = $packeteryOptions->validate($option, $configValue);
                 if ($errorMessage !== false) {
                     $output .= $this->displayError($errorMessage);
@@ -436,6 +438,11 @@ class Packetery extends CarrierModule
                     0 => $this->l('No'),
                 ],
                 'required' => false,
+            ],
+            'PACKETERY_DEFAULT_PACKAGE_PRICE' => [
+                'title' => $this->l('Default package price'),
+                'required' => false,
+                'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
             ],
         ];
     }
