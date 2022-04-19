@@ -191,7 +191,6 @@ class OrderRepository
                    `po`.`latitude`, 
                    `po`.`longitude`,
                    `po`.`weight`,
-                   `po`.`tracking_number`,
                    `po`.`exported`,
                     `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
