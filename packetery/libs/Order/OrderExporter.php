@@ -90,7 +90,7 @@ class OrderExporter
         if (Tools::strlen($address->phone_mobile)) {
             $phone = trim($address->phone_mobile);
         }
-
+        // TODO find proper class and create new method to return order weight, convert if needed
         $weight = '';
         if ($packeteryOrder['weight'] !== null) {
             // used saved if set

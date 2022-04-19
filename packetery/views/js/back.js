@@ -65,3 +65,11 @@ $(document).ready(function () {
         });
     }
 });
+
+$(document).ready(function () {
+    $('#process_post_parcel').on('click',function(event){
+        if(!confirm(process_post_parcel_confirmation)){
+            event.preventDefault();
+        }
+    });
+});

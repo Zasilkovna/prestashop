@@ -763,13 +763,17 @@ class Packetery extends CarrierModule
     public function packeteryHookDisplayAdminOrder($params)
     {
         $messages = [];
+        $orderId = (int)$params['id_order'];
+        $this->context->smarty->assign('orderId', $orderId);
         $this->processPickupPointChange($messages);
+        $this->processPostParcel($messages);
 
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $apiKey = $configHelper->getApiKey();
+
+        /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderId = (int)$params['id_order'];
         $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
         if (!$apiKey || !$packeteryOrder) {
             return;
@@ -794,9 +798,12 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
         $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $packeteryOrder['name_branch']);
         $pickupPointChangeAllowed = false;
+        $postParcelButtonAllowed = false;
 
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
+        $showActionButtonsDivider = false;
         if (!$packeteryCarrier) {
             return;
         }
@@ -839,8 +846,26 @@ class Packetery extends CarrierModule
             $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
             $pickupPointChangeAllowed = true;
         }
+        // TODO find proper class and create new method to return order weight, convert if needed
+        if ($packeteryOrder['weight'] !== null) {
+            $orderWeight = $packeteryOrder['weight'];
+        } else {
+            $order = new \Order($packeteryOrder['id_order']);
+            if (\Packetery\Weight\Converter::isKgConversionSupported()) {
+                $orderWeight = \Packetery\Weight\Converter::getKilograms($order->getTotalWeight());
+            } else {
+                $orderWeight = $order->getTotalWeight();
+            }
+        }
+
+        if (!(bool)$packeteryOrder['exported'] && $orderWeight > 0) {
+            $postParcelButtonAllowed = true;
+            $showActionButtonsDivider = true;
+        }
         $this->context->smarty->assign('messages', $messages);
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
+        $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
+        $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider);
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
@@ -875,7 +900,6 @@ class Packetery extends CarrierModule
             $widgetOptions['street'] = $deliveryAddress->address1;
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
-        $this->context->smarty->assign('orderId', $orderId);
         $this->context->smarty->assign('returnUrl', $this->getAdminLink($orderId));
     }
 
@@ -907,7 +931,6 @@ class Packetery extends CarrierModule
             $widgetOptions['carriers'] = 'packeta';
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
-        $this->context->smarty->assign('orderId', $orderId);
         $this->context->smarty->assign('returnUrl', $this->getAdminLink($orderId));
     }
 
@@ -955,6 +978,7 @@ class Packetery extends CarrierModule
             'latitude' => $address['latitude'],
             'longitude' => $address['longitude'],
         ];
+        /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         return $orderRepository->updateByOrder($packeteryOrderFields, $orderId);
     }
@@ -1196,13 +1220,15 @@ class Packetery extends CarrierModule
      */
     public function hookActionPacketeryOrderGridListingResultsModifier(&$params)
     {
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $addressValidationLevels = $carrierRepository->getAddressValidationLevels();
         if (isset($params['list']) && is_array($params['list'])) {
             foreach ($params['list'] as &$order) {
                 if ($order['weight'] === null) {
+                    // TODO find proper class and create new method to return order weight, convert if needed
                     $orderInstance = new \Order($order['id_order']);
-                    $order['weight'] = \Packetery\Weight\Converter::getKilograms((float)$orderInstance->getTotalWeight());
+                    $order['weight'] = \Packetery\Weight\Converter::getKilograms($orderInstance->getTotalWeight());
                 }
                 if ((bool)$order['is_ad'] === true) {
                     if (isset($addressValidationLevels[$order['id_carrier']]) && in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])) {
@@ -1275,6 +1301,47 @@ class Packetery extends CarrierModule
                     'text' => $this->l('Pickup point could not be changed.'),
                     'class' => 'danger',
                 ];
+            }
+        }
+    }
+
+    /**
+     * @param array $messages
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws \SmartyException tracking link related exception
+     */
+    private function processPostParcel(array &$messages)
+    {
+        if (
+            Tools::isSubmit('process_post_parcel') &&
+            Tools::getIsset('order_id')
+        ) {
+            $orderIds = [Tools::getValue('order_id')];
+            /** @var Packetery\Order\PacketSubmitter $packetSubmitter */
+            $packetSubmitter = $this->diContainer->get(Packetery\Order\PacketSubmitter::class);
+            $exportResult = $packetSubmitter->ordersExport($orderIds);
+            if (is_array($exportResult)) {
+                foreach ($exportResult as $resultRow) {
+                    if (!$resultRow[0]) {
+                        $messages[] = [
+                            'text' => $resultRow[1],
+                            'class' => 'danger',
+                        ];
+                    } elseif ($resultRow[0]) {
+                        /** @var Packetery\Order\Tracking $packeteryTracking */
+                        $packeteryTracking = $this->diContainer->get(Packetery\Order\Tracking::class);
+
+                        $smarty = new \Smarty();
+                        $smarty->assign('trackingNumber', $resultRow[1]);
+                        $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/packeteryTrackingLink.tpl');
+
+                        $messages[] = [
+                            'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryTrackingLink,
+                            'class' => 'success',
+                        ];
+                    }
+                }
             }
         }
     }

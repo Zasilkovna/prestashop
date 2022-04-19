@@ -424,8 +424,8 @@ class PacketeryOrderGridController extends ModuleAdminController
     }
 
     /**
-     * @param string $trackingNumber
-     * @return false|string
+     * @param string|null $trackingNumber
+     * @return string|false
      * @throws ReflectionException
      * @throws SmartyException
      */

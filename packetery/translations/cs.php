@@ -48,6 +48,7 @@ $_MODULE['<{packetery}prestashop>packetery_c094942e6862342615ed2c1b6e2ee311'] = 
 $_MODULE['<{packetery}prestashop>packetery_492bd00238d3ccba86931c7d815092be'] = 'Pro ověření adresy použijte prosím widget.';
 $_MODULE['<{packetery}prestashop>packetery_b18ce70ed15a7a117141d6ee14f9138c'] = 'Výdejní místo bylo úspěšně změněno.';
 $_MODULE['<{packetery}prestashop>packetery_f1111e5bc2fc07a2985e5273341fbd7b'] = 'Výdejní místo se nepodařilo změnit.';
+$_MODULE['<{packetery}prestashop>packetery_3bbd0c26a030a37f3aa35043965f9df1'] = 'Zásilka byla úspěšně podána pod číslem zásilky:';
 $_MODULE['<{packetery}prestashop>packetery_21994b64705fb9bda8ac23e018d36dd1'] = 'Adresa byla úspěšně změněna.';
 $_MODULE['<{packetery}prestashop>packetery_9adba94d0538aa24decee46ce7511368'] = 'Adresu se nepodařilo změnit.';
 $_MODULE['<{packetery}prestashop>display_order_list_footer_c9cc8cce247e49bae79f15173ce97354'] = 'Uložit';
@@ -66,6 +67,8 @@ $_MODULE['<{packetery}prestashop>display_order_main_c9cc8cce247e49bae79f15173ce9
 $_MODULE['<{packetery}prestashop>display_order_main_ee5c5839980b47f1893220655a3de0fb'] = 'Výdejní místo';
 $_MODULE['<{packetery}prestashop>display_order_main_9aa49c5a01dab7e49c73343b47e995a2'] = 'Vyberte prosím výdejní místo';
 $_MODULE['<{packetery}prestashop>display_order_main_128ca07a3ac6521356117915e983660d'] = 'Změnit výdejní místo';
+$_MODULE['<{packetery}prestashop>display_order_main_786313e610ded09bcd936c2b4ebde6ad'] = 'Podat zásilku';
+$_MODULE['<{packetery}prestashop>display_order_main_5606d6f39713e37807ff75042e1ae324'] = 'Opravdu si přejete podat zásilku?';
 $_MODULE['<{packetery}prestashop>carriers_info_83da76284b32119b3e3833c8d8a74392'] = 'Aktualizace dopravců Zásilkovny';
 $_MODULE['<{packetery}prestashop>carriers_info_57d41df11d9a0c7512e13b58daea48f7'] = 'Celkem dopravců';
 $_MODULE['<{packetery}prestashop>carriers_info_ad26b2c4320499b7daf5b347dec3ef27'] = 'Poslední aktualizace dopravců';

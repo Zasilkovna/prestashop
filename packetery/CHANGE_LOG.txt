@@ -92,3 +92,4 @@
       - Updated: internal refactoring - removal of static classess Packeteryclass and PacketeryApi
       - Added: Packeta submenu added to main menu
       - Added: possibility to prepare carrier labels
+      - Added: There is new possibility to post parcel via button in our packetery box in BO order detail
