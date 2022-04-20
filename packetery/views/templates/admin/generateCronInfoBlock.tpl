@@ -2,7 +2,6 @@
     <div class="panel-heading">
         {l s='Automatic PDF label deletion via CRON' mod='packetery'}
     </div>
-
     <div class="clearfix">
         <div class="col-lg-12">
             <p>
@@ -11,7 +10,10 @@
                 {l s='To delete the PDF labels automatically, you need to call this URL via CRON jobs.' mod='packetery'}
             </p>
             <p>
-                <a href="{$DeleteLabelsUrl}" target="_blank">{$DeleteLabelsUrl}</a>
+                <a href="{$DeleteLabelsUrl}&number_of_files=20&number_of_days=10"
+                   target="_blank">{$deleteLabelsUrl}<strong>&number_of_files=20</strong><strong>&number_of_days=10</strong>
+                </a>
+
             </p>
             <p>
                 {l s='You have also added options to adjust the functionality by adding some extra parameters.' mod='packetery'}
@@ -21,36 +23,25 @@
                     <tr>
                         <th>{l s='Parameter' mod='packetery'}</th>
                         <th>{l s='Explanation' mod='packetery'}</th>
-                        <th>{l s='Example URL' mod='packetery'}</th>
                     </tr>
                     <tr>
-                        <td>{l s='numberofdays' mod='packetery'}</td>
+                        <td>{l s='number_of_days' mod='packetery'}</td>
                         <td>
                             {l s='The parameter tells how old files need to be to be deleted.' mod='packetery'}
                             {l s='This example will delete all PDF labels that are older than 10 days.' mod='packetery'}
                         </td>
-                        <td>
-                            <a target="_blank" href="{$DeleteLabelsUrl}&numberofdays=10">
-                                {$DeleteLabelsUrl}<strong>&numberofdays=10</strong>
-                            </a>
-                        </td>
                     </tr>
                     <tr>
-                        <td>{l s='numberoffiles' mod='packetery'}</td>
+                        <td>{l s='number_of_files' mod='packetery'}</td>
                         <td>
                             {l s='The parameter tells how many PDF labels can be deleted in one CRON call.' mod='packetery'}
                             {l s='This example will delete max 20 PDF labels in one batch.' mod='packetery'}
                             {l s='Can be used to ease up your server/hosting resources.' mod='packetery'}
                         </td>
-                        <td>
-                            <a target="_blank" href="{$DeleteLabelsUrl}&numberoffiles=20">
-                                {$DeleteLabelsUrl}<strong>&numberoffiles=20</strong>
-                            </a>
-                        </td>
                     </tr>
                 </thead>
             </table>
-            <p>{l s='* You can also combine these two parameters together.' mod='packetery'}</p>
+            <p>{l s='* You can also use these two parameters separatelly.' mod='packetery'}</p>
         </div>
     </div>
 </div>

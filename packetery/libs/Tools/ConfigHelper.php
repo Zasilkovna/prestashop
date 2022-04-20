@@ -20,7 +20,7 @@ class ConfigHelper
         'PACKETERY_CRON_TOKEN' => 'all',
         'PACKETERY_LABEL_MAX_AGE_DAYS' => 'all',
         'PACKETERY_ID_PREFERENCE' => 'all',
-        'PACKETERY_DEFAULT_PACKAGE_PRICE' => 'all'
+        'PACKETERY_DEFAULT_PACKAGE_PRICE' => 'all',
     ];
 
     /**

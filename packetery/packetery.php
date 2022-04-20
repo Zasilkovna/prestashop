@@ -394,17 +394,19 @@ class Packetery extends CarrierModule
             }
         }
 
-        return $helper->generateForm([$form]).$this->generateCronInfoBlock();
+        return $helper->generateForm([$form]) . $this->generateCronInfoBlock();
     }
 
+    /**
+     * @return false|string
+     * @throws SmartyException
+     */
     private function generateCronInfoBlock() {
         $token = \Packetery\Tools\ConfigHelper::get('PACKETERY_CRON_TOKEN');
         $link = new Link();
-        $DeleteLabelsUrl = $link->getModuleLink('packetery','cron', ['token'=>$token, 'task'=> 'DeleteLabels']);
-
-        $this->context->smarty->assign('DeleteLabelsUrl', $DeleteLabelsUrl);
-
-        return $this->context->smarty->fetch($this->local_path.'views/templates/admin/generateCronInfoBlock.tpl');
+        $deleteLabelsUrl = $link->getModuleLink('packetery', 'cron', ['token' => $token, 'task' => 'DeleteLabels']);
+        $this->context->smarty->assign('deleteLabelsUrl', $deleteLabelsUrl);
+        return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/generateCronInfoBlock.tpl');
     }
 
     private function getConfigurationOptions() {

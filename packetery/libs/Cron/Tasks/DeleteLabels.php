@@ -32,15 +32,11 @@ class DeleteLabels extends Base
         $errors = [];
         $files = glob(PACKETERY_PLUGIN_DIR . '/labels/*.pdf', GLOB_NOSORT);
         $shiftDays = ConfigHelper::get('PACKETERY_LABEL_MAX_AGE_DAYS');
-        $deleteMaxNumberOfFiles = Tools::getValue('numberoffiles');
-        $deleteNumberOfDays = Tools::getValue('numberofdays');
+        $deleteMaxNumberOfFiles = (int)Tools::getValue('number_of_files');
+        $deleteNumberOfDays = Tools::getValue('number_of_days');
 
         if ($deleteNumberOfDays) {
             $shiftDays = $deleteNumberOfDays;
-        }
-
-        if (isset($deleteMaxFiles)) {
-            $deleteMaxNumberOfFiles = $deleteMaxFiles;
         }
 
         if ($shiftDays === false) {
@@ -70,10 +66,10 @@ class DeleteLabels extends Base
                     continue;
                 } else {
                     $deletedFiles++;
+                    if ($deleteMaxNumberOfFiles === $deletedFiles) {
+                        break;
+                    }
                 }
-            }
-            if ($deleteMaxNumberOfFiles && $deleteMaxNumberOfFiles == $deletedFiles) {
-                break;
             }
         }
 
