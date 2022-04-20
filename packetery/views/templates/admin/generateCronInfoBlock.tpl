@@ -1,25 +1,29 @@
 <div id="packetery-form" class="panel col-lg-12">
     <div class="panel-heading">
-        {l s='Automatic PDF label deletion via CRON' mod='packetery'}
+        {l s='CRON jobs' mod='packetery'}
     </div>
-    <div class="clearfix">
-        <div class="col-lg-12">
-            <p>
-                {l s='This URL below provides basic functionality for deleting old PDF labels.' mod='packetery'}
-                {l s='It deletes all PDF labels older than 7 days.' mod='packetery'}
-                {l s='To delete the PDF labels automatically, you need to call this URL via CRON jobs.' mod='packetery'}
-            </p>
-            <p>
-                <a href="{$DeleteLabelsUrl}&number_of_files=20&number_of_days=10"
-                   target="_blank">{$deleteLabelsUrl}<strong>&number_of_files=20</strong><strong>&number_of_days=10</strong>
-                </a>
+    <div class="panel col-lg-12">
+        <div class="panel-heading">
+            {l s='Automatic PDF label deletion via CRON' mod='packetery'}
+        </div>
+        <div class="clearfix">
+            <div class="col-lg-12">
+                <p>
+                    {l s='This URL below provides basic functionality for deleting old PDF labels.' mod='packetery'}
+                    {l s='It deletes all PDF labels older than 7 days.' mod='packetery'}
+                    {l s='To delete the PDF labels automatically, you need to call this URL via CRON jobs.' mod='packetery'}
+                </p>
+                <p>
+                    <a href="{$DeleteLabelsUrl}&number_of_files=20&number_of_days=10"
+                       target="_blank">{$deleteLabelsUrl}<strong>&number_of_files=20</strong><strong>&number_of_days=10</strong>
+                    </a>
 
-            </p>
-            <p>
-                {l s='You have also added options to adjust the functionality by adding some extra parameters.' mod='packetery'}
-            </p>
-            <table class="table">
-                <thead>
+                </p>
+                <p>
+                    {l s='You have also added options to adjust the functionality by adding some extra parameters.' mod='packetery'}
+                </p>
+                <table class="table">
+                    <thead>
                     <tr>
                         <th>{l s='Parameter' mod='packetery'}</th>
                         <th>{l s='Explanation' mod='packetery'}</th>
@@ -39,9 +43,10 @@
                             {l s='Can be used to ease up your server/hosting resources.' mod='packetery'}
                         </td>
                     </tr>
-                </thead>
-            </table>
-            <p>{l s='* You can also use these two parameters separatelly.' mod='packetery'}</p>
+                    </thead>
+                </table>
+                <p>{l s='* You can also use these two parameters separatelly.' mod='packetery'}</p>
+            </div>
         </div>
     </div>
 </div>
