@@ -4,6 +4,7 @@ namespace Packetery\Cron\Tasks;
 
 use Packetery;
 use Packetery\Tools\ConfigHelper;
+use Packetery\Tools\Tools;
 
 /**
  * Deletes labels if they are older than specified number of days.
@@ -31,6 +32,17 @@ class DeleteLabels extends Base
         $errors = [];
         $files = glob(PACKETERY_PLUGIN_DIR . '/labels/*.pdf', GLOB_NOSORT);
         $shiftDays = ConfigHelper::get('PACKETERY_LABEL_MAX_AGE_DAYS');
+        $deleteMaxNumberOfFiles = Tools::getValue('numberoffiles');
+        $deleteNumberOfDays = Tools::getValue('numberofdays');
+
+        if ($deleteNumberOfDays) {
+            $shiftDays = $deleteNumberOfDays;
+        }
+
+        if (isset($deleteMaxFiles)) {
+            $deleteMaxNumberOfFiles = $deleteMaxFiles;
+        }
+
         if ($shiftDays === false) {
             $errors[] = $this->module->l('Configuration can not be loaded.', 'DeleteLabels');
             return $errors;
@@ -39,6 +51,7 @@ class DeleteLabels extends Base
         $shift = 60 * 60 * 24 * $shiftDays;
         $limit = time() - $shift;
 
+        $deletedFiles = 0;
         foreach ($files as $label) {
             $fileTime = filemtime($label);
             if ($fileTime === false) {
@@ -55,7 +68,12 @@ class DeleteLabels extends Base
                         'Failed to remove some labels. Check file permissions.', 'DeleteLabels'
                     );
                     continue;
+                } else {
+                    $deletedFiles++;
                 }
+            }
+            if ($deleteMaxNumberOfFiles && $deleteMaxNumberOfFiles == $deletedFiles) {
+                break;
             }
         }
 

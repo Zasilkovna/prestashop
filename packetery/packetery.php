@@ -398,7 +398,17 @@ class Packetery extends CarrierModule
             }
         }
 
-        return $helper->generateForm([$form]);
+        return $helper->generateForm([$form]).$this->generateCronInfoBlock();
+    }
+
+    private function generateCronInfoBlock() {
+        $token = \Packetery\Tools\ConfigHelper::get('PACKETERY_CRON_TOKEN');
+        $link = new Link();
+        $DeleteLabelsUrl = $link->getModuleLink('packetery','cron', ['token'=>$token, 'task'=> 'DeleteLabels']);
+
+        $this->context->smarty->assign('DeleteLabelsUrl', $DeleteLabelsUrl);
+
+        return $this->context->smarty->fetch($this->local_path.'views/templates/admin/generateCronInfoBlock.tpl');
     }
 
     private function getConfigurationOptions() {
@@ -447,12 +457,6 @@ class Packetery extends CarrierModule
                 'title' => $this->l('Default package price'),
                 'required' => false,
                 'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
-            ],
-            'PACKETERY_CRON_LINK_LABEL_DELETION' => [
-                'title' => $this->l('Automatical label deletion'),
-                'required' => false,
-                'type' => 'html',
-                'html_content' => '<br>'.$this->l('explain URLS params'),
             ],
         ];
     }
