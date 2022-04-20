@@ -93,3 +93,4 @@
       - Added: Packeta submenu added to main menu
       - Added: possibility to prepare carrier labels
       - Added: There is new possibility to post parcel via button in our packetery box in BO order detail
+      - Added: possibility to delete PDF labels via CRON and customize deletion results with GET params (file age/number of deleted files at once)
