@@ -334,10 +334,6 @@ class Packetery extends CarrierModule
             if (isset($optionConf['desc'])) {
                 $inputData['desc'] = $optionConf['desc'];
             }
-            if (isset($optionConf['html_content'])) {
-                $inputData['type'] = $optionConf['type'];
-                $inputData['html_content'] = $optionConf['html_content'];
-            }
             $formInputs[] = $inputData;
         }
 
