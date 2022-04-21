@@ -93,4 +93,4 @@
       - Added: Packeta submenu added to main menu
       - Added: possibility to prepare carrier labels
       - Added: There is new possibility to post parcel via button in our packetery box in BO order detail
-      - Updated: calling library-hd.js from new destination
+      - Updated: Widget HD library URL
