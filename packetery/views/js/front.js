@@ -4,7 +4,7 @@ $.getScript("https://widget.packeta.com/v6/www/js/library.js")
         console.error('Unable to load Packeta Widget.');
     });
 
-$.getScript('https://widget-hd.packeta.com/www/js/library-hd.js').fail(function () {
+$.getScript('https://hd.widget.packeta.com/www/js/library-hd.js').fail(function () {
     console.error('Unable to load Packeta home delivery widget.');
 });
 
