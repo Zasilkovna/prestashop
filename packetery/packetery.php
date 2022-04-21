@@ -405,8 +405,8 @@ class Packetery extends CarrierModule
         $token = \Packetery\Tools\ConfigHelper::get('PACKETERY_CRON_TOKEN');
         $link = new Link();
 
-        $numberOfDays = \Packetery\Cron\Tasks\DeleteLabels::defaultNumberOfDays;
-        $numberOfFiles = \Packetery\Cron\Tasks\DeleteLabels::defaultNumberOfFiles;
+        $numberOfDays = \Packetery\Cron\Tasks\DeleteLabels::DEFAULT_NUMBER_OF_DAYS;
+        $numberOfFiles = \Packetery\Cron\Tasks\DeleteLabels::DEFAULT_NUMBER_OF_FILES;
 
         $deleteLabelsUrl = $link->getModuleLink(
             'packetery',

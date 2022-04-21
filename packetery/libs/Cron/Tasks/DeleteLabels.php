@@ -14,14 +14,14 @@ class DeleteLabels extends Base
     public $module;
 
     /**
-     * Delete files older than $defaultNumberOfDays
+     * Delete files older than DEFAULT_NUMBER_OF_DAYS
      */
-    const defaultNumberOfDays = 7;
+    const DEFAULT_NUMBER_OF_DAYS = 7;
 
     /**
      * Delete number of files in one batch
      */
-    const defaultNumberOfFiles = 500;
+    const DEFAULT_NUMBER_OF_FILES = 500;
 
     /** @var int set default limit to delete PDF labels equals 1 day */
     private $limit = 86400;
@@ -44,23 +44,15 @@ class DeleteLabels extends Base
         $errors = [];
         $getLabels = glob(PACKETERY_PLUGIN_DIR . '/labels/*.pdf', GLOB_NOSORT);
 
-        $deleteNumberOfDays = (int)Tools::getValue('number_of_days', self::defaultNumberOfDays);
-        $deleteNumberOfFiles = (int)Tools::getValue('number_of_files', self::defaultNumberOfFiles);
+        $deleteNumberOfDays = (int)Tools::getValue('number_of_days', self::DEFAULT_NUMBER_OF_DAYS);
+        $deleteNumberOfFiles = (int)Tools::getValue('number_of_files', self::DEFAULT_NUMBER_OF_FILES);
 
         if ($deleteNumberOfDays <= 0) {
-            $errors['deleteNumberOfDays'] = $this->module->l(
-                'Only positive number value for number_of_days parameter possible.',
-                'DeleteLabels'
-            );
-            return $errors;
+            $deleteNumberOfDays = self::DEFAULT_NUMBER_OF_DAYS;
         }
 
         if ($deleteNumberOfFiles <= 0) {
-            $errors['deleteNumberOfFiles'] = $this->module->l(
-                'Only positive number value for number_of_files parameter possible.',
-                'DeleteLabels'
-            );
-            return $errors;
+            $deleteNumberOfFiles = self::DEFAULT_NUMBER_OF_FILES;
         }
 
         $deleteNumberOfDays = $this->limit * $deleteNumberOfDays;
