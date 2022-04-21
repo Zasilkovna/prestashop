@@ -14,9 +14,7 @@
                     {l s='To delete the PDF labels automatically, you need to call this URL via CRON jobs.' mod='packetery'}
                 </p>
                 <p>
-                    <a href="{$deleteLabelsUrl}&number_of_files=20&number_of_days=10"
-                       target="_blank">{$deleteLabelsUrl}<strong>&number_of_files=20</strong><strong>&number_of_days=10</strong>
-                    </a>
+                    <a href="{$deleteLabelsUrl}" target="_blank">{$deleteLabelsUrl}</a>
                 </p>
                 <p>
                     {l s='You have also added options to adjust the functionality by adding some extra parameters.' mod='packetery'}

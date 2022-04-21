@@ -3,7 +3,6 @@
 namespace Packetery\Cron\Tasks;
 
 use Packetery;
-use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\Tools;
 
 /**
@@ -13,6 +12,15 @@ class DeleteLabels extends Base
 {
     /** @var Packetery */
     public $module;
+
+    /** @var int Delete files older than $defaultNumberOfDays */
+    public $defaultNumberOfDays = 7;
+
+    /** @var int Delete number of files in one batch */
+    public $defaultNumberOfFiles = 500;
+
+    /** @var int set default limit to delete PDF labels equals 1 day */
+    public $limit = 86400;
 
     /**
      * DeleteLabels constructor.
@@ -30,24 +38,20 @@ class DeleteLabels extends Base
     public function execute()
     {
         $errors = [];
-        $files = glob(PACKETERY_PLUGIN_DIR . '/labels/*.pdf', GLOB_NOSORT);
-        $shiftDays = ConfigHelper::get('PACKETERY_LABEL_MAX_AGE_DAYS');
-        $deleteMaxNumberOfFiles = (int)Tools::getValue('number_of_files');
-        $deleteNumberOfDays = Tools::getValue('number_of_days');
+        $getLabels = glob(PACKETERY_PLUGIN_DIR . '/labels/*.pdf', GLOB_NOSORT);
 
-        if ($deleteNumberOfDays) {
-            $shiftDays = $deleteNumberOfDays;
-        }
+        $deleteNumberOfDays = Tools::getValue('number_of_days', $this->defaultNumberOfDays);
+        $deleteNumberOfFiles = Tools::getValue('number_of_files', $this->defaultNumberOfFiles);
 
-        if ($shiftDays === false) {
-            $errors[] = $this->module->l('Configuration can not be loaded.', 'DeleteLabels');
-            return $errors;
-        }
+        $deleteNumberOfDays = $this->limit * $deleteNumberOfDays;
+        $this->limit = time() - $deleteNumberOfDays;
 
-        $shift = 60 * 60 * 24 * $shiftDays;
-        $limit = time() - $shift;
+        $files = array_filter($getLabels, function($a){
+            return filemtime($a) < $this->limit;
+        });
 
-        $deletedFiles = 0;
+        $files = array_slice($files, 0, $deleteNumberOfFiles);
+
         foreach ($files as $label) {
             $fileTime = filemtime($label);
             if ($fileTime === false) {
@@ -57,19 +61,11 @@ class DeleteLabels extends Base
                 continue;
             }
 
-            if ($fileTime < $limit) {
-                $result = unlink($label);
-                if ($result === false) {
-                    $errors['unlink'] = $this->module->l(
-                        'Failed to remove some labels. Check file permissions.', 'DeleteLabels'
-                    );
-                    continue;
-                } else {
-                    $deletedFiles++;
-                    if ($deleteMaxNumberOfFiles === $deletedFiles) {
-                        break;
-                    }
-                }
+            if (unlink($label) === false) {
+                $errors['unlink'] = $this->module->l(
+                    'Failed to remove some labels. Check file permissions.', 'DeleteLabels'
+                );
+                continue;
             }
         }
 
