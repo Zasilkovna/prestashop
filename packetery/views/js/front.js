@@ -14,7 +14,7 @@ PacketaModule.runner = {
         // non-blocking AJAX loading, speeds up page load
         var dependencies = [];
         dependencies.push($.getScript('https://widget.packeta.com/v6/www/js/library.js'));
-        dependencies.push($.getScript('https://widget-hd.packeta.com/www/js/library-hd.js'));
+        dependencies.push($.getScript('https://hd.widget.packeta.com/www/js/library-hd.js'));
 
         $.when.apply(null, dependencies).done(function () {
             PacketaModule.runner.onWidgetLoad();
