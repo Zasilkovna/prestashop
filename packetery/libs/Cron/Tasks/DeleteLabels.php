@@ -13,14 +13,18 @@ class DeleteLabels extends Base
     /** @var Packetery */
     public $module;
 
-    /** @var int Delete files older than $defaultNumberOfDays */
-    public $defaultNumberOfDays = 7;
+    /**
+     * Delete files older than $defaultNumberOfDays
+     */
+    const defaultNumberOfDays = 7;
 
-    /** @var int Delete number of files in one batch */
-    public $defaultNumberOfFiles = 500;
+    /**
+     * Delete number of files in one batch
+     */
+    const defaultNumberOfFiles = 500;
 
     /** @var int set default limit to delete PDF labels equals 1 day */
-    public $limit = 86400;
+    private $limit = 86400;
 
     /**
      * DeleteLabels constructor.
@@ -40,14 +44,30 @@ class DeleteLabels extends Base
         $errors = [];
         $getLabels = glob(PACKETERY_PLUGIN_DIR . '/labels/*.pdf', GLOB_NOSORT);
 
-        $deleteNumberOfDays = Tools::getValue('number_of_days', $this->defaultNumberOfDays);
-        $deleteNumberOfFiles = Tools::getValue('number_of_files', $this->defaultNumberOfFiles);
+        $deleteNumberOfDays = (int)Tools::getValue('number_of_days', self::defaultNumberOfDays);
+        $deleteNumberOfFiles = (int)Tools::getValue('number_of_files', self::defaultNumberOfFiles);
+
+        if ($deleteNumberOfDays <= 0) {
+            $errors['deleteNumberOfDays'] = $this->module->l(
+                'Only positive number value for number_of_days parameter possible.',
+                'DeleteLabels'
+            );
+            return $errors;
+        }
+
+        if ($deleteNumberOfFiles <= 0) {
+            $errors['deleteNumberOfFiles'] = $this->module->l(
+                'Only positive number value for number_of_files parameter possible.',
+                'DeleteLabels'
+            );
+            return $errors;
+        }
 
         $deleteNumberOfDays = $this->limit * $deleteNumberOfDays;
         $this->limit = time() - $deleteNumberOfDays;
 
-        $files = array_filter($getLabels, function($a){
-            return filemtime($a) < $this->limit;
+        $files = array_filter($getLabels, function ($labelPath) {
+            return filemtime($labelPath) < $this->limit;
         });
 
         $files = array_slice($files, 0, $deleteNumberOfFiles);
@@ -56,14 +76,16 @@ class DeleteLabels extends Base
             $fileTime = filemtime($label);
             if ($fileTime === false) {
                 $errors['filemtime'] = $this->module->l(
-                    'Failed to retrieve file time for some labels. Check file permissions.', 'DeleteLabels'
+                    'Failed to retrieve file time for some labels. Check file permissions.',
+                    'DeleteLabels'
                 );
                 continue;
             }
 
             if (unlink($label) === false) {
                 $errors['unlink'] = $this->module->l(
-                    'Failed to remove some labels. Check file permissions.', 'DeleteLabels'
+                    'Failed to remove some labels. Check file permissions.',
+                    'DeleteLabels'
                 );
                 continue;
             }

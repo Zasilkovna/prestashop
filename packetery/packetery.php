@@ -404,17 +404,23 @@ class Packetery extends CarrierModule
     private function generateCronInfoBlock() {
         $token = \Packetery\Tools\ConfigHelper::get('PACKETERY_CRON_TOKEN');
         $link = new Link();
+
+        $numberOfDays = \Packetery\Cron\Tasks\DeleteLabels::defaultNumberOfDays;
+        $numberOfFiles = \Packetery\Cron\Tasks\DeleteLabels::defaultNumberOfFiles;
+
         $deleteLabelsUrl = $link->getModuleLink(
             'packetery',
             'cron',
             [
                 'token' => $token,
                 'task' => 'DeleteLabels',
-                'number_of_files' => 20,
-                'number_of_days' => 10
+                'number_of_files' => $numberOfFiles,
+                'number_of_days' => $numberOfDays,
             ]
         );
         $this->context->smarty->assign('deleteLabelsUrl', $deleteLabelsUrl);
+        $this->context->smarty->assign('numberOfDays', $numberOfDays);
+        $this->context->smarty->assign('numberOfFiles', $numberOfFiles);
         return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/generateCronInfoBlock.tpl');
     }
 
