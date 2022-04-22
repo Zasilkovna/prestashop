@@ -102,6 +102,16 @@ class OrderExporter
         $number = (string)(Packetery::ID_PREF_REF === ConfigHelper::get('PACKETERY_ID_PREFERENCE') ? $order->reference : $order->id);
         $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
         $customer = $order->getCustomer();
+
+        /** @var Packetery\Tools\DbTools $dbTools */
+        $dbTools = $this->module->diContainer->get(\Packetery\Tools\DbTools::class);
+
+        $sql = 'SELECT ppp.`is_adult` FROM `' . _DB_PREFIX_ . 'order_detail` pod 
+                LEFT JOIN `' . _DB_PREFIX_ . 'packetery_product` ppp ON (pod.`product_id` = ppp.`id_product`)
+                WHERE pod.`id_order` = ' . $order->id . ' AND ppp.`is_adult` = 1';
+
+        $adultContent = $dbTools->getValue($sql);
+
         $data = [
             'number' => $number,
             'currency' => $targetCurrency,
@@ -118,6 +128,7 @@ class OrderExporter
             'company' => $customer->company,
             'phone' => $phone,
             'email' => $customer->email,
+            'adultContent' => $adultContent,
         ];
 
         if ($packeteryOrder['is_ad']) {
