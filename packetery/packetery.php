@@ -1464,9 +1464,9 @@ class Packetery extends CarrierModule
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
-    public function hookDisplayAdminProductsExtra($params)
+    public function hookDisplayAdminProductsExtra(array $params)
     {
-        $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
+        $idProduct = (int)$params['id_product'];
         $product = new Product($idProduct);
         if (!$product->is_virtual) {
             /** @var Packetery\Tools\DbTools $dbTools */
@@ -1474,12 +1474,12 @@ class Packetery extends CarrierModule
             $sql = 'SELECT `is_adult` FROM `' . _DB_PREFIX_ . 'packetery_product` WHERE `id_product` = ' . (int)$idProduct;
             $packeteryAgeVerification = $dbTools->getValue($sql);
             $adminToken = \Packetery\Tools\Tools::getAdminTokenLite('AdminProducts');
-            $version = '17';
-            if (\Packetery\Tools\Tools::version_compare(_PS_VERSION_, '1.7.0', '<')) $version = '16';
+            $version = '1.7';
+            if (\Packetery\Tools\Tools::version_compare(_PS_VERSION_, '1.7.0', '<')) $version = '1.6';
 
             $this->context->smarty->assign('packeteryAgeVerification', $packeteryAgeVerification);
             $this->context->smarty->assign('adminToken', $adminToken);
-            $this->context->smarty->assign('version', $version);
+            $this->context->smarty->assign('prestashopVersion', $version);
             return $this->display(__FILE__, 'display_admin_product_extra.tpl');
         }
         return false;
@@ -1492,9 +1492,9 @@ class Packetery extends CarrierModule
      * @throws ReflectionException
      * @throws Packetery\Exceptions\DatabaseException
      */
-    public function hookActionProductUpdate($params)
+    public function hookActionProductUpdate(array $params)
     {
-        $idProduct = $params['id_product'];
+        $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
         if (!Tools::getIsset('packetery_product_extra_hook')) {
             return false;
         }
@@ -1504,13 +1504,15 @@ class Packetery extends CarrierModule
         /** @var Packetery\Tools\DbTools $dbTools */
         $dbTools = $this->diContainer->get(\Packetery\Tools\DbTools::class);
 
-        return $dbTools->insert( 'packetery_product',
+        return $dbTools->insert(
+            'packetery_product',
             [
                 'id_product' => $idProduct,
                 'is_adult' => $packeteryAgeVerification,
             ],
             false,
             true,
-            Db::ON_DUPLICATE_KEY);
+            Db::ON_DUPLICATE_KEY
+        );
     }
 }

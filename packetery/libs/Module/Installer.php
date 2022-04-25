@@ -178,7 +178,7 @@ class Installer
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product`';
         $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_product` (
-            `id_product` int NOT NULL PRIMARY KEY,
+            `id_product` int(11) NOT NULL PRIMARY KEY,
             `is_adult` tinyint(1) NOT NULL DEFAULT 0
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 

@@ -1,5 +1,5 @@
 <div id="module-packetery" class="panel product-tab">
-    {if $version == '16'}
+    {if $prestashopVersion == '16'}
         <input type="hidden" name="submitted_tabs[]" value="ModulePacketery"/>
     {/if}
     <input type="hidden" id="packetery_product_extra_hook" name="packetery_product_extra_hook" value="1">
@@ -24,7 +24,7 @@
             </div>
         </div>
     </div>
-    {if $version == '16'}
+    {if $prestashopVersion == '1.6'}
         <div class="panel-footer">
             <a href="index.php?controller=AdminProducts&token={$adminToken}" class="btn btn-default"><i
                         class="process-icon-cancel"></i> {l s='Cancel' mod='packetery'}</a>
