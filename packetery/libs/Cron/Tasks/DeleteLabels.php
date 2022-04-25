@@ -3,7 +3,7 @@
 namespace Packetery\Cron\Tasks;
 
 use Packetery;
-use Packetery\Tools\ConfigHelper;
+use Packetery\Tools\Tools;
 
 /**
  * Deletes labels if they are older than specified number of days.
@@ -12,6 +12,19 @@ class DeleteLabels extends Base
 {
     /** @var Packetery */
     public $module;
+
+    /**
+     * Delete files older than DEFAULT_NUMBER_OF_DAYS
+     */
+    const DEFAULT_NUMBER_OF_DAYS = 7;
+
+    /**
+     * Delete number of files in one batch
+     */
+    const DEFAULT_NUMBER_OF_FILES = 500;
+
+    /** @var int set default limit to delete PDF labels equals 1 day */
+    private $limit = 86400;
 
     /**
      * DeleteLabels constructor.
@@ -29,33 +42,44 @@ class DeleteLabels extends Base
     public function execute()
     {
         $errors = [];
-        $files = glob(PACKETERY_PLUGIN_DIR . '/labels/*.pdf', GLOB_NOSORT);
-        $shiftDays = ConfigHelper::get('PACKETERY_LABEL_MAX_AGE_DAYS');
-        if ($shiftDays === false) {
-            $errors[] = $this->module->l('Configuration can not be loaded.', 'DeleteLabels');
-            return $errors;
+        $getLabels = glob(PACKETERY_PLUGIN_DIR . '/labels/*.pdf', GLOB_NOSORT);
+
+        $deleteNumberOfDays = (int)Tools::getValue('number_of_days', self::DEFAULT_NUMBER_OF_DAYS);
+        $deleteNumberOfFiles = (int)Tools::getValue('number_of_files', self::DEFAULT_NUMBER_OF_FILES);
+
+        if ($deleteNumberOfDays <= 0) {
+            $deleteNumberOfDays = self::DEFAULT_NUMBER_OF_DAYS;
         }
 
-        $shift = 60 * 60 * 24 * $shiftDays;
-        $limit = time() - $shift;
+        if ($deleteNumberOfFiles <= 0) {
+            $deleteNumberOfFiles = self::DEFAULT_NUMBER_OF_FILES;
+        }
+
+        $deleteNumberOfDays = $this->limit * $deleteNumberOfDays;
+        $this->limit = time() - $deleteNumberOfDays;
+
+        $files = array_filter($getLabels, function ($labelPath) {
+            return filemtime($labelPath) < $this->limit;
+        });
+
+        $files = array_slice($files, 0, $deleteNumberOfFiles);
 
         foreach ($files as $label) {
             $fileTime = filemtime($label);
             if ($fileTime === false) {
                 $errors['filemtime'] = $this->module->l(
-                    'Failed to retrieve file time for some labels. Check file permissions.', 'DeleteLabels'
+                    'Failed to retrieve file time for some labels. Check file permissions.',
+                    'DeleteLabels'
                 );
                 continue;
             }
 
-            if ($fileTime < $limit) {
-                $result = unlink($label);
-                if ($result === false) {
-                    $errors['unlink'] = $this->module->l(
-                        'Failed to remove some labels. Check file permissions.', 'DeleteLabels'
-                    );
-                    continue;
-                }
+            if (unlink($label) === false) {
+                $errors['unlink'] = $this->module->l(
+                    'Failed to remove some labels. Check file permissions.',
+                    'DeleteLabels'
+                );
+                continue;
             }
         }
 

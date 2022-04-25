@@ -18,7 +18,6 @@ class ConfigHelper
         'PACKETERY_LAST_CARRIERS_UPDATE' => 'all',
         'PACKETERY_WIDGET_AUTOOPEN' => 'all',
         'PACKETERY_CRON_TOKEN' => 'all',
-        'PACKETERY_LABEL_MAX_AGE_DAYS' => 'all',
         'PACKETERY_ID_PREFERENCE' => 'all',
         'PACKETERY_DEFAULT_PACKAGE_PRICE' => 'all',
     ];

@@ -394,7 +394,34 @@ class Packetery extends CarrierModule
             }
         }
 
-        return $helper->generateForm([$form]);
+        return $helper->generateForm([$form]) . $this->generateCronInfoBlock();
+    }
+
+    /**
+     * @return false|string
+     * @throws SmartyException
+     */
+    private function generateCronInfoBlock() {
+        $token = \Packetery\Tools\ConfigHelper::get('PACKETERY_CRON_TOKEN');
+        $link = new Link();
+
+        $numberOfDays = \Packetery\Cron\Tasks\DeleteLabels::DEFAULT_NUMBER_OF_DAYS;
+        $numberOfFiles = \Packetery\Cron\Tasks\DeleteLabels::DEFAULT_NUMBER_OF_FILES;
+
+        $deleteLabelsUrl = $link->getModuleLink(
+            'packetery',
+            'cron',
+            [
+                'token' => $token,
+                'task' => 'DeleteLabels',
+                'number_of_files' => $numberOfFiles,
+                'number_of_days' => $numberOfDays,
+            ]
+        );
+        $this->context->smarty->assign('deleteLabelsUrl', $deleteLabelsUrl);
+        $this->context->smarty->assign('numberOfDays', $numberOfDays);
+        $this->context->smarty->assign('numberOfFiles', $numberOfFiles);
+        return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/generateCronInfoBlock.tpl');
     }
 
     private function getConfigurationOptions() {

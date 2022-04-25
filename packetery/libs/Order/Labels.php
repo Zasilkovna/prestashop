@@ -44,7 +44,7 @@ class Labels
                 $pdf = $client->packetsLabelsPdf($this->configHelper->getApiPass(), $packets, $format, $offset);
             }
             if ($pdf) {
-                $file_name = 'zasilkovna_' . date("Y-m-d") . '-' . rand(1000, 9999) . '.pdf';
+                $file_name = 'packeta_' . date("Y-m-d") . '-' . rand(1000, 9999) . '.pdf';
                 file_put_contents(_PS_MODULE_DIR_ . 'packetery/labels/' . $file_name, $pdf);
                 return $file_name;
             }
