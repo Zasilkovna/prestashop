@@ -598,7 +598,7 @@ class Packetery extends CarrierModule
     public function hookDisplayHeader()
     {
         $js = [
-            'front.js?v=' . $this->version,
+            'front.js',
         ];
 
         $iterator = new GlobIterator(__DIR__ . '/views/js/checkout-modules/*.js', FilesystemIterator::CURRENT_AS_FILEINFO);
@@ -607,9 +607,12 @@ class Packetery extends CarrierModule
         }
 
         foreach ($js as $file) {
-//            $this->context->controller->addJS($this->_path . 'views/js/' . $file);
             $uri = $this->_path . 'views/js/' . $file;
-            $this->context->controller->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
+            $this->context->controller->registerJavascript(
+                sha1($uri),
+                $uri,
+                ['position' => 'bottom', 'priority' => 80]
+            );
         }
 
         $this->context->controller->registerStylesheet('packetery-front', $this->_path . 'views/css/front.css?v=' . $this->version, ['server' => 'remote']);
