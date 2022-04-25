@@ -1,5 +1,5 @@
 <div id="module-packetery" class="panel product-tab">
-    {if $prestashopVersion == '16'}
+    {if $prestashopVersion == '1.6'}
         <input type="hidden" name="submitted_tabs[]" value="ModulePacketery"/>
     {/if}
     <input type="hidden" id="packetery_product_extra_hook" name="packetery_product_extra_hook" value="1">
