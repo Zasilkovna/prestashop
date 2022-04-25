@@ -11,6 +11,7 @@ use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Tools\ConfigHelper;
+use Packetery\Tools\DbTools;
 use Packetery\Weight\Converter;
 use ReflectionException;
 use Tools;
@@ -103,14 +104,14 @@ class OrderExporter
         $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
         $customer = $order->getCustomer();
 
-        /** @var Packetery\Tools\DbTools $dbTools */
-        $dbTools = $this->module->diContainer->get(\Packetery\Tools\DbTools::class);
+        /** @var DbTools $dbTools */
+        $dbTools = $this->module->diContainer->get(DbTools::class);
 
         $sql = 'SELECT ppp.`is_adult` FROM `' . _DB_PREFIX_ . 'order_detail` pod 
                 LEFT JOIN `' . _DB_PREFIX_ . 'packetery_product` ppp ON (pod.`product_id` = ppp.`id_product`)
                 WHERE pod.`id_order` = ' . $order->id . ' AND ppp.`is_adult` = 1';
 
-        $adultContent = $dbTools->getValue($sql);
+        $adultContent = (bool) $dbTools->getValue($sql);
 
         $data = [
             'number' => $number,

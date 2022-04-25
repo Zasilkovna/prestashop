@@ -27,8 +27,6 @@
  * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
  */
 
-use Packetery\Exceptions\DatabaseException;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -131,7 +129,7 @@ class Packetery extends CarrierModule
     /**
      * @param array $params hook parameters
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookActionCarrierUpdate(array $params)
     {
@@ -242,7 +240,7 @@ class Packetery extends CarrierModule
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function getContent()
     {
@@ -307,7 +305,7 @@ class Packetery extends CarrierModule
      * @return string HTML code
      * @throws PrestaShopException
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function displayForm()
     {
@@ -552,7 +550,7 @@ class Packetery extends CarrierModule
      * @return string|void
      * @throws ReflectionException
      * @throws SmartyException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookDisplayCarrierExtraContent(array $params)
     {
@@ -664,7 +662,7 @@ class Packetery extends CarrierModule
      * @throws PrestaShopException
      * @throws ReflectionException
      * @throws SmartyException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      * @throws \PrestaShop\PrestaShop\Adapter\CoreException
      */
     public function hookDisplayBeforeCarrier(array $params)
@@ -787,7 +785,7 @@ class Packetery extends CarrierModule
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException|SmartyException
      */
     public function packeteryHookDisplayAdminOrder($params)
     {
@@ -903,7 +901,7 @@ class Packetery extends CarrierModule
      * @param array $packeteryOrder
      * @param int $orderId
      * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @throws PrestaShopException|ReflectionException
      */
     private function prepareAddressChange($apiKey, array $packeteryOrder, $orderId)
     {
@@ -991,7 +989,7 @@ class Packetery extends CarrierModule
      * @param array $address
      * @return bool
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     private function saveAddressChange(array $address)
     {
@@ -1015,7 +1013,7 @@ class Packetery extends CarrierModule
     /**
      * @return bool
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     private function savePickupPointChange()
     {
@@ -1109,7 +1107,7 @@ class Packetery extends CarrierModule
      * @param array $params
      * @return string|void
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookDisplayOrderConfirmation($params)
     {
@@ -1140,7 +1138,7 @@ class Packetery extends CarrierModule
      * @param array $params
      * @return string|void
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookDisplayOrderDetail($params)
     {
@@ -1164,7 +1162,7 @@ class Packetery extends CarrierModule
      * inspiration: https://github.com/PrestaShop/ps_legalcompliance/blob/dev/ps_legalcompliance.php
      * @param array $params
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookSendMailAlterTemplateVars(&$params)
     {
@@ -1246,7 +1244,7 @@ class Packetery extends CarrierModule
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookActionPacketeryOrderGridListingResultsModifier(&$params)
     {
@@ -1277,7 +1275,7 @@ class Packetery extends CarrierModule
      * Is not called in SuperCheckout. Process all validations in addSupercheckoutOrderValidator.
      * @param array $params
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookActionValidateStepComplete(array &$params)
     {
@@ -1311,7 +1309,7 @@ class Packetery extends CarrierModule
     /**
      * @param array $messages
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     private function processPickupPointChange(array &$messages)
     {
@@ -1338,7 +1336,7 @@ class Packetery extends CarrierModule
     /**
      * @param array $messages
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      * @throws \SmartyException tracking link related exception
      */
     private function processPostParcel(array &$messages)
@@ -1381,7 +1379,7 @@ class Packetery extends CarrierModule
      * @param array $packeteryOrder
      * @param string $countryDiffersMessage
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     private function processAddressChange(array &$messages, array $packeteryOrder, $countryDiffersMessage)
     {
@@ -1461,21 +1459,27 @@ class Packetery extends CarrierModule
      * Shows Packetery form in BO product detail
      * @param array $params Hook parameter
      * @return false|string
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      * @throws ReflectionException
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
     public function hookDisplayAdminProductsExtra($params)
     {
-        $idProduct = $params['id_product'];
+        $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
         $product = new Product($idProduct);
         if (!$product->is_virtual) {
             /** @var Packetery\Tools\DbTools $dbTools */
             $dbTools = $this->diContainer->get(\Packetery\Tools\DbTools::class);
             $sql = 'SELECT `is_adult` FROM `' . _DB_PREFIX_ . 'packetery_product` WHERE `id_product` = ' . (int)$idProduct;
             $packeteryAgeVerification = $dbTools->getValue($sql);
+            $adminToken = \Packetery\Tools\Tools::getAdminTokenLite('AdminProducts');
+            $version = '17';
+            if (\Packetery\Tools\Tools::version_compare(_PS_VERSION_, '1.7.0', '<')) $version = '16';
+
             $this->context->smarty->assign('packeteryAgeVerification', $packeteryAgeVerification);
+            $this->context->smarty->assign('adminToken', $adminToken);
+            $this->context->smarty->assign('version', $version);
             return $this->display(__FILE__, 'display_admin_product_extra.tpl');
         }
         return false;
@@ -1486,7 +1490,7 @@ class Packetery extends CarrierModule
      * @param array $params product information
      * @return bool
      * @throws ReflectionException
-     * @throws DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookActionProductUpdate($params)
     {
