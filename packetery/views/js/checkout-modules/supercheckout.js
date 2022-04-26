@@ -23,7 +23,7 @@ var PacketeryCheckoutModuleSupercheckout = {
     }
 };
 
-$(function () {
+window.addEventListener('load', function(event) {
     if (typeof addSupercheckoutOrderValidator !== 'undefined') {
         addSupercheckoutOrderValidator(function () {
             var $selectedInput = PacketeryCheckoutModuleSupercheckout.getSelectedInput(),

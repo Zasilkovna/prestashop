@@ -1,13 +1,3 @@
-// non-blocking AJAX loading, speeds up page load
-$.getScript("https://widget.packeta.com/v6/www/js/library.js")
-    .fail(function() {
-        console.error('Unable to load Packeta Widget.');
-    });
-
-$.getScript('https://hd.widget.packeta.com/www/js/library-hd.js').fail(function () {
-    console.error('Unable to load Packeta home delivery widget.');
-});
-
 var country = 'cz,sk'; /* Default countries */
 
 function PacketeryCheckoutModulesManager() {
@@ -60,20 +50,21 @@ function PacketeryCheckoutModulesManager() {
     }
 }
 var packeteryModulesManager = new PacketeryCheckoutModulesManager();
-var widgetInitialized = false;
 var $selectedInput;
 
-$(document).ready(function () {
+window.addEventListener('load', function(event) {
+    // non-blocking AJAX loading, speeds up page load
+    $.getScript("https://widget.packeta.com/v6/www/js/library.js")
+        .fail(function() {
+            console.error('Unable to load Packeta Widget.');
+        });
+
+    $.getScript('https://hd.widget.packeta.com/www/js/library-hd.js').fail(function () {
+        console.error('Unable to load Packeta home delivery widget.');
+    });
+
     if ($('.zas-box').length) {
         onShippingLoadedCallback();
-        widgetInitialized = true;
-    }
-});
-
-$(window).load(function () {
-    if ($('.zas-box').length && widgetInitialized === false) {
-        onShippingLoadedCallback();
-        widgetInitialized = true;
     }
 });
 
