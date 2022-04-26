@@ -24,6 +24,8 @@ function upgrade_module_3_0_0($module)
         $module->registerHook('displayPacketeryOrderGridListAfter') &&
         $module->registerHook('actionPacketeryOrderGridListingResultsModifier') &&
         $module->registerHook('actionValidateStepComplete') &&
+        $module->registerHook('displayAdminProductsExtra') &&
+        $module->registerHook('actionProductUpdate') &&
         $module->registerHook('actionPacketeryCarrierGridListingResultsModifier') &&
         ConfigHelper::update('PACKETERY_WIDGET_AUTOOPEN', 0) &&
         ConfigHelper::update('PACKETERY_CRON_TOKEN', Tools::passwdGen(32)) &&

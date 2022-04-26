@@ -93,6 +93,7 @@ class Uninstaller
                     SELECT `id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
                 )';
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
+        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product`';
 
         $apiCarrierRepository = $this->module->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
         $sql[] = $apiCarrierRepository->getDropTableSql();

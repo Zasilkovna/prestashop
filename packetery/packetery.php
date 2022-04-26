@@ -1078,6 +1078,7 @@ class Packetery extends CarrierModule
             'actionValidateStepComplete',
             'actionPacketeryCarrierGridListingResultsModifier',
             'actionProductUpdate',
+            'DisplayAdminProductsExtra',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -1468,21 +1469,22 @@ class Packetery extends CarrierModule
     {
         $idProduct = (int)$params['id_product'];
         $product = new Product($idProduct);
-        if (!$product->is_virtual) {
-            /** @var Packetery\Tools\DbTools $dbTools */
-            $dbTools = $this->diContainer->get(\Packetery\Tools\DbTools::class);
-            $sql = 'SELECT `is_adult` FROM `' . _DB_PREFIX_ . 'packetery_product` WHERE `id_product` = ' . (int)$idProduct;
-            $packeteryAgeVerification = $dbTools->getValue($sql);
-            $adminToken = \Packetery\Tools\Tools::getAdminTokenLite('AdminProducts');
-            $version = '1.7';
-            if (\Packetery\Tools\Tools::version_compare(_PS_VERSION_, '1.7.0', '<')) $version = '1.6';
 
-            $this->context->smarty->assign('packeteryAgeVerification', $packeteryAgeVerification);
-            $this->context->smarty->assign('adminToken', $adminToken);
-            $this->context->smarty->assign('prestashopVersion', $version);
-            return $this->display(__FILE__, 'display_admin_product_extra.tpl');
+        if ($product->is_virtual) {
+            return false;
         }
-        return false;
+
+        /** @var Packetery\Tools\DbTools $dbTools */
+        $dbTools = $this->diContainer->get(\Packetery\Tools\DbTools::class);
+        $sql = 'SELECT `is_adult` FROM `' . _DB_PREFIX_ . 'packetery_product` WHERE `id_product` = ' . (int)$idProduct;
+        $packeteryAgeVerification = $dbTools->getValue($sql);
+        $adminToken = \Packetery\Tools\Tools::getAdminTokenLite('AdminProducts');
+
+        $this->context->smarty->assign('packeteryAgeVerification', $packeteryAgeVerification);
+        $this->context->smarty->assign('adminToken', $adminToken);
+        $this->context->smarty->assign('isPrestaShop16', Tools::version_compare(_PS_VERSION_, '1.7.0', '<'));
+
+        return $this->display(__FILE__, 'display_admin_product_extra.tpl');
     }
 
     /**
@@ -1494,25 +1496,18 @@ class Packetery extends CarrierModule
      */
     public function hookActionProductUpdate(array $params)
     {
-        $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
         if (!Tools::getIsset('packetery_product_extra_hook')) {
             return false;
         }
 
-        $packeteryAgeVerification = Tools::getIsset('packetery_age_verification');
+        $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
 
         /** @var Packetery\Tools\DbTools $dbTools */
         $dbTools = $this->diContainer->get(\Packetery\Tools\DbTools::class);
 
-        return $dbTools->insert(
-            'packetery_product',
-            [
-                'id_product' => $idProduct,
-                'is_adult' => $packeteryAgeVerification,
-            ],
-            false,
-            true,
-            Db::ON_DUPLICATE_KEY
-        );
+        $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_product` (`id_product`, `is_adult`)
+                values ( ' . $idProduct . ', ' . $packeteryAgeVerification . ') 
+                ON DUPLICATE KEY UPDATE `is_adult` = ' . Tools::getIsset('packetery_age_verification');
+        return $dbTools->execute($sql);
     }
 }
