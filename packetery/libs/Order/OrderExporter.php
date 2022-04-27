@@ -104,14 +104,8 @@ class OrderExporter
         $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
         $customer = $order->getCustomer();
 
-        /** @var DbTools $dbTools */
-        $dbTools = $this->module->diContainer->get(DbTools::class);
 
-        $sql = 'SELECT ppp.`is_adult` FROM `' . _DB_PREFIX_ . 'order_detail` pod 
-                LEFT JOIN `' . _DB_PREFIX_ . 'packetery_product` ppp ON (pod.`product_id` = ppp.`id_product`)
-                WHERE pod.`id_order` = ' . $order->id . ' AND ppp.`is_adult` = 1';
-
-        $adultContent = (bool) $dbTools->getValue($sql);
+        $adultContent = $orderRepository->isOrderAdult($order->id);
 
         $data = [
             'number' => $number,

@@ -93,7 +93,6 @@ class Uninstaller
                     SELECT `id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
                 )';
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
-        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product`';
 
         $apiCarrierRepository = $this->module->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
         $sql[] = $apiCarrierRepository->getDropTableSql();
@@ -101,6 +100,8 @@ class Uninstaller
         // keep order table backup
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_order_backup`';
         $sql[] = 'RENAME TABLE `' . _DB_PREFIX_ . 'packetery_order` TO `' . _DB_PREFIX_ . 'packetery_order_backup`';
+
+        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product_attribute`';
 
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText())) {
             return false;

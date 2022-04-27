@@ -26,7 +26,7 @@
     </div>
     {if $isPrestaShop16}
         <div class="panel-footer">
-            <a href="index.php?controller=AdminProducts&token={$adminToken}" class="btn btn-default"><i
+            <a href="{$adminProductUrl}" class="btn btn-default"><i
                         class="process-icon-cancel"></i> {l s='Cancel' mod='packetery'}</a>
             <button type="submit" name="submitAddproduct" class="btn btn-default pull-right"><i
                         class="process-icon-save"></i> {l s='Save' mod='packetery'}</button>

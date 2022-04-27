@@ -1078,7 +1078,8 @@ class Packetery extends CarrierModule
             'actionValidateStepComplete',
             'actionPacketeryCarrierGridListingResultsModifier',
             'actionProductUpdate',
-            'DisplayAdminProductsExtra',
+            'displayAdminProductsExtra',
+            'actionProductDelete',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -1467,47 +1468,69 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayAdminProductsExtra(array $params)
     {
-        $idProduct = (int)$params['id_product'];
+        //Do not use $params to get id_product, prestashop 1.6 doesn't have it.
+        $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
         $product = new Product($idProduct);
+
+        if (Validate::isLoadedObject($product) === false) {
+            return false;
+        }
 
         if ($product->is_virtual) {
             return false;
         }
 
-        /** @var Packetery\Tools\DbTools $dbTools */
-        $dbTools = $this->diContainer->get(\Packetery\Tools\DbTools::class);
-        $sql = 'SELECT `is_adult` FROM `' . _DB_PREFIX_ . 'packetery_product` WHERE `id_product` = ' . (int)$idProduct;
-        $packeteryAgeVerification = $dbTools->getValue($sql);
-        $adminToken = \Packetery\Tools\Tools::getAdminTokenLite('AdminProducts');
+        /** @var Packetery\Product\ProductAttributeRepository $productAttribute */
+        $productAttribute = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+
+        $packeteryAgeVerification = $productAttribute->get($product->id);
+        $getAdminProductUrl = $this->context->link->getAdminLink('AdminProducts');
 
         $this->context->smarty->assign('packeteryAgeVerification', $packeteryAgeVerification);
-        $this->context->smarty->assign('adminToken', $adminToken);
+        $this->context->smarty->assign('adminProductUrl', $getAdminProductUrl);
         $this->context->smarty->assign('isPrestaShop16', Tools::version_compare(_PS_VERSION_, '1.7.0', '<'));
 
         return $this->display(__FILE__, 'display_admin_product_extra.tpl');
+
+    }
+
+    /**
+     * Shows Packetery form in BO product detail
+     * @param array $params product information
+     * @return bool|false
+     * @throws \Packetery\Exceptions\DatabaseException|ReflectionException
+     */
+    public function hookActionProductUpdate(array $params)
+    {
+        if (Tools::getIsset('packetery_product_extra_hook') === false) {
+            return false;
+        }
+
+        if (Validate::isLoadedObject($params['product']) === false) {
+            return false;
+        }
+
+        $isAdult = (int)Tools::getIsset('packetery_age_verification');
+
+        /** @var Packetery\Product\ProductAttributeRepository $dbTools */
+        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        $productAttributeRepository->insertUpdateIsAdult($params['product']->id, $isAdult);
     }
 
     /**
      * Shows Packetery form in BO product detail
      * @param array $params product information
      * @return bool
-     * @throws ReflectionException
-     * @throws Packetery\Exceptions\DatabaseException
+     * @throws \Packetery\Exceptions\DatabaseException|ReflectionException
      */
-    public function hookActionProductUpdate(array $params)
+    public function hookActionProductDelete(array $params)
     {
-        if (!Tools::getIsset('packetery_product_extra_hook')) {
+        if (Validate::isLoadedObject($params['product']) === false) {
             return false;
         }
 
-        $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
-
-        /** @var Packetery\Tools\DbTools $dbTools */
-        $dbTools = $this->diContainer->get(\Packetery\Tools\DbTools::class);
-
-        $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'packetery_product` (`id_product`, `is_adult`)
-                values ( ' . $idProduct . ', ' . $packeteryAgeVerification . ') 
-                ON DUPLICATE KEY UPDATE `is_adult` = ' . Tools::getIsset('packetery_age_verification');
-        return $dbTools->execute($sql);
+        /** @var Packetery\Product\ProductAttributeRepository $dbTools */
+        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        $productAttributeRepository->delete($params['product']->id);
     }
 }
