@@ -104,9 +104,6 @@ class OrderExporter
         $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
         $customer = $order->getCustomer();
 
-
-        $adultContent = $orderRepository->isOrderAdult($order->id);
-
         $data = [
             'number' => $number,
             'currency' => $targetCurrency,
@@ -123,7 +120,7 @@ class OrderExporter
             'company' => $customer->company,
             'phone' => $phone,
             'email' => $customer->email,
-            'adultContent' => $adultContent,
+            'adultContent' => $orderRepository->isOrderAdult($order->id),
         ];
 
         if ($packeteryOrder['is_ad']) {

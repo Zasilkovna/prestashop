@@ -368,6 +368,7 @@ class OrderRepository
         $sql = 'SELECT ppp.`is_adult` FROM `' . _DB_PREFIX_ . 'order_detail` pod 
                 LEFT JOIN `' . _DB_PREFIX_ . 'packetery_product_attribute` ppp ON (pod.`product_id` = ppp.`id_product`)
                 WHERE pod.`id_order` = ' . $orderId . ' AND ppp.`is_adult` = 1';
+
         return (bool) $this->dbTools->getValue($sql);
     }
 }

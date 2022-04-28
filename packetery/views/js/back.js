@@ -76,5 +76,21 @@ $(document).ready(function () {
 
 //workaround for PS 1.6 BO product detail where PS BO product.js hides the packetery tab because it contains the word pack.
 setTimeout(function() {
-    $('#link-ModulePacketery').show();
+    disableTabByProductType(product_type);
+
+    $('[name="type_product"]').on('change', function(){
+        var actualPrudoctType = $('[name="type_product"]:checked').val();
+        disableTabByProductType(actualPrudoctType);
+    });
+
 }, 500);
+
+function disableTabByProductType(actualPrudoctType) {
+    if (actualPrudoctType == 0) {
+        $('#link-ModulePacketery').show();
+    } else if (actualPrudoctType == 1) {
+        $('#link-ModulePacketery').show();
+    } else {
+        $('#link-ModulePacketery').hide();
+    }
+}
