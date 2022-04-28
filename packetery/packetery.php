@@ -1460,7 +1460,7 @@ class Packetery extends CarrierModule
     /**
      * Shows Packetery form in BO product detail
      * @param array $params Hook parameter
-     * @return false|string
+     * @return false|string|void
      * @throws Packetery\Exceptions\DatabaseException
      * @throws ReflectionException
      * @throws PrestaShopDatabaseException
@@ -1468,27 +1468,27 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayAdminProductsExtra(array $params)
     {
-        //Do not use $params to get id_product, prestashop 1.6 doesn't have it.
-        $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
-        $product = new Product($idProduct);
+        $isPrestaShop16 = Tools::version_compare(_PS_VERSION_, '1.7.0', '<');
+        $idProduct = (int)$params['id_product'];
 
-        if (Validate::isLoadedObject($product) === false) {
-            return false;
+        if ($isPrestaShop16) {
+            $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
         }
 
-        if ($product->is_virtual) {
-            return false;
+        $product = new Product($idProduct);
+
+        if (Validate::isLoadedObject($product) === false || $product->is_virtual) {
+            return;
         }
 
         /** @var Packetery\Product\ProductAttributeRepository $productAttribute */
         $productAttribute = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
 
-        $packeteryAgeVerification = $productAttribute->get($product->id);
-        $getAdminProductUrl = $this->context->link->getAdminLink('AdminProducts');
-
-        $this->context->smarty->assign('packeteryAgeVerification', $packeteryAgeVerification);
-        $this->context->smarty->assign('adminProductUrl', $getAdminProductUrl);
-        $this->context->smarty->assign('isPrestaShop16', Tools::version_compare(_PS_VERSION_, '1.7.0', '<'));
+        $this->context->smarty->assign(array(
+                'packeteryAgeVerification' => $productAttribute->getValue($product->id, 'is_adult'),
+                'adminProductUrl' => $this->context->link->getAdminLink('AdminProducts'),
+                'isPrestaShop16' => $isPrestaShop16
+        ));
 
         return $this->display(__FILE__, 'display_admin_product_extra.tpl');
 
@@ -1497,24 +1497,38 @@ class Packetery extends CarrierModule
     /**
      * Shows Packetery form in BO product detail
      * @param array $params product information
-     * @return bool|false
+     * @return void
      * @throws \Packetery\Exceptions\DatabaseException|ReflectionException
      */
     public function hookActionProductUpdate(array $params)
     {
-        if (Tools::getIsset('packetery_product_extra_hook') === false) {
-            return false;
-        }
-
-        if (Validate::isLoadedObject($params['product']) === false) {
-            return false;
+        if (Tools::getIsset('packetery_product_extra_hook') === false || Validate::isLoadedObject($params['product']) === false) {
+            return;
         }
 
         $isAdult = (int)Tools::getIsset('packetery_age_verification');
 
         /** @var Packetery\Product\ProductAttributeRepository $dbTools */
-        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
-        $productAttributeRepository->insertUpdateIsAdult($params['product']->id, $isAdult);
+        $productAttribute = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+
+        $productAttributeInfo = $productAttribute->getValue($params['product']->id, 'id_product');
+
+        if ($productAttributeInfo) {
+
+            $data = [
+                'is_adult' => $isAdult,
+            ];
+            $productAttribute->update($params['product']->id, $data);
+
+        } else {
+
+            $data = [
+                'id_product' => $params['product']->id,
+                'is_adult' => $isAdult,
+            ];
+            $productAttribute->insert($data);
+
+        }
     }
 
     /**
@@ -1526,7 +1540,7 @@ class Packetery extends CarrierModule
     public function hookActionProductDelete(array $params)
     {
         if (Validate::isLoadedObject($params['product']) === false) {
-            return false;
+            return;
         }
 
         /** @var Packetery\Product\ProductAttributeRepository $dbTools */

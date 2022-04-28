@@ -24,13 +24,67 @@ class ProductAttributeRepository
 
     /**
      * @param int $idProduct
-     * @return array|bool|object|null
+     * @return array|false
      * @throws DatabaseException
      */
-    public function get($idProduct)
+    public function getRow($idProduct)
     {
-        return $this->dbTools->getRow(
-            'SELECT * FROM ' . $this->getPrefixedTableName() . ' WHERE `id_product` = ' . $idProduct
+        $getRow = $this->dbTools->getRow(
+            'SELECT
+                `id_product`,
+                `is_adult`
+                FROM ' . $this->getPrefixedTableName() . ' WHERE `id_product` = ' . $idProduct
+        );
+
+        if (is_array($getRow)) {
+            return $getRow;
+        }
+        return false;
+    }
+
+    /**
+     * @param int $idProduct
+     * @param string $value
+     * @return string|false
+     * @throws DatabaseException
+     */
+    public function getValue($idProduct, $value)
+    {
+        $getValue = $this->dbTools->getValue(
+            'SELECT '.pSQL($value).' FROM ' . $this->getPrefixedTableName() . ' WHERE `id_product` = ' . $idProduct
+        );
+
+        if (is_string($getValue)) {
+            return $getValue;
+        }
+        return false;
+    }
+
+    /**
+     * @param array $data
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function insert(array $data)
+    {
+        return $this->dbTools->insert(
+            self::$tableName,
+            $data
+        );
+    }
+
+    /**
+     * @param array $data
+     * @param int $idProduct
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function update($idProduct, array $data)
+    {
+        return $this->dbTools->update(
+            self::$tableName,
+            $data,
+            '`id_product` = '. $idProduct
         );
     }
 
@@ -54,19 +108,4 @@ class ProductAttributeRepository
     {
         return _DB_PREFIX_ . self::$tableName;
     }
-
-    /**
-     * @param int $idProduct
-     * @param bool $isAdult
-     * @return bool
-     * @throws DatabaseException
-     */
-    public function insertUpdateIsAdult($idProduct, $isAdult)
-    {
-        $sql = 'INSERT INTO `' . $this->getPrefixedTableName() . '` (`id_product`, `is_adult`)
-                values ( ' . $idProduct . ', ' . $isAdult . ')
-                ON DUPLICATE KEY UPDATE `id_product` = ' . $idProduct . ', `is_adult` = ' . $isAdult;
-        return $this->dbTools->execute($sql);
-    }
-
 }
