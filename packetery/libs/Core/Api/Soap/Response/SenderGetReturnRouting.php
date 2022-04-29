@@ -5,8 +5,6 @@
  * @package Packetery
  */
 
-declare( strict_types=1 );
-
 
 namespace Packetery\Core\Api\Soap\Response;
 
@@ -20,7 +18,8 @@ class SenderGetReturnRouting extends BaseResponse {
 	 *
 	 * @return bool|null
 	 */
-	public function senderExists(): ?bool {
+	public function senderExists()
+    {
 		if ( null === $this->fault ) {
 			return true;
 		}

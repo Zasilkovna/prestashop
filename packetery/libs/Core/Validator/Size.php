@@ -5,8 +5,6 @@
  * @package Packetery\Validator
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Validator;
 
 use Packetery\Core\Entity;
@@ -25,7 +23,8 @@ class Size {
 	 *
 	 * @return bool
 	 */
-	public function validate( Entity\Size $size ): bool {
+	public function validate( Entity\Size $size )
+    {
 		return ( $size->getLength() && $size->getWidth() && $size->getHeight() );
 	}
 

@@ -5,15 +5,15 @@
  * @package Packetery\Api
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Api;
+
+use Exception;
 
 /**
  * Class InvalidRequestException.
  *
  * @package Packetery\Api
  */
-class InvalidRequestException extends \Exception {
+class InvalidRequestException extends Exception {
 
 }

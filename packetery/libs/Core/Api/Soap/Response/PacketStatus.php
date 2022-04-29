@@ -5,9 +5,6 @@
  * @package Packetery\Api\Soap\Request
  */
 
-declare( strict_types=1 );
-
-
 namespace Packetery\Core\Api\Soap\Response;
 
 /**
@@ -29,7 +26,8 @@ class PacketStatus extends BaseResponse {
 	 *
 	 * @return string
 	 */
-	public function getCodeText(): string {
+	public function getCodeText()
+    {
 		return $this->codeText;
 	}
 
@@ -40,7 +38,8 @@ class PacketStatus extends BaseResponse {
 	 *
 	 * @return void
 	 */
-	public function setCodeText( string $codeText ): void {
+	public function setCodeText( $codeText )
+    {
 		$this->codeText = $codeText;
 	}
 }

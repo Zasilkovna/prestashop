@@ -5,9 +5,6 @@
  * @package Packetery\Api\Soap\Request
  */
 
-declare( strict_types=1 );
-
-
 namespace Packetery\Core\Api\Soap\Request;
 
 /**
@@ -29,7 +26,7 @@ class PacketStatus {
 	 *
 	 * @param int $packetId Packet ID.
 	 */
-	public function __construct( int $packetId ) {
+	public function __construct( $packetId ) {
 		$this->packetId = $packetId;
 	}
 
@@ -38,7 +35,8 @@ class PacketStatus {
 	 *
 	 * @return int
 	 */
-	public function getPacketId(): int {
+	public function getPacketId()
+    {
 		return $this->packetId;
 	}
 }

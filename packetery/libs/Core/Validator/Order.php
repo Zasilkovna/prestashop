@@ -5,8 +5,6 @@
  * @package Packetery\Validator
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Validator;
 
 use Packetery\Core\Entity;
@@ -50,7 +48,8 @@ class Order {
 	 *
 	 * @return bool
 	 */
-	public function validate( Entity\Order $order ): bool {
+	public function validate( Entity\Order $order )
+    {
 		return (
 			$order->getNumber() &&
 			$order->getName() &&
@@ -71,7 +70,8 @@ class Order {
 	 *
 	 * @return bool
 	 */
-	private function validateAddress( Entity\Order $order ): bool {
+	private function validateAddress( Entity\Order $order )
+    {
 		if ( $order->isHomeDelivery() ) {
 			$address = $order->getDeliveryAddress();
 			if ( null === $address ) {
@@ -91,7 +91,8 @@ class Order {
 	 *
 	 * @return bool
 	 */
-	private function validateSize( Entity\Order $order ): bool {
+	private function validateSize( Entity\Order $order )
+    {
 		$carrier = $order->getCarrier();
 		if ( null === $carrier ) {
 			return true;

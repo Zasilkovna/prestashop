@@ -5,9 +5,6 @@
  * @package Packetery\Core\Api\Soap\Request
  */
 
-declare( strict_types=1 );
-
-
 namespace Packetery\Core\Api\Soap\Request;
 
 /**
@@ -29,7 +26,7 @@ class BarcodePng {
 	 *
 	 * @param string $barcode Packet barcode.
 	 */
-	public function __construct( string $barcode ) {
+	public function __construct( $barcode ) {
 		$this->barcode = $barcode;
 	}
 
@@ -38,7 +35,8 @@ class BarcodePng {
 	 *
 	 * @return string
 	 */
-	public function getBarcode(): string {
+	public function getBarcode()
+    {
 		return $this->barcode;
 	}
 }

@@ -5,9 +5,6 @@
  * @package Packetery
  */
 
-declare( strict_types=1 );
-
-
 namespace Packetery\Core\Api\Soap\Request;
 
 /**
@@ -27,7 +24,7 @@ class SenderGetReturnRouting {
 	 *
 	 * @param string $senderLabel Sender label.
 	 */
-	public function __construct( string $senderLabel ) {
+	public function __construct( $senderLabel ) {
 		$this->senderLabel = $senderLabel;
 	}
 
@@ -36,7 +33,8 @@ class SenderGetReturnRouting {
 	 *
 	 * @return string
 	 */
-	public function getSenderLabel(): string {
+	public function getSenderLabel()
+    {
 		return $this->senderLabel;
 	}
 }

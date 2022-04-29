@@ -5,8 +5,6 @@
  * @package Packetery\Core\Api\Soap\Request
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Api\Soap\Request;
 
 /**
@@ -44,7 +42,8 @@ class CreateShipment {
 	 *
 	 * @return string[]
 	 */
-	public function getPacketIds(): array {
+	public function getPacketIds()
+    {
 		return $this->packetIds;
 	}
 
@@ -53,7 +52,8 @@ class CreateShipment {
 	 *
 	 * @return string|null
 	 */
-	public function getCustomBarcode(): ?string {
+	public function getCustomBarcode()
+    {
 		return $this->customBarcode;
 	}
 
@@ -62,7 +62,8 @@ class CreateShipment {
 	 *
 	 * @param string|null $customBarcode Custom barcode.
 	 */
-	public function setCustomBarcode( ?string $customBarcode ): void {
+	public function setCustomBarcode( $customBarcode )
+    {
 		$this->customBarcode = $customBarcode;
 	}
 }

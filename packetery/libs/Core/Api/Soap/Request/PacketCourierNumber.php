@@ -5,8 +5,6 @@
  * @package Packetery\Core\Api\Soap\Request
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Api\Soap\Request;
 
 /**
@@ -28,7 +26,7 @@ class PacketCourierNumber {
 	 *
 	 * @param string $packetId Packet id.
 	 */
-	public function __construct( string $packetId ) {
+	public function __construct( $packetId ) {
 		$this->packetId = $packetId;
 	}
 
@@ -37,7 +35,8 @@ class PacketCourierNumber {
 	 *
 	 * @return string
 	 */
-	public function getPacketId(): string {
+	public function getPacketId()
+    {
 		return $this->packetId;
 	}
 

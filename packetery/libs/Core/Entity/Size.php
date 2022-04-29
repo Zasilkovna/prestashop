@@ -5,8 +5,6 @@
  * @package Packetery\Entity
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Entity;
 
 /**
@@ -43,7 +41,7 @@ class Size {
 	 * @param float|null $width Width.
 	 * @param float|null $height Height.
 	 */
-	public function __construct( ?float $length = null, ?float $width = null, ?float $height = null ) {
+	public function __construct( $length = null, $width = null, $height = null ) {
 		$this->length = $length;
 		$this->width  = $width;
 		$this->height = $height;
@@ -54,7 +52,8 @@ class Size {
 	 *
 	 * @return float|null
 	 */
-	public function getLength(): ?float {
+	public function getLength()
+    {
 		return $this->length;
 	}
 
@@ -63,7 +62,8 @@ class Size {
 	 *
 	 * @return float|null
 	 */
-	public function getWidth(): ?float {
+	public function getWidth()
+    {
 		return $this->width;
 	}
 
@@ -72,7 +72,8 @@ class Size {
 	 *
 	 * @return float|null
 	 */
-	public function getHeight(): ?float {
+	public function getHeight()
+    {
 		return $this->height;
 	}
 
@@ -83,7 +84,8 @@ class Size {
 	 *
 	 * @return void
 	 */
-	public function setLength( ?float $length ): void {
+	public function setLength( $length )
+    {
 		$this->length = $length;
 	}
 
@@ -94,7 +96,8 @@ class Size {
 	 *
 	 * @return void
 	 */
-	public function setWidth( ?float $width ): void {
+	public function setWidth( $width )
+    {
 		$this->width = $width;
 	}
 
@@ -105,7 +108,8 @@ class Size {
 	 *
 	 * @return void
 	 */
-	public function setHeight( ?float $height ): void {
+	public function setHeight( $height )
+    {
 		$this->height = $height;
 	}
 }

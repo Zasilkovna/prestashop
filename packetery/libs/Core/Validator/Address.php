@@ -5,8 +5,6 @@
  * @package Packetery\Validator
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Validator;
 
 use Packetery\Core\Entity;
@@ -25,7 +23,8 @@ class Address {
 	 *
 	 * @return bool
 	 */
-	public function validate( Entity\Address $address ): bool {
+	public function validate( Entity\Address $address )
+    {
 		return ( $address->getStreet() && $address->getCity() && $address->getZip() );
 	}
 

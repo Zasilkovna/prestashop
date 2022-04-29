@@ -5,9 +5,6 @@
  * @package Packetery\Core\Api\Soap\Response
  */
 
-declare( strict_types=1 );
-
-
 namespace Packetery\Core\Api\Soap\Response;
 
 /**
@@ -57,7 +54,8 @@ class CreateShipment extends BaseResponse {
 	 *
 	 * @return int
 	 */
-	public function getId(): int {
+	public function getId()
+    {
 		return $this->id;
 	}
 
@@ -66,7 +64,8 @@ class CreateShipment extends BaseResponse {
 	 *
 	 * @param int $id ID.
 	 */
-	public function setId( int $id ): void {
+	public function setId( $id )
+    {
 		$this->id = $id;
 	}
 
@@ -75,7 +74,8 @@ class CreateShipment extends BaseResponse {
 	 *
 	 * @return string
 	 */
-	public function getChecksum(): string {
+	public function getChecksum()
+    {
 		return $this->checksum;
 	}
 
@@ -84,7 +84,8 @@ class CreateShipment extends BaseResponse {
 	 *
 	 * @param string $checksum Checksum.
 	 */
-	public function setChecksum( string $checksum ): void {
+	public function setChecksum( $checksum )
+    {
 		$this->checksum = $checksum;
 	}
 
@@ -93,7 +94,8 @@ class CreateShipment extends BaseResponse {
 	 *
 	 * @return string
 	 */
-	public function getBarcode(): string {
+	public function getBarcode()
+    {
 		return $this->barcode;
 	}
 
@@ -102,7 +104,8 @@ class CreateShipment extends BaseResponse {
 	 *
 	 * @param string $barcode Barcode.
 	 */
-	public function setBarcode( string $barcode ): void {
+	public function setBarcode( $barcode )
+    {
 		$this->barcode = $barcode;
 	}
 
@@ -111,7 +114,8 @@ class CreateShipment extends BaseResponse {
 	 *
 	 * @return string
 	 */
-	public function getSimpleBarcodeText(): string {
+	public function getSimpleBarcodeText()
+    {
 		$exploded = explode( ':', $this->barcodeText );
 		$first    = array_shift( $exploded );
 
@@ -123,7 +127,8 @@ class CreateShipment extends BaseResponse {
 	 *
 	 * @return string
 	 */
-	public function getBarcodeText(): string {
+	public function getBarcodeText()
+    {
 		return $this->barcodeText;
 	}
 
@@ -132,7 +137,8 @@ class CreateShipment extends BaseResponse {
 	 *
 	 * @param string $barcodeText Barcode text.
 	 */
-	public function setBarcodeText( string $barcodeText ): void {
+	public function setBarcodeText( $barcodeText )
+    {
 		$this->barcodeText = $barcodeText;
 	}
 
@@ -141,7 +147,8 @@ class CreateShipment extends BaseResponse {
 	 *
 	 * @return int[]
 	 */
-	public function getInvalidPacketIds(): array {
+	public function getInvalidPacketIds()
+    {
 		return $this->invalidPacketIds;
 	}
 
@@ -150,7 +157,8 @@ class CreateShipment extends BaseResponse {
 	 *
 	 * @param array $invalidPacketIds Invalid packets.
 	 */
-	public function setInvalidPacketIds( array $invalidPacketIds ): void {
+	public function setInvalidPacketIds( array $invalidPacketIds )
+    {
 		$this->invalidPacketIds = $invalidPacketIds;
 	}
 }

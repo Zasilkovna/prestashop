@@ -5,9 +5,6 @@
  * @package Packetery\Log
  */
 
-declare( strict_types=1 );
-
-
 namespace Packetery\Core\Log;
 
 /**
@@ -20,14 +17,14 @@ interface ILogger {
 	/**
 	 * Registers log driver.
 	 */
-	public function register(): void;
+	public function register();
 
 	/**
 	 * Adds log record.
 	 *
 	 * @param Record $record Record.
 	 */
-	public function add( Record $record ): void;
+	public function add( Record $record );
 
 	/**
 	 * Get logs.
@@ -36,5 +33,5 @@ interface ILogger {
 	 *
 	 * @return iterable
 	 */
-	public function getRecords( array $sorting = [] ): iterable;
+	public function getRecords( array $sorting = [] );
 }

@@ -5,8 +5,6 @@
  * @package Packetery\Api\Soap\Response
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Api\Soap\Response;
 
 /**
@@ -42,7 +40,8 @@ class CreatePacket extends BaseResponse {
 	 *
 	 * @param int $id Id.
 	 */
-	public function setId( int $id ): void {
+	public function setId( $id )
+    {
 		$this->id = $id;
 	}
 
@@ -51,7 +50,8 @@ class CreatePacket extends BaseResponse {
 	 *
 	 * @param string $barcode Barcode.
 	 */
-	public function setBarcode( string $barcode ): void {
+	public function setBarcode( $barcode )
+    {
 		$this->barcode = $barcode;
 	}
 
@@ -60,7 +60,8 @@ class CreatePacket extends BaseResponse {
 	 *
 	 * @param array $errors Errors.
 	 */
-	public function setValidationErrors( array $errors ): void {
+	public function setValidationErrors( array $errors )
+    {
 		$this->validationErrors = $errors;
 	}
 
@@ -69,7 +70,8 @@ class CreatePacket extends BaseResponse {
 	 *
 	 * @return int
 	 */
-	public function getId(): int {
+	public function getId()
+    {
 		return $this->id;
 	}
 
@@ -78,7 +80,8 @@ class CreatePacket extends BaseResponse {
 	 *
 	 * @return string
 	 */
-	public function getBarcode(): string {
+	public function getBarcode()
+    {
 		return $this->barcode;
 	}
 
@@ -87,7 +90,8 @@ class CreatePacket extends BaseResponse {
 	 *
 	 * @return array|null
 	 */
-	public function getValidationErrors(): ?array {
+	public function getValidationErrors()
+    {
 		return $this->validationErrors;
 	}
 
@@ -96,7 +100,8 @@ class CreatePacket extends BaseResponse {
 	 *
 	 * @return string
 	 */
-	public function getErrorsAsString(): string {
+	public function getErrorsAsString()
+    {
 		$allErrors = $this->validationErrors;
 		array_unshift( $allErrors, $this->getFaultString() );
 

@@ -5,8 +5,6 @@
  * @package Packetery\Entity
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Entity;
 
 /**
@@ -72,7 +70,7 @@ class Address {
 	 * @param string|null $city City.
 	 * @param string|null $zip Zip.
 	 */
-	public function __construct( ?string $street, ?string $city, ?string $zip ) {
+	public function __construct( $street, $city, $zip ) {
 		$this->street = $street;
 		$this->city   = $city;
 		$this->zip    = $zip;
@@ -83,7 +81,8 @@ class Address {
 	 *
 	 * @return string|null
 	 */
-	public function getStreet(): ?string {
+	public function getStreet()
+    {
 		return $this->street;
 	}
 
@@ -92,7 +91,8 @@ class Address {
 	 *
 	 * @return string|null
 	 */
-	public function getCity(): ?string {
+	public function getCity()
+    {
 		return $this->city;
 	}
 
@@ -101,7 +101,8 @@ class Address {
 	 *
 	 * @return string|null
 	 */
-	public function getZip(): ?string {
+	public function getZip()
+    {
 		return $this->zip;
 	}
 
@@ -110,7 +111,8 @@ class Address {
 	 *
 	 * @return string|null
 	 */
-	public function getHouseNumber(): ?string {
+	public function getHouseNumber()
+    {
 		return $this->houseNumber;
 	}
 
@@ -119,7 +121,8 @@ class Address {
 	 *
 	 * @param string|null $houseNumber House number.
 	 */
-	public function setHouseNumber( ?string $houseNumber ): void {
+	public function setHouseNumber( $houseNumber )
+    {
 		$this->houseNumber = $houseNumber;
 	}
 
@@ -128,7 +131,8 @@ class Address {
 	 *
 	 * @return string|null
 	 */
-	public function getLongitude(): ?string {
+	public function getLongitude()
+    {
 		return $this->longitude;
 	}
 
@@ -139,7 +143,8 @@ class Address {
 	 *
 	 * @return void
 	 */
-	public function setLongitude( ?string $longitude ): void {
+	public function setLongitude( $longitude )
+    {
 		$this->longitude = $longitude;
 	}
 
@@ -148,7 +153,8 @@ class Address {
 	 *
 	 * @return string|null
 	 */
-	public function getLatitude(): ?string {
+	public function getLatitude()
+    {
 		return $this->latitude;
 	}
 
@@ -159,7 +165,8 @@ class Address {
 	 *
 	 * @return void
 	 */
-	public function setLatitude( ?string $latitude ): void {
+	public function setLatitude( $latitude )
+    {
 		$this->latitude = $latitude;
 	}
 
@@ -168,7 +175,8 @@ class Address {
 	 *
 	 * @return string|null
 	 */
-	public function getCounty(): ?string {
+	public function getCounty()
+    {
 		return $this->county;
 	}
 
@@ -179,7 +187,8 @@ class Address {
 	 *
 	 * @return void
 	 */
-	public function setCounty( ?string $county ): void {
+	public function setCounty( $county )
+    {
 		$this->county = $county;
 	}
 
@@ -188,7 +197,8 @@ class Address {
 	 *
 	 * @return array
 	 */
-	public function export(): array {
+	public function export()
+    {
 		return get_object_vars( $this );
 	}
 }

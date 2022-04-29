@@ -5,8 +5,6 @@
  * @package Packetery\Api\Soap\Response
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Api\Soap\Response;
 
 /**
@@ -28,7 +26,8 @@ class PacketsCourierLabelsPdf extends BaseResponse {
 	 *
 	 * @param string $pdfContents Pdf contents.
 	 */
-	public function setPdfContents( string $pdfContents ): void {
+	public function setPdfContents( $pdfContents )
+    {
 		$this->pdfContents = $pdfContents;
 	}
 
@@ -37,7 +36,8 @@ class PacketsCourierLabelsPdf extends BaseResponse {
 	 *
 	 * @return string
 	 */
-	public function getPdfContents(): string {
+	public function getPdfContents()
+    {
 		return $this->pdfContents;
 	}
 

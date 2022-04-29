@@ -67,12 +67,12 @@ class PickupPoint {
 	 * @param string|null $url Point url.
 	 */
 	public function __construct(
-		?string $id = null,
-		?string $name = null,
-		?string $city = null,
-		?string $zip = null,
-		?string $street = null,
-		?string $url = null
+		$id = null,
+		$name = null,
+		$city = null,
+		$zip = null,
+		$street = null,
+		$url = null
 	) {
 		$this->id     = $id;
 		$this->name   = $name;
@@ -87,7 +87,8 @@ class PickupPoint {
 	 *
 	 * @return string|null
 	 */
-	public function getId(): ?string {
+	public function getId()
+    {
 		return $this->id;
 	}
 
@@ -96,7 +97,8 @@ class PickupPoint {
 	 *
 	 * @return string|null
 	 */
-	public function getName(): ?string {
+	public function getName()
+    {
 		return $this->name;
 	}
 
@@ -105,7 +107,8 @@ class PickupPoint {
 	 *
 	 * @return string|null
 	 */
-	public function getUrl(): ?string {
+	public function getUrl()
+    {
 		return $this->url;
 	}
 
@@ -114,7 +117,8 @@ class PickupPoint {
 	 *
 	 * @return string|null
 	 */
-	public function getStreet(): ?string {
+	public function getStreet()
+    {
 		return $this->street;
 	}
 
@@ -123,7 +127,8 @@ class PickupPoint {
 	 *
 	 * @return string|null
 	 */
-	public function getZip(): ?string {
+	public function getZip()
+    {
 		return $this->zip;
 	}
 
@@ -132,7 +137,8 @@ class PickupPoint {
 	 *
 	 * @return string|null
 	 */
-	public function getCity(): ?string {
+	public function getCity()
+    {
 		return $this->city;
 	}
 
@@ -143,7 +149,8 @@ class PickupPoint {
 	 *
 	 * @return void
 	 */
-	public function setId( ?string $id ): void {
+	public function setId( $id )
+    {
 		$this->id = $id;
 	}
 
@@ -154,7 +161,8 @@ class PickupPoint {
 	 *
 	 * @return void
 	 */
-	public function setName( ?string $name ): void {
+	public function setName( $name )
+    {
 		$this->name = $name;
 	}
 
@@ -165,7 +173,8 @@ class PickupPoint {
 	 *
 	 * @return void
 	 */
-	public function setUrl( ?string $url ): void {
+	public function setUrl( $url )
+    {
 		$this->url = $url;
 	}
 
@@ -176,7 +185,8 @@ class PickupPoint {
 	 *
 	 * @return void
 	 */
-	public function setStreet( ?string $street ): void {
+	public function setStreet( $street )
+    {
 		$this->street = $street;
 	}
 
@@ -187,7 +197,8 @@ class PickupPoint {
 	 *
 	 * @return void
 	 */
-	public function setZip( ?string $zip ): void {
+	public function setZip( $zip )
+    {
 		$this->zip = $zip;
 	}
 
@@ -198,7 +209,8 @@ class PickupPoint {
 	 *
 	 * @return void
 	 */
-	public function setCity( ?string $city ): void {
+	public function setCity( $city )
+    {
 		$this->city = $city;
 	}
 }

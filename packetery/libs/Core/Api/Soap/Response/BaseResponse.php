@@ -5,8 +5,6 @@
  * @package Packetery\Core\Api\Soap\Response
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Api\Soap\Response;
 
 /**
@@ -35,7 +33,8 @@ class BaseResponse {
 	 *
 	 * @return bool
 	 */
-	public function hasFault(): bool {
+	public function hasFault()
+    {
 		return (bool) $this->fault;
 	}
 
@@ -44,7 +43,8 @@ class BaseResponse {
 	 *
 	 * @return bool
 	 */
-	public function hasWrongPassword(): bool {
+	public function hasWrongPassword()
+    {
 		return ( 'IncorrectApiPasswordFault' === $this->fault );
 	}
 
@@ -53,7 +53,8 @@ class BaseResponse {
 	 *
 	 * @param string $fault Fault identifier.
 	 */
-	public function setFault( string $fault ): void {
+	public function setFault( $fault )
+    {
 		$this->fault = $fault;
 	}
 
@@ -62,7 +63,8 @@ class BaseResponse {
 	 *
 	 * @param string $faultString Fault string.
 	 */
-	public function setFaultString( string $faultString ): void {
+	public function setFaultString( $faultString )
+    {
 		$this->faultString = $faultString;
 	}
 
@@ -71,7 +73,8 @@ class BaseResponse {
 	 *
 	 * @return string|null
 	 */
-	public function getFaultString(): ?string {
+	public function getFaultString()
+    {
 		return $this->faultString;
 	}
 

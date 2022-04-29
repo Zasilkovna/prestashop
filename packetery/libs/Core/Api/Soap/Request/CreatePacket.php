@@ -5,8 +5,6 @@
  * @package Packetery\Api\Soap\Request
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Api\Soap\Request;
 
 use Packetery\Core\Entity;
@@ -208,7 +206,8 @@ class CreatePacket {
 	 *
 	 * @return array
 	 */
-	public function getSubmittableData(): array {
+	public function getSubmittableData()
+    {
 		return array_filter( get_object_vars( $this ) );
 	}
 

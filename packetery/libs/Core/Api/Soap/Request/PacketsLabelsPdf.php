@@ -5,8 +5,6 @@
  * @package Packetery\Api\Soap\Request
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Api\Soap\Request;
 
 /**
@@ -44,7 +42,7 @@ class PacketsLabelsPdf {
 	 * @param string   $labelFormat Label format.
 	 * @param int      $offset Offset.
 	 */
-	public function __construct( array $packetIds, string $labelFormat, int $offset ) {
+	public function __construct( array $packetIds, $labelFormat, $offset ) {
 		$this->packetIds   = $packetIds;
 		$this->labelFormat = $labelFormat;
 		$this->offset      = $offset;
@@ -55,7 +53,8 @@ class PacketsLabelsPdf {
 	 *
 	 * @return array
 	 */
-	public function getPacketIds(): array {
+	public function getPacketIds()
+    {
 		return $this->packetIds;
 	}
 
@@ -64,7 +63,8 @@ class PacketsLabelsPdf {
 	 *
 	 * @return string
 	 */
-	public function getFormat(): string {
+	public function getFormat()
+    {
 		return $this->labelFormat;
 	}
 
@@ -73,7 +73,8 @@ class PacketsLabelsPdf {
 	 *
 	 * @return int
 	 */
-	public function getOffset(): int {
+	public function getOffset()
+    {
 		return $this->offset;
 	}
 }

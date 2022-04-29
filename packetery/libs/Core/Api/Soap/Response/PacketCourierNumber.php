@@ -5,8 +5,6 @@
  * @package Packetery\Core\Api\Soap\Response
  */
 
-declare( strict_types=1 );
-
 namespace Packetery\Core\Api\Soap\Response;
 
 /**
@@ -28,7 +26,8 @@ class PacketCourierNumber extends BaseResponse {
 	 *
 	 * @param string $number Packet carrier number.
 	 */
-	public function setNumber( string $number ): void {
+	public function setNumber( $number )
+    {
 		$this->number = $number;
 	}
 
@@ -37,7 +36,8 @@ class PacketCourierNumber extends BaseResponse {
 	 *
 	 * @return string
 	 */
-	public function getNumber(): string {
+	public function getNumber()
+    {
 		return $this->number;
 	}
 
