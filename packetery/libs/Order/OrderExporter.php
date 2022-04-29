@@ -11,7 +11,6 @@ use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Tools\ConfigHelper;
-use Packetery\Tools\DbTools;
 use Packetery\Weight\Converter;
 use ReflectionException;
 use Tools;
