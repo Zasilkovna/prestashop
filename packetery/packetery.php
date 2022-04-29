@@ -1516,7 +1516,7 @@ class Packetery extends CarrierModule
 
         $productAttributeInfo = $productAttribute->getRow($product->id);
 
-        if (isset($productAttributeInfo)) {
+        if ($productAttributeInfo) {
 
             $data = [
                 'is_adult' => $isAdult,
