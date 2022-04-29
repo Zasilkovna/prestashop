@@ -1516,7 +1516,7 @@ class Packetery extends CarrierModule
 
         $productAttributeInfo = $productAttribute->getRow($product->id);
 
-        if ($productAttributeInfo['id_product']) {
+        if (isset($productAttributeInfo)) {
 
             $data = [
                 'is_adult' => $isAdult,
@@ -1548,6 +1548,8 @@ class Packetery extends CarrierModule
 
         /** @var Packetery\Product\ProductAttributeRepository $dbTools */
         $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
-        $productAttributeRepository->delete($params['product']->id);
+        if ($productAttributeRepository->delete($params['product']->id)) {
+			return;
+        }
     }
 }
