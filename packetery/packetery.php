@@ -1338,7 +1338,7 @@ class Packetery extends CarrierModule
     /**
      * @param array $messages
      * @throws ReflectionException
-     * @throws Packetery\Exceptions\DatabaseException
+     * @throws \Packetery\Exceptions\DatabaseException
      * @throws \SmartyException tracking link related exception
      */
     private function processPostParcel(array &$messages)
