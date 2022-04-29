@@ -45,7 +45,7 @@ class Client {
 	 * @return void
 	 */
 	public function setApiPassword( $apiPassword )
-    {
+	{
 		$this->apiPassword = $apiPassword;
 	}
 
@@ -57,7 +57,7 @@ class Client {
 	 * @return Response\CreatePacket
 	 */
 	public function createPacket( Request\CreatePacket $request )
-    {
+	{
 		$response = new Response\CreatePacket();
 		try {
 			$soapClient = new SoapClient( self::WSDL_URL );
@@ -73,6 +73,27 @@ class Client {
 	}
 
 	/**
+	 * Submits packet data to Packeta API.
+	 *
+	 * @param Request\CancelPacket $request Packet attributes.
+	 *
+	 * @return Response\CancelPacket
+	 */
+	public function cancelPacket( Request\CancelPacket $request )
+	{
+		$response = new Response\CancelPacket();
+		try {
+			$soapClient = new SoapClient( self::WSDL_URL );
+			$soapClient->cancelPacket( $this->apiPassword, $request->getPacketId() );
+		} catch ( SoapFault $exception ) {
+			$response->setFault( $this->getFaultIdentifier( $exception ) );
+			$response->setFaultString( $exception->faultstring );
+		}
+
+		return $response;
+	}
+
+	/**
 	 * Retrieves packet status.
 	 *
 	 * @param Request\PacketStatus $request Packet attributes.
@@ -80,7 +101,7 @@ class Client {
 	 * @return Response\PacketStatus
 	 */
 	public function packetStatus( Request\PacketStatus $request )
-    {
+	{
 		$response = new Response\PacketStatus();
 		try {
 			$soapClient = new SoapClient( self::WSDL_URL );
@@ -102,7 +123,7 @@ class Client {
 	 * @return Response\CreateShipment
 	 */
 	public function createShipment( Request\CreateShipment $request )
-    {
+	{
 		$response = new Response\CreateShipment();
 		try {
 			$soapClient = new SoapClient( self::WSDL_URL );
@@ -115,7 +136,7 @@ class Client {
 			$response->setFault( $this->getFaultIdentifier( $exception ) );
 			$response->setFaultString( $exception->faultstring );
 
-			if ( isset( $exception->detail ) && isset( $exception->detail->PacketIdsFault ) ) {
+			if ( isset( $exception->detail, $exception->detail->PacketIdsFault ) ) {
 				$invalidPacketIds         = (array) $exception->detail->PacketIdsFault->ids->packetId;
 				$invalidPacketIdsFiltered = [];
 
@@ -142,7 +163,7 @@ class Client {
 	 * @return Response\BarcodePng
 	 */
 	public function barcodePng( Request\BarcodePng $request )
-    {
+	{
 		$response = new Response\BarcodePng();
 		try {
 			$soapClient = new SoapClient( self::WSDL_URL );
@@ -164,7 +185,7 @@ class Client {
 	 * @return Response\PacketsLabelsPdf
 	 */
 	public function packetsLabelsPdf( Request\PacketsLabelsPdf $request )
-    {
+	{
 		$response = new Response\PacketsLabelsPdf();
 		try {
 			$soapClient  = new SoapClient( self::WSDL_URL );
@@ -186,7 +207,7 @@ class Client {
 	 * @return Response\PacketsCourierLabelsPdf
 	 */
 	public function packetsCarrierLabelsPdf( Request\PacketsCourierLabelsPdf $request )
-    {
+	{
 		$response = new Response\PacketsCourierLabelsPdf();
 		try {
 			$soapClient  = new SoapClient( self::WSDL_URL );
@@ -208,7 +229,7 @@ class Client {
 	 * @return Response\PacketCourierNumber
 	 */
 	public function packetCourierNumber( Request\PacketCourierNumber $request )
-    {
+	{
 		$response = new Response\PacketCourierNumber();
 		try {
 			$soapClient = new SoapClient( self::WSDL_URL );
@@ -230,7 +251,7 @@ class Client {
 	 * @return Response\SenderGetReturnRouting
 	 */
 	public function senderGetReturnRouting( Request\SenderGetReturnRouting $request )
-    {
+	{
 		$response = new Response\SenderGetReturnRouting();
 		try {
 			$soapClient = new SoapClient( self::WSDL_URL );
@@ -252,7 +273,7 @@ class Client {
 	 * @return array
 	 */
 	protected function getValidationErrors( SoapFault $exception )
-    {
+	{
 		$errors = [];
 
 		$faults = (isset($exception->detail->PacketAttributesFault->attributes->fault) ? $exception->detail->PacketAttributesFault->attributes->fault : []);
@@ -274,7 +295,7 @@ class Client {
 	 * @return int|string
 	 */
 	private function getFaultIdentifier( SoapFault $exception )
-    {
+	{
 		if ( isset( $exception->detail ) ) {
 			return array_keys( get_object_vars( $exception->detail ) )[0];
 		}
