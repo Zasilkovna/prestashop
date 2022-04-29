@@ -176,6 +176,12 @@ class Installer
             `address_validation` varchar(40) NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
+        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product_attribute`';
+        $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_product_attribute` (
+            `id_product` int(11) NOT NULL PRIMARY KEY,
+            `is_adult` tinyint(1) NOT NULL DEFAULT 0
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+
         $apiCarrierRepository = $this->module->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
         $sql[] = $apiCarrierRepository->getCreateTableSql();
 

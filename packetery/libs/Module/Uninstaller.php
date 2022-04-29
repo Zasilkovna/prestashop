@@ -101,6 +101,8 @@ class Uninstaller
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_order_backup`';
         $sql[] = 'RENAME TABLE `' . _DB_PREFIX_ . 'packetery_order` TO `' . _DB_PREFIX_ . 'packetery_order_backup`';
 
+        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product_attribute`';
+
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText())) {
             return false;
         }

@@ -73,3 +73,23 @@ $(document).ready(function () {
         }
     });
 });
+
+//workaround for PS 1.6 BO product detail where PS BO product.js hides the packetery tab because it contains the word pack.
+setTimeout(function() {
+    disableTabByProductType(product_type);
+
+    $('[name="type_product"]').on('change', function(){
+        var actualProductType  = parseInt($('[name="type_product"]:checked').val());
+        disableTabByProductType(actualProductType);
+    });
+
+}, 500);
+
+function disableTabByProductType(actualProductType) {
+    // 0 - standard product, 1 - pack of products, 2 - virtual product
+    if (actualProductType === 2) {
+        $('#link-ModulePacketery').hide();
+    } else {
+        $('#link-ModulePacketery').show();
+    }
+}

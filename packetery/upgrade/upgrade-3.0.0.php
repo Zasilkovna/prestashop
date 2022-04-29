@@ -24,6 +24,9 @@ function upgrade_module_3_0_0($module)
         $module->registerHook('displayPacketeryOrderGridListAfter') &&
         $module->registerHook('actionPacketeryOrderGridListingResultsModifier') &&
         $module->registerHook('actionValidateStepComplete') &&
+        $module->registerHook('displayAdminProductsExtra') &&
+        $module->registerHook('actionProductUpdate') &&
+        $module->registerHook('actionProductDelete') &&
         $module->registerHook('actionPacketeryCarrierGridListingResultsModifier') &&
         ConfigHelper::update('PACKETERY_WIDGET_AUTOOPEN', 0) &&
         ConfigHelper::update('PACKETERY_CRON_TOKEN', Tools::passwdGen(32)) &&
@@ -82,6 +85,11 @@ function upgrade_module_3_0_0($module)
         `id_branch` = "' . Packetery::PP_ALL . '"
         WHERE `pickup_point_type` = "external" AND
         `id_branch` = "";';
+    $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product`';
+    $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_product` (
+            `id_product` int(11) NOT NULL PRIMARY KEY,
+            `is_adult` tinyint(1) NOT NULL DEFAULT 0
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
     if (!$dbTools->executeQueries($sql, $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.0.0'), true)) {
         return false;

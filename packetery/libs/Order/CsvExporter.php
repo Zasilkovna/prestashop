@@ -56,7 +56,7 @@ class CsvExporter
                 'weight' => $exportData['weight'],
                 'pickupPointOrCarrier' => $exportData['pickupPointOrCarrier'],
                 'senderLabel' => $exportData['senderLabel'],
-                'adultContent' => '',
+                'adultContent' => $exportData['adultContent'],
                 'delayedDelivery' => '',
                 'street' => '',
                 'houseNumber' => '',

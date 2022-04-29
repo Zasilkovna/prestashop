@@ -1077,6 +1077,9 @@ class Packetery extends CarrierModule
             'actionPacketeryOrderGridListingResultsModifier',
             'actionValidateStepComplete',
             'actionPacketeryCarrierGridListingResultsModifier',
+            'actionProductUpdate',
+            'displayAdminProductsExtra',
+            'actionProductDelete',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -1452,5 +1455,101 @@ class Packetery extends CarrierModule
     public function getContext()
     {
         return $this->context;
+    }
+
+    /**
+     * Shows Packetery form in BO product detail
+     * @param array $params Hook parameter
+     * @return false|string|void
+     * @throws Packetery\Exceptions\DatabaseException
+     * @throws ReflectionException
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public function hookDisplayAdminProductsExtra(array $params)
+    {
+        $isPrestaShop16 = Tools::version_compare(_PS_VERSION_, '1.7.0', '<');
+        //Do not use $params to get id_product, prestashop 1.6 doesn't have it.
+        if ($isPrestaShop16) {
+            $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
+        } else {
+            $idProduct = (int)$params['id_product'];
+        }
+
+        $product = new Product($idProduct);
+
+        if (Validate::isLoadedObject($product) === false || $product->is_virtual) {
+            return;
+        }
+
+        /** @var Packetery\Product\ProductAttributeRepository $productAttribute */
+        $productAttribute = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        $packeteryAgeVerification = $productAttribute->getRow($product->id);
+
+        $this->context->smarty->assign([
+                'packeteryAgeVerification' => $packeteryAgeVerification['is_adult'],
+                'adminProductUrl' => $this->context->link->getAdminLink('AdminProducts'),
+                'isPrestaShop16' => $isPrestaShop16,
+        ]);
+
+        return $this->display(__FILE__, 'display_admin_product_extra.tpl');
+
+    }
+
+    /**
+     * Shows Packetery form in BO product detail
+     * @param array $params product information
+     * @return void
+     * @throws \Packetery\Exceptions\DatabaseException|ReflectionException
+     */
+    public function hookActionProductUpdate(array $params)
+    {
+        if (Tools::getIsset('packetery_product_extra_hook') === false || Validate::isLoadedObject($params['product']) === false) {
+            return;
+        }
+        $product = $params['product'];
+
+        $isAdult = (int)Tools::getIsset('packetery_age_verification');
+
+        /** @var Packetery\Product\ProductAttributeRepository $dbTools */
+        $productAttribute = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+
+        $productAttributeInfo = $productAttribute->getRow($product->id);
+
+        if ($productAttributeInfo) {
+
+            $data = [
+                'is_adult' => $isAdult,
+            ];
+            $productAttribute->update($product->id, $data);
+
+        } else {
+
+            $data = [
+                'id_product' => $product->id,
+                'is_adult' => $isAdult,
+            ];
+            $productAttribute->insert($data);
+
+        }
+    }
+
+    /**
+     * Shows Packetery form in BO product detail
+     * @param array $params product information
+     * @return bool
+     * @throws \Packetery\Exceptions\DatabaseException|ReflectionException
+     */
+    public function hookActionProductDelete(array $params)
+    {
+        if (Validate::isLoadedObject($params['product']) === false) {
+            return;
+        }
+
+        /** @var Packetery\Product\ProductAttributeRepository $dbTools */
+        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        if ($productAttributeRepository->delete($params['product']->id)) {
+			return;
+        }
     }
 }

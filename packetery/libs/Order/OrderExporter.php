@@ -102,6 +102,7 @@ class OrderExporter
         $number = (string)(Packetery::ID_PREF_REF === ConfigHelper::get('PACKETERY_ID_PREFERENCE') ? $order->reference : $order->id);
         $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
         $customer = $order->getCustomer();
+
         $data = [
             'number' => $number,
             'currency' => $targetCurrency,
@@ -118,6 +119,7 @@ class OrderExporter
             'company' => $customer->company,
             'phone' => $phone,
             'email' => $customer->email,
+            'adultContent' => $orderRepository->isOrderAdult($order->id),
         ];
 
         if ($packeteryOrder['is_ad']) {
