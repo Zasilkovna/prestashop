@@ -1140,7 +1140,7 @@ class Packetery extends CarrierModule
      * @param array $params
      * @return string|void
      * @throws ReflectionException
-     * @throws Packetery\Exceptions\DatabaseException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function hookDisplayOrderDetail($params)
     {
@@ -1468,8 +1468,14 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayAdminProductsExtra(array $params)
     {
+        $isPrestaShop16 = Tools::version_compare(_PS_VERSION_, '1.7.0', '<');
         //Do not use $params to get id_product, prestashop 1.6 doesn't have it.
-        $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
+        if ($isPrestaShop16) {
+            $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
+        } else {
+            $idProduct = (int)$params['id_product'];
+        }
+
         $product = new Product($idProduct);
 
         if (Validate::isLoadedObject($product) === false || $product->is_virtual) {
@@ -1478,12 +1484,13 @@ class Packetery extends CarrierModule
 
         /** @var Packetery\Product\ProductAttributeRepository $productAttribute */
         $productAttribute = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        $packeteryAgeVerification = $productAttribute->getRow($product->id);
 
-        $this->context->smarty->assign(array(
-                'packeteryAgeVerification' => $productAttribute->getValue($product->id, 'is_adult'),
+        $this->context->smarty->assign([
+                'packeteryAgeVerification' => $packeteryAgeVerification['is_adult'],
                 'adminProductUrl' => $this->context->link->getAdminLink('AdminProducts'),
-                'isPrestaShop16' => Tools::version_compare(_PS_VERSION_, '1.7.0', '<');
-        ));
+                'isPrestaShop16' => $isPrestaShop16,
+        ]);
 
         return $this->display(__FILE__, 'display_admin_product_extra.tpl');
 
@@ -1507,9 +1514,9 @@ class Packetery extends CarrierModule
         /** @var Packetery\Product\ProductAttributeRepository $dbTools */
         $productAttribute = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
 
-        $productAttributeInfo = $productAttribute->getValue($product->id, 'id_product');
+        $productAttributeInfo = $productAttribute->getRow($product->id);
 
-        if ($productAttributeInfo) {
+        if ($productAttributeInfo['id_product']) {
 
             $data = [
                 'is_adult' => $isAdult,

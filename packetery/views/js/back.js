@@ -79,18 +79,16 @@ setTimeout(function() {
     disableTabByProductType(product_type);
 
     $('[name="type_product"]').on('change', function(){
-        var actualPrudoctType = $('[name="type_product"]:checked').val();
-        disableTabByProductType(actualPrudoctType);
+        var actualProductType  = parseInt($('[name="type_product"]:checked').val());
+        disableTabByProductType(actualProductType);
     });
 
 }, 500);
 
-function disableTabByProductType(actualPrudoctType) {
-    if (actualPrudoctType == 0) {
-        $('#link-ModulePacketery').show();
-    } else if (actualPrudoctType == 1) {
-        $('#link-ModulePacketery').show();
-    } else {
+function disableTabByProductType(actualProductType) {
+    if (actualProductType === 2) {
         $('#link-ModulePacketery').hide();
+    } else {
+        $('#link-ModulePacketery').show();
     }
 }

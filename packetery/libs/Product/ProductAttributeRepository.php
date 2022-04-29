@@ -43,24 +43,6 @@ class ProductAttributeRepository
     }
 
     /**
-     * @param int $idProduct
-     * @param string $value
-     * @return string|false
-     * @throws DatabaseException
-     */
-    public function getValue($idProduct, $value)
-    {
-        $getValue = $this->dbTools->getValue(
-            'SELECT '.pSQL($value).' FROM ' . $this->getPrefixedTableName() . ' WHERE `id_product` = ' . $idProduct
-        );
-
-        if (is_string($getValue)) {
-            return $getValue;
-        }
-        return false;
-    }
-
-    /**
      * @param array $data
      * @return bool
      * @throws DatabaseException
