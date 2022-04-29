@@ -96,3 +96,4 @@
       - Updated: Widget HD library URL
       - Added: possibility to delete PDF labels via CRON and customize deletion results with GET params (file age/number of deleted files at once)
       - Added: ID verification request for adult products upon delivery
+      - Added: Packetery/Core API layer
