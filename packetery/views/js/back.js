@@ -74,6 +74,13 @@ $(document).ready(function(){
 				} else {
 					html += '<td class="center"> <i class="icon-remove status"></i>  </td>';
 				}
+
+				if (orders[i].address_validated === true) {
+					html += '<td class="center"> <i class="icon-check status"></i>  </td>';
+				} else {
+					html += '<td class="center"> <i class="icon-remove status"></i>  </td>';
+				}
+
 				if (orders[i].exported == '1') {
 					html += '<td class="center"> <i class="icon-check status"></i>  </td>';
 				} else {
