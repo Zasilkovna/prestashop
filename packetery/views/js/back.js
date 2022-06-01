@@ -13,6 +13,7 @@ $(document).ready(function () {
         var widgetHdOptions = {
             layout: 'hd',
             carrierId: widgetHdOptionsData['carrierId'],
+            appIdentity: widgetHdOptionsData['app_identity'],
             country: widgetHdOptionsData['country'],
             language: widgetHdOptionsData['language'],
             street: widgetHdOptionsData['street'],
