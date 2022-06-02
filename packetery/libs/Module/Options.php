@@ -33,9 +33,10 @@ class Options
         switch ($id) {
             case 'PACKETERY_APIPASS':
                 if (Validate::isString($value)) {
-                    if (Tools::strlen($value) !== 32) {
-                        return $this->module->l('Api password is wrong.', 'options');
-                    }
+                    if (!$this->isApiKeyValid($value)) {
+                    return $this->module->l('Api password is wrong.', 'options');
+                }
+
                     return false;
                 }
                 return $this->module->l('Api password must be string', 'options');
@@ -77,4 +78,21 @@ class Options
                 return $value;
         }
     }
+
+    /**
+     * @param string $apiKey
+     * @return bool
+     */
+    public function isApiKeyValid(string $apiKeyPass)
+    {
+        if (Tools::strlen($apiKeyPass) < 32) {
+            return false;
+        }
+        $apiKey = substr($apiKeyPass, 0, 16);
+
+        $test = "http://www.zasilkovna.cz/api/$apiKey/test";
+
+        return (Tools::file_get_contents($test) == 1);
+    }
+
 }

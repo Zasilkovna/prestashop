@@ -182,20 +182,9 @@ class Packetery extends CarrierModule
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $key = $configHelper->getApiKey();
-        if (Tools::strlen($key) < 5) {
-            $key = false;
-        }
-        $test = "http://www.zasilkovna.cz/api/$key/test";
-        if (!$key) {
+        if (Tools::strlen($key) < 32) {
             $error[] = $this->l('Packeta API password is not set.');
             $have_error = true;
-        } elseif (!$error) {
-            if (Tools::file_get_contents($test) != 1) {
-                $error[] = $this->l(
-                    'Cannot access Packeta API with specified password. Possibly the API password is wrong.'
-                );
-                $have_error = true;
-            }
         }
 
         return $have_error;
