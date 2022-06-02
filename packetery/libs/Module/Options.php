@@ -32,14 +32,11 @@ class Options
     {
         switch ($id) {
             case 'PACKETERY_APIPASS':
-                if (Validate::isString($value)) {
-                    if (!$this->isApiKeyValid($value)) {
+                if (!$this->isApiKeyValid($value)) {
                     return $this->module->l('Api password is wrong.', 'options');
                 }
 
-                    return false;
-                }
-                return $this->module->l('Api password must be string', 'options');
+                return false;
             case 'PACKETERY_ESHOP_ID':
                 try {
                     $this->soapApi->senderGetReturnRouting($value);
@@ -85,7 +82,7 @@ class Options
      */
     public function isApiKeyValid(string $apiKeyPass)
     {
-        if (Tools::strlen($apiKeyPass) < 32) {
+        if (Tools::strlen($apiKeyPass) !== 32) {
             return false;
         }
         $apiKey = substr($apiKeyPass, 0, 16);
