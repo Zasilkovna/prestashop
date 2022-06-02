@@ -13,7 +13,7 @@ $(document).ready(function () {
         var widgetHdOptions = {
             layout: 'hd',
             carrierId: widgetHdOptionsData['carrierId'],
-            appIdentity: widgetHdOptionsData['app_identity'],
+            appIdentity: widgetHdOptionsData['appIdentity'],
             country: widgetHdOptionsData['country'],
             language: widgetHdOptionsData['language'],
             street: widgetHdOptionsData['street'],
@@ -47,7 +47,7 @@ $(document).ready(function () {
 
         var widgetOptionsData = $widgetButton.data('widget-options');
         var widgetOptions = {
-            appIdentity: widgetOptionsData['app_identity'],
+            appIdentity: widgetOptionsData['appIdentity'],
             country: widgetOptionsData['country'],
             language: widgetOptionsData['lang']
         };
