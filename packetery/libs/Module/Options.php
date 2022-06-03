@@ -29,17 +29,17 @@ class Options
     }
 
     /**
-     * @param Packetery $module
      * @param string $id from POST
      * @param string $value from POST
      * @return false|string false on success, error message on failure
-     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\ApiClientException
+     * @throws \ReflectionException
      */
     public function validate($id, $value)
     {
         switch ($id) {
             case 'PACKETERY_APIPASS':
-                if (!$this->isApiKeyValid($value)) {
+                if (!$this->isApiPasswordValid($value)) {
                     return $this->module->l('Api password is wrong.', 'options');
                 }
 
@@ -84,32 +84,23 @@ class Options
     }
 
     /**
-     * @param string $apiKeyPass
+     * @param string $apiPassword
      * @return bool
+     * @throws \ReflectionException
+     * @throws \Packetery\Exceptions\ApiClientException
      */
-    public function isApiKeyValid($apiKeyPass)
+    public function isApiPasswordValid($apiPassword)
     {
-        if (\Tools::strlen($apiKeyPass) !== 32) {
+        if (\Tools::strlen($apiPassword) !== 32) {
             return false;
         }
-        $apiKey = ConfigHelper::getApiKeyFromApiPass($apiKeyPass);
-
+        $apiKey = ConfigHelper::getApiKeyFromApiPass($apiPassword);
         $url = sprintf(self::PACKETA_API_KEY_TEST_URI, $apiKey);
 
-        if (class_exists('GuzzleHttp\Client')) {
-            $client = new Client();
-            try {
-                /** @var Response $result */
-                $result = $client->get($url);
-            } catch (TransferException $exception) {
-                throw new DownloadException($exception->getMessage());
-            }
-            $body = $result->getBody();
+        /** @var \Packetery\Module\ApiClientFacade $client */
+        $client = $this->module->diContainer->get(ApiClientFacade::class);
 
-            return (isset($body) && $body->getContents() == 1);
-        }
-
-        return (\Tools::file_get_contents($test, false, null, 30, true) == 1);
+        return $client->get($url) === '1';
     }
-
 }
+
