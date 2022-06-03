@@ -29,6 +29,8 @@ class ApiClientFacade
             if (isset($body)) {
                 return $body->getContents();
             }
+
+            return '';
         }
 
         return \Tools::file_get_contents($url, false, null, 30, true);
