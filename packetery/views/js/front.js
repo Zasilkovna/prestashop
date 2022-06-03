@@ -345,7 +345,8 @@ PacketaModule.ui = {
                 language: language,
                 country: country,
                 // in this case, there will always be one carrier
-                carrierId: widgetCarriers
+                carrierId: widgetCarriers,
+                appIdentity: PacketaModule.config.appIdentity
             };
             if (customerStreet) {
                 widgetOptions.street = customerStreet;

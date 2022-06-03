@@ -912,6 +912,7 @@ class Packetery extends CarrierModule
             'country' => strtolower($packeteryOrder['ps_country']),
             'language' => $configHelper->getBackendLanguage(),
             'carrierId' => $packeteryOrder['id_branch'],
+            'appIdentity' => $this->getAppIdentity(),
         ];
         if (\Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
             $widgetOptions['street'] = $packeteryOrder['street'];
@@ -943,7 +944,7 @@ class Packetery extends CarrierModule
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $widgetOptions = [
             'api_key' => $apiKey,
-            'app_identity' => $this->getAppIdentity(),
+            'appIdentity' => $this->getAppIdentity(),
             'country' => strtolower($packeteryOrder['country']),
             'module_dir' => _MODULE_DIR_,
             'lang' => $configHelper->getBackendLanguage(),
