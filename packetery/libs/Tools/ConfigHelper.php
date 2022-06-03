@@ -103,15 +103,6 @@ class ConfigHelper
     }
 
     /**
-     * @return string|false
-     */
-    public function getBackendLanguage()
-    {
-        $employee = Context::getContext()->employee;
-        return Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT'));
-    }
-
-    /**
      * @param string $apiPass
      * @return false|string
      */
@@ -119,4 +110,14 @@ class ConfigHelper
     {
         return substr($apiPass, 0, 16);
     }
+
+    /**
+     * @return string|false
+     */
+    public function getBackendLanguage()
+    {
+        $employee = Context::getContext()->employee;
+        return Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT'));
+    }
 }
+
