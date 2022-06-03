@@ -3,10 +3,15 @@
 namespace Packetery\Module;
 
 use Packetery;
+use Packetery\Exceptions\DownloadException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use ReflectionException;
 use Tools;
 use Validate;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Message\Response;
+use Packetery\Tools\ConfigHelper;
 
 class Options
 {
@@ -14,6 +19,8 @@ class Options
     private $module;
     /** @var SoapApi */
     private $soapApi;
+
+    const PACKETA_API_KEY_TEST_URI = 'http://www.zasilkovna.cz/api/%s/test';
 
     public function __construct(Packetery $module, SoapApi $soapApi)
     {
@@ -77,19 +84,32 @@ class Options
     }
 
     /**
-     * @param string $apiKey
+     * @param string $apiKeyPass
      * @return bool
      */
-    public function isApiKeyValid(string $apiKeyPass)
+    public function isApiKeyValid($apiKeyPass)
     {
-        if (Tools::strlen($apiKeyPass) !== 32) {
+        if (\Tools::strlen($apiKeyPass) !== 32) {
             return false;
         }
-        $apiKey = substr($apiKeyPass, 0, 16);
+        $apiKey = ConfigHelper::getApiKeyFromApiPass($apiKeyPass);
 
-        $test = "http://www.zasilkovna.cz/api/$apiKey/test";
+        $url = sprintf(self::PACKETA_API_KEY_TEST_URI, $apiKey);
 
-        return (Tools::file_get_contents($test) == 1);
+        if (class_exists('GuzzleHttp\Client')) {
+            $client = new Client();
+            try {
+                /** @var Response $result */
+                $result = $client->get($url);
+            } catch (TransferException $exception) {
+                throw new DownloadException($exception->getMessage());
+            }
+            $body = $result->getBody();
+
+            return (isset($body) && $body->getContents() == 1);
+        }
+
+        return (\Tools::file_get_contents($test, false, null, 30, true) == 1);
     }
 
 }

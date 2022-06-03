@@ -99,7 +99,7 @@ class ConfigHelper
             return false;
         }
 
-        return substr($apiPass, 0, 16);
+        return self::getApiKeyFromApiPass($apiPass);
     }
 
     /**
@@ -111,4 +111,12 @@ class ConfigHelper
         return Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT'));
     }
 
+    /**
+     * @param string $apiPass
+     * @return false|string
+     */
+    public static function getApiKeyFromApiPass($apiPass)
+    {
+        return substr($apiPass, 0, 16);
+    }
 }
