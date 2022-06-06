@@ -3,10 +3,15 @@
 namespace Packetery\Module;
 
 use Packetery;
+use Packetery\Exceptions\DownloadException;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use ReflectionException;
 use Tools;
 use Validate;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Message\Response;
+use Packetery\Tools\ConfigHelper;
 
 class Options
 {
@@ -15,6 +20,8 @@ class Options
     /** @var SoapApi */
     private $soapApi;
 
+    const PACKETA_API_KEY_TEST_URI = 'http://www.zasilkovna.cz/api/%s/test';
+
     public function __construct(Packetery $module, SoapApi $soapApi)
     {
         $this->module = $module;
@@ -22,23 +29,21 @@ class Options
     }
 
     /**
-     * @param Packetery $module
      * @param string $id from POST
      * @param string $value from POST
      * @return false|string false on success, error message on failure
-     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\ApiClientException
+     * @throws \ReflectionException
      */
     public function validate($id, $value)
     {
         switch ($id) {
             case 'PACKETERY_APIPASS':
-                if (Validate::isString($value)) {
-                    if (Tools::strlen($value) !== 32) {
-                        return $this->module->l('Api password is wrong.', 'options');
-                    }
-                    return false;
+                if (!$this->isApiPasswordValid($value)) {
+                    return $this->module->l('Api password is wrong.', 'options');
                 }
-                return $this->module->l('Api password must be string', 'options');
+
+                return false;
             case 'PACKETERY_ESHOP_ID':
                 try {
                     $this->soapApi->senderGetReturnRouting($value);
@@ -77,4 +82,25 @@ class Options
                 return $value;
         }
     }
+
+    /**
+     * @param string $apiPassword
+     * @return bool
+     * @throws \ReflectionException
+     * @throws \Packetery\Exceptions\ApiClientException
+     */
+    public function isApiPasswordValid($apiPassword)
+    {
+        if (\Tools::strlen($apiPassword) !== 32) {
+            return false;
+        }
+        $apiKey = ConfigHelper::getApiKeyFromApiPass($apiPassword);
+        $url = sprintf(self::PACKETA_API_KEY_TEST_URI, $apiKey);
+
+        /** @var \Packetery\Module\ApiClientFacade $client */
+        $client = $this->module->diContainer->get(ApiClientFacade::class);
+
+        return $client->get($url) === '1';
+    }
 }
+
