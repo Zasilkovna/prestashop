@@ -597,9 +597,13 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayHeader()
     {
-        $js = [
-            'front.js?v=' . $this->version,
-        ];
+        $server = 'local';
+        $frontJsPath = 'front.js';
+        if (!Configuration::get('PS_JS_THEME_CACHE')) {
+            $frontJsPath .= '?v=' . $this->version;
+            $server = 'remote';
+        }
+        $js = [$frontJsPath];
 
         $iterator = new GlobIterator(__DIR__ . '/views/js/checkout-modules/*.js', FilesystemIterator::CURRENT_AS_FILEINFO);
         foreach($iterator as $entry) {
@@ -607,12 +611,18 @@ class Packetery extends CarrierModule
         }
 
         foreach ($js as $file) {
-//            $this->context->controller->addJS($this->_path . 'views/js/' . $file);
             $uri = $this->_path . 'views/js/' . $file;
-            $this->context->controller->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
+            $this->context->controller->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => $server, 'attribute' => '']);
         }
 
-        $this->context->controller->registerStylesheet('packetery-front', $this->_path . 'views/css/front.css?v=' . $this->version, ['server' => 'remote']);
+        $server = 'local';
+        $cssPath = $this->_path . 'views/css/front.css';
+        if (!Configuration::get('PS_CSS_THEME_CACHE')) {
+            $cssPath .= '?v=' . $this->version;
+            $server = 'remote';
+        }
+
+        $this->context->controller->registerStylesheet('packetery-front', $cssPath, ['server' => $server, 'media' => 'all']);
     }
 
     /*ORDERS*/
