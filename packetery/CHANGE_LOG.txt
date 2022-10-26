@@ -1,4 +1,6 @@
 2.1.17 - Updated: sk "Is COD" translation update
+       - Removed: displaying widget button right after shipping method change
+       - Updated: increased delay for backup widget button displaying mechanism
 2.1.16 - Fixed: Correct loading of Packeta order list in case of paging
 2.1.15 - Added: support for Packeta address validation widget in the cart with 'none', 'optional' and 'required'
          modes of operation. Validated address is saved and used in exports.

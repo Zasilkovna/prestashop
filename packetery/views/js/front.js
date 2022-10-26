@@ -305,8 +305,6 @@ tools = {
                 prestashop_carrier_id = packeteryModulesManager.getCarrierId($this),
                 $extra = packeteryModulesManager.getWidgetParent($this);
 
-            $extra.closest(module.getExtraContentSelector()).show();
-
             // if selected carrier has no Packeta widget then enable Continue button and we're done here
             if (!$extra.find('#open-packeta-widget').length && !$extra.find('#open-packeta-widget-hd').length) {
                 module.enableSubmitButton();
@@ -320,7 +318,7 @@ tools = {
                     if ($wrapper.is(':hidden')) {
                         $wrapper.show();
                     }
-                }, 500);
+                }, 700);
             }
 
             if ($extra.find('#open-packeta-widget').length) {
