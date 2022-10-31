@@ -40,6 +40,9 @@ require_once __DIR__ . '/autoload.php';
 
 class Packetery extends CarrierModule
 {
+    const LOCAL = 'local';
+    const REMOTE = 'remote';
+
     protected $config_form = false;
 
     /** @var PaymentRepository */
@@ -597,22 +600,38 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayHeader()
     {
-        $js = [
-            'front.js?v=' . $this->version,
+        $jsList = [
+            'front.js',
         ];
-
         $iterator = new GlobIterator(__DIR__ . '/views/js/checkout-modules/*.js', FilesystemIterator::CURRENT_AS_FILEINFO);
-        foreach($iterator as $entry) {
-            $js[] = 'checkout-modules/' . $entry->getBasename();
+        foreach ($iterator as $entry) {
+            $jsList[] = 'checkout-modules/' . $entry->getBasename();
         }
 
-        foreach ($js as $file) {
-//            $this->context->controller->addJS($this->_path . 'views/js/' . $file);
+        $jsServer = self::LOCAL;
+        if (!Configuration::get('PS_JS_THEME_CACHE')) {
+            $jsServer = self::REMOTE;
+            $jsListFinal = [];
+            foreach ($jsList as $relativePath) {
+                $jsListFinal[] = $relativePath . '?v=' . $this->version;
+            }
+        } else {
+            $jsListFinal = $jsList;
+        }
+
+        foreach ($jsListFinal as $file) {
             $uri = $this->_path . 'views/js/' . $file;
-            $this->context->controller->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => 'remote']);
+            $this->context->controller->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => $jsServer, 'attribute' => '']);
         }
 
-        $this->context->controller->registerStylesheet('packetery-front', $this->_path . 'views/css/front.css?v=' . $this->version, ['server' => 'remote']);
+        $cssServer = self::LOCAL;
+        $cssPath = $this->_path . 'views/css/front.css';
+        if (!Configuration::get('PS_CSS_THEME_CACHE')) {
+            $cssPath .= '?v=' . $this->version;
+            $cssServer = self::REMOTE;
+        }
+
+        $this->context->controller->registerStylesheet('packetery-front', $cssPath, ['server' => $cssServer, 'media' => 'all']);
     }
 
     /*ORDERS*/
