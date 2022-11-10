@@ -800,7 +800,7 @@ $(document).ready(function(){
 $(document).ready(function () {
 	var $widgetHdButton = $('.open-packeta-hd-widget');
 	if ($widgetHdButton.length === 1) {
-		$.getScript('https://hd.widget.packeta.com/www/js/library.js').fail(function () {
+		$.getScript('https://widget.packeta.com/v6/www/js/library.js').fail(function () {
 			console.error('Unable to load Packeta home delivery widget.');
 		});
 
