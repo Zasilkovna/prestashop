@@ -4,10 +4,6 @@ $.getScript("https://widget.packeta.com/v6/www/js/library.js")
         console.error('Unable to load Packeta Widget.');
     });
 
-$.getScript('https://hd.widget.packeta.com/www/js/library-hd.js').fail(function () {
-    console.error('Unable to load Packeta home delivery widget.');
-});
-
 var country = 'cz,sk'; /* Default countries */
 
 function PacketeryCheckoutModulesManager() {
@@ -193,7 +189,7 @@ window.initializePacketaWidget = function ()
         if (customerZip) {
             widgetOptions.postCode = customerZip;
         }
-        PacketaHD.Widget.pick(packetaApiKey, function (result) {
+        Packeta.Widget.pick(packetaApiKey, function (result) {
             var $selectedDeliveryOption = module.getSelectedInput();
             $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
 

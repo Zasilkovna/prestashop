@@ -800,7 +800,7 @@ $(document).ready(function(){
 $(document).ready(function () {
 	var $widgetHdButton = $('.open-packeta-hd-widget');
 	if ($widgetHdButton.length === 1) {
-		$.getScript('https://hd.widget.packeta.com/www/js/library-hd.js').fail(function () {
+		$.getScript('https://hd.widget.packeta.com/www/js/library.js').fail(function () {
 			console.error('Unable to load Packeta home delivery widget.');
 		});
 
@@ -821,7 +821,7 @@ $(document).ready(function () {
 		};
 		$widgetHdButton.on('click', function (event) {
 			event.preventDefault();
-			PacketaHD.Widget.pick(widgetHdOptionsData['apiKey'], function (result) {
+			Packeta.Widget.pick(widgetHdOptionsData['apiKey'], function (result) {
 				if (result !== null && result.address !== null) {
 					var address = result.address;
 					$('.packetery form input[name="address"]').val(JSON.stringify(address));
