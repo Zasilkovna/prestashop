@@ -23,7 +23,7 @@ $(document).ready(function () {
         };
         $widgetHdButton.on('click', function (event) {
             event.preventDefault();
-            PacketaHD.Widget.pick(widgetHdOptionsData['apiKey'], function (result) {
+            Packeta.Widget.pick(widgetHdOptionsData['apiKey'], function (result) {
                 if (result !== null && result.address !== null) {
                     var address = result.address;
                     $('.packetery form input[name="address"]').val(JSON.stringify(address));

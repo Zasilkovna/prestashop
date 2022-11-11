@@ -359,7 +359,7 @@ PacketaModule.ui = {
             if (customerZip) {
                 widgetOptions.postCode = customerZip;
             }
-            PacketaHD.Widget.pick(PacketaModule.config.apiKey, function (result) {
+            Packeta.Widget.pick(PacketaModule.config.apiKey, function (result) {
                 if (result != null && result.address != null) {
                     // there is also property packetaWidgetMessage which is true
                     var address = result.address;
