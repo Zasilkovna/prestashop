@@ -14,7 +14,6 @@ PacketaModule.runner = {
         // non-blocking AJAX loading, speeds up page load
         var dependencies = [];
         dependencies.push($.getScript('https://widget.packeta.com/v6/www/js/library.js'));
-        dependencies.push($.getScript('https://hd.widget.packeta.com/www/js/library-hd.js'));
 
         $.when.apply(null, dependencies).done(function () {
             PacketaModule.runner.onWidgetLoad();
@@ -360,7 +359,7 @@ PacketaModule.ui = {
             if (customerZip) {
                 widgetOptions.postCode = customerZip;
             }
-            PacketaHD.Widget.pick(PacketaModule.config.apiKey, function (result) {
+            Packeta.Widget.pick(PacketaModule.config.apiKey, function (result) {
                 if (result != null && result.address != null) {
                     // there is also property packetaWidgetMessage which is true
                     var address = result.address;
