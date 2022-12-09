@@ -4,6 +4,7 @@ global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{packetery}prestashop>packetery.api_5552dc553d496d4b06866ca45b890b4a'] = 'Najprv vyberte objednávky.';
 $_MODULE['<{packetery}prestashop>packetery.api_ffea7a72647ef53ba8cb26537a4bc2c0'] = 'Nepodarilo se načítať objednávku za účelom prípravy balíku.';
+$_MODULE['<{packetery}prestashop>packetery.api_4187014f98a93a8339a9ea26cf78f132'] = 'Nepodarilo sa nájsť menu výdajného miesta, objednávka';
 $_MODULE['<{packetery}prestashop>packetery.api_40580ead2944ee1f216ef9be35c18eb4'] = 'Nepodarilo se nájsť výmenný kurz medzi objednávkou a pobočkou. Objednávka';
 $_MODULE['<{packetery}prestashop>packetery.api_3593dc2dea08cf4567f70933c079f6a9'] = 'Zákazníkovi nie je pridelený žiaden e-mail.';
 $_MODULE['<{packetery}prestashop>packetery.api_e44acb63fc22a1c3f0c4f2aa511e8bb1'] = 'Nedá sa stiahnuť zoznam dopravcov. Chyba siete.';

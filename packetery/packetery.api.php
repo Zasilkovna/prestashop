@@ -230,11 +230,15 @@ class PacketeryApi
         $currency = new Currency($order->id_currency);
         $branch_currency_iso = $packetery_order['currency_branch'];
         $order_currency_iso = $currency->iso_code;
-        if ($order_currency_iso != $branch_currency_iso)
-        {
+        if ($branch_currency_iso === null) {
+            return array(
+                0,
+                $module->l('Can\'t find currency of pickup point, order', 'packetery.api') . ' - ' . $id_order,
+            );
+        }
+        if ($order_currency_iso != $branch_currency_iso) {
             $total = Packeteryclass::getRateTotal($order_currency_iso, $branch_currency_iso, $total);
-            if (!$total)
-            {
+            if ($total === 0) {
                 return array(
                     0,
                     $module->l('Can\'t find order currency rate between order and pickup point, order', 'packetery.api') . ' - ' . $id_order,
