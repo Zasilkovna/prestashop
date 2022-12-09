@@ -1431,7 +1431,7 @@ class Packetery extends CarrierModule
                 if ($carrier['name'] === '0') {
                     $carrier['name'] = \Packetery\Carrier\CarrierTools::getCarrierNameFromShopName();
                 }
-                [$carrierZones, $carrierCountries] = $carrierTools->getZonesAndCountries(
+                list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
                     $carrier['id_carrier']
                 );
                 $carrier['zones'] = implode(', ', array_column($carrierZones, 'name'));
