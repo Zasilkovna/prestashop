@@ -98,3 +98,5 @@
       - Added: ID verification request for adult products upon delivery
       - Added: Packetery/Core API layer
       - Updated: frontend JavaScript and CSS files registered in a way respecting CCC (Combine, Compress and Cache) setting
+      - Fixed: proper missing order currency rate handling
+      - Removed: loading currency rate from cnb.cz

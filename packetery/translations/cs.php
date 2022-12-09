@@ -89,6 +89,7 @@ $_MODULE['<{packetery}prestashop>deletelabels_c14077f78432a7944ec8c09566b5f25d']
 $_MODULE['<{packetery}prestashop>deletelabels_79500929219856f7162cea4f4d85d9b7'] = 'Nepodařilo se získat čas vytvoření některých štítků. Zkontrolujte souborová oprávnění.';
 $_MODULE['<{packetery}prestashop>deletelabels_60abf2c345b55a7ed556d3293ea5c70c'] = 'Nepodařilo se odstranit některé štítky. Zkontrolujte souborová oprávnění.';
 $_MODULE['<{packetery}prestashop>orderexporter_4988c308d36d231707ae7e2d1e8d06b2'] = 'Nepodařilo se načíst údaje potřebné pro exportování objednávky';
+$_MODULE['<{packetery}prestashop>orderexporter_4187014f98a93a8339a9ea26cf78f132'] = 'Nepodařilo se nalézt měnu výdejního místa, objednávka';
 $_MODULE['<{packetery}prestashop>orderexporter_40580ead2944ee1f216ef9be35c18eb4'] = 'Nepodařilo se nalézt směnný kurz mezi objednávkou a výdejním místem, objednávka';
 $_MODULE['<{packetery}prestashop>packetsubmitter_5552dc553d496d4b06866ca45b890b4a'] = 'Vyberte prosím nejdříve objednávky.';
 $_MODULE['<{packetery}prestashop>options_a8aadecdc79bcce492c6b27b78077b02'] = 'Nesprávné API heslo.';

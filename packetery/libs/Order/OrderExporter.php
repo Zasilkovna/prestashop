@@ -56,10 +56,18 @@ class OrderExporter
 
         $orderCurrency = new Currency($order->id_currency);
         $targetCurrency = $packeteryOrder['currency_branch'];
+        if ($targetCurrency === null) {
+            throw new ExportException(
+                $this->module->l(
+                    'Can\'t find currency of pickup point, order',
+                    'orderexporter'
+                ) . ' - ' . $order->id
+            );
+        }
         if ($orderCurrency->iso_code !== $targetCurrency) {
             $paymentRepository = $this->module->diContainer->get(PaymentRepository::class);
             $total = $paymentRepository->getRateTotal($orderCurrency->iso_code, $targetCurrency, $total);
-            if (!$total) {
+            if ($total === 0) {
                 throw new ExportException(
                     $this->module->l(
                         'Can\'t find order currency rate between order and pickup point, order',

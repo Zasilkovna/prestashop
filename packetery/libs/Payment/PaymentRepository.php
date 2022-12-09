@@ -119,48 +119,22 @@ class PaymentRepository
 
     /**
      * Converts price from order currency to branch currency
-     * @param string $order_currency_iso
-     * @param string $branch_currency_iso
+     * @param string $orderCurrencyIso
+     * @param string $branchCurrencyIso
      * @param float|int $total
      * @return float|int
      * @throws DatabaseException
      */
-    public function getRateTotal($order_currency_iso, $branch_currency_iso, $total)
-    {
-        $cnb_rates = null;
-        $conversion_rate_order = $this->orderRepository->getConversionRate($order_currency_iso);
-        $conversion_rate_branch = $this->orderRepository->getConversionRate($branch_currency_iso);
+    public function getRateTotal($orderCurrencyIso, $branchCurrencyIso, $total) {
+        $conversionRateOrder = $this->orderRepository->getConversionRate($orderCurrencyIso);
+        $conversionRateBranch = $this->orderRepository->getConversionRate($branchCurrencyIso);
 
-        if ($conversion_rate_branch) {
-            $conversion_rate = $conversion_rate_branch / $conversion_rate_order;
-            $total = round($conversion_rate * $total, 2);
-        } else {
-            if (!$cnb_rates) {
-                $data = @Tools::file_get_contents(
-                    'http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt'
-                );
-                if ($data) {
-                    $cnb_rates = array();
-                    foreach (array_slice(explode("\n", $data), 2) as $rate) {
-                        $rate = explode('|', $rate);
-                        if (!empty($rate[3])) {
-                            $cnb_rates[$rate[3]] = (float)preg_replace(
-                                '/[^0-9.]*/',
-                                '',
-                                str_replace(',', '.', $rate[4])
-                            );
-                        }
-                    }
-                    $cnb_rates['CZK'] = 1;
-                }
-            }
-            if (isset($cnb_rates[$order_currency_iso]) && ($cnb_rates)) {
-                $total = round($total * $cnb_rates[$order_currency_iso] / $cnb_rates[$branch_currency_iso], 2);
-            } else {
-                return 0;
-            }
+        if ($conversionRateBranch) {
+            $conversionRate = $conversionRateBranch / $conversionRateOrder;
+            return round($conversionRate * $total, 2);
         }
-        return $total;
+
+        return 0;
     }
 
     /**
