@@ -238,7 +238,7 @@ class PacketeryApi
         }
         if ($order_currency_iso != $branch_currency_iso) {
             $total = Packeteryclass::getRateTotal($order_currency_iso, $branch_currency_iso, $total);
-            if ($total === 0) {
+            if ($total === null) {
                 return array(
                     0,
                     $module->l('Can\'t find order currency rate between order and pickup point, order', 'packetery.api') . ' - ' . $id_order,

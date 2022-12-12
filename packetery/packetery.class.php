@@ -45,7 +45,7 @@ class Packeteryclass
      * @param string $orderCurrencyIso
      * @param string $branchCurrencyIso
      * @param float|int $total
-     * @return float|int Returns 0 if rate was not found.
+     * @return float|int|null Returns null if rate was not found.
      */
     public static function getRateTotal($orderCurrencyIso, $branchCurrencyIso, $total) {
         $sql = 'SELECT `cs`.`conversion_rate` FROM `' . _DB_PREFIX_ . 'currency_shop` `cs` 
@@ -63,7 +63,7 @@ class Packeteryclass
             return round($conversionRate * $total, 2);
         }
 
-        return 0;
+        return null;
     }
 
     /**
