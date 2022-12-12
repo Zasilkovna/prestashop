@@ -67,7 +67,7 @@ class OrderExporter
         if ($orderCurrency->iso_code !== $targetCurrency) {
             $paymentRepository = $this->module->diContainer->get(PaymentRepository::class);
             $total = $paymentRepository->getRateTotal($orderCurrency->iso_code, $targetCurrency, $total);
-            if ($total === 0) {
+            if ($total === null) {
                 throw new ExportException(
                     $this->module->l(
                         'Can\'t find order currency rate between order and pickup point, order',

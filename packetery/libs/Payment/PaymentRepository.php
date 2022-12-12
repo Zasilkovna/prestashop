@@ -122,7 +122,7 @@ class PaymentRepository
      * @param string $orderCurrencyIso
      * @param string $branchCurrencyIso
      * @param float|int $total
-     * @return float|int
+     * @return float|int|null Returns null if rate was not found.
      * @throws DatabaseException
      */
     public function getRateTotal($orderCurrencyIso, $branchCurrencyIso, $total) {
@@ -134,7 +134,7 @@ class PaymentRepository
             return round($conversionRate * $total, 2);
         }
 
-        return 0;
+        return null;
     }
 
     /**
