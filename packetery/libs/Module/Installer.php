@@ -58,26 +58,31 @@ class Installer
     public function insertMenuItems()
     {
         // https://devdocs.prestashop.com/1.7/modules/concepts/controllers/admin-controllers/tabs/#which-parent-to-choose
+        // first parameter in l method in translatedName cannot be string from variable and we must register the translation before adding tabs
         $menuConfig = [
             [
                 'parentClass' => 'SELL',
                 'class' => 'Packetery',
-                'name' => $this->module->l('Packeta', 'installer'),
+                'name' => 'Packeta',
+                'translatedName' => $this->module->l('Packeta', 'installer')
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketerySetting',
-                'name' => $this->module->l('Configuration', 'installer'),
+                'name' => 'Configuration',
+                'translatedName' => $this->module->l('Configuration', 'installer')
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryOrderGrid',
-                'name' => $this->module->l('Packeta Orders', 'installer'),
+                'name' => 'Packeta Orders',
+                'translatedName' => $this->module->l('Packeta Orders', 'installer')
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryCarrierGrid',
-                'name' => $this->module->l('Carrier settings', 'installer'),
+                'name' => 'Carrier settings',
+                'translatedName' => $this->module->l('Carrier settings', 'installer')
             ],
         ];
 
@@ -98,26 +103,17 @@ class Installer
     }
 
     /**
-     * @param string $field
+     * @param string $translationKey
+     * @param string $translationSource
      * @return array
      * @throws DatabaseException
      */
-    private function createMultiLangField($field)
+    private function createMultiLangField($translationKey, $translationSource)
     {
-        $langIds = [];
-        if (method_exists('Language', 'getIDs')) {
-            $langIds = Language::getIDs(true);
-        } else {
-            // old PrestaShop 1.6
-            $activeLanguages = $this->dbTools->getRows('SELECT `id_lang` FROM `' . _DB_PREFIX_ . 'lang` WHERE `active` = 1');
-            if ($activeLanguages) {
-                $langIds = array_column($activeLanguages, 'id_lang');
-            }
-        }
-
         $multiLangField = [];
-        foreach ($langIds as $langId) {
-            $multiLangField[$langId] = $field;
+        $languages = Language::getLanguages();
+        foreach ($languages as $language) {
+            $multiLangField[$language['id_lang']] = $this->module->l($translationKey, $translationSource, $language['language_code']);
         }
 
         return $multiLangField;
@@ -219,6 +215,7 @@ class Installer
      * @param string $parentClassName
      * @param string $className
      * @param string $name
+     * @param string $translatedName
      * @return bool
      * @throws PrestaShopException
      * @throws PrestaShopDatabaseException
@@ -235,7 +232,7 @@ class Installer
         $tab->id_parent = $parentId;
         $tab->module = 'packetery';
         $tab->class_name = $className;
-        $tab->name = $this->createMultiLangField($name);
+        $tab->name = $this->createMultiLangField($name, 'installer');
         $tab->position = Tab::getNewLastPosition($parentId);
         if ($parentClassName === 'SELL') {
             $tab->icon = 'local_shipping';
