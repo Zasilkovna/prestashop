@@ -113,7 +113,7 @@ class Installer
         $multiLangField = [];
         $languages = Language::getLanguages();
         foreach ($languages as $language) {
-            $multiLangField[$language['id_lang']] = $this->module->l($translationKey, $translationSource, $language['language_code']);
+            $multiLangField[$language['id_lang']] = $this->module->l($translationKey, $translationSource, $language['locale']);
         }
 
         return $multiLangField;
