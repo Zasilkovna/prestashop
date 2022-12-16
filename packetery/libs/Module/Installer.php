@@ -114,6 +114,7 @@ class Installer
         $multiLangField = [];
         $languages = Language::getLanguages();
         foreach ($languages as $language) {
+            //We check if we have translation for that language. l method never returns the original english string.
             $haveTranslation = in_array($language['iso_code'], self::TRANSLATED_LOCALES);
             $multiLangField[$language['id_lang']] = $haveTranslation ? $this->module->l($translationKey, 'installer', $language['language_code']) : $translationKey;
         }
