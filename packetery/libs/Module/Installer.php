@@ -20,7 +20,7 @@ class Installer
     /** @var DbTools */
     private $dbTools;
 
-    private const TRANSLATED_LOCALES = ['cs', 'sk'];
+    private const TRANSLATED_LANGUAGES = ['cs', 'sk'];
 
     /**
      * @param DbTools $dbTools
@@ -114,8 +114,8 @@ class Installer
         $multiLangField = [];
         $languages = Language::getLanguages();
         foreach ($languages as $language) {
-            //We check if we have translation for that language. l method never returns the original english string.
-            $haveTranslation = in_array($language['iso_code'], self::TRANSLATED_LOCALES);
+            // We check if we have translation for that language. l method never returns the original english string.
+            $haveTranslation = in_array($language['iso_code'], self::TRANSLATED_LANGUAGES);
             $multiLangField[$language['id_lang']] = $haveTranslation ? $this->module->l($translationKey, 'installer', $language['language_code']) : $translationKey;
         }
 
