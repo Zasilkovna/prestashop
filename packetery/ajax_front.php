@@ -32,9 +32,9 @@ $real_token = Tools::getToken('ajax_front');
 if ($token !== $real_token) {
     exit;
 }
-$module = Module::getInstanceByName('packetery');
 
-if($module === false) {
+$module = Module::getInstanceByName('packetery');
+if ($module === false) {
     exit;
 }
 
