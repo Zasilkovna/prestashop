@@ -115,6 +115,15 @@ class CarrierRepository
             WHERE `c`.`id_carrier` = ' . $carrierId);
     }
 
+    public function isPickupPointCarrier($branchId)
+    {
+        $result = $this->dbTools->getValue(
+            'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_carriers` WHERE is_pickup_points = 1 AND `id` = "' . $this->db->escape($branchId) . '"'
+        );
+
+        return ((int)$result === 1);
+    }
+
     /**
      * @param int $oldId
      * @param int $newId

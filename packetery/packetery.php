@@ -1291,6 +1291,13 @@ class Packetery extends CarrierModule
         $cart = $params['cart'];
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
+
+        if($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) && empty($params['request_params']['packeta-branch-id']) ) {
+            $this->context->controller->errors[] = $this->l('Please select pickup point.');
+            $params['completed'] = false;
+            return;
+        }
+
         if ($packeteryCarrier['address_validation'] !== 'required') {
             $params['completed'] = true;
             return;
