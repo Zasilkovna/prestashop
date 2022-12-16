@@ -106,17 +106,16 @@ class Installer
 
     /**
      * @param string $translationKey
-     * @param string $translationSource
      * @return array
      * @throws DatabaseException
      */
-    private function createMultiLangField($translationKey, $translationSource)
+    private function createMultiLangField($translationKey)
     {
         $multiLangField = [];
         $languages = Language::getLanguages();
         foreach ($languages as $language) {
             $haveTranslation = in_array($language['iso_code'], self::TRANSLATED_LOCALES);
-            $multiLangField[$language['id_lang']] = $haveTranslation ? $this->module->l($translationKey, $translationSource, $language['locale']) : $translationKey;
+            $multiLangField[$language['id_lang']] = $haveTranslation ? $this->module->l($translationKey, 'installer', $language['locale']) : $translationKey;
         }
 
         return $multiLangField;
@@ -218,7 +217,6 @@ class Installer
      * @param string $parentClassName
      * @param string $className
      * @param string $name
-     * @param string $translatedName
      * @return bool
      * @throws PrestaShopException
      * @throws PrestaShopDatabaseException
@@ -235,7 +233,7 @@ class Installer
         $tab->id_parent = $parentId;
         $tab->module = 'packetery';
         $tab->class_name = $className;
-        $tab->name = $this->createMultiLangField($name, 'installer');
+        $tab->name = $this->createMultiLangField($name);
         $tab->position = Tab::getNewLastPosition($parentId);
         if ($parentClassName === 'SELL') {
             $tab->icon = 'local_shipping';
