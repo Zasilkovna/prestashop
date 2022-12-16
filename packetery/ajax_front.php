@@ -25,7 +25,6 @@
 
 require_once dirname(__FILE__) . '/../../config/config.inc.php';
 require_once dirname(__FILE__) . '/../../init.php';
-require_once dirname(__FILE__) . '/packetery.php';
 
 // TODO: use Context::getContext()->customer->isLogged() instead?
 $token = Tools::getValue('token');
@@ -33,22 +32,24 @@ $real_token = Tools::getToken('ajax_front');
 if ($token !== $real_token) {
     exit;
 }
+$module = Module::getInstanceByName('packetery');
+
+if($module === false) {
+    exit;
+}
 
 switch (Tools::getValue('action')) {
     /*FRONT*/
     case 'savePickupPointInCart':
-        $module = new Packetery();
         $orderSaver = $module->diContainer->get(\Packetery\Order\OrderSaver::class);
         header('Content-Type: application/json');
         echo $orderSaver->savePickupPointInCartGetJson();
         break;
     case 'fetchExtraContent':
-        $module = new Packetery();
         $packeteryCart = $module->diContainer->get(\Packetery\Module\Cart::class);
         echo $packeteryCart->packeteryCreateExtraContent();
         break;
     case 'saveAddressInCart':
-        $module = new Packetery();
         $orderAjax = $module->diContainer->get(\Packetery\Order\Ajax::class);
         $orderAjax->saveAddressInCart();
         break;
