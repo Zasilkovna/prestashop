@@ -1079,6 +1079,8 @@ class Packetery extends CarrierModule
             'actionProductUpdate',
             'displayAdminProductsExtra',
             'actionProductDelete',
+            'actionCarrierProcess',
+            'displayPayment'
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -1270,6 +1272,28 @@ class Packetery extends CarrierModule
                 }
             }
         }
+    }
+
+    public function hookActionCarrierProcess($params)
+    {
+        /** @var CartCore $cart */
+        $cart = $params['cart'];
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
+
+        if($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) && !$orderRepository->isPickupPointChosenByCart($cart->id) ) {
+            $this->context->controller->errors[] = $this->l('Please select pickup point.');
+            return;
+        }
+    }
+
+    public function hookDisplayPayment($params)
+    {
+        $cart = $params;
+        $tt = 2+1;
+        return false;
     }
 
     /**
