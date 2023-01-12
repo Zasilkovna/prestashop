@@ -57,6 +57,10 @@ class OrderRepository
     }
 
     /**
+     * Tested versions:
+     * 1.6.0.6 - Db::ON_DUPLICATE_KEY missing
+     * 1.6.1.24 - ok
+     *
      * @param array $data
      */
     public function save($data)

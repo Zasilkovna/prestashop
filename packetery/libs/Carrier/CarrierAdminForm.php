@@ -24,6 +24,10 @@ class CarrierAdminForm
     }
 
     /**
+     * Tested versions:
+     * 1.6.0.6 - malformed form action
+     * 1.6.1.24 - ok
+     *
      * @throws \Packetery\Exceptions\DatabaseException
      * @throws \Exception
      */
