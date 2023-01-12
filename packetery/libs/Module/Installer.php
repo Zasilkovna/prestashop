@@ -20,6 +20,8 @@ class Installer
     /** @var DbTools */
     private $dbTools;
 
+    private const TRANSLATED_LANGUAGES = ['cs', 'sk'];
+
     /**
      * @param DbTools $dbTools
      */
@@ -58,26 +60,31 @@ class Installer
     public function insertMenuItems()
     {
         // https://devdocs.prestashop.com/1.7/modules/concepts/controllers/admin-controllers/tabs/#which-parent-to-choose
+        // first parameter in l method in translatedName cannot be string from variable and we must register the translation before adding tabs
         $menuConfig = [
             [
                 'parentClass' => 'SELL',
                 'class' => 'Packetery',
-                'name' => $this->module->l('Packeta', 'installer'),
+                'name' => 'Packeta',
+                'translatedName' => $this->module->l('Packeta', 'installer')
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketerySetting',
-                'name' => $this->module->l('Configuration', 'installer'),
+                'name' => 'Configuration',
+                'translatedName' => $this->module->l('Configuration', 'installer')
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryOrderGrid',
-                'name' => $this->module->l('Packeta Orders', 'installer'),
+                'name' => 'Packeta Orders',
+                'translatedName' => $this->module->l('Packeta Orders', 'installer')
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryCarrierGrid',
-                'name' => $this->module->l('Carrier settings', 'installer'),
+                'name' => 'Carrier settings',
+                'translatedName' => $this->module->l('Carrier settings', 'installer')
             ],
         ];
 
@@ -98,26 +105,18 @@ class Installer
     }
 
     /**
-     * @param string $field
+     * @param string $translationKey
      * @return array
      * @throws DatabaseException
      */
-    private function createMultiLangField($field)
+    private function createMultiLangField($translationKey)
     {
-        $langIds = [];
-        if (method_exists('Language', 'getIDs')) {
-            $langIds = Language::getIDs(true);
-        } else {
-            // old PrestaShop 1.6
-            $activeLanguages = $this->dbTools->getRows('SELECT `id_lang` FROM `' . _DB_PREFIX_ . 'lang` WHERE `active` = 1');
-            if ($activeLanguages) {
-                $langIds = array_column($activeLanguages, 'id_lang');
-            }
-        }
-
         $multiLangField = [];
-        foreach ($langIds as $langId) {
-            $multiLangField[$langId] = $field;
+        $languages = Language::getLanguages();
+        foreach ($languages as $language) {
+            // We check if we have translation for that language. l method never returns the original english string.
+            $haveTranslation = in_array($language['iso_code'], self::TRANSLATED_LANGUAGES);
+            $multiLangField[$language['id_lang']] = $haveTranslation ? $this->module->l($translationKey, 'installer', $language['language_code']) : $translationKey;
         }
 
         return $multiLangField;
