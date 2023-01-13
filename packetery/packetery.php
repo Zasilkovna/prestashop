@@ -1274,6 +1274,12 @@ class Packetery extends CarrierModule
         }
     }
 
+    /**
+     * @param $params
+     * @return void
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
+     */
     public function hookActionCarrierProcess($params)
     {
         /** @var CartCore $cart */
@@ -1287,13 +1293,6 @@ class Packetery extends CarrierModule
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
             return;
         }
-    }
-
-    public function hookDisplayPayment($params)
-    {
-        $cart = $params;
-        $tt = 2+1;
-        return false;
     }
 
     /**
