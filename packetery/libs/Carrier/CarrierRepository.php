@@ -116,7 +116,7 @@ class CarrierRepository
     }
 
     /**
-     * @param int $carrierId
+     * @param string $carrierId
      * @return bool
      * @throws DatabaseException
      */

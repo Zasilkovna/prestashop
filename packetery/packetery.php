@@ -1275,7 +1275,7 @@ class Packetery extends CarrierModule
 
     /**
      * Called in PS 1.6 after choosing the carrier
-     * @param $params
+     * @param array $params
      * @return void
      * @throws ReflectionException
      * @throws \Packetery\Exceptions\DatabaseException
@@ -1289,7 +1289,9 @@ class Packetery extends CarrierModule
 
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
 
-        if ($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) && !$orderRepository->isPickupPointChosenByCart($cart->id)) {
+        if ($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
+            !$orderRepository->isPickupPointChosenByCart($cart->id)
+        ) {
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
         }
     }
