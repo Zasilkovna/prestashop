@@ -1079,6 +1079,7 @@ class Packetery extends CarrierModule
             'actionProductUpdate',
             'displayAdminProductsExtra',
             'actionProductDelete',
+            'actionCarrierProcess',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -1273,6 +1274,29 @@ class Packetery extends CarrierModule
     }
 
     /**
+     * Called in PS 1.6 after choosing the carrier
+     * @param array $params
+     * @return void
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
+     */
+    public function hookActionCarrierProcess($params)
+    {
+        /** @var CartCore $cart */
+        $cart = $params['cart'];
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
+
+        if ($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
+            !$orderRepository->isPickupPointChosenByCart($cart->id)
+        ) {
+            $this->context->controller->errors[] = $this->l('Please select pickup point.');
+        }
+    }
+
+    /**
      * Is not called in SuperCheckout. Process all validations in addSupercheckoutOrderValidator.
      * @param array $params
      * @throws ReflectionException
@@ -1291,6 +1315,15 @@ class Packetery extends CarrierModule
         $cart = $params['cart'];
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
+
+        if ($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
+            empty($params['request_params']['packeta-branch-id'])
+        ) {
+            $this->context->controller->errors[] = $this->l('Please select pickup point.');
+            $params['completed'] = false;
+            return;
+        }
+
         if ($packeteryCarrier['address_validation'] !== 'required') {
             $params['completed'] = true;
             return;

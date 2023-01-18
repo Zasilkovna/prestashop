@@ -159,6 +159,17 @@ class OrderRepository
 
     /**
      * @param int $cartId
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function isPickupPointChosenByCart($cartId)
+    {
+        $result = $this->dbTools->getValue('SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . (int)$cartId . ' AND `name_branch` IS NOT NULL') === 1;
+        return ((int)$result === 1);
+    }
+
+    /**
+     * @param int $cartId
      * @param int $carrierId
      * @return array|bool|object|null
      * @throws DatabaseException
