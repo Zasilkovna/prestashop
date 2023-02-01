@@ -117,16 +117,6 @@ class CarrierAdminForm
         return '<div class="packetery">' . PHP_EOL . $helper->generateForm($form) . PHP_EOL . '</div>';
     }
 
-    public function getAllowedCountriesIsoCodesForCurrentCarrier() {
-        $allowedCountriesIds = Carrier::getDeliveredCountries($this->carrierId, true, true);
-        $allowedCountriesIsoCodes = array();
-        foreach ($allowedCountriesIds as $countryId) {
-            $country = new Country($countryId);
-            $allowedCountriesIsoCodes[] = $country->iso_code;
-        }
-        return $allowedCountriesIsoCodes;
-    }
-
     public function buildSecondStep()
     {
         $this->repository = $this->module->diContainer->get(CarrierRepository::class);
@@ -182,9 +172,10 @@ class CarrierAdminForm
 
         [$availableCarriers, $warning] = $this->getAvailableCarriers($apiCarrierRepository, $carrierData);
 
-        $countries = $this->getAllowedCountriesIsoCodesForCurrentCarrier();
+        $countries = $this->getCountriesForCarrier($carrierData['id_carrier']);
 
         $vendors = $this->vendors->getVendorsByCountries($countries);
+
 
         $helper = new HelperForm();
         $helper->show_cancel_button = true;
@@ -375,5 +366,15 @@ class CarrierAdminForm
         array_unshift($availableCarriers, ['id' => null, 'name' => '--']);
 
         return [$availableCarriers, $warning];
+    }
+
+    private function getCountriesForCarrier($idCarrier)
+    {
+        $carrierTools = $this->module->diContainer->get(CarrierTools::class);
+        [$carrierZones, $carrierCountries] = $carrierTools->getZonesAndCountries(
+            $idCarrier, 'iso_code'
+        );
+
+        return $carrierCountries;
     }
 }
