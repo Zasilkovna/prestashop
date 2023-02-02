@@ -56,31 +56,34 @@ class CarrierAdminForm
                 } else {
                     $pickupPointType = 'external';
                 }
-
             } else {
                 $pickupPointType = null;
             }
 
-            /*$this->repository->setPacketeryCarrier(
-                $this->carrierId,
-                $branchId,
-                $apiCarrier['name'],
-                $apiCarrier['currency'],
-                $pickupPointType,
-                Tools::getValue('is_cod'),
-                $addressValidation
-            );*/
-
+            if ((string)$branchId === '') {
+                $this->repository->deleteById($this->carrierId);
+            } else {
+                $this->repository->setPacketeryCarrier(
+                    $this->carrierId,
+                    $branchId,
+                    $apiCarrier['name'],
+                    $apiCarrier['currency'],
+                    $pickupPointType,
+                    false,
+                    null,
+                    null
+                );
+            }
 
             $messageManager->setMessage('info', $this->module->l('Carrier settings were saved.', 'carrieradminform'));
-            Tools::redirectAdmin($this->module->getContext()->link->getAdminLink('PacketeryCarrierGrid'));
+
         }
 
         if ($carrierData['name'] === '0') {
             $carrierData['name'] = CarrierTools::getCarrierNameFromShopName();
         }
 
-        [$availableCarriers, $warning] = $this->getAvailableCarriers($apiCarrierRepository, $carrierData);
+        list($availableCarriers, $warning) = $this->getAvailableCarriers($apiCarrierRepository, $carrierData);
 
         $helper = new HelperForm();
         $form = [
@@ -127,54 +130,53 @@ class CarrierAdminForm
         }
         $apiCarrierRepository = $this->module->diContainer->get(ApiCarrierRepository::class);
 
-        /*if (Tools::isSubmit('submitCarrierAdminFormSecondStep')) {
-            $branchId = Tools::getValue('id_branch');
-            $messageManager = $this->module->diContainer->get(MessageManager::class);
-            if ((string)$branchId === '') {
-                $this->repository->deleteById($this->carrierId);
+        $apiCarrier = $apiCarrierRepository->getById($carrierData['id_branch']);
+        if (!$apiCarrier) {
+            $this->error = $this->module->l('Failed to load Packeta carrier.', 'carrieradminform');
+            return;
+        }
+
+        if ($apiCarrier['is_pickup_points']) {
+            if ($carrierData['id_branch'] === Packetery::ZPOINT) {
+                $pickupPointType = 'internal';
             } else {
-                $apiCarrier = $apiCarrierRepository->getById($branchId);
-                if (!$apiCarrier) {
-                    $this->error = $this->module->l('Failed to load Packeta carrier.', 'carrieradminform');
-                    return;
-                }
-                $addressValidation = Tools::getValue('address_validation');
-                if ($apiCarrier['is_pickup_points']) {
-                    if ($branchId === Packetery::ZPOINT) {
-                        $pickupPointType = 'internal';
-                    } else {
-                        $pickupPointType = 'external';
-                    }
-                    if ($addressValidation !== 'none') {
-                        $messageManager->setMessage('warning', $this->module->l('Address validation setting is not applicable for pickup point carriers.', 'carrieradminform'));
-                    }
-                } else {
-                    $pickupPointType = null;
-                }
-                $this->repository->setPacketeryCarrier(
-                    $this->carrierId,
-                    $branchId,
-                    $apiCarrier['name'],
-                    $apiCarrier['currency'],
-                    $pickupPointType,
-                    Tools::getValue('is_cod'),
-                    $addressValidation
-                );
+                $pickupPointType = 'external';
             }
+        } else {
+            $pickupPointType = null;
+        }
+
+        $countries = $this->getCountriesForCarrier($carrierData['id_carrier']);
+        $vendors = $this->vendors->getVendorsByCountries($countries);
+
+        if (Tools::isSubmit('submitCarrierAdminFormSecondStep')) {
+            $messageManager = $this->module->diContainer->get(MessageManager::class);
+
+            $formData = Tools::getAllValues();
+            $allowedVendors = $this->getAllowedVendorsJsonFromForm($formData, $vendors);
+
+            $this->repository->setPacketeryCarrier(
+                $this->carrierId,
+                $carrierData['id_branch'],
+                $apiCarrier['name'],
+                $apiCarrier['currency'],
+                $pickupPointType,
+                Tools::getValue('is_cod'),
+                Tools::getValue('address_validation'),
+                $allowedVendors
+            );
+
 
             $messageManager->setMessage('info', $this->module->l('Carrier settings were saved.', 'carrieradminform'));
-            Tools::redirectAdmin($this->module->getContext()->link->getAdminLink('PacketeryCarrierGrid'));
-        }*/
+            Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
+        }
 
         if ($carrierData['name'] === '0') {
             $carrierData['name'] = CarrierTools::getCarrierNameFromShopName();
         }
 
-        [$availableCarriers, $warning] = $this->getAvailableCarriers($apiCarrierRepository, $carrierData);
+        list($availableCarriers, $warning) = $this->getAvailableCarriers($apiCarrierRepository, $carrierData);
 
-        $countries = $this->getCountriesForCarrier($carrierData['id_carrier']);
-
-        $vendors = $this->vendors->getVendorsByCountries($countries);
 
 
         $helper = new HelperForm();
@@ -183,79 +185,93 @@ class CarrierAdminForm
             [
                 'form' => [
                     'legend' => [
-                        'title' => $this->module->l('Edit carrier', 'carrieradminform') . ': ' . $carrierData['name'],
+                        'title' => $this->module->l('Edit carrier settings', 'carrieradminform'),
                         'icon' => 'icon-cogs'
-                    ],
-                    'input' => [
-                        [
-                            'type' => 'radio',
-                            'label' => $this->module->l('Validate address using widget?', 'carrieradminform'),
-                            'name' => 'address_validation',
-                            'desc' => $this->module->l('Applicable only in case of home delivery carrier.', 'carrieradminform'),
-                            'values' => [
-                                [
-                                    'id' => 'address_validation_0',
-                                    'value' => 'none',
-                                    'label' => $this->module->l('No', 'carrieradminform'),
-                                ],
-                                [
-                                    'id' => 'address_validation_1',
-                                    'value' => 'required',
-                                    'label' => $this->module->l('Yes', 'carrieradminform'),
-                                ],
-                                [
-                                    'id' => 'address_validation_2',
-                                    'value' => 'optional',
-                                    'label' => $this->module->l('Optionally', 'carrieradminform'),
-                                ],
-                            ]
-                        ],
-                        [
-                            'type' => 'radio',
-                            'label' => $this->module->l('Is COD?', 'carrieradminform'),
-                            'name' => 'is_cod',
-                            'required' => true,
-                            'desc' => $this->module->l('YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.', 'carrieradminform'),
-                            'values' => [
-                                [
-                                    'id' => 'is_cod_0',
-                                    'value' => 0,
-                                    'label' => $this->module->l('No', 'carrieradminform'),
-                                ],
-                                [
-                                    'id' => 'is_cod_1',
-                                    'value' => 1,
-                                    'label' => $this->module->l('Yes', 'carrieradminform'),
-                                ],
-                            ]
-                        ],
-                        [
-                            'type' => 'checkbox',
-                            'label' => $this->module->l('Allowed vendors'),
-                            'name' => 'allowed_vendors',
-                            'values' => [
-                                'query' => $vendors,
-                                'id' => 'name',
-                                'name' => 'friendly_name'
-                            ],
-                            'hint' => $this->module->l('The vendors allowed for this carrier')
-                        ],
                     ],
                     'submit' => [
                         'title' => $this->module->l('Edit', 'carrieradminform'),
                         'class' => 'btn btn-default pull-right',
-                        'name' => 'submitCarrierAdminForm',
+                        'name' => 'submitCarrierAdminFormSecondStep',
                     ],
                     'warning' => $warning,
                 ],
             ],
         ];
 
+        if ((bool) $apiCarrier['is_pickup_points'] === false) {
+            $form[0]['form']['input'][] = [
+                'type'   => 'radio',
+                'label'  => $this->module->l('Validate address using widget?', 'carrieradminform'),
+                'name'   => 'address_validation',
+                'desc'   => $this->module->l('Applicable only in case of home delivery carrier.', 'carrieradminform'),
+                'values' => [
+                    [
+                        'id'    => 'address_validation_0',
+                        'value' => 'none',
+                        'label' => $this->module->l('No', 'carrieradminform'),
+                    ],
+                    [
+                        'id'    => 'address_validation_1',
+                        'value' => 'required',
+                        'label' => $this->module->l('Yes', 'carrieradminform'),
+                    ],
+                    [
+                        'id'    => 'address_validation_2',
+                        'value' => 'optional',
+                        'label' => $this->module->l('Optionally', 'carrieradminform'),
+                    ],
+                ]
+            ];
+        }else{
+
+            $form[0]['form']['input'][] = [
+                'type' => 'checkbox',
+                'label' => $this->module->l('Allowed vendors'),
+                'name' => 'allowed_vendors',
+                'values' => [
+                    'query' => $vendors,
+                    'id' => 'name',
+                    'name' => 'friendly_name'
+                ],
+                'hint' => $this->module->l('The vendors allowed for this carrier')
+            ];
+        }
+
+        if ((bool) $apiCarrier['disallows_cod'] === false) {
+            $form[0]['form']['input'][] = [
+                'type' => 'radio',
+                'label' => $this->module->l('Is COD?', 'carrieradminform'),
+                'name' => 'is_cod',
+                'required' => true,
+                'desc' => $this->module->l('YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.', 'carrieradminform'),
+                'values' => [
+                    [
+                        'id' => 'is_cod_0',
+                        'value' => 0,
+                        'label' => $this->module->l('No', 'carrieradminform'),
+                    ],
+                    [
+                        'id' => 'is_cod_1',
+                        'value' => 1,
+                        'label' => $this->module->l('Yes', 'carrieradminform'),
+                    ],
+                ]
+            ];
+        }
+
+
+
         $helper->fields_value['is_cod'] = $carrierData['is_cod'];
         if ($carrierData['address_validation']) {
             $helper->fields_value['address_validation'] = $carrierData['address_validation'];
         } else {
             $helper->fields_value['address_validation'] = 'none';
+        }
+
+        if (!empty($carrierData['allowed_vendors'])) {
+            foreach($this->getAllowedVendorsFromJson($carrierData['allowed_vendors']) as $vendor) {
+                $helper->fields_value['allowed_vendors_' . $vendor] = $vendor;
+            }
         }
 
         return '<div class="packetery">' . PHP_EOL . $helper->generateForm($form) . PHP_EOL . '</div>';
@@ -331,7 +347,7 @@ class CarrierAdminForm
     {
         $warning = null;
         $carrierTools = $this->module->diContainer->get(CarrierTools::class);
-        [$carrierZones, $carrierCountries] = $carrierTools->getZonesAndCountries(
+        list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
             $this->carrierId, 'iso_code'
         );
         $availableCarriers = $apiCarrierRepository->getByCountries($carrierCountries);
@@ -367,14 +383,37 @@ class CarrierAdminForm
 
         return [$availableCarriers, $warning];
     }
-
     private function getCountriesForCarrier($idCarrier)
     {
         $carrierTools = $this->module->diContainer->get(CarrierTools::class);
-        [$carrierZones, $carrierCountries] = $carrierTools->getZonesAndCountries(
+        list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
             $idCarrier, 'iso_code'
         );
 
         return $carrierCountries;
+    }
+
+    private function getAllowedVendorsFromJson($json)
+    {
+        $allowedVendors = json_decode($json);
+        if (!is_array($allowedVendors)) {
+            return [];
+        }
+
+        return $allowedVendors;
+    }
+
+    private function getAllowedVendorsJsonFromForm($formData, $possibleVendors)
+    {
+        $allowedVendors = [];
+        foreach ($possibleVendors as $vendor) {
+            $vendorFormName = 'allowed_vendors_' . $vendor['name'];
+
+            if (isset($formData[$vendorFormName]) && (bool) $formData[$vendorFormName] === true) {
+                $allowedVendors[] = $vendor['name'];
+            }
+        }
+
+        return json_encode($allowedVendors);
     }
 }

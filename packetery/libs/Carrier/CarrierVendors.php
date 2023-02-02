@@ -11,25 +11,25 @@ class CarrierVendors
         'alzabox' => [
             'friendly_name' => 'Alzabox',
             'countries'     => [
-                'cz' => 'czalzabox'
+                'CZ' => 'czalzabox'
             ]
         ],
         'zpoint'  => [
             'friendly_name' => 'Z-Point',
             'countries'     => [
-                'cz' => 'czzpoint',
-                'sk' => 'skzpoint',
-                'hu' => 'huzpoint',
-                'ro' => 'rozpoint'
+                'CZ' => 'czzpoint',
+                'SK' => 'skzpoint',
+                'HU' => 'huzpoint',
+                'RO' => 'rozpoint'
             ]
         ],
         'zbox'    => [
             'friendly_name' => 'Z-box',
             'countries'     => [
-                'cz' => 'czzbox',
-                'sk' => 'skzbox',
-                'hu' => 'huzbox',
-                'ro' => 'rozbox'
+                'CZ' => 'czzbox',
+                'SK' => 'skzbox',
+                'HU' => 'huzbox',
+                'RO' => 'rozbox'
             ]
         ],
     ];
@@ -43,7 +43,7 @@ class CarrierVendors
                 if (array_key_exists($country, $countriesVendor)) {
                     $result[] = [
                         'name'          => $countriesVendor[$country],
-                        'friendly_name' => $vendorData['friendly_name']
+                        'friendly_name' => sprintf('%s %s', $vendorData['friendly_name'], $country )
                     ];
                 }
             }

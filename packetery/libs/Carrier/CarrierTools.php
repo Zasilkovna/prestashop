@@ -6,6 +6,7 @@ namespace Packetery\Carrier;
 use Carrier;
 use ConfigurationCore as Configuration;
 use CountryCore as Country;
+use Context;
 
 class CarrierTools
 {
@@ -46,4 +47,19 @@ class CarrierTools
 
         return str_replace(['#', ';'], '', Configuration::get('PS_SHOP_NAME'));
     }
+
+    public static function getEditLink($carrierId)
+    {
+        $parameters = [
+            'id_carrier' => $carrierId,
+            'viewcarrier' => 1,
+        ];
+        $getParameters = http_build_query($parameters);
+        $gridBaseUrl = Context::getContext()->link->getAdminLink('PacketeryCarrierGrid');
+
+        $link = sprintf('%s&%s', $gridBaseUrl, $getParameters);
+        return $link;
+    }
+
+
 }
