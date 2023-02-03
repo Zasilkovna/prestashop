@@ -383,6 +383,11 @@ class CarrierAdminForm
 
         return [$availableCarriers, $warning];
     }
+
+    /**
+     * @param $idCarrier
+     * @return mixed
+     */
     private function getCountriesForCarrier($idCarrier)
     {
         $carrierTools = $this->module->diContainer->get(CarrierTools::class);
@@ -393,6 +398,10 @@ class CarrierAdminForm
         return $carrierCountries;
     }
 
+    /**
+     * @param $json
+     * @return array
+     */
     private function getAllowedVendorsFromJson($json)
     {
         $allowedVendors = json_decode($json);
@@ -403,6 +412,11 @@ class CarrierAdminForm
         return $allowedVendors;
     }
 
+    /**
+     * @param $formData
+     * @param $possibleVendors
+     * @return false|string
+     */
     private function getAllowedVendorsJsonFromForm($formData, $possibleVendors)
     {
         $allowedVendors = [];

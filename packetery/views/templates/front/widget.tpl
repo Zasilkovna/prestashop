@@ -22,7 +22,7 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <div id="packetery-carrier-{$carrier_id|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
+    <input type="hidden" id="widget_vendors" name="widget_vendors" value="{$widget_vendors}">
     <!--Packetery widget-->
     <div id="packetery-widget" class="clearfix">
         <div class="widget-left">
