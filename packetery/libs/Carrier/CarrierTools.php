@@ -31,7 +31,16 @@ class CarrierTools
                 }
             }
         }
-        return array($carrierZones, $carrierCountries);
+        return [$carrierZones, $carrierCountries];
+    }
+
+    /**
+     * @param int $carrierId
+     * @return mixed
+     */
+    public function getCountries($carrierId, $countryParam = 'name') {
+        $zonesAndCountries = $this->getZonesAndCountries($carrierId, $countryParam);
+        return end($zonesAndCountries);
     }
 
     /**
@@ -48,6 +57,10 @@ class CarrierTools
         return str_replace(['#', ';'], '', Configuration::get('PS_SHOP_NAME'));
     }
 
+    /**
+     * @param int $carrierId
+     * @return string
+     */
     public static function getEditLink($carrierId)
     {
         $parameters = [
@@ -60,6 +73,4 @@ class CarrierTools
         $link = sprintf('%s&%s', $gridBaseUrl, $getParameters);
         return $link;
     }
-
-
 }
