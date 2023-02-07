@@ -50,8 +50,4 @@ class CarrierVendors
         }
         return $result;
     }
-
-
-
-
 }

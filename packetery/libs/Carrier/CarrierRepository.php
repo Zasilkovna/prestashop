@@ -72,8 +72,6 @@ class CarrierRepository
         );
     }
 
-
-
     /**
      * @return array|false
      * @throws DatabaseException

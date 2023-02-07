@@ -7,6 +7,7 @@ use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Tools\MessageManager;
 use Tools;
+
 class CarrierAdminForm
 {
     private $carrierId;
@@ -386,6 +387,7 @@ class CarrierAdminForm
         }
 
         array_unshift($availableCarriers, ['id' => null, 'name' => '--']);
+
         return [$availableCarriers, $warning];
     }
 
@@ -437,9 +439,6 @@ class CarrierAdminForm
 
         $possibleVendors = $this->vendors->getVendorsByCountries($countries);
 
-        if (empty($possibleVendors)) {
-            return [];
-        }
         return $possibleVendors;
     }
 }

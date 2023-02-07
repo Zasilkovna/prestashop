@@ -574,12 +574,6 @@ class Packetery extends CarrierModule
         if (!$packeteryCarrier) {
             return;
         }
-        $widgetCarriers = '';
-        if (is_numeric($packeteryCarrier['id_branch'])) {
-            $widgetCarriers = $packeteryCarrier['id_branch'];
-        } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
-            $widgetCarriers = 'packeta';
-        }
 
         $widgetVendors = [];
         if($packeteryCarrier['allowed_vendors'] !== null) {
@@ -587,14 +581,13 @@ class Packetery extends CarrierModule
 
             foreach($allowedVendors as $vendor) {
                 $widgetVendors[] = [
-                  'code' => $vendor,
-                  'selected' => true
+                    'code' => $vendor,
+                    'selected' => true
                 ];
             }
         }
         $widgetVendors = json_encode($widgetVendors);
         $this->context->smarty->assign('widget_vendors', $widgetVendors);
-        $this->context->smarty->assign('widget_carriers', $widgetCarriers);
 
         $orderData = null;
         if (!empty($cart) && ($packeteryCarrier['pickup_point_type'] !== null || $packeteryCarrier['address_validation'] !== 'none')) {
@@ -646,6 +639,7 @@ class Packetery extends CarrierModule
                     $id_branch = $orderData['id_branch'];
                 }
             }
+
             $this->context->smarty->assign('id_branch', $id_branch);
             $this->context->smarty->assign('name_branch', $name_branch);
             $this->context->smarty->assign('currency_branch', $currency_branch);
