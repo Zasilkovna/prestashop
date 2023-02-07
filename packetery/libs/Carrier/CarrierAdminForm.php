@@ -84,7 +84,7 @@ class CarrierAdminForm
                         ],
                     ],
                     'submit' => [
-                        'title' => $this->module->l('Edit', 'carrieradminform'),
+                        'title' => $this->module->l('Save', 'carrieradminform'),
                         'class' => 'btn btn-default pull-right',
                         'name' => 'submitCarrierForm',
                     ],
@@ -199,7 +199,7 @@ class CarrierAdminForm
                     ],
                     'input' => $formInputs,
                     'submit' => [
-                        'title' => $this->module->l('Edit', 'carrieradminform'),
+                        'title' => $this->module->l('Save', 'carrieradminform'),
                         'class' => 'btn btn-default pull-right',
                         'name' => 'submitCarrierOptionsForm',
                     ],
@@ -253,6 +253,11 @@ class CarrierAdminForm
 
         $pickupPointType = $apiCarrier['is_pickup_points'] ? ($branchId === Packetery::ZPOINT ? 'internal' : 'external') : null;
 
+        $vendor = null;
+        if($branchId !== Packetery::ZPOINT && $branchId !== Packetery::PP_ALL) {
+            $vendor = json_encode([$branchId]);
+        }
+
         if ((string)$branchId === '') {
             $this->repository->deleteById($this->carrierId);
         } else {
@@ -264,7 +269,7 @@ class CarrierAdminForm
                 $pickupPointType,
                 false,
                 null,
-                null
+                $vendor
             );
         }
 
@@ -274,8 +279,8 @@ class CarrierAdminForm
 
     public function saveCarrierOptions($carrierData, $apiCarrier) {
         $formData = Tools::getAllValues();
-        $allowedVendors = $this->getAllowedVendorsJsonFromForm($formData);
         $pickupPointType = $apiCarrier['is_pickup_points'] ? ($carrierData['id_branch'] === Packetery::ZPOINT ? 'internal' : 'external') : null;
+        $allowedVendors = ($carrierData['id_branch'] === Packetery::ZPOINT || $carrierData['id_branch'] === Packetery::PP_ALL) ? $this->getAllowedVendorsJsonFromForm($formData) : json_encode([$carrierData['id_branch']]);
 
         $this->repository->setPacketeryCarrier(
             $this->carrierId,
