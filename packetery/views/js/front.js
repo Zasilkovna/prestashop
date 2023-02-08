@@ -279,7 +279,7 @@ PacketaModule.ui = {
             var widgetOptions = {
                 appIdentity: PacketaModule.config.appIdentity,
                 country: country,
-                language: language
+                language: language,
             };
             var $selectedInput = module.getSelectedInput();
             if ($selectedInput.length === 0) {

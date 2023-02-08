@@ -576,17 +576,17 @@ class Packetery extends CarrierModule
         }
 
         $widgetVendors = [];
-        if($packeteryCarrier['allowed_vendors'] !== null) {
+        if ($packeteryCarrier['allowed_vendors'] !== null) {
             $allowedVendors = json_decode($packeteryCarrier['allowed_vendors']);
 
-            foreach($allowedVendors as $vendor) {
+            foreach ($allowedVendors as $vendor) {
                 $widgetVendors[] = [
                     'code' => $vendor,
                     'selected' => true
                 ];
             }
         }
-        $widgetVendors = json_encode($widgetVendors);
+
         $this->context->smarty->assign('widget_vendors', $widgetVendors);
 
         $orderData = null;
@@ -639,7 +639,6 @@ class Packetery extends CarrierModule
                     $id_branch = $orderData['id_branch'];
                 }
             }
-
             $this->context->smarty->assign('id_branch', $id_branch);
             $this->context->smarty->assign('name_branch', $name_branch);
             $this->context->smarty->assign('currency_branch', $currency_branch);
@@ -921,12 +920,13 @@ class Packetery extends CarrierModule
     {
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+
         $widgetOptions = [
             'apiKey' => $apiKey,
             'country' => strtolower($packeteryOrder['ps_country']),
             'language' => $configHelper->getBackendLanguage(),
-            'carrierId' => $packeteryOrder['id_branch'],
             'appIdentity' => $this->getAppIdentity(),
+            'vendors' => $this->getAllowedVendorsForOrder($orderId),
         ];
         if (\Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
             $widgetOptions['street'] = $packeteryOrder['street'];
@@ -957,11 +957,12 @@ class Packetery extends CarrierModule
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $widgetOptions = [
-            'api_key' => $apiKey,
+            'apiKey' => $apiKey,
             'appIdentity' => $this->getAppIdentity(),
             'country' => strtolower($packeteryOrder['country']),
             'module_dir' => _MODULE_DIR_,
             'lang' => $configHelper->getBackendLanguage(),
+            'vendors' => $this->getAllowedVendorsForOrder($orderId),
         ];
         if (
             $packeteryCarrier['pickup_point_type'] === 'external' &&
@@ -974,6 +975,45 @@ class Packetery extends CarrierModule
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
         $this->context->smarty->assign('returnUrl', $this->getAdminLink($orderId));
+    }
+
+    /**
+     * @param int $orderId
+     * @return array
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
+     */
+    public function getAllowedVendorsForOrder($orderId)
+    {
+        /** @var \Packetery\Order\OrderRepository $orderRepository */
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+
+        $packeteryOrder = $orderRepository->getById($orderId);
+        if (empty($packeteryOrder)) {
+            return [];
+        }
+
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById($packeteryOrder['id_carrier']);
+        if (empty($packeteryCarrier)) {
+            return [];
+        }
+
+        $widgetVendors = [];
+        if ($packeteryCarrier['allowed_vendors'] !== null) {
+            $allowedVendors = json_decode($packeteryCarrier['allowed_vendors']);
+
+            foreach ($allowedVendors as $vendor) {
+                $widgetVendors[] = [
+                    'code' => $vendor,
+                    'selected' => true
+                ];
+            }
+        }
+
+        return $widgetVendors;
     }
 
     /**

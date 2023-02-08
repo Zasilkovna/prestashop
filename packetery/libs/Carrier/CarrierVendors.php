@@ -39,12 +39,12 @@ class CarrierVendors
     {
         $result = [];
         foreach (self::VENDORS_TYPES as $vendorData) {
-            $countriesVendor = $vendorData['countries'];
+            $vendorCountries = $vendorData['countries'];
             foreach ($countries as $country) {
-                if (array_key_exists($country, $countriesVendor)) {
+                if (array_key_exists($country, $vendorCountries)) {
                     $result[] = [
-                        'name'          => $countriesVendor[$country],
-                        'friendly_name' => sprintf('%s %s', $vendorData['friendly_name'], $country )
+                        'name' => $vendorCountries[$country],
+                        'friendly_name' => sprintf('%s %s', $vendorData['friendly_name'], $country)
                     ];
                 }
             }

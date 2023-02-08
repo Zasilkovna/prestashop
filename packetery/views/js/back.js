@@ -12,7 +12,6 @@ $(document).ready(function () {
         var widgetHdOptionsData = $widgetHdButton.data('widget-options');
         var widgetHdOptions = {
             layout: 'hd',
-            carrierId: widgetHdOptionsData['carrierId'],
             appIdentity: widgetHdOptionsData['appIdentity'],
             country: widgetHdOptionsData['country'],
             language: widgetHdOptionsData['language'],
@@ -21,6 +20,11 @@ $(document).ready(function () {
             city: widgetHdOptionsData['city'],
             postcode: widgetHdOptionsData['zip']
         };
+
+        if (widgetHdOptionsData['vendors']) {
+            widgetHdOptions.vendors = widgetHdOptionsData['vendors'];
+        }
+
         $widgetHdButton.on('click', function (event) {
             event.preventDefault();
             Packeta.Widget.pick(widgetHdOptionsData['apiKey'], function (result) {
@@ -51,13 +55,13 @@ $(document).ready(function () {
             country: widgetOptionsData['country'],
             language: widgetOptionsData['lang']
         };
-        if (widgetOptionsData['carriers']) {
-            widgetOptions.carriers = widgetOptionsData['carriers'];
+        if (widgetOptionsData['vendors']) {
+            widgetOptions.vendors = widgetOptionsData['vendors'];
         }
 
         $widgetButton.on('click', function (event) {
             event.preventDefault();
-            Packeta.Widget.pick(widgetOptionsData['api_key'], function (pickupPoint) {
+            Packeta.Widget.pick(widgetOptionsData['apiKey'], function (pickupPoint) {
                 if (pickupPoint !== null) {
                     $('.packetery form input[name="pickup_point"]').val(JSON.stringify(pickupPoint));
                     $('.picked-delivery-place').text(pickupPoint.name);
