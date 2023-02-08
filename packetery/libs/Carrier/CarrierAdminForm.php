@@ -266,11 +266,6 @@ class CarrierAdminForm
     {
         $apiCarrier = $this->apiRepository->getById($branchId);
 
-        if (!$apiCarrier) {
-            $this->error = $this->module->l('Failed to load Packeta carrier.', 'carrieradminform');
-            Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
-        }
-
         $pickupPointType = $apiCarrier['is_pickup_points'] ? ($branchId === Packetery::ZPOINT ? 'internal' : 'external') : null;
 
         $vendor = null;

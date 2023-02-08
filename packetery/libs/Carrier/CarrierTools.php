@@ -40,7 +40,7 @@ class CarrierTools
      */
     public function getCountries($carrierId, $countryParam = 'name') {
         $zonesAndCountries = $this->getZonesAndCountries($carrierId, $countryParam);
-        return array_shift($zonesAndCountries);
+        return array_pop($zonesAndCountries);
     }
 
     /**

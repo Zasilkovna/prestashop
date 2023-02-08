@@ -128,7 +128,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
             foreach ($this->_list as $carrierData) {
                 $carrierHelper = new CarrierAdminForm($carrierData['id_carrier'], $module);
                 $availableCarriersData = $carrierHelper->getAvailableCarriers($carrierData);
-                $warning = array_shift($availableCarriersData);
+                $warning = array_pop($availableCarriersData);
                 if ($warning) {
                     $this->warnings[] = $warning;
                 }
