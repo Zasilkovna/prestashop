@@ -197,7 +197,16 @@ class CarrierRepository
      * @return bool
      * @throws DatabaseException
      */
-    public function setPacketeryCarrier($carrierId, $branchId, $branchName, $branchCurrency, $pickupPointType, $isCod, $addressValidation, $allowedVendors)
+    public function setPacketeryCarrier(
+        $carrierId,
+        $branchId,
+        $branchName,
+        $branchCurrency,
+        $pickupPointType,
+        $isCod,
+        $addressValidation,
+        $allowedVendors
+    )
     {
         $carrierId = (int)$carrierId;
         $branchId = (string)$branchId;
@@ -211,10 +220,10 @@ class CarrierRepository
         } else {
             $fieldsToSet = [
                 'pickup_point_type' => $pickupPointType,
-                'id_branch' => $this->db->escape($branchId),
-                'name_branch' => $this->db->escape($branchName),
-                'is_cod' => $isCod,
-                'allowed_vendors' => $allowedVendors
+                'id_branch'         => $this->db->escape($branchId),
+                'name_branch'       => $this->db->escape($branchName),
+                'is_cod'            => $isCod,
+                'allowed_vendors'   => $allowedVendors
             ];
             if ($pickupPointType === null) {
                 if (!$addressValidation) {
