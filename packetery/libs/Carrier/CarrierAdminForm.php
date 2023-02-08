@@ -317,26 +317,16 @@ class CarrierAdminForm
         Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
     }
 
-    /**
-     * @return mixed
-     */
     public function getError()
     {
         return $this->error;
     }
 
-    /**
-     * @return mixed
-     */
     public function getHtml()
     {
         return $this->formHtml;
     }
 
-    /**
-     * @param $html
-     * @return void
-     */
     public function addHtml($html)
     {
         $this->formHtml .= $html;
