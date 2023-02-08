@@ -161,8 +161,6 @@ class CarrierAdminForm
         }
 
         $possibleVendors = $this->getPossibleVendors();
-
-        $helper = new HelperForm();
         $formInputs = [];
 
         if ((bool)$apiCarrier['is_pickup_points'] === false) {
@@ -226,6 +224,10 @@ class CarrierAdminForm
             ];
         }
 
+        if (empty($formInputs)) {
+            return null;
+        }
+
         $form = [
             [
                 'form' => [
@@ -246,6 +248,7 @@ class CarrierAdminForm
             ],
         ];
 
+        $helper = new HelperForm();
         $helper->fields_value['is_cod'] = $carrierData['is_cod'];
         if ($carrierData['address_validation']) {
             $helper->fields_value['address_validation'] = $carrierData['address_validation'];
@@ -275,7 +278,7 @@ class CarrierAdminForm
         $pickupPointType = $this->getPickupPointType($apiCarrier, $branchId);
 
         $vendor = null;
-        if($branchId !== Packetery::ZPOINT && $branchId !== Packetery::PP_ALL) {
+        if ($branchId !== Packetery::ZPOINT && $branchId !== Packetery::PP_ALL) {
             $vendor = json_encode([$branchId]);
         }
 

@@ -37,18 +37,19 @@ class CarrierVendors
      */
     public function getVendorsByCountries(array $countries)
     {
-        $result = [];
+        $vendors = [];
         foreach (self::VENDORS_TYPES as $vendorData) {
             $vendorCountries = $vendorData['countries'];
             foreach ($countries as $country) {
                 if (array_key_exists($country, $vendorCountries)) {
-                    $result[] = [
+                    $vendors[] = [
                         'name' => $vendorCountries[$country],
                         'friendly_name' => sprintf('%s %s', $vendorData['friendly_name'], $country)
                     ];
                 }
             }
         }
-        return $result;
+        asort($vendors);
+        return $vendors;
     }
 }
