@@ -61,7 +61,7 @@ class CarrierAdminForm
 
     /**
      * @return string|null
-     * @throws Packetery\Exceptions\DatabaseException
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function buildCarrierForm()
     {
