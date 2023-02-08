@@ -70,7 +70,6 @@ class CarrierTools
         $getParameters = http_build_query($parameters);
         $gridBaseUrl = Context::getContext()->link->getAdminLink('PacketeryCarrierGrid');
 
-        $link = sprintf('%s&%s', $gridBaseUrl, $getParameters);
-        return $link;
+        return sprintf('%s&%s', $gridBaseUrl, $getParameters);
     }
 }

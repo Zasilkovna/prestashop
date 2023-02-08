@@ -15,31 +15,52 @@ class CarrierAdminForm
     private $formHtml;
     private $error;
 
+    /**
+     * @var CarrierVendors $vendors
+     */
+    private $vendors;
+
+    /**
+     * @var CarrierRepository $repository
+     */
+    private $repository;
+
+    /**
+     * @var ApiCarrierRepository $apiRepository
+     */
+    private $apiRepository;
+
+    /**
+     * @var CarrierTools $tools
+     */
+    private $tools;
+
+    /**
+     * @var MessageManager $messageManager
+     */
+    private $messageManager;
+
     private static $countriesWithInternalPickupPoints = ['CZ', 'SK', 'HU', 'RO'];
 
+    /**
+     * CarrierAdminForm constructor.
+     *
+     * @param $carrierId
+     * @param Packetery $module
+     */
     public function __construct($carrierId, $module)
     {
         $this->carrierId = $carrierId;
         $this->module = $module;
-
-        /** @var CarrierVendors $vendors */
         $this->vendors = $this->module->diContainer->get(CarrierVendors::class);
-
-        /** @var CarrierRepository $repository */
         $this->repository = $this->module->diContainer->get(CarrierRepository::class);
-
-        /** @var ApiCarrierRepository $apiRepository */
         $this->apiRepository = $this->module->diContainer->get(ApiCarrierRepository::class);
-
-        /** @var CarrierTools $tools */
         $this->tools = $this->module->diContainer->get(CarrierTools::class);
-
-        /** @var CarrierTools $tools */
         $this->messageManager = $this->module->diContainer->get(MessageManager::class);
     }
 
     /**
-     * @return string|void
+     * @return string|null
      * @throws Packetery\Exceptions\DatabaseException
      */
     public function buildCarrierForm()
@@ -125,7 +146,7 @@ class CarrierAdminForm
         $possibleVendors = $this->getPossibleVendors();
 
         $helper = new HelperForm();
-        $helper->show_cancel_button = true;
+        $formInputs = [];
 
         if ((bool) $apiCarrier['is_pickup_points'] === false) {
             $formInputs[] = [
@@ -151,21 +172,19 @@ class CarrierAdminForm
                     ],
                 ]
             ];
-        }else{
-            if (!empty($possibleVendors)) {
-                $formInputs[] = [
-                    'type' => 'checkbox',
-                    'label' => $this->module->l('Allowed vendors'),
-                    'name' => 'allowed_vendors',
-                    'values' => [
-                        'query' => $possibleVendors,
-                        'id' => 'name',
-                        'name' => 'friendly_name'
-                    ],
-                    'hint' => $this->module->l('The vendors allowed for this carrier'),
-                    'desc' => $this->module->l('If you don\'t check at least one vendor, all vendors will be available.', 'carrieradminform'),
-                ];
-            }
+        }else if (!empty($possibleVendors)) {
+            $formInputs[] = [
+                'type' => 'checkbox',
+                'label' => $this->module->l('Allowed vendors'),
+                'name' => 'allowed_vendors',
+                'values' => [
+                    'query' => $possibleVendors,
+                    'id' => 'name',
+                    'name' => 'friendly_name'
+                ],
+                'hint' => $this->module->l('The vendors allowed for this carrier'),
+                'desc' => $this->module->l('If you don\'t check at least one vendor, all vendors will be available.', 'carrieradminform'),
+            ];
         }
 
         if ((bool) $apiCarrier['disallows_cod'] === false) {
@@ -241,6 +260,7 @@ class CarrierAdminForm
     /**
      * @param $branchId
      * @return void
+     * @throws \Packetery\Exceptions\DatabaseException
      */
     public function saveCarrier($branchId)
     {
@@ -442,8 +462,6 @@ class CarrierAdminForm
             $countries = [$apiCarrier['country']];
         }
 
-        $possibleVendors = $this->vendors->getVendorsByCountries($countries);
-
-        return $possibleVendors;
+        return $this->vendors->getVendorsByCountries($countries);
     }
 }

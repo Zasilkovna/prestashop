@@ -2,9 +2,6 @@
 
 namespace Packetery\Carrier;
 
-/**
- *
- */
 class CarrierVendors
 {
     const VENDORS_TYPES = [
@@ -34,10 +31,14 @@ class CarrierVendors
         ],
     ];
 
+    /**
+     * @param array $countries
+     * @return array
+     */
     public function getVendorsByCountries(array $countries)
     {
         $result = [];
-        foreach (self::VENDORS_TYPES as $vendorType => $vendorData) {
+        foreach (self::VENDORS_TYPES as $vendorData) {
             $countriesVendor = $vendorData['countries'];
             foreach ($countries as $country) {
                 if (array_key_exists($country, $countriesVendor)) {

@@ -182,7 +182,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
         return $this->packetery;
     }
 
-    public function displayEditLink($token, $carrierId, $name = null)
+    public function displayEditLink($token = null, $carrierId, $name = null)
     {
         return '<a class="edit btn btn-default" href="' . CarrierTools::getEditLink($carrierId) . '"><i class="icon-pencil"></i> ' . $this->l('Edit', 'packeterycarriergridcontroller') . '</a>';
     }
