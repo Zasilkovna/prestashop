@@ -223,7 +223,7 @@ class CarrierRepository
                 'id_branch'         => $this->db->escape($branchId),
                 'name_branch'       => $this->db->escape($branchName),
                 'is_cod'            => $isCod,
-                'allowed_vendors'   => $allowedVendors
+                'allowed_vendors'   => $allowedVendors,
             ];
             if ($pickupPointType === null) {
                 if (!$addressValidation) {
