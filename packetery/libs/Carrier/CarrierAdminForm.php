@@ -118,6 +118,9 @@ class CarrierAdminForm
                             ],
                         ],
                     ],
+                    'buttons' => [
+                        $this->getBackButton(),
+                    ],
                     'submit' => [
                         'title' => $this->module->l('Save', 'carrieradminform'),
                         'class' => 'btn btn-default pull-right',
@@ -235,6 +238,9 @@ class CarrierAdminForm
                         'title' => $this->module->l('Save', 'carrieradminform'),
                         'class' => 'btn btn-default pull-right',
                         'name' => 'submitCarrierOptionsForm',
+                    ],
+                    'buttons' => [
+                        $this->getBackButton(),
                     ],
                 ],
             ],
@@ -490,5 +496,17 @@ class CarrierAdminForm
         }
 
         return $this->vendors->getVendorsByCountries($countries);
+    }
+
+    /**
+     * @return array
+     */
+    private function getBackButton()
+    {
+        return [
+            'href' => $this->module->getContext()->link->getAdminLink('PacketeryCarrierGrid'),
+            'title' => $this->module->l('Back to list', 'carrieradminform'),
+            'class' => 'btn btn-default pull-left',
+        ];
     }
 }
