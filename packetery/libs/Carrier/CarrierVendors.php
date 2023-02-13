@@ -49,7 +49,7 @@ class CarrierVendors
                 }
             }
         }
-        asort($vendors);
+
         return $vendors;
     }
 }

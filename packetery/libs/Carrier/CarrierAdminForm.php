@@ -190,7 +190,7 @@ class CarrierAdminForm
         } else if (!empty($possibleVendors)) {
             $formInputs[] = [
                 'type' => 'checkbox',
-                'label' => $this->module->l('Allowed vendors'),
+                'label' => $this->module->l('Allowed pickup point types'),
                 'name' => 'allowed_vendors',
                 'values' => [
                     'query' => $possibleVendors,
@@ -311,7 +311,7 @@ class CarrierAdminForm
         $formData = Tools::getAllValues();
         $pickupPointType = $this->getPickupPointType($apiCarrier, $carrierData['id_branch']);
 
-        if($carrierData['id_branch'] === Packetery::ZPOINT || $carrierData['id_branch'] === Packetery::PP_ALL) {
+        if ($carrierData['id_branch'] === Packetery::ZPOINT || $carrierData['id_branch'] === Packetery::PP_ALL) {
             $allowedVendors = $this->getAllowedVendorsJsonFromForm($formData);
         } else {
             $allowedVendors = json_encode([$carrierData['id_branch']]);

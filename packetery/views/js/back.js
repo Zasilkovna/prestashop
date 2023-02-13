@@ -88,8 +88,6 @@ setTimeout(function() {
         disableTabByProductType(actualProductType);
     });
 
-}, 500);
-
 function disableTabByProductType(actualProductType) {
     // 0 - standard product, 1 - pack of products, 2 - virtual product
     if (actualProductType === 2) {
