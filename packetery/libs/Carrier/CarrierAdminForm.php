@@ -189,16 +189,10 @@ class CarrierAdminForm
             ];
         } else if (!empty($possibleVendors)) {
             $formInputs[] = [
-                'type' => 'checkbox',
-                'label' => $this->module->l('Allowed pickup point types'),
                 'name' => 'allowed_vendors',
-                'values' => [
-                    'query' => $possibleVendors,
-                    'id' => 'name',
-                    'name' => 'friendly_name'
-                ],
-                'hint' => $this->module->l('The vendors allowed for this carrier'),
-                'desc' => $this->module->l('If you don\'t check at least one vendor, all vendors will be available.', 'carrieradminform'),
+                'label' => $this->module->l('Allowed pickup point types'),
+                'type' => 'html',
+                'html_content' => $this->getVendorsHtml($possibleVendors, $this->getAllowedVendorsFromJson($carrierData['allowed_vendors']))
             ];
         }
 
@@ -256,13 +250,6 @@ class CarrierAdminForm
             $helper->fields_value['address_validation'] = 'none';
         }
 
-        if (!empty($carrierData['allowed_vendors'])) {
-            $allowedVendors = $this->getAllowedVendorsFromJson($carrierData['allowed_vendors']);
-            foreach($allowedVendors as $vendor) {
-                $helper->fields_value['allowed_vendors_' . $vendor] = $vendor;
-            }
-        }
-
         return '<div class="packetery">' . PHP_EOL . $helper->generateForm($form) . PHP_EOL . '</div>';
     }
 
@@ -277,9 +264,15 @@ class CarrierAdminForm
 
         $pickupPointType = $this->getPickupPointType($apiCarrier, $branchId);
 
-        $vendor = null;
+        $allowedVendors = null;
         if ($branchId !== Packetery::ZPOINT && $branchId !== Packetery::PP_ALL) {
-            $vendor = json_encode([$branchId]);
+            $allowedVendors = json_encode([$branchId]);
+        }else{
+            $possibleVendors = $this->getPossibleVendors();
+            foreach($possibleVendors as $possibleVendor) {
+                $allowedVendors[] = $possibleVendor['name'];
+            }
+            $allowedVendors = json_encode($allowedVendors);
         }
 
         if ((string)$branchId === '') {
@@ -293,7 +286,7 @@ class CarrierAdminForm
                 $pickupPointType,
                 false,
                 null,
-                $vendor
+                $allowedVendors
             );
         }
 
@@ -345,6 +338,24 @@ class CarrierAdminForm
     public function addHtml($html)
     {
         $this->formHtml .= $html;
+    }
+
+    private function getVendorsHtml($possibleVendors, $allowedVendors)
+    {
+        $vendorsData = [];
+
+        foreach($possibleVendors as $vendor) {
+            $vendorsData[] = [
+                'id' => $vendor['id'],
+                'name' => $vendor['name'],
+                'isChecked' => in_array($vendor['id'], $allowedVendors, true),
+                'isDisabled' => $vendor['vendorsCountInSameCountry'] > 1 ? false : true,
+            ];
+        }
+
+        $smarty = new \Smarty();
+        $smarty->assign('allowedVendors', $vendorsData);
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/vendors.tpl');
     }
 
     /**
@@ -473,10 +484,10 @@ class CarrierAdminForm
 
         $allowedVendors = [];
         foreach ($possibleVendors as $vendor) {
-            $vendorFormName = 'allowed_vendors_' . $vendor['name'];
+            $vendorFormName = 'allowed_vendors_' . $vendor['id'];
 
             if (isset($formData[$vendorFormName]) && (bool)$formData[$vendorFormName] === true) {
-                $allowedVendors[] = $vendor['name'];
+                $allowedVendors[] = $vendor['id'];
             }
         }
 
