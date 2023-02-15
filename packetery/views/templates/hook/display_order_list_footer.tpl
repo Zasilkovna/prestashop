@@ -7,6 +7,6 @@
     // in old PrestaShop, this hook is outside the form tag
     $('button[name="submitPacketeryOrderGrid"]').on('click', function (e) {
         e.preventDefault();
-        $('form#orders').submit();
+        $('form#form-orders').submit();
     });
 </script>
