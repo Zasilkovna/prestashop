@@ -1396,7 +1396,7 @@ class Packetery extends CarrierModule
 
                         $smarty = new \Smarty();
                         $smarty->assign('trackingNumber', $resultRow[1]);
-                        $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/packeteryTrackingLink.tpl');
+                        $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/packeteryTrackingLink.tpl');
 
                         $messages[] = [
                             'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryTrackingLink,
