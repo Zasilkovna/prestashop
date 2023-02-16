@@ -5,9 +5,6 @@
  * @package Packetery\Core\Api\Soap\Response
  */
 
-declare( strict_types=1 );
-
-
 namespace Packetery\Core\Api\Soap\Response;
 
 /**
@@ -22,7 +19,7 @@ class CancelPacket extends BaseResponse {
 	 *
 	 * @return bool
 	 */
-	public function hasCancelNotAllowedFault(): bool {
+	public function hasCancelNotAllowedFault() {
 		return ( 'CancelNotAllowedFault' === $this->fault );
 	}
 }

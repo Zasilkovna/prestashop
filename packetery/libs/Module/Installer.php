@@ -20,7 +20,7 @@ class Installer
     /** @var DbTools */
     private $dbTools;
 
-    private const TRANSLATED_LANGUAGES = ['cs', 'sk'];
+    const TRANSLATED_LANGUAGES = ['cs', 'sk'];
 
     /**
      * @param DbTools $dbTools
