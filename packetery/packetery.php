@@ -1316,8 +1316,12 @@ class Packetery extends CarrierModule
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
 
-        if ($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
-            empty($params['request_params']['packeta-branch-id'])
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        $orderData = $orderRepository->getByCart((int)$cart->id);
+
+        if (
+            $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
+            empty($orderData['id_branch'])
         ) {
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
             $params['completed'] = false;
@@ -1329,8 +1333,6 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getByCart((int)$cart->id);
         if (!$orderData || !\Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
             $this->context->controller->errors[] = $this->l('Please use widget to validate address.');
             $params['completed'] = false;
