@@ -1298,6 +1298,8 @@ class Packetery extends CarrierModule
 
     /**
      * Is not called in SuperCheckout. Process all validations in addSupercheckoutOrderValidator.
+     * Is not called in PS 1.6.
+     * TODO: use suitable validations in hookActionCarrierProcess, solve like packeteryHookDisplayAdminOrder.
      * @param array $params
      * @throws ReflectionException
      * @throws \Packetery\Exceptions\DatabaseException

@@ -186,6 +186,7 @@ PacketaModule.ui = {
             var $deliveryInput = $(e);
             var carrierId = packeteryModulesManager.getCarrierId($deliveryInput);
 
+            // TODO: fix address validation in PS 1.6
             var isCarrierWithDeliveryPoints = PacketaModule.config.deliveryPointCarrierIds.indexOf(carrierId) >= 0;
             if (!isCarrierWithDeliveryPoints) {
                 return;
