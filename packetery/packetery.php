@@ -1298,6 +1298,8 @@ class Packetery extends CarrierModule
 
     /**
      * Is not called in SuperCheckout. Process all validations in addSupercheckoutOrderValidator.
+     * Is not called in PS 1.6.
+     * TODO: use suitable validations in hookActionCarrierProcess, solve like packeteryHookDisplayAdminOrder.
      * @param array $params
      * @throws ReflectionException
      * @throws \Packetery\Exceptions\DatabaseException
@@ -1316,8 +1318,12 @@ class Packetery extends CarrierModule
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
 
-        if ($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
-            empty($params['request_params']['packeta-branch-id'])
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        $orderData = $orderRepository->getByCart((int)$cart->id);
+
+        if (
+            $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
+            empty($orderData['id_branch'])
         ) {
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
             $params['completed'] = false;
@@ -1329,8 +1335,6 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getByCart((int)$cart->id);
         if (!$orderData || !\Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
             $this->context->controller->errors[] = $this->l('Please use widget to validate address.');
             $params['completed'] = false;
@@ -1396,7 +1400,7 @@ class Packetery extends CarrierModule
 
                         $smarty = new \Smarty();
                         $smarty->assign('trackingNumber', $resultRow[1]);
-                        $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/packeteryTrackingLink.tpl');
+                        $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/packeteryTrackingLink.tpl');
 
                         $messages[] = [
                             'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryTrackingLink,

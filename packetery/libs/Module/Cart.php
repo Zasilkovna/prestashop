@@ -23,6 +23,7 @@ class Cart
         $packetery = new Packetery();
         $params = [
             'packetery' => [
+                // TODO: fix address validation in PS 1.6
                 'template' => 'views/templates/front/carrier-extra-content.tpl'
             ],
             'carrier' => [
