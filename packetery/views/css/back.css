@@ -66,3 +66,31 @@
 .icon-Packetery:before {
     content: "\f0d1";
 }
+
+.packeteryordergrid .fixed-width-md,
+.packeteryordergrid .fixed-width-lg,
+.packeteryordergrid .fixed-width-sm {
+    width: unset !important;
+}
+
+.packeteryordergrid .bootstrap .table > thead > tr > th {
+    padding: 8px 4px;
+}
+
+.packeteryordergrid .column-date_add,
+.packeteryordergrid .column-name_branch {
+    word-break: normal;
+}
+
+.packeteryordergrid .column-customer {
+    white-space: nowrap;
+}
+
+.packeteryordergrid thead tr th .title_box {
+    white-space: normal !important;
+    text-align: left !important;
+}
+
+.packeteryordergrid .column-weight input {
+    padding: 8px;
+}

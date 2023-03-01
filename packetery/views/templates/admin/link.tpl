@@ -1,1 +1,1 @@
-<a{(isset($class)) ? " class=\"`$class`\"" : ''} href="{$link}"><i class="{$icon}"></i> {$title}</a>
+<a{(isset($class)) ? " class=\"`$class`\"" : ''} href="{$link}" data-toggle="tooltip" data-original-title="{$title}"><i class="{$icon}"></i></a>
