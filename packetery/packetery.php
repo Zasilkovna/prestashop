@@ -463,6 +463,17 @@ class Packetery extends CarrierModule
                 'required' => false,
                 'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
             ],
+            'PACKETERY_DEFAULT_WEIGHT' => [
+                'title' => $this->l('Default weight (kg)'),
+                'required' => false,
+                'desc' => $this->l('This value is automatically added to the total weight of each order that contains products with zero weight.'),
+            ],
+            'PACKETERY_DEFAULT_PACKAGING_WEIGHT' => [
+                'title' => $this->l('Weight of packaging material (kg)'),
+                'required' => false,
+                'desc' => $this->l('This parameter is used to determine the weight of the packaging material. 
+                This value is automatically added to the total weight of each order that contains products with non-zero weight.'),
+            ],
         ];
     }
 

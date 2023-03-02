@@ -78,6 +78,11 @@ class Options
         switch ($option) {
             case 'PACKETERY_DEFAULT_PACKAGE_PRICE':
                 return str_replace([',', ' '], ['.', ''], $value);
+            case 'PACKETERY_DEFAULT_WEIGHT':
+            case 'PACKETERY_DEFAULT_PACKAGING_WEIGHT':
+                $value = str_replace(',', '.', $value);
+                $value = preg_replace('/[^0-9.]/', '', $value);
+                return $value;
             default:
                 return $value;
         }
