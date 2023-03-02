@@ -553,7 +553,7 @@ class PacketeryOrderGridController extends ModuleAdminController
                 $iconClass = 'icon-send';
                 $title = $this->l('Submit packet', 'packeteryordergridcontroller');
             }
-            $href = $this->getModule()->getAdminLink('PacketeryOrderGrid', ['id_order' => $orderId, 'action' => $action]);
+            $href = sprintf('%s&amp;id_order=%s&amp;action=%s', $this->context->link->getAdminLink('PacketeryOrderGrid'), $orderId, $action);
             $smarty = new Smarty();
             $smarty->assign('link', $href);
             $smarty->assign('title', $title);

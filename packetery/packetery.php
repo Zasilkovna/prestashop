@@ -217,7 +217,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign(
             ['totalCarriers' => $totalCarriers, 'lastCarriersUpdate' => $lastCarriersUpdate]
         );
-        $updateCarriersLink = $this->getAdminLink('PacketeryCarrierGrid', ['action' => 'updateCarriers']);
+        $updateCarriersLink = $this->context->link->getAdminLink('PacketeryCarrierGrid') . '&action=updateCarriers';
         $this->context->smarty->assign('updateCarriersLink', $updateCarriersLink);
 
         return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriers_info.tpl');
