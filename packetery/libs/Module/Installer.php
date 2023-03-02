@@ -70,12 +70,6 @@ class Installer
             ],
             [
                 'parentClass' => 'Packetery',
-                'class' => 'PacketerySetting',
-                'name' => 'Configuration',
-                'translatedName' => $this->module->l('Configuration', 'installer')
-            ],
-            [
-                'parentClass' => 'Packetery',
                 'class' => 'PacketeryOrderGrid',
                 'name' => 'Packeta Orders',
                 'translatedName' => $this->module->l('Packeta Orders', 'installer')
@@ -85,6 +79,12 @@ class Installer
                 'class' => 'PacketeryCarrierGrid',
                 'name' => 'Carrier settings',
                 'translatedName' => $this->module->l('Carrier settings', 'installer')
+            ],
+            [
+                'parentClass' => 'Packetery',
+                'class' => 'PacketerySetting',
+                'name' => 'Configuration',
+                'translatedName' => $this->module->l('Configuration', 'installer')
             ],
         ];
 
