@@ -28,15 +28,6 @@
 	</div>
 
 	<div class="clearfix">
-		<label class="control-label col-lg-3">
-			{l s='Link for updating carriers by cron' mod='packetery'}:
-		</label>
-		<div class="packetery-carriers-right-column">
-			{$updateCarriersCronLink}
-		</div>
-	</div>
-
-	<div class="clearfix">
 		<label class="control-label col-lg-3"></label>
 		<div class="packetery-carriers-right-column packetery-button-container">
 			<img src="{$module_dir|escape:'html':'UTF-8'}/logo.png" alt="Packeta" />
