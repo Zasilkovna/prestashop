@@ -205,7 +205,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         if ($this->errors) {
             return;
         }
-        Tools::redirectAdmin(self::$currentIndex . '&token=' . $this->token);
+        $this->confirmations[] = $this->l('The shipments were successfully submitted.', 'packeteryordergridcontroller');
     }
 
     public function processBulkCreatePacket()
@@ -435,7 +435,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function getReferenceColumnValue($columnValue, array $row)
     {
-        if(empty($row['id_order'])) {
+        if (empty($row['id_order'])) {
             return $columnValue;
         }
         $orderLink = $this->getModule()->getAdminLink('AdminOrders', ['id_order' => $row['id_order'], 'vieworder' => true], '#packetaPickupPointChange');
