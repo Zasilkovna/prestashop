@@ -46,4 +46,20 @@
             </div>
         </div>
     </div>
+
+    <div class="panel col-lg-12">
+        <div class="panel-heading">
+            {l s='Automatic updating of Packeta carriers' mod='packetery'}
+        </div>
+        <div class="clearfix">
+            <div class="col-lg-12">
+                <p>
+                    {l s='Link to update Packeta carriers using CRON' mod='packetery'}:
+                </p>
+                <p>
+                    <a href="{$updateCarriersUrl}" target="_blank">{$updateCarriersUrl}</a>
+                </p>
+            </div>
+        </div>
+    </div>
 </div>

@@ -219,9 +219,6 @@ class Packetery extends CarrierModule
         );
         $updateCarriersLink = $this->context->link->getAdminLink('PacketeryCarrierGrid') . '&action=updateCarriers';
         $this->context->smarty->assign('updateCarriersLink', $updateCarriersLink);
-        $updateCarriersCronLink = $this->context->link->getModuleLink($this->name, 'cron',
-            ['token' => \Packetery\Tools\ConfigHelper::get('PACKETERY_CRON_TOKEN'), 'task' => 'DownloadCarriers']);
-        $this->context->smarty->assign('updateCarriersCronLink', $updateCarriersCronLink);
 
         return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriers_info.tpl');
     }
@@ -401,7 +398,7 @@ class Packetery extends CarrierModule
         $numberOfFiles = \Packetery\Cron\Tasks\DeleteLabels::DEFAULT_NUMBER_OF_FILES;
 
         $deleteLabelsUrl = $link->getModuleLink(
-            'packetery',
+            $this->name,
             'cron',
             [
                 'token' => $token,
@@ -410,6 +407,17 @@ class Packetery extends CarrierModule
                 'number_of_days' => $numberOfDays,
             ]
         );
+
+        $updateCarriersUrl = $link->getModuleLink(
+            $this->name,
+            'cron',
+            [
+                'token' => $token,
+                'task' => 'DownloadCarriers'
+            ]
+        );
+
+        $this->context->smarty->assign('updateCarriersUrl', $updateCarriersUrl);
         $this->context->smarty->assign('deleteLabelsUrl', $deleteLabelsUrl);
         $this->context->smarty->assign('numberOfDays', $numberOfDays);
         $this->context->smarty->assign('numberOfFiles', $numberOfFiles);
