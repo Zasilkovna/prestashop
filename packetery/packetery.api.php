@@ -32,7 +32,7 @@ include_once(dirname(__file__) . '/packetery.class.php');
 
 class PacketeryApi
 {
-    const API_WSDL_URL = 'https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl';
+    const API_WSDL_URL = 'http://www.zasilkovna.cz/api/soap-php-bugfix.wsdl';
 
     /*LABELS*/
     public static function downloadPdfAjax()
@@ -65,7 +65,7 @@ class PacketeryApi
 
     public static function packetsLabelsPdf($packets, $apiPassword)
     {
-        $client = new SoapClient("https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl");
+        $client = new SoapClient("http://www.zasilkovna.cz/api/soap-php-bugfix.wsdl");
         $format = Configuration::get('PACKETERY_LABEL_FORMAT');
         $offset = 0;
         try
@@ -493,7 +493,7 @@ class PacketeryApi
     {
         $api_key = self::getApiPass($apiPassword);
 
-        $branch_new_url = 'https://www.zasilkovna.cz/api/v4/' . $api_key . '/branch.xml?address-delivery';
+        $branch_new_url = 'http://www.zasilkovna.cz/api/v4/' . $api_key . '/branch.xml?address-delivery';
         $branches = self::parseBranches($branch_new_url);
         if (($countBranches = self::countBranches()) && (!$branches))
         {
