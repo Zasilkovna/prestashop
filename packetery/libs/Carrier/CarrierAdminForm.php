@@ -2,6 +2,7 @@
 
 namespace Packetery\Carrier;
 
+use Country;
 use HelperForm;
 use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
@@ -158,6 +159,9 @@ class CarrierAdminForm
 
         if (Tools::isSubmit('submitCarrierOptionsForm')) {
             $this->saveCarrierOptions($carrierData, $apiCarrier);
+
+            $this->messageManager->setMessage('error', $this->module->l('You must choose at lease one vendor for every country.', 'carrieradminform'));
+            Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
         }
 
         $possibleVendors = $this->getPossibleVendors();
@@ -310,6 +314,10 @@ class CarrierAdminForm
             $allowedVendors = json_encode([$carrierData['id_branch']]);
         }
 
+        if ($allowedVendors === null) {
+            return;
+        }
+
         $this->repository->setPacketeryCarrier(
             $this->carrierId,
             $carrierData['id_branch'],
@@ -344,17 +352,22 @@ class CarrierAdminForm
     {
         $vendorsData = [];
 
-        foreach($possibleVendors as $vendor) {
-            $vendorsData[] = [
-                'id' => $vendor['id'],
-                'name' => $vendor['name'],
-                'isChecked' => in_array($vendor['id'], $allowedVendors, true),
-                'isDisabled' => $vendor['vendorsCountInSameCountry'] > 1 ? false : true,
-            ];
+        foreach($possibleVendors as $countryCode => $vendorGroups) {
+            $countryId = Country::getByIso($countryCode);
+            $countryName = Country::getNameById($this->module->getContext()->language->id, $countryId);
+            $vendorsData[$countryCode]['countryName'] = $countryName;
+
+            foreach($vendorGroups as $vendorGroup) {
+                $vendorsData[$countryCode]['groups'][] = [
+                    'id' => $countryCode . '_' . $vendorGroup['group'],
+                    'name' => $vendorGroup['group'],
+                    'label' => $vendorGroup['name'],
+                ];
+            }
         }
 
         $smarty = new \Smarty();
-        $smarty->assign('allowedVendors', $vendorsData);
+        $smarty->assign('vendorsData', $vendorsData);
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/vendors.tpl');
     }
 
@@ -476,18 +489,33 @@ class CarrierAdminForm
 
     /**
      * @param array $formData
-     * @return false|string
+     * @return string|null
      */
     private function getAllowedVendorsJsonFromForm(array $formData)
     {
         $possibleVendors = $this->getPossibleVendors();
 
-        $allowedVendors = [];
-        foreach ($possibleVendors as $vendor) {
-            $vendorFormName = 'allowed_vendors_' . $vendor['id'];
+        if (empty($possibleVendors) || !isset($formData['allowed_vendors'])) {
+            return null;
+        }
 
-            if (isset($formData[$vendorFormName]) && (bool)$formData[$vendorFormName] === true) {
-                $allowedVendors[] = $vendor['id'];
+        foreach($possibleVendors as $countryCode => $vendorGroups) {
+            if (!isset($formData['allowed_vendors'][$countryCode])) {
+                return null;
+            }
+        }
+
+        $allowedVendors = [];
+
+        foreach ($formData['allowed_vendors'] as $countryCode => $vendorGroups) {
+            // Checkbox value is "on" if checked.
+            foreach ($vendorGroups as $vendorGroup => $value) {
+
+                if (!in_array($vendorGroup, array_column($possibleVendors[$countryCode], 'group'))) {
+                    return null;
+                }
+
+                $allowedVendors[$countryCode][] = $vendorGroup;
             }
         }
 

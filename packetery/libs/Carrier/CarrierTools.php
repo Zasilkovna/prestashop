@@ -31,6 +31,7 @@ class CarrierTools
                 }
             }
         }
+
         return [$carrierZones, $carrierCountries];
     }
 

@@ -23,63 +23,79 @@ class CarrierVendors
      */
     public function getVendorsByCountries(array $countries)
     {
-        $vendors = [];
-        foreach ($this->getVendorsTypes() as $vendorData) {
-            $vendorCountries = $vendorData['countries'];
-            foreach ($countries as $country) {
-                if (array_key_exists($country, $vendorCountries)) {
-                    $vendors[] = [
-                        'id' => $vendorCountries[$country],
-                        'name' => sprintf('%s %s', $country, $vendorData['name']),
-                        'country' => $country,
-                    ];
-                }
-            }
-        }
-
-        $countryCount = [];
-        foreach ($vendors as $vendor) {
-            if (!isset($countryCount[$vendor['country']])) {
-                $countryCount[$vendor['country']] = 0;
-            }
-            $countryCount[$vendor['country']]++;
-        }
+        $vendors = $this->getVendors();
 
         $finalVendors = [];
-        foreach ($vendors as $vendor) {
-            $vendor['vendorsCountInSameCountry'] = $countryCount[$vendor['country']];
-            $finalVendors[] = $vendor;
+
+        foreach ($countries as $country) {
+            $country = strtolower($country);
+            if (isset($vendors[$country])) {
+                $finalVendors[$country] = $vendors[$country];
+            }
         }
 
         return $finalVendors;
     }
 
-    public function getVendorsTypes()
+    public function getVendors()
     {
+        $zpointName = $this->module->l('Packeta internal pickup points', 'carriervendors');
+        $zboxName = $this->module->l('Packeta', 'carriervendors') . ' Z-BOX';
+        $alzaBoxName = 'AlzaBox';
+
         return [
-            'alzabox' => [
-                'name' => $this->module->l('AlzaBox'),
-                'countries' => [
-                    'CZ' => 'czalzabox'
-                ]
+            'cz' => [
+                [
+                    'group' => 'zpoint',
+                    'country' => 'cz',
+                    'name' => $zpointName,
+                ],
+                [
+                    'group' => 'zbox',
+                    'country' => 'cz',
+                    'name' => $zboxName,
+                ],
+                [
+                    'group' => 'alzabox',
+                    'country' => 'cz',
+                    'name' => $alzaBoxName,
+                ],
             ],
-            'zpoint' => [
-                'name' => $this->module->l('Packeta internal pickup points'),
-                'countries' => [
-                    'CZ' => 'czzpoint',
-                    'SK' => 'skzpoint',
-                    'HU' => 'huzpoint',
-                    'RO' => 'rozpoint'
-                ]
+            'sk' => [
+                [
+                    'group' => 'zpoint',
+                    'country' => 'sk',
+                    'name' => $zpointName,
+                ],
+                [
+                    'group' => 'zbox',
+                    'country' => 'sk',
+                    'name' => $zboxName,
+                ],
             ],
-            'zbox' => [
-                'name' => $this->module->l('Packeta Z-BOX'),
-                'countries' => [
-                    'CZ' => 'czzbox',
-                    'SK' => 'skzbox',
-                    'HU' => 'huzbox',
-                    'RO' => 'rozbox'
-                ]
+            'hu' => [
+                [
+                    'group' => 'zpoint',
+                    'country' => 'hu',
+                    'name' => $zpointName,
+                ],
+                [
+                    'group' => 'zbox',
+                    'country' => 'hu',
+                    'name' => $zboxName,
+                ],
+            ],
+            'ro' => [
+                [
+                    'group' => 'zpoint',
+                    'country' => 'ro',
+                    'name' => $zpointName,
+                ],
+                [
+                    'group' => 'zbox',
+                    'country' => 'ro',
+                    'name' => $zboxName,
+                ],
             ],
         ];
     }
