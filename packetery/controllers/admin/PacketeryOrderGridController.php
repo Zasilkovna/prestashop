@@ -59,7 +59,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             `a`.*,
             `po`.*,
             IF(`po`.`tracking_number` IS NOT NULL, `po`.`tracking_number`, \'\') AS `tracking_number`,
-            CONCAT(`c`.`firstname`, " ", `c`.`lastname`) AS `customer`,
+            CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
             IF(`a`.`valid`, 1, 0) AS `badge_success`,
             CAST(`po`.`weight` AS DECIMAL(10,2)) AS `weight`,
             `osl`.`name` AS `osname`,
@@ -452,7 +452,6 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function getCustomerColumnValue($customerName, array $row)
     {
-        $customerName = $this->formatCustomerName($customerName);
         if (empty($row['id_customer'])) {
             return $customerName;
         }
@@ -502,30 +501,6 @@ class PacketeryOrderGridController extends ModuleAdminController
         $smarty->assign('orderId', $row['id_order']);
         $smarty->assign('disabled', $row['exported']);
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/weightEditable.tpl');
-    }
-
-    /**
-     * @param string $customerFullName
-     * @return string
-     */
-    public function formatCustomerName($customerFullName)
-    {
-        if(empty($customerFullName)) {
-            return '';
-        }
-        $customerName = explode(' ', $customerFullName);
-        $nameMaxIndex = count($customerName) - 1;
-        $customerShortenedName = '';
-
-        foreach ($customerName as $nameArrayIndex => $namePart) {
-            if ($nameArrayIndex < $nameMaxIndex) {
-                $customerShortenedName .= sprintf("%s. ", $namePart[0]);
-            } elseif($nameArrayIndex === $nameMaxIndex) {
-                $customerShortenedName .= $namePart;
-            }
-        }
-
-        return $customerShortenedName;
     }
 
     /**
