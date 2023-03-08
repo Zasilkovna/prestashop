@@ -157,11 +157,9 @@ class CarrierAdminForm
             $carrierData['name'] = CarrierTools::getCarrierNameFromShopName();
         }
 
+
         if (Tools::isSubmit('submitCarrierOptionsForm')) {
             $this->saveCarrierOptions($carrierData, $apiCarrier);
-
-            $this->messageManager->setMessage('error', $this->module->l('You must choose at lease one vendor for every country.', 'carrieradminform'));
-            Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
         }
 
         $possibleVendors = $this->getPossibleVendors();
@@ -268,14 +266,17 @@ class CarrierAdminForm
 
         $pickupPointType = $this->getPickupPointType($apiCarrier, $branchId);
 
-        $allowedVendors = null;
         if ($branchId !== Packetery::ZPOINT && $branchId !== Packetery::PP_ALL) {
-            $allowedVendors = json_encode([$branchId]);
+            $allowedVendors = null;
         }else{
             $possibleVendors = $this->getPossibleVendors();
-            foreach($possibleVendors as $possibleVendor) {
-                $allowedVendors[] = $possibleVendor['name'];
+            $allowedVendors = [];
+
+            foreach($possibleVendors as $country => $vendors) {
+                $selectedVendor = $vendors[0];
+                $allowedVendors[$country][] = $selectedVendor['group'];
             }
+
             $allowedVendors = json_encode($allowedVendors);
         }
 
@@ -309,13 +310,14 @@ class CarrierAdminForm
         $pickupPointType = $this->getPickupPointType($apiCarrier, $carrierData['id_branch']);
 
         if ($carrierData['id_branch'] === Packetery::ZPOINT || $carrierData['id_branch'] === Packetery::PP_ALL) {
-            $allowedVendors = $this->getAllowedVendorsJsonFromForm($formData);
+            $allowedVendors = $this->getAllowedVendorsFromForm($formData);
         } else {
-            $allowedVendors = json_encode([$carrierData['id_branch']]);
+            $allowedVendors = [$carrierData['id_branch']];
         }
 
-        if ($allowedVendors === null) {
-            return;
+        if (isset($allowedVendors['error'])) {
+            $this->messageManager->setMessage('warning', $allowedVendors['error']);
+            Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
         }
 
         $this->repository->setPacketeryCarrier(
@@ -326,7 +328,7 @@ class CarrierAdminForm
             $pickupPointType,
             Tools::getValue('is_cod'),
             Tools::getValue('address_validation'),
-            $allowedVendors
+            json_encode($allowedVendors)
         );
 
         $this->messageManager->setMessage('info', $this->module->l('Carrier settings were saved.', 'carrieradminform'));
@@ -362,6 +364,7 @@ class CarrierAdminForm
                     'id' => $countryCode . '_' . $vendorGroup['group'],
                     'name' => $vendorGroup['group'],
                     'label' => $vendorGroup['name'],
+                    'checked' => in_array($vendorGroup['group'], array_values($allowedVendors[$countryCode]), true)
                 ];
             }
         }
@@ -479,19 +482,18 @@ class CarrierAdminForm
      */
     private function getAllowedVendorsFromJson($json)
     {
-        $allowedVendors = json_decode($json);
+        $allowedVendors = json_decode($json, true);
         if (!is_array($allowedVendors)) {
             return [];
         }
-
         return $allowedVendors;
     }
 
     /**
      * @param array $formData
-     * @return string|null
+     * @return array|null
      */
-    private function getAllowedVendorsJsonFromForm(array $formData)
+    private function getAllowedVendorsFromForm(array $formData)
     {
         $possibleVendors = $this->getPossibleVendors();
 
@@ -501,7 +503,7 @@ class CarrierAdminForm
 
         foreach($possibleVendors as $countryCode => $vendorGroups) {
             if (!isset($formData['allowed_vendors'][$countryCode])) {
-                return null;
+                return ['error' => $this->module->l('You must select at least one vendor for each country.', 'carrieradminform')];
             }
         }
 
@@ -512,14 +514,14 @@ class CarrierAdminForm
             foreach ($vendorGroups as $vendorGroup => $value) {
 
                 if (!in_array($vendorGroup, array_column($possibleVendors[$countryCode], 'group'))) {
-                    return null;
+                    return ['error' => $this->module->l('One of selected vendor is not available anymore.', 'carrieradminform')];
                 }
 
                 $allowedVendors[$countryCode][] = $vendorGroup;
             }
         }
 
-        return json_encode($allowedVendors);
+        return $allowedVendors;
     }
 
     /**

@@ -24,13 +24,15 @@ class CarrierVendors
     public function getVendorsByCountries(array $countries)
     {
         $vendors = $this->getVendors();
-
         $finalVendors = [];
+        $countriesDefaultOrder = array_keys($vendors);
 
-        foreach ($countries as $country) {
-            $country = strtolower($country);
-            if (isset($vendors[$country])) {
-                $finalVendors[$country] = $vendors[$country];
+        foreach ($countriesDefaultOrder as $countryDefault) {
+            foreach ($countries as $country) {
+                $country = strtolower($country);
+                if ($country === $countryDefault && isset($vendors[$country])) {
+                    $finalVendors[$country] = $vendors[$country];
+                }
             }
         }
 
@@ -96,7 +98,7 @@ class CarrierVendors
                     'country' => 'ro',
                     'name' => $zboxName,
                 ],
-            ],
+            ]
         ];
     }
 }

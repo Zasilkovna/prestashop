@@ -575,16 +575,32 @@ class Packetery extends CarrierModule
             return;
         }
 
+        $addressDelivery = new AddressCore($cart->id_address_delivery);
+        $addressDeliveryCountryIso = CountryCore::getIsoById($addressDelivery->id_country);
+
         $widgetVendors = [];
         if ($packeteryCarrier['allowed_vendors'] !== null) {
             $allowedVendors = json_decode($packeteryCarrier['allowed_vendors']);
 
-            foreach ($allowedVendors as $vendor) {
-                $widgetVendors[] = [
-                    'code' => $vendor,
-                    'selected' => true
-                ];
+            foreach ($allowedVendors as $country => $vendorGroup) {
+                foreach ($vendorGroup as $vendor) {
+                    $widgetVendors[] = [
+                        'group' => $vendor !== 'zpoint' ? $vendor : '',
+                        'country' => $country,
+                        'selected' => true
+                    ];
+                }
             }
+
+            if (!array_key_exists($addressDeliveryCountryIso, $allowedVendors)) {
+                $widgetVendors = [];
+            }
+
+        }else{
+            $widgetVendors[] = [
+                'carrierId' => $packeteryCarrier['id_branch'],
+                'selected' => true
+            ];
         }
 
         $this->context->smarty->assign('widget_vendors', $widgetVendors);
