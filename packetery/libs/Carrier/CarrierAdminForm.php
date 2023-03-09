@@ -264,12 +264,18 @@ class CarrierAdminForm
     {
         $apiCarrier = $this->apiRepository->getById($branchId);
 
+        if (!$apiCarrier) {
+            $this->repository->deleteById($this->carrierId);
+            $this->messageManager->setMessage('info', $this->module->l('Carrier has been saved.', 'carrieradminform'));
+            Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
+        }
+
         $pickupPointType = $this->getPickupPointType($apiCarrier, $branchId);
 
         if ($branchId !== Packetery::ZPOINT && $branchId !== Packetery::PP_ALL) {
             $allowedVendors = null;
         }else{
-            $possibleVendors = $this->getPossibleVendors();
+            $possibleVendors = $this->getPossibleVendors($apiCarrier);
             $allowedVendors = [];
 
             foreach($possibleVendors as $country => $vendors) {
@@ -525,13 +531,17 @@ class CarrierAdminForm
     }
 
     /**
+     * @param $apiCarrier
      * @return array
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
-    private function getPossibleVendors()
+    private function getPossibleVendors($apiCarrier = null)
     {
         $carrierData = $this->repository->getById($this->carrierId);
-        $apiCarrier = $this->apiRepository->getById($carrierData['id_branch']);
+
+        if ($apiCarrier === null) {
+            $apiCarrier = $this->apiRepository->getById($carrierData['id_branch']);
+        }
 
         if ($apiCarrier['id'] === Packetery::PP_ALL || $apiCarrier['id'] === Packetery::ZPOINT) {
             $countries = $this->tools->getCountries($this->carrierId, 'iso_code');
