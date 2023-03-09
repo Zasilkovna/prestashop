@@ -576,7 +576,7 @@ class Packetery extends CarrierModule
         }
 
         $addressDelivery = new AddressCore($cart->id_address_delivery);
-        $addressDeliveryCountryIso = CountryCore::getIsoById($addressDelivery->id_country);
+        $addressDeliveryCountryIso = strtolower(CountryCore::getIsoById($addressDelivery->id_country));
 
         $widgetVendors = [];
         if ($packeteryCarrier['allowed_vendors'] !== null) {

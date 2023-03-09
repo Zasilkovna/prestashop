@@ -83,10 +83,11 @@ $(document).ready(function () {
 setTimeout(function() {
     disableTabByProductType();
 
-    $('[name="type_product"]').on('change', function(){
-        var actualProductType  = parseInt($('[name="type_product"]:checked').val());
+    $('[name="type_product"]').on('change', function () {
+        var actualProductType = parseInt($('[name="type_product"]:checked').val());
         disableTabByProductType(actualProductType);
     });
+}, 500);
 
 function disableTabByProductType(actualProductType) {
     // 0 - standard product, 1 - pack of products, 2 - virtual product
