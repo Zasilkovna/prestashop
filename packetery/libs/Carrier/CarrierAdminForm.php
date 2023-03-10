@@ -504,7 +504,7 @@ class CarrierAdminForm
         $possibleVendors = $this->getPossibleVendors();
 
         if (empty($possibleVendors) || !isset($formData['allowed_vendors'])) {
-            return null;
+            return ['error' => $this->module->l('You must select at least one vendor for each country.', 'carrieradminform')];
         }
 
         foreach($possibleVendors as $countryCode => $vendorGroups) {
