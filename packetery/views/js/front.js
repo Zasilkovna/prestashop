@@ -192,12 +192,11 @@ window.initializePacketaWidget = function ()
         Packeta.Widget.pick(packetaApiKey, function (result) {
             var $selectedDeliveryOption = module.getSelectedInput();
             $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
+            var $addressValidationResult = $widgetParent.find('.address-validation-result');
 
-            if (result != null && result.address != null) {
+            if (result != null && result.address != null && result.address.country === country) {
                 // there is also property packetaWidgetMessage which is true
                 var address = result.address;
-                var $addressValidationResult = $widgetParent.find('.address-validation-result');
-                if (address.country === country) {
                     packetery.widgetSaveOrderAddress(address);
                     $widgetParent.find('#addressValidated').val(true);
                     $addressValidationResult.addClass('address-validated');
@@ -206,14 +205,15 @@ window.initializePacketaWidget = function ()
                         address.street + ' ' + address.houseNumber + ', ' + address.city + ', ' + address.postcode
                     );
                     module.enableSubmitButton();
-                } else {
-                    $widgetParent.find('#addressValidated').val(false);
-                    $addressValidationResult.removeClass('address-validated');
-                    $addressValidationResult.text($widgetParent.find('#countryDiffersMessage').val());
-                    if (PacketaModule.ui.isAddressValidationUnsatisfied($widgetParent)) {
-                        module.disableSubmitButton();
-                    }
+                    return true;
+            } else {
+                $widgetParent.find('#addressValidated').val(false);
+                $addressValidationResult.removeClass('address-validated');
+                $addressValidationResult.text($widgetParent.find('#addressNotValidatedMessage').val());
+                if (PacketaModule.ui.isAddressValidationUnsatisfied($widgetParent)) {
+                    module.disableSubmitButton();
                 }
+                return false;
             }
         }, widgetOptions);
     });
