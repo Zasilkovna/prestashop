@@ -76,7 +76,7 @@ $(window).load(function () {
 window.initializePacketaWidget = function ()
 {
     // set YOUR Packeta API key
-    var packetaApiKey = $("#packeta-api-key").val();
+    var packetaApiKey = $('input[name="packeta-api-key"]').val();
 
     // no Packetery carrier enabled
     if (typeof packetaApiKey === 'undefined') {
@@ -89,11 +89,11 @@ window.initializePacketaWidget = function ()
         country = customerCountry;
     }
     var language = 'en';
-    var shopLanguage = $('#shop-language').val();
+    var shopLanguage = $('input[name="shop-language"]').val();
     if (shopLanguage !== '') {
         language = shopLanguage;
     }
-    var app_identity = $('#app_identity').val(); // Get module version for widgets
+    var app_identity = $('input[name="app_identity"]').val(); // Get module version for widgets
 
     var module = packeteryModulesManager.detectModule();
     $selectedInput = module.getSelectedInput();
@@ -388,7 +388,7 @@ packetery = {
 ajaxs = {
     baseuri: function ()
     {
-        return $('#baseuri').val();
+        return $('input[name="baseuri"]').val();
     },
     checkToken: function ()
     {

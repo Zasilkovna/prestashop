@@ -486,10 +486,12 @@ class Packetery extends CarrierModule
         global $language;
 
         $id_carrier = $params['carrier']['id'];
+        $base_uri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
         $this->context->smarty->assign('carrier_id', $id_carrier);
-
         $this->context->smarty->assign('app_identity', Packeteryclass::APP_IDENTITY_PREFIX . $this->version);
         $this->context->smarty->assign('language', (array)$language);
+        $this->context->smarty->assign('baseuri', $base_uri);
+        $this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
 
         $cart = $params['cart'];
 
@@ -587,9 +589,6 @@ class Packetery extends CarrierModule
             $this->context->smarty->assign('packeta_carrier_id', $carrierId);
             $this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
 
-            $base_uri = __PS_BASE_URI__ == '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-            $this->context->smarty->assign('baseuri', $base_uri);
-            $this->context->smarty->assign('packeta_api_key', PacketeryApi::getApiKey());
             $output = $this->context->smarty->fetch($this->local_path . 'views/templates/front/widget.tpl');
         }
         return $output;
