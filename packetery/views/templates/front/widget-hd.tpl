@@ -2,6 +2,7 @@
     <input type="hidden" name="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
     <input type="hidden" name="shop-language" value="{$language['iso_code']|escape:'htmlall':'UTF-8'}">
     <input type="hidden" name="app_identity" value="{$app_identity}">
+    <input type="hidden" name="packeta-api-key" class="packeta-api-key" value="{$packeta_api_key}">
     <input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
     <input type="hidden" id="customerCountry" name="customerCountry" value="{$customerCountry|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerStreet" name="customerStreet" value="{$customerStreet|escape:'htmlall':'UTF-8'}">
@@ -41,8 +42,6 @@
                             </span>
                         </li>
                     </ul>
-                    <input type="hidden" class="packeta-api-key" name="packeta-api-key"
-                           value="{$packeta_api_key}">
                 </div>
             </div>
         </div>

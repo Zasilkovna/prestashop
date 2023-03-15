@@ -25,6 +25,7 @@
     <input type="hidden" name="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
     <input type="hidden" name="carrier_id" id="carrier_id" value="{$carrier_id|escape:'htmlall':'UTF-8'}">
     <input type="hidden" name="app_identity" value="{$app_identity}">
+    <input type="hidden" name="packeta-api-key" class="packeta-api-key" value="{$packeta_api_key}">
     <input type="hidden" name="shop-language" value="{$language['iso_code']|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerCountry" name="customerCountry" value="{$customerCountry|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="zpoint_carriers" name="zpoint_carriers" value="{$zpoint_carriers}">
@@ -44,8 +45,6 @@
                     </ul>
                     <input type="hidden" id="packeta-branch-id" class="packeta-branch-id" name="packeta-branch-id"
                            value="{$id_branch}">
-                    <input type="hidden" id="packeta-api-key" class="packeta-api-key" name="packeta-api-key"
-                           value="{$packeta_api_key}">
                     <input type="hidden" id="packeta-branch-name" class="packeta-branch-name" name="packeta-branch-name"
                            value="{$name_branch}">
                     <input type="hidden" id="packeta-branch-currency" class="packeta-branch-currency" name="packeta-branch-currency"
