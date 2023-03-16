@@ -12,6 +12,7 @@ $(document).ready(function () {
         var widgetHdOptionsData = $widgetHdButton.data('widget-options');
         var widgetHdOptions = {
             layout: 'hd',
+            carrierId: widgetHdOptionsData['carrierId'],
             appIdentity: widgetHdOptionsData['appIdentity'],
             country: widgetHdOptionsData['country'],
             language: widgetHdOptionsData['language'],
@@ -21,8 +22,8 @@ $(document).ready(function () {
             postcode: widgetHdOptionsData['zip']
         };
 
-        if (widgetHdOptionsData['vendors']) {
-            widgetHdOptions.vendors = widgetHdOptionsData['vendors'];
+        if (widgetHdOptionsData['carriers']) {
+            widgetHdOptions.carriers = widgetHdOptionsData['carriers'];
         }
 
         $widgetHdButton.on('click', function (event) {

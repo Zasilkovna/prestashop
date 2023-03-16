@@ -942,7 +942,7 @@ class Packetery extends CarrierModule
             'country' => strtolower($packeteryOrder['ps_country']),
             'language' => $configHelper->getBackendLanguage(),
             'appIdentity' => $this->getAppIdentity(),
-            'vendors' => $this->getAllowedVendorsForOrder($orderId),
+            'carrierId' => $packeteryOrder['id_branch'],
         ];
         if (\Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
             $widgetOptions['street'] = $packeteryOrder['street'];
