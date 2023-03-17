@@ -1472,6 +1472,7 @@ class Packetery extends CarrierModule
 
                         $smarty = new \Smarty();
                         $smarty->assign('trackingNumber', $resultRow[1]);
+                        $smarty->assign('trackingUrl', \Packetery\Core\Helper::getTrackingUrl($resultRow[1]));
                         $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
 
                         $messages[] = [

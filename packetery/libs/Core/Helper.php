@@ -56,7 +56,7 @@ class Helper {
 	 *
 	 * @return string
 	 */
-	public function get_tracking_url( $packet_id )
+	public static function getTrackingUrl( $packet_id )
     {
 		return sprintf( self::TRACKING_URL, rawurlencode( $packet_id ) );
 	}

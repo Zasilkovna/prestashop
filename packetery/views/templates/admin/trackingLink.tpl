@@ -1,1 +1,1 @@
-<a href="https://tracking.packeta.com/?id={$trackingNumber}" target="_blank">{$trackingNumber}</a>
+<a href="{$trackingUrl}" target="_blank">{$trackingNumber}</a>

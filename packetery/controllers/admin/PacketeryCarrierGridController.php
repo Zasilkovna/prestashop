@@ -156,13 +156,17 @@ class PacketeryCarrierGridController extends ModuleAdminController
         unset($this->toolbar_btn['new']);
     }
 
+    /**
+     * @param bool $booleanValue
+     * @return false|string
+     * @throws SmartyException
+     */
     public function getIconForBoolean($booleanValue)
     {
-        if ($booleanValue) {
-            return '<span class="list-action-enable action-enabled"><i class="icon-check"></i></span>';
-        }
+        $smarty = new Smarty();
+        $smarty->assign('value', $booleanValue);
 
-        return '<span class="list-action-enable action-disabled"><i class="icon-remove"></i></span>';
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/booleanIcon.tpl');
     }
 
     public function getCarrierName($carrierId)

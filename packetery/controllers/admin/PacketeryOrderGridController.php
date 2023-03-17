@@ -100,10 +100,12 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'title' => $this->l('ID', 'packeteryordergridcontroller'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
+                'tmpTableFilter' => true,
             ],
             'reference' => [
                 'title' => $this->l('Reference', 'packeteryordergridcontroller'),
                 'callback' => 'getReferenceColumnValue',
+                'tmpTableFilter' => true,
             ],
             'customer' => [
                 'title' => $this->l('Customer', 'packeteryordergridcontroller'),
@@ -123,13 +125,15 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'list' => $this->statuses_array,
                 'filter_key' => 'os!id_order_state',
                 'filter_type' => 'int',
-                'order_key' => 'osname'
+                'order_key' => 'osname',
+                'tmpTableFilter' => true,
             ],
             'date_add' => [
                 'title' => $this->l('Date', 'packeteryordergridcontroller'),
                 'type' => 'datetime',
                 'filter_key' => 'a!date_add',
                 'align' => 'text-left',
+                'tmpTableFilter' => true,
             ],
             'is_cod' => [
                 'title' => $this->l('Is COD', 'packeteryordergridcontroller'),
@@ -148,6 +152,7 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'filter_key' => 'po!tracking_number',
                 'search' => true,
                 'orderby' => false,
+                'tmpTableFilter' => true,
             ],
             'weight' => [
                 'title' => $this->l('Weight (kg)', 'packeteryordergridcontroller'),
@@ -238,6 +243,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         if (!$packetNumbers) {
             $this->warnings[] = $this->l('Please submit selected orders first.', 'packeteryordergridcontroller');
         }
+
         return $packetNumbers;
     }
 
@@ -423,6 +429,8 @@ class PacketeryOrderGridController extends ModuleAdminController
         }
         $smarty = new Smarty();
         $smarty->assign('trackingNumber', $trackingNumber);
+        $smarty->assign('trackingUrl', \Packetery\Core\Helper::getTrackingUrl($trackingNumber));
+
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/trackingLink.tpl');
     }
 
@@ -455,7 +463,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         if (empty($row['id_customer'])) {
             return $customerName;
         }
-        $customerLink = $this->getModule()->getAdminLink('AdminCustomers', ['id_customer' => $row['id_customer'], 'viewcustomer' => true]);
+        $customerLink = $this->getModule()->getAdminLink('AdminCustomers', ['id_customer' => $row['id_customer'], 'viewcustomer' => true,]);
 
         return $this->getColumnLink($customerLink, $customerName);
     }
@@ -473,6 +481,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             'link' => $link,
             'columnValue' => $columnValue,
         ]);
+
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/orderGridColumnLink.tpl');
     }
 
@@ -485,6 +494,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $smarty = new Smarty();
         $smarty->assign('value', $booleanValue);
+
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/booleanIcon.tpl');
     }
 
@@ -500,6 +510,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         $smarty->assign('weight', $weight);
         $smarty->assign('orderId', $row['id_order']);
         $smarty->assign('disabled', $row['exported']);
+
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/weightEditable.tpl');
     }
 
@@ -536,6 +547,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             $smarty->assign('class', 'btn btn-sm label-tooltip');
             $links[$action] = $smarty->fetch(__DIR__ . '/../../views/templates/admin/link.tpl');
         }
+
         return $links;
     }
 
@@ -547,6 +559,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         if ($this->packetery === null) {
             $this->packetery = new Packetery();
         }
+
         return $this->packetery;
     }
 
