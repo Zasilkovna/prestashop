@@ -378,6 +378,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     private function getMaxOffsets()
     {
         $module = $this->getModule();
+
         return array_combine(
             array_keys($module->getAvailableLabelFormats()),
             array_column($module->getAvailableLabelFormats(), 'maxOffset')
