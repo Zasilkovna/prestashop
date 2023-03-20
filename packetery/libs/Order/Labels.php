@@ -2,7 +2,7 @@
 
 namespace Packetery\Order;
 
-use Packetery\Module\SoapApi;
+use Packetery\Core\Api\Soap\Client;
 use Packetery\Tools\ConfigHelper;
 use SoapClient;
 use SoapFault;
@@ -34,7 +34,7 @@ class Labels
      */
     public function packetsLabelsPdf($packets, $type, $offset, $packetsEnhanced = null)
     {
-        $client = new SoapClient(SoapApi::API_WSDL_URL);
+        $client = new SoapClient(Client::WSDL_URL);
         try {
             if ($type === self::TYPE_CARRIER) {
                 $format = ConfigHelper::get('PACKETERY_CARRIER_LABEL_FORMAT');

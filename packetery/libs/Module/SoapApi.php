@@ -3,6 +3,7 @@
 namespace Packetery\Module;
 
 use Packetery;
+use Packetery\Core\Api\Soap\Client;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Order\OrderRepository;
 use Packetery\Response\PacketCarrierNumber;
@@ -44,7 +45,7 @@ class SoapApi
      */
     public function senderGetReturnRouting($senderIndication)
     {
-        $client = new SoapClient(self::API_WSDL_URL);
+        $client = new SoapClient(Client::WSDL_URL);
         try {
             $response = $client->senderGetReturnRouting($this->configHelper->getApiPass(), $senderIndication);
             return $response->routingSegment;
@@ -61,7 +62,7 @@ class SoapApi
     {
         $packetInfo = new PacketInfo();
         try {
-            $client = new SoapClient(self::API_WSDL_URL);
+            $client = new SoapClient(Client::WSDL_URL);
             // get PacketInfoResult
             $response = $client->packetInfo($this->configHelper->getApiPass(), $packetId);
             if (
@@ -121,7 +122,7 @@ class SoapApi
     {
         $response = new PacketCarrierNumber();
         try {
-            $soapClient = new SoapClient(self::API_WSDL_URL);
+            $soapClient = new SoapClient(Client::WSDL_URL);
             $number = $soapClient->packetCourierNumber($this->configHelper->getApiPass(), $packetId);
             $response->setNumber($number);
         } catch (SoapFault $exception) {
