@@ -16,7 +16,6 @@ class CarrierVendors
         $this->module = $module;
     }
 
-
     /**
      * @param array $countries
      * @return array
@@ -39,6 +38,9 @@ class CarrierVendors
         return $finalVendors;
     }
 
+    /**
+     * @return array[]
+     */
     public function getVendors()
     {
         $zpointName = $this->module->l('Packeta internal pickup points', 'carriervendors');

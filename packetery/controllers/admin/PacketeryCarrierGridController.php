@@ -183,6 +183,11 @@ class PacketeryCarrierGridController extends ModuleAdminController
 
     public function displayEditLink($token = null, $carrierId, $name = null)
     {
-        return '<a class="edit btn btn-default" href="' . CarrierTools::getEditLink($carrierId) . '"><i class="icon-pencil"></i> ' . $this->l('Edit', 'packeterycarriergridcontroller') . '</a>';
+        $smarty = new Smarty();
+        $smarty->assign('link', CarrierTools::getEditLink($carrierId));
+        $smarty->assign('title', $this->l('Edit', 'packeterycarriergridcontroller'));
+        $smarty->assign('class', 'edit btn btn-default');
+        $smarty->assign('icon', 'icon-pencil');
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/link.tpl');
     }
 }

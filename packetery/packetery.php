@@ -587,7 +587,7 @@ class Packetery extends CarrierModule
                     $widgetVendors[] = [
                         'group' => $vendor !== 'zpoint' ? $vendor : '',
                         'country' => $country,
-                        'selected' => true
+                        'selected' => true,
                     ];
                 }
             }
@@ -596,10 +596,10 @@ class Packetery extends CarrierModule
                 $widgetVendors = [];
             }
 
-        }else{
+        } else {
             $widgetVendors[] = [
                 'carrierId' => $packeteryCarrier['id_branch'],
-                'selected' => true
+                'selected' => true,
             ];
         }
 
@@ -936,7 +936,6 @@ class Packetery extends CarrierModule
     {
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
-
         $widgetOptions = [
             'apiKey' => $apiKey,
             'country' => strtolower($packeteryOrder['ps_country']),
@@ -1024,7 +1023,7 @@ class Packetery extends CarrierModule
             foreach ($allowedVendors as $vendor) {
                 $widgetVendors[] = [
                     'code' => $vendor,
-                    'selected' => true
+                    'selected' => true,
                 ];
             }
         }

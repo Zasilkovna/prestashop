@@ -194,7 +194,10 @@ class CarrierAdminForm
                 'name' => 'allowed_vendors',
                 'label' => $this->module->l('Allowed pickup point types'),
                 'type' => 'html',
-                'html_content' => $this->getVendorsHtml($possibleVendors, $this->getAllowedVendorsFromJson($carrierData['allowed_vendors']))
+                'html_content' => $this->getVendorsHtml(
+                    $possibleVendors,
+                    $this->getAllowedVendorsFromJson($carrierData['allowed_vendors'])
+                ),
             ];
         }
 
@@ -229,7 +232,7 @@ class CarrierAdminForm
                 'form' => [
                     'legend' => [
                         'title' => $this->module->l('Edit carrier settings', 'carrieradminform'),
-                        'icon' => 'icon-cogs'
+                        'icon' => 'icon-cogs',
                     ],
                     'input' => $formInputs,
                     'submit' => [
@@ -274,7 +277,7 @@ class CarrierAdminForm
 
         if ($branchId !== Packetery::ZPOINT && $branchId !== Packetery::PP_ALL) {
             $allowedVendors = null;
-        }else{
+        } else {
             $possibleVendors = $this->getPossibleVendors($apiCarrier);
             $allowedVendors = [];
 
@@ -381,10 +384,10 @@ class CarrierAdminForm
     }
 
     /**
-     * @param $carrierCountries
+     * @param array $carrierCountries
      * @return bool
      */
-    private function hasInternalCountry($carrierCountries)
+    private function hasInternalCountry(array $carrierCountries)
     {
         foreach ($carrierCountries as $carrierCountry) {
             if (in_array($carrierCountry, self::$countriesWithInternalPickupPoints, true)) {
@@ -395,10 +398,10 @@ class CarrierAdminForm
     }
 
     /**
-     * @param $carrierCountries
+     * @param array $carrierCountries
      * @return bool
      */
-    private function hasPickupPointCountry($carrierCountries)
+    private function hasPickupPointCountry(array $carrierCountries)
     {
         $apiCarrierRepository = $this->module->diContainer->get(ApiCarrierRepository::class);
         $countriesWithPickupPoints = $apiCarrierRepository->getExternalPickupPointCountries();
@@ -462,6 +465,7 @@ class CarrierAdminForm
     public function getCarrierWarning(array $carrierData)
     {
         $availableCarriersData = $this->getAvailableCarriers($carrierData);
+
         return array_pop($availableCarriersData);
     }
 
@@ -492,6 +496,7 @@ class CarrierAdminForm
         if (!is_array($allowedVendors)) {
             return [];
         }
+
         return $allowedVendors;
     }
 
@@ -518,7 +523,6 @@ class CarrierAdminForm
         foreach ($formData['allowed_vendors'] as $countryCode => $vendorGroups) {
             // Checkbox value is "on" if checked.
             foreach ($vendorGroups as $vendorGroup => $value) {
-
                 if (!in_array($vendorGroup, array_column($possibleVendors[$countryCode], 'group'))) {
                     return ['error' => $this->module->l('One of selected vendor is not available anymore.', 'carrieradminform')];
                 }

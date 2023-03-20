@@ -215,7 +215,12 @@ class CarrierRepository
 
         $isPacketeryCarrier = $this->existsById($carrierId);
         if ($branchId === '' && $isPacketeryCarrier) {
-            $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0, 'allowed_vendors' => null];
+            $carrierUpdate = [
+                'is_module' => 0,
+                'external_module_name' => null,
+                'need_range' => 0,
+                'allowed_vendors' => null,
+            ];
             $result = $this->deleteById($carrierId);
         } else {
             $fieldsToSet = [

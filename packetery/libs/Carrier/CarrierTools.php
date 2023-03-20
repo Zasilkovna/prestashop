@@ -37,11 +37,13 @@ class CarrierTools
 
     /**
      * @param int $carrierId
-     * @return mixed
+     * @return array
      */
-    public function getCountries($carrierId, $countryParam = 'name') {
+    public function getCountries($carrierId, $countryParam = 'name')
+    {
         $zonesAndCountries = $this->getZonesAndCountries($carrierId, $countryParam);
-        return array_pop($zonesAndCountries);
+
+        return (array)array_pop($zonesAndCountries);
     }
 
     /**
