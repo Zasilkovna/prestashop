@@ -1043,9 +1043,12 @@ class Packetery extends CarrierModule
     {
         if (Tools::version_compare(_PS_VERSION_, '1.7.5', '<')) {
             // Code compliant from PrestaShop 1.5 to 1.7.4
-            return $this->context->link->getAdminLink(
-                $controller
-            ) . '&' . http_build_query($params) . $anchor;
+            return sprintf(
+                '%s&%s%s',
+                $this->context->link->getAdminLink($controller),
+                http_build_query($params),
+                $anchor
+            );
         }
         // Recommended code from PrestaShop 1.7.5
         return $this->context->link->getAdminLink(
