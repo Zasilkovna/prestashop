@@ -287,10 +287,11 @@ PacketaModule.ui = {
                 return;
             }
             var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
-            var widgetCarriers = $widgetParent.find('#widget_carriers').val();
-            if (widgetCarriers !== '') {
-                widgetOptions.carriers = widgetCarriers;
+            var widgetVendors = $widgetParent.find('#widget_vendors').val();
+            if (widgetVendors !== '') {
+                widgetOptions.vendors = JSON.parse(widgetVendors);
             }
+
             Packeta.Widget.pick(PacketaModule.config.apiKey, function (pickupPoint) {
                 if (pickupPoint == null) {
                     return;

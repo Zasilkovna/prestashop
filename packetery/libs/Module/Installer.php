@@ -172,7 +172,8 @@ class Installer
             `currency_branch` char(3) NULL,
             `is_cod` tinyint(1) NOT NULL DEFAULT 0,
             `pickup_point_type` varchar(40) NULL,
-            `address_validation` varchar(40) NULL
+            `address_validation` varchar(40) NULL,
+            `allowed_vendors` text NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product_attribute`';

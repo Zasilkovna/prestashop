@@ -94,8 +94,8 @@ class CarrierRepository
     {
         $carrierId = (int)$carrierId;
         return $this->dbTools->getRow('
-            SELECT `id_carrier`, `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`,
-                   `address_validation`
+            SELECT `id_carrier`, `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`, 
+                   `address_validation`, `allowed_vendors`
             FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
             WHERE `id_carrier` = ' . $carrierId);
     }
@@ -109,7 +109,7 @@ class CarrierRepository
     {
         $carrierId = (int)$carrierId;
         return $this->dbTools->getRow('
-            SELECT `c`.`id_carrier`, `name`, `id_branch`, `is_cod`, `address_validation`
+            SELECT `c`.`id_carrier`, `name`, `id_branch`, `is_cod`, `address_validation`, `allowed_vendors`
             FROM `' . _DB_PREFIX_ . 'carrier` `c`
             LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` USING(`id_carrier`)
             WHERE `c`.`id_carrier` = ' . $carrierId);
@@ -197,7 +197,16 @@ class CarrierRepository
      * @return bool
      * @throws DatabaseException
      */
-    public function setPacketeryCarrier($carrierId, $branchId, $branchName, $branchCurrency, $pickupPointType, $isCod, $addressValidation)
+    public function setPacketeryCarrier(
+        $carrierId,
+        $branchId,
+        $branchName,
+        $branchCurrency,
+        $pickupPointType,
+        $isCod,
+        $addressValidation,
+        $allowedVendors
+    )
     {
         $carrierId = (int)$carrierId;
         $branchId = (string)$branchId;
@@ -206,14 +215,20 @@ class CarrierRepository
 
         $isPacketeryCarrier = $this->existsById($carrierId);
         if ($branchId === '' && $isPacketeryCarrier) {
-            $carrierUpdate = ['is_module' => 0, 'external_module_name' => null, 'need_range' => 0];
+            $carrierUpdate = [
+                'is_module' => 0,
+                'external_module_name' => null,
+                'need_range' => 0,
+                'allowed_vendors' => null,
+            ];
             $result = $this->deleteById($carrierId);
         } else {
             $fieldsToSet = [
                 'pickup_point_type' => $pickupPointType,
-                'id_branch' => $this->db->escape($branchId),
-                'name_branch' => $this->db->escape($branchName),
-                'is_cod' => $isCod,
+                'id_branch'         => $this->db->escape($branchId),
+                'name_branch'       => $this->db->escape($branchName),
+                'is_cod'            => $isCod,
+                'allowed_vendors'   => $allowedVendors,
             ];
             if ($pickupPointType === null) {
                 if (!$addressValidation) {

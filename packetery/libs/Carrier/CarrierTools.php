@@ -6,6 +6,7 @@ namespace Packetery\Carrier;
 use Carrier;
 use ConfigurationCore as Configuration;
 use CountryCore as Country;
+use Context;
 
 class CarrierTools
 {
@@ -30,7 +31,19 @@ class CarrierTools
                 }
             }
         }
-        return array($carrierZones, $carrierCountries);
+
+        return [$carrierZones, $carrierCountries];
+    }
+
+    /**
+     * @param int $carrierId
+     * @return array
+     */
+    public function getCountries($carrierId, $countryParam = 'name')
+    {
+        $zonesAndCountries = $this->getZonesAndCountries($carrierId, $countryParam);
+
+        return (array)array_pop($zonesAndCountries);
     }
 
     /**
@@ -45,5 +58,21 @@ class CarrierTools
         }
 
         return str_replace(['#', ';'], '', Configuration::get('PS_SHOP_NAME'));
+    }
+
+    /**
+     * @param int $carrierId
+     * @return string
+     */
+    public static function getEditLink($carrierId)
+    {
+        $parameters = [
+            'id_carrier' => $carrierId,
+            'viewcarrier' => 1,
+        ];
+        $getParameters = http_build_query($parameters);
+        $gridBaseUrl = Context::getContext()->link->getAdminLink('PacketeryCarrierGrid');
+
+        return sprintf('%s&%s', $gridBaseUrl, $getParameters);
     }
 }

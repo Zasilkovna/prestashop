@@ -574,13 +574,36 @@ class Packetery extends CarrierModule
         if (!$packeteryCarrier) {
             return;
         }
-        $widgetCarriers = '';
-        if (is_numeric($packeteryCarrier['id_branch'])) {
-            $widgetCarriers = $packeteryCarrier['id_branch'];
-        } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
-            $widgetCarriers = 'packeta';
+
+        $addressDelivery = new AddressCore($cart->id_address_delivery);
+        $addressDeliveryCountryIso = strtolower(CountryCore::getIsoById($addressDelivery->id_country));
+
+        $widgetVendors = [];
+        if ($packeteryCarrier['allowed_vendors'] !== null) {
+            $allowedVendors = json_decode($packeteryCarrier['allowed_vendors']);
+
+            foreach ($allowedVendors as $country => $vendorGroup) {
+                foreach ($vendorGroup as $vendor) {
+                    $widgetVendors[] = [
+                        'group' => $vendor !== 'zpoint' ? $vendor : '',
+                        'country' => $country,
+                        'selected' => true,
+                    ];
+                }
+            }
+
+            if (!array_key_exists($addressDeliveryCountryIso, $allowedVendors)) {
+                $widgetVendors = [];
+            }
+
+        } else {
+            $widgetVendors[] = [
+                'carrierId' => $packeteryCarrier['id_branch'],
+                'selected' => true,
+            ];
         }
-        $this->context->smarty->assign('widget_carriers', $widgetCarriers);
+
+        $this->context->smarty->assign('widget_vendors', $widgetVendors);
 
         $orderData = null;
         if (!empty($cart) && ($packeteryCarrier['pickup_point_type'] !== null || $packeteryCarrier['address_validation'] !== 'none')) {
@@ -917,8 +940,8 @@ class Packetery extends CarrierModule
             'apiKey' => $apiKey,
             'country' => strtolower($packeteryOrder['ps_country']),
             'language' => $configHelper->getBackendLanguage(),
-            'carrierId' => $packeteryOrder['id_branch'],
             'appIdentity' => $this->getAppIdentity(),
+            'carrierId' => $packeteryOrder['id_branch'],
         ];
         if (\Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
             $widgetOptions['street'] = $packeteryOrder['street'];
@@ -949,11 +972,12 @@ class Packetery extends CarrierModule
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $widgetOptions = [
-            'api_key' => $apiKey,
+            'apiKey' => $apiKey,
             'appIdentity' => $this->getAppIdentity(),
             'country' => strtolower($packeteryOrder['country']),
             'module_dir' => _MODULE_DIR_,
             'lang' => $configHelper->getBackendLanguage(),
+            'vendors' => $this->getAllowedVendorsForOrder($orderId),
         ];
         if (
             $packeteryCarrier['pickup_point_type'] === 'external' &&
@@ -966,6 +990,45 @@ class Packetery extends CarrierModule
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
         $this->context->smarty->assign('returnUrl', $this->getAdminLink($orderId));
+    }
+
+    /**
+     * @param int $orderId
+     * @return array
+     * @throws ReflectionException
+     * @throws \Packetery\Exceptions\DatabaseException
+     */
+    public function getAllowedVendorsForOrder($orderId)
+    {
+        /** @var \Packetery\Order\OrderRepository $orderRepository */
+        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+
+        $packeteryOrder = $orderRepository->getById($orderId);
+        if (empty($packeteryOrder)) {
+            return [];
+        }
+
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById($packeteryOrder['id_carrier']);
+        if (empty($packeteryCarrier)) {
+            return [];
+        }
+
+        $widgetVendors = [];
+        if ($packeteryCarrier['allowed_vendors'] !== null) {
+            $allowedVendors = json_decode($packeteryCarrier['allowed_vendors']);
+
+            foreach ($allowedVendors as $vendor) {
+                $widgetVendors[] = [
+                    'code' => $vendor,
+                    'selected' => true,
+                ];
+            }
+        }
+
+        return $widgetVendors;
     }
 
     /**

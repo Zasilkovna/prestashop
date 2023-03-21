@@ -4,6 +4,7 @@ use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Carrier\CarrierAdminForm;
 use Packetery\Carrier\CarrierRepository;
 use Packetery\Tools\MessageManager;
+use Packetery\Carrier\CarrierTools;
 
 class PacketeryCarrierGridController extends ModuleAdminController
 {
@@ -126,7 +127,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
             }
             foreach ($this->_list as $carrierData) {
                 $carrierHelper = new CarrierAdminForm($carrierData['id_carrier'], $module);
-                list($availableCarriers, $warning) = $carrierHelper->getAvailableCarriers($apiCarrierRepository, $carrierData);
+                $warning = $carrierHelper->getCarrierWarning($carrierData);
                 if ($warning) {
                     $this->warnings[] = $warning;
                 }
@@ -182,8 +183,11 @@ class PacketeryCarrierGridController extends ModuleAdminController
 
     public function displayEditLink($token = null, $carrierId, $name = null)
     {
-        $link = sprintf('%s&amp;viewcarrier&amp;id_carrier=%s', $this->context->link->getAdminLink('PacketeryCarrierGrid'), $carrierId);
-        return '<a class="edit btn btn-default" href="' . $link . '"><i class="icon-pencil"></i> ' . $this->l('Edit', 'packeterycarriergridcontroller') . '</a>';
+        $smarty = new Smarty();
+        $smarty->assign('link', CarrierTools::getEditLink($carrierId));
+        $smarty->assign('title', $this->l('Edit', 'packeterycarriergridcontroller'));
+        $smarty->assign('class', 'edit btn btn-default');
+        $smarty->assign('icon', 'icon-pencil');
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/link.tpl');
     }
-
 }
