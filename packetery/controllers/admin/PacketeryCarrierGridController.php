@@ -166,7 +166,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $smarty = new Smarty();
         $smarty->assign('value', $booleanValue);
 
-        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/booleanIcon.tpl');
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/booleanIcon.tpl');
     }
 
     public function getCarrierName($carrierId)
@@ -192,6 +192,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $smarty->assign('title', $this->l('Edit', 'packeterycarriergridcontroller'));
         $smarty->assign('class', 'edit btn btn-default');
         $smarty->assign('icon', 'icon-pencil');
-        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/link.tpl');
+
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/grid/link.tpl');
     }
 }

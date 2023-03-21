@@ -483,7 +483,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             'columnValue' => $columnValue,
         ]);
 
-        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/orderGridColumnLink.tpl');
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/targetBlankLink.tpl');
     }
 
     /**
@@ -496,7 +496,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         $smarty = new Smarty();
         $smarty->assign('value', $booleanValue);
 
-        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/booleanIcon.tpl');
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/booleanIcon.tpl');
     }
 
     /**
@@ -512,7 +512,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         $smarty->assign('orderId', $row['id_order']);
         $smarty->assign('disabled', $row['exported']);
 
-        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/weightEditable.tpl');
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/weightEditable.tpl');
     }
 
     /**
@@ -546,7 +546,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             $smarty->assign('title', $title);
             $smarty->assign('icon', $iconClass);
             $smarty->assign('class', 'btn btn-sm label-tooltip');
-            $links[$action] = $smarty->fetch(__DIR__ . '/../../views/templates/admin/link.tpl');
+            $links[$action] = $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/link.tpl');
         }
 
         return $links;
