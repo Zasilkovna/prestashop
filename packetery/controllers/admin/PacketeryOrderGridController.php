@@ -59,8 +59,9 @@ class PacketeryOrderGridController extends ModuleAdminController
             `a`.*,
             `po`.*,
             IF(`po`.`tracking_number` IS NOT NULL, `po`.`tracking_number`, \'\') AS `tracking_number`,
-            CONCAT(`c`.`firstname`, " ", `c`.`lastname`) AS `customer`,
+            CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
             IF(`a`.`valid`, 1, 0) AS `badge_success`,
+            CAST(`po`.`weight` AS DECIMAL(10,2)) AS `weight`,
             `osl`.`name` AS `osname`,
             `os`.`color`
         ';
@@ -99,13 +100,17 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'title' => $this->l('ID', 'packeteryordergridcontroller'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
+                'tmpTableFilter' => true,
             ],
             'reference' => [
                 'title' => $this->l('Reference', 'packeteryordergridcontroller'),
+                'callback' => 'getReferenceColumnValue',
+                'tmpTableFilter' => true,
             ],
             'customer' => [
                 'title' => $this->l('Customer', 'packeteryordergridcontroller'),
                 'havingFilter' => false,
+                'callback' => 'getCustomerColumnValue',
             ],
             'total_paid' => [
                 'title' => $this->l('Total Price', 'packeteryordergridcontroller'),
@@ -120,12 +125,15 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'list' => $this->statuses_array,
                 'filter_key' => 'os!id_order_state',
                 'filter_type' => 'int',
-                'order_key' => 'osname'
+                'order_key' => 'osname',
+                'tmpTableFilter' => true,
             ],
             'date_add' => [
-                'title' => $this->l('Order Date', 'packeteryordergridcontroller'),
+                'title' => $this->l('Date', 'packeteryordergridcontroller'),
                 'type' => 'datetime',
                 'filter_key' => 'a!date_add',
+                'align' => 'text-left',
+                'tmpTableFilter' => true,
             ],
             'is_cod' => [
                 'title' => $this->l('Is COD', 'packeteryordergridcontroller'),
@@ -135,36 +143,22 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'filter_key' => 'po!is_cod',
             ],
             'name_branch' => [
-                'title' => $this->l('Destination pickup point', 'packeteryordergridcontroller'),
+                'title' => $this->l('Pickup point / Carrier', 'packeteryordergridcontroller'),
                 'filter_key' => 'po!name_branch',
-            ],
-            'is_ad' => [
-                'title' => $this->l('Delivery type', 'packeteryordergridcontroller'),
-                'align' => 'center',
-                'callback' => 'getDeliveryTypeHtml',
-                'filter_key' => 'po!is_ad',
-                'type' => 'select',
-                // it's a boolean column, depends on order
-                'list' => ['PP', 'HD'],
-            ],
-            'exported' => [
-                'title' => $this->l('Exported', 'packeteryordergridcontroller'),
-                'type' => 'bool',
-                'align' => 'center',
-                'callback' => 'getIconForBoolean',
-                'filter_key' => 'po!exported',
             ],
             'tracking_number' => [
                 'title' => $this->l('Tracking number', 'packeteryordergridcontroller'),
                 'callback' => 'getTrackingLink',
                 'filter_key' => 'po!tracking_number',
-                'search' => false,
+                'search' => true,
                 'orderby' => false,
+                'tmpTableFilter' => true,
             ],
             'weight' => [
                 'title' => $this->l('Weight (kg)', 'packeteryordergridcontroller'),
                 'type' => 'editable',
                 'search' => false,
+                'callback' => 'getWeightEditable',
             ],
         ];
 
@@ -216,7 +210,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         if ($this->errors) {
             return;
         }
-        Tools::redirectAdmin(self::$currentIndex . '&token=' . $this->token);
+        $this->confirmations[] = $this->l('The shipments were successfully submitted.', 'packeteryordergridcontroller');
     }
 
     public function processBulkCreatePacket()
@@ -249,6 +243,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         if (!$packetNumbers) {
             $this->warnings[] = $this->l('Please submit selected orders first.', 'packeteryordergridcontroller');
         }
+
         return $packetNumbers;
     }
 
@@ -375,9 +370,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             }
         }
 
-        $this->addRowAction('edit');
-        $this->addRowAction('submit');
-        $this->addRowAction('print');
+        $this->addRowAction('action');
 
         return parent::renderList();
     }
@@ -385,6 +378,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     private function getMaxOffsets()
     {
         $module = $this->getModule();
+
         return array_combine(
             array_keys($module->getAvailableLabelFormats()),
             array_column($module->getAvailableLabelFormats(), 'maxOffset')
@@ -425,7 +419,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     /**
      * @param string|null $trackingNumber
-     * @return string|false
+     * @return string
      * @throws ReflectionException
      * @throws SmartyException
      */
@@ -436,45 +430,99 @@ class PacketeryOrderGridController extends ModuleAdminController
         }
         $smarty = new Smarty();
         $smarty->assign('trackingNumber', $trackingNumber);
-        /** @var SoapApi $soapApi */
-        $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
-        $packetInfo = $soapApi->getPacketInfo($trackingNumber);
-        if ($packetInfo->hasFault()) {
-            $this->warnings = sprintf(
-                '%s: %s',
-                $this->l('Retrieving shipment information failed', 'packeteryordergridcontroller'),
-                $trackingNumber
-            );
-        } else {
-            $smarty->assign([
-                'carrierNumber' => $packetInfo->getNumber(),
-                'carrierTrackingUrl' => $packetInfo->getTrackingLink(),
-            ]);
-        }
-        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/trackingLink.tpl');
+        $smarty->assign('trackingUrl', \Packetery\Core\Helper::getTrackingUrl($trackingNumber));
+
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/trackingLink.tpl');
     }
 
+    /**
+     * @param string $columnValue
+     * @param array $row
+     * @return false|string
+     * @throws PrestaShopException
+     * @throws SmartyException
+     */
+    public function getReferenceColumnValue($columnValue, array $row)
+    {
+        if (empty($row['id_order'])) {
+            return $columnValue;
+        }
+        $orderLink = $this->getModule()->getAdminLink('AdminOrders', ['id_order' => $row['id_order'], 'vieworder' => true], '#packetaPickupPointChange');
+
+        return $this->getColumnLink($orderLink, $columnValue);
+    }
+
+    /**
+     * @param string|null $customerName
+     * @param array $row
+     * @return false|string
+     * @throws PrestaShopException
+     * @throws SmartyException
+     */
+    public function getCustomerColumnValue($customerName, array $row)
+    {
+        if (empty($row['id_customer'])) {
+            return $customerName;
+        }
+        $customerLink = $this->getModule()->getAdminLink('AdminCustomers', ['id_customer' => $row['id_customer'], 'viewcustomer' => true,]);
+
+        return $this->getColumnLink($customerLink, $customerName);
+    }
+
+    /**
+     * @param string $link
+     * @param string $columnValue
+     * @return false|string
+     * @throws SmartyException
+     */
+    public function getColumnLink($link, $columnValue)
+    {
+        $smarty = new Smarty();
+        $smarty->assign([
+            'link' => $link,
+            'columnValue' => $columnValue,
+        ]);
+
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/targetBlankLink.tpl');
+    }
+
+    /**
+     * @param bool $booleanValue
+     * @return false|string
+     * @throws SmartyException
+     */
     public function getIconForBoolean($booleanValue)
     {
         $smarty = new Smarty();
         $smarty->assign('value', $booleanValue);
-        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/booleanIcon.tpl');
+
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/booleanIcon.tpl');
     }
 
-    public function getDeliveryTypeHtml($deliveryType)
+    /**
+     * @param float $weight
+     * @param array $row
+     * @return false|string
+     * @throws SmartyException
+     */
+    public function getWeightEditable($weight, array $row)
     {
-        if ($deliveryType === '1') {
-            return 'HD';
-        }
-        if ($deliveryType === '0') {
-            return 'PP';
-        }
         $smarty = new Smarty();
-        $smarty->assign('prependText', 'HD');
-        $smarty->assign('value', ($deliveryType === 'HD-OK'));
-        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/booleanIcon.tpl');
+        $smarty->assign('weight', $weight);
+        $smarty->assign('orderId', $row['id_order']);
+        $smarty->assign('disabled', $row['exported']);
+
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/weightEditable.tpl');
     }
 
+    /**
+     * @param int $orderId
+     * @return array
+     * @throws DatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
+     * @throws SmartyException
+     */
     private function getActionLinks($orderId)
     {
         $links = [];
@@ -486,49 +534,48 @@ class PacketeryOrderGridController extends ModuleAdminController
             if ($orderData['tracking_number']) {
                 $action = 'print';
                 $iconClass = 'icon-print';
-                $title = $this->l('Print', 'packeteryordergridcontroller');
+                $title = $this->l('Print labels', 'packeteryordergridcontroller');
             } else {
                 $action = 'submit';
                 $iconClass = 'icon-send';
-                $title = $this->l('Export', 'packeteryordergridcontroller');
+                $title = $this->l('Submit packet', 'packeteryordergridcontroller');
             }
-            $href = sprintf('%s&amp;id_order=%s&amp;action=%s', $this->context->link->getAdminLink('PacketeryOrderGrid'), $orderId, $action);
+            $href = $this->getModule()->getAdminLink('PacketeryOrderGrid', ['id_order' => $orderId, 'action' => $action]);
             $smarty = new Smarty();
             $smarty->assign('link', $href);
             $smarty->assign('title', $title);
             $smarty->assign('icon', $iconClass);
-            $links[$action] = $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/link.tpl');
+            $smarty->assign('class', 'btn btn-sm label-tooltip');
+            $links[$action] = $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/link.tpl');
         }
+
         return $links;
     }
 
+    /**
+     * @return Packetery
+     */
     private function getModule()
     {
         if ($this->packetery === null) {
             $this->packetery = new Packetery();
         }
+
         return $this->packetery;
     }
 
-    public function displayEditLink($token = null, $orderId, $name = null)
+    /**
+     * @param string $token
+     * @param int $orderId
+     * @return string
+     */
+    public function displayActionLink($token = null, $orderId)
     {
-        $smarty = new Smarty();
-        $smarty->assign('link', $this->getModule()->getAdminLink($orderId, ''));
-        $smarty->assign('title', $this->l('Detail', 'packeteryordergridcontroller'));
-        $smarty->assign('class', 'edit btn btn-default');
-        $smarty->assign('icon', 'icon-pencil');
-        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/link.tpl');
-    }
+        $actionLinkHtml = '';
+        foreach ($this->getActionLinks($orderId) as $link) {
+            $actionLinkHtml .= $link;
+        }
 
-    public function displaySubmitLink($token = null, $orderId, $name = null)
-    {
-        $actionLinks = $this->getActionLinks($orderId);
-        return (isset($actionLinks['submit']) ? $actionLinks['submit'] : '');
-    }
-
-    public function displayPrintLink($token = null, $orderId, $name = null)
-    {
-        $actionLinks = $this->getActionLinks($orderId);
-        return (isset($actionLinks['print']) ? $actionLinks['print'] : '');
+        return $actionLinkHtml;
     }
 }

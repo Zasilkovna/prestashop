@@ -394,6 +394,7 @@ class CarrierAdminForm
                 return true;
             }
         }
+
         return false;
     }
 
@@ -410,6 +411,7 @@ class CarrierAdminForm
                 return true;
             }
         }
+
         return false;
     }
 

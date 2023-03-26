@@ -217,7 +217,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign(
             ['totalCarriers' => $totalCarriers, 'lastCarriersUpdate' => $lastCarriersUpdate]
         );
-        $updateCarriersLink = $this->context->link->getAdminLink('PacketeryCarrierGrid') . '&action=updateCarriers';
+        $updateCarriersLink = $this->getAdminLink('PacketeryCarrierGrid', ['action' => 'updateCarriers']);
         $this->context->smarty->assign('updateCarriersLink', $updateCarriersLink);
 
         return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriers_info.tpl');
@@ -957,7 +957,7 @@ class Packetery extends CarrierModule
             $widgetOptions['street'] = $deliveryAddress->address1;
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
-        $this->context->smarty->assign('returnUrl', $this->getAdminLink($orderId));
+        $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
     }
 
     /**
@@ -989,8 +989,9 @@ class Packetery extends CarrierModule
             $widgetOptions['carriers'] = 'packeta';
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
-        $this->context->smarty->assign('returnUrl', $this->getAdminLink($orderId));
+        $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
     }
+
 
     /**
      * @param int $orderId
@@ -1033,25 +1034,28 @@ class Packetery extends CarrierModule
 
     /**
      * see https://devdocs.prestashop.com/1.7/modules/core-updates/1.7.5/
-     * @param int $orderId
-     * @param string $anchor
+     * @param string $controller
+     * @param array|null $params
+     * @param string|null $anchor
      * @return string
-     * @throws PrestaShopException
      */
-    public function getAdminLink($orderId, $anchor = '#packetaPickupPointChange')
+    public function getAdminLink($controller, array $params = [], $anchor = '')
     {
         if (Tools::version_compare(_PS_VERSION_, '1.7.5', '<')) {
             // Code compliant from PrestaShop 1.5 to 1.7.4
-            return $this->context->link->getAdminLink(
-                'AdminOrders'
-            ) . '&id_order=' . $orderId . '&vieworder'. $anchor;
+            return sprintf(
+                '%s&%s%s',
+                $this->context->link->getAdminLink($controller),
+                http_build_query($params),
+                $anchor
+            );
         }
         // Recommended code from PrestaShop 1.7.5
         return $this->context->link->getAdminLink(
-            'AdminOrders',
+            $controller,
             true,
             [],
-            ['id_order' => $orderId, 'vieworder' => 1]
+            $params
         ) . $anchor;
     }
 
@@ -1471,7 +1475,8 @@ class Packetery extends CarrierModule
 
                         $smarty = new \Smarty();
                         $smarty->assign('trackingNumber', $resultRow[1]);
-                        $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/packeteryTrackingLink.tpl');
+                        $smarty->assign('trackingUrl', \Packetery\Core\Helper::getTrackingUrl($resultRow[1]));
+                        $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
 
                         $messages[] = [
                             'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryTrackingLink,
@@ -1595,7 +1600,7 @@ class Packetery extends CarrierModule
 
         $this->context->smarty->assign([
                 'packeteryAgeVerification' => $packeteryAgeVerification['is_adult'],
-                'adminProductUrl' => $this->context->link->getAdminLink('AdminProducts'),
+                'adminProductUrl' => $this->getAdminLink('AdminProducts'),
                 'isPrestaShop16' => $isPrestaShop16,
         ]);
 

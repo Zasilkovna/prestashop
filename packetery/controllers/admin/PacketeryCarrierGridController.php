@@ -156,13 +156,17 @@ class PacketeryCarrierGridController extends ModuleAdminController
         unset($this->toolbar_btn['new']);
     }
 
+    /**
+     * @param bool $booleanValue
+     * @return false|string
+     * @throws SmartyException
+     */
     public function getIconForBoolean($booleanValue)
     {
-        if ($booleanValue) {
-            return '<span class="list-action-enable action-enabled"><i class="icon-check"></i></span>';
-        }
+        $smarty = new Smarty();
+        $smarty->assign('value', $booleanValue);
 
-        return '<span class="list-action-enable action-disabled"><i class="icon-remove"></i></span>';
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/booleanIcon.tpl');
     }
 
     public function getCarrierName($carrierId)
@@ -188,6 +192,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $smarty->assign('title', $this->l('Edit', 'packeterycarriergridcontroller'));
         $smarty->assign('class', 'edit btn btn-default');
         $smarty->assign('icon', 'icon-pencil');
-        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/link.tpl');
+
+        return $smarty->fetch(dirname(__FILE__) . '/../../views/templates/admin/grid/link.tpl');
     }
 }
