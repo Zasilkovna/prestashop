@@ -564,9 +564,12 @@ class Packetery extends CarrierModule
         $customerZip = '';
         if (isset($cart->id_address_delivery) && !empty($cart->id_address_delivery)) {
             $address = new AddressCore($cart->id_address_delivery);
-            $customerStreet = $address->address1;
-            $customerCity = $address->city;
+            $customerStreet = trim($address->address1);
+            $customerCity = trim($address->city);
             $customerZip = str_replace(' ', '', $address->postcode);
+            if ($customerZip === '0') {
+                $customerZip = '';
+            }
         }
 
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
