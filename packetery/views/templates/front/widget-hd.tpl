@@ -1,9 +1,10 @@
 <div id="packetery-carrier-{$carrier_id|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="widget_vendors" name="widget_vendors" value='{$widget_vendors|@json_encode|escape}'>
-    <input type="hidden" id="customerStreet" name="customerStreet" value="{if $customerStreet && !empty($customerStreet)}{$customerStreet|escape:'htmlall':'UTF-8'}{/if}">
+    <input type="hidden" id="customerStreet" name="customerStreet" value="{$customerStreet|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerHouseNumber" name="customerHouseNumber" value="{$customerHouseNumber|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" id="customerCity" name="customerCity" value="{if $customerCity && !empty($customerCity)}{$customerCity|escape:'htmlall':'UTF-8'}{/if}">
-    <input type="hidden" id="customerZip" name="customerZip" value="{if $customerZip && !empty($customerZip)}{$customerZip|escape:'htmlall':'UTF-8'}{/if}">
+    <input type="hidden" id="customerCity" name="customerCity" value="{$customerCity|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="customerZip" name="customerZip" value="{$customerZip|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" id="addressValidated" name="addressValidated" value="{$addressValidated|escape:'htmlall':'UTF-8'}">
     <div id="packetery-widget" class="clearfix">
         <div class="widget-left">
             <div class="col-md-12">
