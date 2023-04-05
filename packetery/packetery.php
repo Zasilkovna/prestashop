@@ -623,13 +623,13 @@ class Packetery extends CarrierModule
                 $addressValidated = true;
                 $this->context->smarty->assign('customerStreet', $orderData['street']);
                 $this->context->smarty->assign('customerHouseNumber', $orderData['house_number']);
-                $this->context->smarty->assign('customerCity', $orderData['city']);
+                $this->context->smarty->assign('customerCity', trim($orderData['city']));
                 $this->context->smarty->assign('customerZip', str_replace(' ', '', $orderData['zip']));
             } else {
-                $this->context->smarty->assign('customerStreet', $customerStreet);
+                $this->context->smarty->assign('customerStreet', trim($customerStreet));
                 $this->context->smarty->assign('customerHouseNumber', '');
-                $this->context->smarty->assign('customerCity', $customerCity);
-                $this->context->smarty->assign('customerZip', $customerZip);
+                $this->context->smarty->assign('customerCity', trim($customerCity));
+                $this->context->smarty->assign('customerZip', ($customerZip !== '0') ? trim($customerZip) : '');
             }
             $this->context->smarty->assign('addressValidationSetting', $packeteryCarrier['address_validation']);
             $this->context->smarty->assign('addressValidated', $addressValidated);
