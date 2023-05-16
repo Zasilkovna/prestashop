@@ -83,7 +83,7 @@ class Packetery extends CarrierModule
         $this->displayName = $this->l('Packeta');
         $this->description = $this->l('Packeta pick-up points, orders export, and print shipping labels');
 
-        $this->ps_versions_compliancy = array('min' => '1.6.0.0', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7.0.0', 'max' => _PS_VERSION_);
     }
 
     /**
