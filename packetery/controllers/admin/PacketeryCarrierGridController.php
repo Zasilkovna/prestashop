@@ -30,7 +30,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $this->identifier = 'id_carrier';
 
         $this->_select = '
-            `a`.`id_carrier`, `a`.`active`,
+            `a`.`id_carrier`, `a`.`active` AS `is_active`,
             `pc`.`id_branch`, `pc`.`is_cod`, `pc`.`pickup_point_type`
         ';
         $this->_join = '
@@ -91,9 +91,10 @@ class PacketeryCarrierGridController extends ModuleAdminController
                 'filter_type' => 'string',
                 'callback' => 'getCarrierName',
             ],
-            'active' => [
+            'is_active' => [
                 'title' => $this->l('Active', 'packeterycarriergridcontroller'),
                 'type' => 'bool',
+                'filter_key' => 'active',
                 'align' => 'center',
                 'callback' => 'getIconForBoolean',
             ],
