@@ -54,11 +54,10 @@ class PacketeryOrderGridController extends ModuleAdminController
         $this->table = 'orders';
         $this->identifier = 'id_order';
 
-        // there has to be `id` for 'editable' to work
+        // there has to be `id` for 'editable' to work; a.* is prepended
         $this->_select = '
             `a`.`id_order` AS `id`,
-            `a`.*,
-            `po`.*,
+            `po`.`is_cod`, `po`.`name_branch`, `po`.`is_ad`, `po`.`zip`, `po`.`exported`,
             IF(`po`.`tracking_number` IS NOT NULL, `po`.`tracking_number`, \'\') AS `tracking_number`,
             CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
             IF(`a`.`valid`, 1, 0) AS `badge_success`,
@@ -101,12 +100,11 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'title' => $this->l('ID', 'packeteryordergridcontroller'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
-                'tmpTableFilter' => true,
+                'filter_key' => 'a!id_order',
             ],
             'reference' => [
                 'title' => $this->l('Reference', 'packeteryordergridcontroller'),
                 'callback' => 'getReferenceColumnValue',
-                'tmpTableFilter' => true,
             ],
             'customer' => [
                 'title' => $this->l('Customer', 'packeteryordergridcontroller'),
@@ -127,14 +125,12 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'filter_key' => 'os!id_order_state',
                 'filter_type' => 'int',
                 'order_key' => 'osname',
-                'tmpTableFilter' => true,
             ],
             'date_add' => [
                 'title' => $this->l('Date', 'packeteryordergridcontroller'),
                 'type' => 'datetime',
                 'filter_key' => 'a!date_add',
                 'align' => 'text-left',
-                'tmpTableFilter' => true,
             ],
             'is_cod' => [
                 'title' => $this->l('Is COD', 'packeteryordergridcontroller'),
@@ -153,7 +149,6 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'filter_key' => 'po!tracking_number',
                 'search' => true,
                 'orderby' => false,
-                'tmpTableFilter' => true,
             ],
             'weight' => [
                 'title' => $this->l('Weight (kg)', 'packeteryordergridcontroller'),
