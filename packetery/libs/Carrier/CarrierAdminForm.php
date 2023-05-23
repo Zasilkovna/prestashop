@@ -212,13 +212,16 @@ class CarrierAdminForm
             ];
         }
 
-        if ((bool)$apiCarrier['disallows_cod'] === false) {
+        if ((bool)$apiCarrier['disallows_cod'] === false && (bool)$carrierData['is_cod'] === true) {
             $formInputs[] = [
                 'type' => 'radio',
                 'label' => $this->module->l('Is COD?', 'carrieradminform'),
                 'name' => 'is_cod',
                 'required' => true,
-                'desc' => $this->module->l('YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.', 'carrieradminform'),
+                'desc' => sprintf('%s %s',
+                    $this->module->l('YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.', 'carrieradminform'),
+                    $this->module->l('The option of cash on delivery with the carrier is already obsolete and we recommend not using it. It will be completely removed soon.', 'carrieradminform')
+                ),
                 'values' => [
                     [
                         'id' => 'is_cod_0',

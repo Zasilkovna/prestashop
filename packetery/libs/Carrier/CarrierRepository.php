@@ -159,7 +159,7 @@ class CarrierRepository
      * @return bool
      * @throws DatabaseException
      */
-    public function insertPacketery(array $fieldsToSet)
+    private function insertPacketery(array $fieldsToSet)
     {
         return $this->dbTools->insert('packetery_address_delivery', $fieldsToSet, true);
     }
