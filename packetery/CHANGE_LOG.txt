@@ -19,6 +19,7 @@
        - Added: possibility to delete PDF labels via CRON and customize deletion results with GET params (file age/number of deleted files at once)
        - Added: ID verification request for adult products upon delivery
        - Added: Packetery/Core API layer
+       - Added: settings for "Default package weight" and "Default packaging weight"
 2.1.17 - Updated: sk "Is COD" translation update
        - Removed: displaying widget button right after shipping method change
        - Updated: increased delay for backup widget button displaying mechanism

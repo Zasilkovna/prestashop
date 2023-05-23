@@ -9,6 +9,7 @@ use Packetery\Carrier\CarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Tools\Logger;
+use Packetery\Weight\Calculator;
 use Tools;
 
 class OrderSaver
@@ -25,24 +26,30 @@ class OrderSaver
     /** @var CarrierRepository */
     private $carrierRepository;
 
+    /** @var Calculator */
+    private $weightCalculator;
+
     /**
      * TODO: later inherit from some Base class
      * @param OrderRepository $orderRepository
      * @param PaymentRepository $paymentRepository
      * @param Logger $logger
      * @param CarrierRepository $carrierRepository
+     * @param Calculator $weightCalculator
      */
     public function __construct(
         OrderRepository $orderRepository,
         PaymentRepository $paymentRepository,
         Logger $logger,
-        CarrierRepository $carrierRepository
+        CarrierRepository $carrierRepository,
+        Calculator $weightCalculator
     )
     {
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
         $this->logger = $logger;
         $this->carrierRepository = $carrierRepository;
+        $this->weightCalculator = $weightCalculator;
     }
 
     /**
@@ -96,6 +103,11 @@ class OrderSaver
             $carrierIsCod = ((int)$packeteryCarrier['is_cod'] === 1);
             $paymentIsCod = $this->paymentRepository->isCod($order->module);
             $data['is_cod'] = ($carrierIsCod || $paymentIsCod);
+        }
+
+        $packeteryWeight = $this->weightCalculator->getPacketeryWeight($order);
+        if ($packeteryWeight) {
+            $data['weight'] = $packeteryWeight;
         }
 
         $this->orderRepository->save($data);

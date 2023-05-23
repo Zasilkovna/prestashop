@@ -203,7 +203,9 @@ class Installer
             ConfigHelper::update('PACKETERY_WIDGET_AUTOOPEN', 0) &&
             ConfigHelper::update('PACKETERY_CRON_TOKEN', \Tools::passwdGen(32)) &&
             ConfigHelper::update('PACKETERY_ID_PREFERENCE', Packetery::ID_PREF_ID) &&
-            ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0)
+            ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0) &&
+            ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_WEIGHT', 0) &&
+            ConfigHelper::update('PACKETERY_DEFAULT_PACKAGING_WEIGHT', 0)
         );
     }
 
