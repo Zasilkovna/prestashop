@@ -3,6 +3,7 @@
 namespace Packetery\Module;
 
 use Packetery;
+use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\DbTools;
 use PrestaShopException;
 use PrestaShopLogger;
@@ -140,7 +141,10 @@ class Uninstaller
             Configuration::deleteByName('PACKETERY_ID_PREFERENCE') &&
             Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGE_PRICE') &&
             Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGE_WEIGHT') &&
-            Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGING_WEIGHT')
+            Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGING_WEIGHT') &&
+            Configuration::deleteByName(ConfigHelper::KEY_LAST_FEATURE_CHECK) &&
+            Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION) &&
+            Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION_URL)
         );
     }
 
