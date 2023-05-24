@@ -38,6 +38,7 @@ function upgrade_module_3_0_0($module)
         ConfigHelper::update(ConfigHelper::KEY_LAST_FEATURE_CHECK, (string) time()) &&
         ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $module->version) &&
         ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, '') &&
+        ConfigHelper::update(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION, 0) &&
         Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') &&
         Configuration::deleteByName('PACKETERY_ORDERS_PER_PAGE') &&
         Configuration::deleteByName('PACKETERY_ADDRESS_VALIDATION') &&

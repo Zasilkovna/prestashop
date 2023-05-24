@@ -482,6 +482,14 @@ class Packetery extends CarrierModule
                 'required' => false,
                 'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
             ],
+            \Packetery\Tools\ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION => [
+                'title' => $this->l('Currency conversion'),
+                'options' => [
+                    1 => $this->l('Enable currency conversion according to the exchange rate in PrestaShop'),
+                    0 => $this->l('Disable currency conversion, cash on delivery will be sent to Packeta in the currency of the order'),
+                ],
+                'required' => false,
+            ],
             'PACKETERY_DEFAULT_PACKAGE_WEIGHT' => [
                 'title' => $this->l('Default package weight in kg'),
                 'required' => false,
