@@ -57,8 +57,9 @@ class OrderExporter
         }
 
         $orderCurrency = new Currency($order->id_currency);
-        $targetCurrency = $packeteryOrder['currency_branch'];
-        if ($targetCurrency === null) {
+        $exportCurrency = $orderCurrency->iso_code;
+        $shippingCountryCurrency = $packeteryOrder['currency_branch'];
+        if ($shippingCountryCurrency === null) {
             throw new ExportException(
                 $this->module->l(
                     'Can\'t find currency of pickup point, order',
@@ -67,11 +68,12 @@ class OrderExporter
             );
         }
         if (
-            $orderCurrency->iso_code !== $targetCurrency &&
+            $orderCurrency->iso_code !== $shippingCountryCurrency &&
             (bool)ConfigHelper::get(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION) === true
         ) {
+            $exportCurrency = $shippingCountryCurrency;
             $paymentRepository = $this->module->diContainer->get(PaymentRepository::class);
-            $total = $paymentRepository->getRateTotal($orderCurrency->iso_code, $targetCurrency, $total);
+            $total = $paymentRepository->getRateTotal($orderCurrency->iso_code, $shippingCountryCurrency, $total);
             if ($total === null) {
                 throw new ExportException(
                     $this->module->l(
@@ -84,9 +86,9 @@ class OrderExporter
 
         $isCod = $packeteryOrder['is_cod'];
         if ($isCod) {
-            if ($targetCurrency === 'CZK') {
+            if ($exportCurrency === 'CZK') {
                 $codValue = ceil($total);
-            } elseif ($targetCurrency === 'HUF') {
+            } elseif ($exportCurrency === 'HUF') {
                 $codValue = $this->roundUpMultiples($total);
             } else {
                 $codValue = round($total, 2);
@@ -113,7 +115,7 @@ class OrderExporter
 
         $data = [
             'number' => $number,
-            'currency' => $targetCurrency,
+            'currency' => $exportCurrency,
             'value' => $total,
             'codValue' => $codValue,
             'weight' => $weight,
