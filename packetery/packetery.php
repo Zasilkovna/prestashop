@@ -242,7 +242,7 @@ class Packetery extends CarrierModule
      */
     public function getContent()
     {
-        $output = '<div class="packetery">' . PHP_EOL;
+        $output = '';
 
         if (!extension_loaded('soap')) {
             $output .= $this->displayError($this->l('Soap is disabled. You have to enable Soap on your server'));
@@ -293,7 +293,6 @@ class Packetery extends CarrierModule
             }
         }
         $output .= $this->displayForm();
-        $output .= PHP_EOL . '</div>';
 
         return $output;
     }

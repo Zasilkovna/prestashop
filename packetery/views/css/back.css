@@ -95,11 +95,3 @@
 .packeteryordergrid .column-weight input {
     padding: 8px;
 }
-
-.packetery-panel-wrapper {
-    position: absolute;
-}
-
-#content.bootstrap .packetery-top-margin {
-    margin-top: 82px;
-}
