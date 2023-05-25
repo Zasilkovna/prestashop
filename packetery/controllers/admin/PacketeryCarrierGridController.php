@@ -3,6 +3,7 @@
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Carrier\CarrierAdminForm;
 use Packetery\Carrier\CarrierRepository;
+use Packetery\Module\VersionChecker;
 use Packetery\Tools\MessageManager;
 use Packetery\Carrier\CarrierTools;
 
@@ -130,6 +131,11 @@ class PacketeryCarrierGridController extends ModuleAdminController
     {
         $module = $this->getModule();
         $carriersInformation = $module->getCarriersContent();
+
+        $versionChecker = $module->diContainer->get(VersionChecker::class);
+        if ($versionChecker->isNewVersionAvailable()) {
+            $this->warnings[] = $versionChecker->getVersionUpdateMessageHtml();
+        }
 
         $this->addRowAction('edit');
         $list = parent::renderList();
