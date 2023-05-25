@@ -9,19 +9,16 @@ use Shop;
 
 class ConfigHelper
 {
+    const KEY_LAST_FEATURE_CHECK = 'PACKETERY_LAST_FEATURE_CHECK';
+    const KEY_LAST_VERSION_URL = 'PACKETERY_LAST_VERSION_URL';
+    const KEY_LAST_VERSION = 'PACKETERY_LAST_VERSION';
+
+    const BEHAVIOR_ALL = 'all'; // default
+    const BEHAVIOR_SEPARATE = 'separate';
+
     private static $configBehavior = [
-        'PACKETERY_APIPASS' => 'all',
         // It is possible to have multiple senders for one set of credentials.
-        'PACKETERY_ESHOP_ID' => 'separate',
-        'PACKETERY_LABEL_FORMAT' => 'all',
-        'PACKETERY_CARRIER_LABEL_FORMAT' => 'all',
-        'PACKETERY_LAST_CARRIERS_UPDATE' => 'all',
-        'PACKETERY_WIDGET_AUTOOPEN' => 'all',
-        'PACKETERY_CRON_TOKEN' => 'all',
-        'PACKETERY_ID_PREFERENCE' => 'all',
-        'PACKETERY_DEFAULT_PACKAGE_PRICE' => 'all',
-        'PACKETERY_DEFAULT_PACKAGE_WEIGHT' => 'all',
-        'PACKETERY_DEFAULT_PACKAGING_WEIGHT' => 'all',
+        'PACKETERY_ESHOP_ID' => self::BEHAVIOR_SEPARATE,
     ];
 
     /**
@@ -31,7 +28,7 @@ class ConfigHelper
      */
     public static function get($key, $groupId = false, $shopId = false)
     {
-        if (self::$configBehavior[$key] === 'all') {
+        if (self::getConfigBehavior($key) === self::BEHAVIOR_ALL) {
             return Configuration::get($key, null, null, null);
         }
 
@@ -74,7 +71,7 @@ class ConfigHelper
      */
     public static function update($key, $values)
     {
-        if (self::$configBehavior[$key] === 'all') {
+        if (self::getConfigBehavior($key) === self::BEHAVIOR_ALL) {
             // Shop group id and shop id is 0, which is saved as null. Passing null makes PS load active ones,
             // that is not desired. Empty string would work the same way.
             return Configuration::updateValue($key, $values, false, 0, 0);
@@ -121,5 +118,18 @@ class ConfigHelper
         $employee = Context::getContext()->employee;
         return Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT'));
     }
-}
 
+    /**
+     * @param string $key
+     * @return string
+     */
+    private static function getConfigBehavior($key)
+    {
+        if (isset(self::$configBehavior[$key])) {
+            return self::$configBehavior[$key];
+        }
+
+        return self::BEHAVIOR_ALL;
+    }
+
+}

@@ -242,25 +242,25 @@ class Packetery extends CarrierModule
      */
     public function getContent()
     {
-        $soapDisabled = 0;
-        if (!extension_loaded('soap')) {
-            $soapDisabled = 1;
-        }
-
         $output = '<div class="packetery">' . PHP_EOL;
 
-        $usedWeightUnit = Configuration::get('PS_WEIGHT_UNIT');
+        if (!extension_loaded('soap')) {
+            $output .= $this->displayError($this->l('Soap is disabled. You have to enable Soap on your server'));
+        }
+
+        $versionChecker = $this->diContainer->get(\Packetery\Module\VersionChecker::class);
+        if ($versionChecker->isNewVersionAvailable()) {
+            $output .= $this->displayWarning($versionChecker->getVersionUpdateMessageHtml());
+        }
+
         if (\Packetery\Weight\Converter::isKgConversionSupported() === false) {
             $output .= $this->displayInformation(sprintf(
                 $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to one of: %s.'),
-                $usedWeightUnit,
+                Configuration::get('PS_WEIGHT_UNIT'),
                 implode(', ', array_keys(\Packetery\Weight\Converter::$mapping))
             ));
         }
 
-        if ($soapDisabled) {
-            $output .= $this->displayError($this->l('Soap is disabled. You have to enable Soap on your server'));
-        }
         if (Tools::isSubmit('submit' . $this->name)) {
             $confOptions = $this->getConfigurationOptions();
             $error = false;
@@ -1166,6 +1166,10 @@ class Packetery extends CarrierModule
 
         $this->context->controller->addCSS($this->_path . 'views/css/back.css' . $suffix, 'all', null, false);
         $this->context->controller->addJS($this->_path . 'views/js/back.js' . $suffix);
+
+        /** @var \Packetery\Features\FeaturesManager $featuresManager */
+        $featuresManager = $this->diContainer->get(\Packetery\Features\FeaturesManager::class);
+        $featuresManager->checkForUpdate();
     }
 
     /**

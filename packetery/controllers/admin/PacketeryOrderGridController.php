@@ -25,6 +25,7 @@
 
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Module\SoapApi;
+use Packetery\Module\VersionChecker;
 use Packetery\Order\CsvExporter;
 use Packetery\Order\Labels;
 use Packetery\Order\OrderRepository;
@@ -185,6 +186,11 @@ class PacketeryOrderGridController extends ModuleAdminController
         $title = $this->l('Packeta Orders', 'packeteryordergridcontroller');
         $this->meta_title = $title;
         $this->toolbar_title = $title;
+
+        $versionChecker = $this->getModule()->diContainer->get(VersionChecker::class);
+        if ($versionChecker->isNewVersionAvailable()) {
+            $this->warnings[] = $versionChecker->getVersionUpdateMessageHtml();
+        }
     }
 
     /**

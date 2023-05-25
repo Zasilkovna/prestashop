@@ -205,7 +205,10 @@ class Installer
             ConfigHelper::update('PACKETERY_ID_PREFERENCE', Packetery::ID_PREF_ID) &&
             ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0) &&
             ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_WEIGHT', 0) &&
-            ConfigHelper::update('PACKETERY_DEFAULT_PACKAGING_WEIGHT', 0)
+            ConfigHelper::update('PACKETERY_DEFAULT_PACKAGING_WEIGHT', 0) &&
+            ConfigHelper::update(ConfigHelper::KEY_LAST_FEATURE_CHECK, (string) time()) &&
+            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $this->module->version) &&
+            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, '')
         );
     }
 
