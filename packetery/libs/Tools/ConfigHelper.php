@@ -20,6 +20,8 @@ class ConfigHelper
         'PACKETERY_CRON_TOKEN' => 'all',
         'PACKETERY_ID_PREFERENCE' => 'all',
         'PACKETERY_DEFAULT_PACKAGE_PRICE' => 'all',
+        'PACKETERY_DEFAULT_PACKAGE_WEIGHT' => 'all',
+        'PACKETERY_DEFAULT_PACKAGING_WEIGHT' => 'all',
     ];
 
     /**

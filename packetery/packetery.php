@@ -483,6 +483,16 @@ class Packetery extends CarrierModule
                 'required' => false,
                 'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
             ],
+            'PACKETERY_DEFAULT_PACKAGE_WEIGHT' => [
+                'title' => $this->l('Default package weight in kg'),
+                'required' => false,
+                'desc' => $this->l('Enter the default weight for the shipment if the order weight is zero'),
+            ],
+            'PACKETERY_DEFAULT_PACKAGING_WEIGHT' => [
+                'title' => $this->l('Default packaging weight in kg'),
+                'required' => false,
+                'desc' => $this->l('Enter the default weight of the packaging in kg if the order weight is non-zero'),
+            ],
         ];
     }
 
@@ -892,19 +902,12 @@ class Packetery extends CarrierModule
             $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
             $pickupPointChangeAllowed = true;
         }
-        // TODO find proper class and create new method to return order weight, convert if needed
-        if ($packeteryOrder['weight'] !== null) {
-            $orderWeight = $packeteryOrder['weight'];
-        } else {
-            $order = new \Order($packeteryOrder['id_order']);
-            if (\Packetery\Weight\Converter::isKgConversionSupported()) {
-                $orderWeight = \Packetery\Weight\Converter::getKilograms($order->getTotalWeight());
-            } else {
-                $orderWeight = $order->getTotalWeight();
-            }
-        }
 
-        if (!(bool)$packeteryOrder['exported'] && $orderWeight > 0) {
+        /** @var \Packetery\Weight\Calculator $weightCalculator */
+        $weightCalculator = $this->diContainer->get(\Packetery\Weight\Calculator::class);
+        $orderWeight = $weightCalculator->getFinalWeight($packeteryOrder);
+
+        if (!(bool)$packeteryOrder['exported'] && $orderWeight !== null && $orderWeight > 0) {
             $postParcelButtonAllowed = true;
             $showActionButtonsDivider = true;
         }
@@ -1313,21 +1316,23 @@ class Packetery extends CarrierModule
     {
         /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+
+        /** @var \Packetery\Weight\Calculator $weightCalculator */
+        $weightCalculator = $this->diContainer->get(\Packetery\Weight\Calculator::class);
+
         $addressValidationLevels = $carrierRepository->getAddressValidationLevels();
         if (isset($params['list']) && is_array($params['list'])) {
             foreach ($params['list'] as &$order) {
-                if ($order['weight'] === null) {
-                    // TODO find proper class and create new method to return order weight, convert if needed
-                    $orderInstance = new \Order($order['id_order']);
-                    $order['weight'] = \Packetery\Weight\Converter::getKilograms($orderInstance->getTotalWeight());
-                }
-                if ((bool)$order['is_ad'] === true) {
-                    if (isset($addressValidationLevels[$order['id_carrier']]) && in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])) {
-                        if (Packetery\Address\AddressTools::hasValidatedAddress($order)) {
-                            $order['is_ad'] = 'HD-OK';
-                        } else {
-                            $order['is_ad'] = 'HD-KO';
-                        }
+                $order['weight'] = $weightCalculator->getFinalWeight($order);
+                if (
+                    (bool)$order['is_ad'] === true &&
+                    isset($addressValidationLevels[$order['id_carrier']]) &&
+                    in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])
+                ) {
+                    if (Packetery\Address\AddressTools::hasValidatedAddress($order)) {
+                        $order['is_ad'] = 'HD-OK';
+                    } else {
+                        $order['is_ad'] = 'HD-KO';
                     }
                 }
             }

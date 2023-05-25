@@ -59,10 +59,20 @@ class Options
                     );
                 }
             case 'PACKETERY_DEFAULT_PACKAGE_PRICE':
-                if (Validate::isUnsignedInt($value) || $value === 0 || (Validate::isFloat($value) && $value >= 0)) {
+                if ($this->isNonNegative($value)) {
                     return false;
                 }
                 return $this->module->l('Please insert default package price', 'options');
+            case 'PACKETERY_DEFAULT_PACKAGE_WEIGHT':
+                if ($this->isNonNegative($value)) {
+                    return false;
+                }
+                return $this->module->l('Please insert default package weight in kg', 'options');
+            case 'PACKETERY_DEFAULT_PACKAGING_WEIGHT':
+                if ($this->isNonNegative($value)) {
+                    return false;
+                }
+                return $this->module->l('Please insert default packaging weight in kg', 'options');
             default:
                 return false;
         }
@@ -77,6 +87,8 @@ class Options
     {
         switch ($option) {
             case 'PACKETERY_DEFAULT_PACKAGE_PRICE':
+            case 'PACKETERY_DEFAULT_PACKAGE_WEIGHT':
+            case 'PACKETERY_DEFAULT_PACKAGING_WEIGHT':
                 return str_replace([',', ' '], ['.', ''], $value);
             default:
                 return $value;
@@ -101,6 +113,15 @@ class Options
         $client = $this->module->diContainer->get(ApiClientFacade::class);
 
         return $client->get($url) === '1';
+    }
+
+    /**
+     * @param string $value
+     * @return bool
+     */
+    public function isNonNegative($value)
+    {
+        return (Validate::isUnsignedInt($value) || (Validate::isFloat($value) && $value >= 0));
     }
 
 }

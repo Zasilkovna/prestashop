@@ -33,6 +33,8 @@ function upgrade_module_3_0_0($module)
         ConfigHelper::update('PACKETERY_ID_PREFERENCE', Packetery::ID_PREF_ID) &&
         ConfigHelper::update('PACKETERY_CARRIER_LABEL_FORMAT', 'A6 on A4') &&
         ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0) &&
+        ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_WEIGHT', 0) &&
+        ConfigHelper::update('PACKETERY_DEFAULT_PACKAGING_WEIGHT', 0) &&
         Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') &&
         Configuration::deleteByName('PACKETERY_ORDERS_PER_PAGE') &&
         Configuration::deleteByName('PACKETERY_ADDRESS_VALIDATION') &&
