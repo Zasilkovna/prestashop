@@ -138,7 +138,9 @@ class Uninstaller
             Configuration::deleteByName('PACKETERY_WIDGET_AUTOOPEN') &&
             Configuration::deleteByName('PACKETERY_CRON_TOKEN') &&
             Configuration::deleteByName('PACKETERY_ID_PREFERENCE') &&
-            Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGE_PRICE')
+            Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGE_PRICE') &&
+            Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGE_WEIGHT') &&
+            Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGING_WEIGHT')
         );
     }
 

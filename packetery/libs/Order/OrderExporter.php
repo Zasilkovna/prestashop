@@ -11,7 +11,6 @@ use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Tools\ConfigHelper;
-use Packetery\Weight\Converter;
 use ReflectionException;
 use Tools;
 
@@ -21,9 +20,13 @@ class OrderExporter
     /** @var Packetery */
     private $module;
 
-    public function __construct(Packetery $module)
+    /** @var Packetery\Weight\Calculator */
+    private $weightCalculator;
+
+    public function __construct(Packetery $module, Packetery\Weight\Calculator $weightCalculator)
     {
         $this->module = $module;
+        $this->weightCalculator = $weightCalculator;
     }
 
     /**
@@ -35,6 +38,7 @@ class OrderExporter
      */
     public function prepareData(Order $order)
     {
+        /** @var OrderRepository $orderRepository */
         $orderRepository = $this->module->diContainer->get(OrderRepository::class);
         $packeteryOrder = $orderRepository->getWithShopById($order->id);
 
@@ -96,14 +100,9 @@ class OrderExporter
         if (Tools::strlen($address->phone_mobile)) {
             $phone = trim($address->phone_mobile);
         }
-        // TODO find proper class and create new method to return order weight, convert if needed
-        $weight = '';
-        if ($packeteryOrder['weight'] !== null) {
-            // used saved if set
-            $weight = $packeteryOrder['weight'];
-        } else if (Converter::isKgConversionSupported()) {
-            $weight = Converter::getKilograms($order->getTotalWeight());
-        }
+
+        $weight = $this->weightCalculator->getFinalWeight($packeteryOrder);
+        $weight = (!$weight ? '' : $weight);
 
         $number = (string)(Packetery::ID_PREF_REF === ConfigHelper::get('PACKETERY_ID_PREFERENCE') ? $order->reference : $order->id);
         $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
