@@ -1334,7 +1334,13 @@ class Packetery extends CarrierModule
         $addressValidationLevels = $carrierRepository->getAddressValidationLevels();
         if (isset($params['list']) && is_array($params['list'])) {
             foreach ($params['list'] as &$order) {
-                $order['weight'] = $weightCalculator->getFinalWeight($order);
+                $finalWeight = $weightCalculator->getFinalWeight($order);
+                if ($finalWeight !== null) {
+                    $order['weight'] = $finalWeight;
+                } else {
+                    $order['weight'] = 0;
+                }
+
                 if (
                     (bool)$order['is_ad'] === true &&
                     isset($addressValidationLevels[$order['id_carrier']]) &&

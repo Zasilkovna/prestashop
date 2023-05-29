@@ -315,7 +315,14 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $packetNumbers = $this->preparePacketNumbers([Tools::getValue('id_order')]);
         if ($packetNumbers) {
-            $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER);
+            /** @var SoapApi $soapApi */
+            $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
+            $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
+            if (!empty($packetsEnhanced)) {
+                $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, $packetsEnhanced);
+            } else {
+                $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA);
+            }
         }
     }
 

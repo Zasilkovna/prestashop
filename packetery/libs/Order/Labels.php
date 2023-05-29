@@ -26,10 +26,10 @@ class Labels
     }
 
     /**
-     * @param array $packets
+     * @param array $packets Used for packeta labels.
      * @param string $type
      * @param int $offset
-     * @param array|null $packetsEnhanced
+     * @param array|null $packetsEnhanced Used for carrier labels.
      * @return string|void
      */
     public function packetsLabelsPdf($packets, $type, $offset, $packetsEnhanced = null)
