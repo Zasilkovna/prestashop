@@ -58,11 +58,6 @@
     display: inline-block !important;
 }
 
-/* new settings form */
-.bootstrap .packetery select.fixed-width-xl {
-    width: 100% !important;
-}
-
 /* main menu item */
 .icon-Packetery:before {
     content: "\f0d1";
@@ -94,12 +89,4 @@
 
 .packeteryordergrid .column-weight input {
     padding: 8px;
-}
-
-.packetery-panel-wrapper {
-    position: absolute;
-}
-
-#content.bootstrap .packetery-top-margin {
-    margin-top: 82px;
 }
