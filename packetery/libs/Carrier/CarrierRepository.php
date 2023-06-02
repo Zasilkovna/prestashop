@@ -56,7 +56,7 @@ class CarrierRepository
             FROM `' . _DB_PREFIX_ . 'carrier` `c`
             LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` USING(`id_carrier`)
             LEFT JOIN `' . _DB_PREFIX_ . ApiCarrierRepository::$tableName . '` `ac` ON `ac`.`id` = `pad`.`id_branch` 
-            WHERE `c`.`deleted` = 0 AND `c`.`active` = 1
+            WHERE `c`.`deleted` = 0
             ORDER BY `ac`.`country`, `ac`.`name`
         ');
     }
