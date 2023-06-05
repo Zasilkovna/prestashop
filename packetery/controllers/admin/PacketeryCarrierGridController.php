@@ -143,15 +143,11 @@ class PacketeryCarrierGridController extends ModuleAdminController
 
         if ($this->_list) {
             $module = $this->getModule();
-            if ($this->totalCarriers === 0) {
-                $this->warnings[] = $this->l('There are no available Packeta carriers. Please run the update first.', 'packeterycarriergridcontroller');
-            } else {
-                foreach ($this->_list as $carrierData) {
-                    $carrierHelper = new CarrierAdminForm($carrierData['id_carrier'], $module);
-                    $warning = $carrierHelper->getCarrierWarning($carrierData);
-                    if ($warning) {
-                        $this->warnings[] = $warning;
-                    }
+            foreach ($this->_list as $carrierData) {
+                $carrierHelper = new CarrierAdminForm((int)$carrierData['id_carrier'], $module);
+                $warning = $carrierHelper->getCarrierWarning($carrierData);
+                if ($warning) {
+                    $this->warnings[] = $warning;
                 }
             }
         }

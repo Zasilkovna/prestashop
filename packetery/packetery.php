@@ -204,12 +204,16 @@ class Packetery extends CarrierModule
 
         $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
-        if (
-            (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') ||
-            ($configHelper->getApiKey() && $apiCarrierRepository->getAdAndExternalCount() === 0)
-        ) {
+        if (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') {
             $downloader = $this->diContainer->get(\Packetery\ApiCarrier\Downloader::class);
-            $this->context->smarty->assign('messages', [$downloader->run()]);
+            Tools::redirectAdmin($this->getAdminLink('PacketeryCarrierGrid', ['messages' => [$downloader->run()]]));
+        }
+        if (Tools::getIsset('messages')) {
+            $this->context->smarty->assign('messages', Tools::getValue('messages'));
+        }
+        $updateAutomatically = ($configHelper->getApiKey() && $apiCarrierRepository->getAdAndExternalCount() === 0);
+        if ($updateAutomatically) {
+            Tools::redirectAdmin($this->getAdminLink('PacketeryCarrierGrid', ['action' => 'updateCarriers']));
         }
 
         $lastCarriersUpdate = \Packetery\Tools\ConfigHelper::get('PACKETERY_LAST_CARRIERS_UPDATE');

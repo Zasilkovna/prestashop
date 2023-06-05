@@ -1,6 +1,12 @@
 <?php
 
+use Packetery\ApiCarrier\ApiCarrierRepository;
+use Packetery\Carrier\CarrierAdminForm;
+use Packetery\Carrier\CarrierRepository;
+use Packetery\Module\Installer;
+use Packetery\Module\Uninstaller;
 use Packetery\Tools\ConfigHelper;
+use Packetery\Tools\DbTools;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -12,9 +18,9 @@ if (!defined('_PS_VERSION_')) {
  */
 function upgrade_module_3_0_0($module)
 {
-    $installer = $module->diContainer->get(\Packetery\Module\Installer::class);
+    $installer = $module->diContainer->get(Installer::class);
     $installer->setModule($module);
-    $uninstaller = $module->diContainer->get(\Packetery\Module\Uninstaller::class);
+    $uninstaller = $module->diContainer->get(Uninstaller::class);
     $result = (
         $module->unregisterHook('actionOrderHistoryAddAfter') &&
         $module->unregisterHook('displayBackOfficeHeader') &&
@@ -35,7 +41,7 @@ function upgrade_module_3_0_0($module)
         ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0) &&
         ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_WEIGHT', 0) &&
         ConfigHelper::update('PACKETERY_DEFAULT_PACKAGING_WEIGHT', 0) &&
-        ConfigHelper::update(ConfigHelper::KEY_LAST_FEATURE_CHECK, (string) time()) &&
+        ConfigHelper::update(ConfigHelper::KEY_LAST_FEATURE_CHECK, (string)time()) &&
         ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $module->version) &&
         ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, '') &&
         ConfigHelper::update(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION, 0) &&
@@ -58,7 +64,7 @@ function upgrade_module_3_0_0($module)
         ADD `allowed_vendors` text NULL;';
     $sql[] = 'UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery`
         SET `address_validation` = "none" WHERE `pickup_point_type` IS NULL;';
-    $apiCarrierRepository = $module->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
+    $apiCarrierRepository = $module->diContainer->get(ApiCarrierRepository::class);
     $sql[] = $apiCarrierRepository->getCreateTableSql();
     $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_branch`;';
     $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery`
@@ -78,9 +84,26 @@ function upgrade_module_3_0_0($module)
             `is_adult` tinyint(1) NOT NULL DEFAULT 0
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
-    $dbTools = $module->diContainer->get(\Packetery\Tools\DbTools::class);
+    $dbTools = $module->diContainer->get(DbTools::class);
     if (!$dbTools->executeQueries($sql, $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.0.0'), true)) {
         return false;
+    }
+
+    $carrierUpdates = [];
+    $carrierRepository = $module->diContainer->get(CarrierRepository::class);
+    $internalPickupPointCarriers = $carrierRepository->getInternalPickupPointCarriers();
+    if ($internalPickupPointCarriers) {
+        foreach ($internalPickupPointCarriers as $carrierData) {
+            $carrierAdminForm = new CarrierAdminForm((int)$carrierData['id_carrier'], $module);
+            // Second parameter ensures that internal pickup points are not needed to exist in carriers table.
+            $allowedVendorsJson = $carrierAdminForm->getDefaultAllowedVendors($carrierData, ['id' => $carrierData['id_branch']]);
+            $carrierUpdates[] = sprintf('UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery`
+                SET `allowed_vendors` = "%s" WHERE `id_carrier` = "%s";',
+                $dbTools->db->escape($allowedVendorsJson), $carrierData['id_carrier']);
+        }
+        if (!$dbTools->executeQueries($carrierUpdates, $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.0.0'), true)) {
+            return false;
+        }
     }
 
     return true;

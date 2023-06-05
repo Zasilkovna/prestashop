@@ -103,6 +103,17 @@ class CarrierRepository
     }
 
     /**
+     * @return array|bool|\mysqli_result|\PDOStatement|resource|null
+     * @throws DatabaseException
+     */
+    public function getInternalPickupPointCarriers()
+    {
+        return $this->dbTools->getRows(sprintf('
+            SELECT `id_carrier`, `id_branch` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
+            WHERE `id_branch` IN ("%s", "%s")', Packetery::ZPOINT, Packetery::PP_ALL));
+    }
+
+    /**
      * @param int $carrierId
      * @return array|bool|object|null
      * @throws DatabaseException
