@@ -56,7 +56,7 @@ class CarrierRepository
             FROM `' . _DB_PREFIX_ . 'carrier` `c`
             LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` USING(`id_carrier`)
             LEFT JOIN `' . _DB_PREFIX_ . ApiCarrierRepository::$tableName . '` `ac` ON `ac`.`id` = `pad`.`id_branch` 
-            WHERE `c`.`deleted` = 0 AND `c`.`active` = 1
+            WHERE `c`.`deleted` = 0
             ORDER BY `ac`.`country`, `ac`.`name`
         ');
     }
@@ -100,6 +100,17 @@ class CarrierRepository
                    `address_validation`, `allowed_vendors`
             FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
             WHERE `id_carrier` = ' . $carrierId);
+    }
+
+    /**
+     * @return array|bool|\mysqli_result|\PDOStatement|resource|null
+     * @throws DatabaseException
+     */
+    public function getInternalPickupPointCarriers()
+    {
+        return $this->dbTools->getRows(sprintf('
+            SELECT `id_carrier`, `id_branch` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
+            WHERE `id_branch` IN ("%s", "%s")', Packetery::ZPOINT, Packetery::PP_ALL));
     }
 
     /**
@@ -159,7 +170,7 @@ class CarrierRepository
      * @return bool
      * @throws DatabaseException
      */
-    public function insertPacketery(array $fieldsToSet)
+    private function insertPacketery(array $fieldsToSet)
     {
         return $this->dbTools->insert('packetery_address_delivery', $fieldsToSet, true);
     }

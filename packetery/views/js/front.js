@@ -287,7 +287,7 @@ PacketaModule.ui = {
             }
             var $widgetParent = packeteryModulesManager.getWidgetParent($selectedInput);
             var widgetVendors = $widgetParent.find('#widget_vendors').val();
-            if (widgetVendors !== '') {
+            if (widgetVendors !== '' && widgetVendors !== '[]') {
                 widgetOptions.vendors = JSON.parse(widgetVendors);
             } else {
                 widgetOptions.country = country;

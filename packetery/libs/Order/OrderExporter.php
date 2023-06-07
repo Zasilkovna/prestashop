@@ -57,8 +57,9 @@ class OrderExporter
         }
 
         $orderCurrency = new Currency($order->id_currency);
-        $targetCurrency = $packeteryOrder['currency_branch'];
-        if ($targetCurrency === null) {
+        $exportCurrency = $orderCurrency->iso_code;
+        $shippingCountryCurrency = $packeteryOrder['currency_branch'];
+        if ($shippingCountryCurrency === null) {
             throw new ExportException(
                 $this->module->l(
                     'Can\'t find currency of pickup point, order',
@@ -66,24 +67,28 @@ class OrderExporter
                 ) . ' - ' . $order->id
             );
         }
-        if ($orderCurrency->iso_code !== $targetCurrency) {
+        if (
+            $orderCurrency->iso_code !== $shippingCountryCurrency &&
+            (bool)ConfigHelper::get(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION) === true
+        ) {
+            $exportCurrency = $shippingCountryCurrency;
             $paymentRepository = $this->module->diContainer->get(PaymentRepository::class);
-            $total = $paymentRepository->getRateTotal($orderCurrency->iso_code, $targetCurrency, $total);
+            $total = $paymentRepository->getRateTotal($orderCurrency->iso_code, $shippingCountryCurrency, $total);
             if ($total === null) {
                 throw new ExportException(
                     $this->module->l(
-                        'Can\'t find order currency rate between order and pickup point, order',
+                        'Unable to find the exchange rate in the PrestaShop currency settings for the destination country of the order',
                         'orderexporter'
-                    ) . ' - ' . $order->id
+                    ) . ': ' . $order->id
                 );
             }
         }
 
         $isCod = $packeteryOrder['is_cod'];
         if ($isCod) {
-            if ($targetCurrency === 'CZK') {
+            if ($exportCurrency === 'CZK') {
                 $codValue = ceil($total);
-            } elseif ($targetCurrency === 'HUF') {
+            } elseif ($exportCurrency === 'HUF') {
                 $codValue = $this->roundUpMultiples($total);
             } else {
                 $codValue = round($total, 2);
@@ -110,7 +115,7 @@ class OrderExporter
 
         $data = [
             'number' => $number,
-            'currency' => $targetCurrency,
+            'currency' => $exportCurrency,
             'value' => $total,
             'codValue' => $codValue,
             'weight' => $weight,

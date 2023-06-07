@@ -21,6 +21,8 @@
        - Added: Packetery/Core API layer
        - Added: settings for "Default package weight" and "Default packaging weight"
        - Updated: label print action no longer creates temporary file for received PDF
+       - Updated: The option of cash on delivery with the carrier has been made obsolete.
+       - Added: The option to set whether the value of the order will be converted according to the PrestaShop conversion rate or just sent to Packeta.
 2.1.17 - Updated: sk "Is COD" translation update
        - Removed: displaying widget button right after shipping method change
        - Updated: increased delay for backup widget button displaying mechanism
