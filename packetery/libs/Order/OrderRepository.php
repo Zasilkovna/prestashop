@@ -250,7 +250,7 @@ class OrderRepository
                    `street`,
                    `house_number`
             FROM `' . _DB_PREFIX_ . 'packetery_order` 
-            WHERE id_order = ' . $orderId);
+            WHERE `id_order` = ' . $orderId);
     }
 
     /**
@@ -263,6 +263,7 @@ class OrderRepository
         $orderId = (int)$orderId;
         return $this->dbTools->getRow('
             SELECT
+                   `po`.`id_order`,
                    `po`.`id_branch`,
                    `po`.`name_branch`,
                    `po`.`id_carrier`, 

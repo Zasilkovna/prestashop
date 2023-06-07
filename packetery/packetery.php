@@ -204,12 +204,16 @@ class Packetery extends CarrierModule
 
         $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
-        if (
-            (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') ||
-            ($configHelper->getApiKey() && $apiCarrierRepository->getAdAndExternalCount() === 0)
-        ) {
+        if (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') {
             $downloader = $this->diContainer->get(\Packetery\ApiCarrier\Downloader::class);
-            $this->context->smarty->assign('messages', [$downloader->run()]);
+            Tools::redirectAdmin($this->getAdminLink('PacketeryCarrierGrid', ['messages' => [$downloader->run()]]));
+        }
+        if (Tools::getIsset('messages')) {
+            $this->context->smarty->assign('messages', Tools::getValue('messages'));
+        }
+        $updateAutomatically = ($configHelper->getApiKey() && $apiCarrierRepository->getAdAndExternalCount() === 0);
+        if ($updateAutomatically) {
+            Tools::redirectAdmin($this->getAdminLink('PacketeryCarrierGrid', ['action' => 'updateCarriers']));
         }
 
         $lastCarriersUpdate = \Packetery\Tools\ConfigHelper::get('PACKETERY_LAST_CARRIERS_UPDATE');
@@ -481,6 +485,14 @@ class Packetery extends CarrierModule
                 'title' => $this->l('Default package price'),
                 'required' => false,
                 'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
+            ],
+            \Packetery\Tools\ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION => [
+                'title' => $this->l('Currency conversion'),
+                'options' => [
+                    1 => $this->l('Enable currency conversion according to the exchange rate in PrestaShop'),
+                    0 => $this->l('Disable currency conversion, cash on delivery will be sent to Packeta in the currency of the order'),
+                ],
+                'required' => false,
             ],
             'PACKETERY_DEFAULT_PACKAGE_WEIGHT' => [
                 'title' => $this->l('Default package weight in kg'),
@@ -1326,7 +1338,13 @@ class Packetery extends CarrierModule
         $addressValidationLevels = $carrierRepository->getAddressValidationLevels();
         if (isset($params['list']) && is_array($params['list'])) {
             foreach ($params['list'] as &$order) {
-                $order['weight'] = $weightCalculator->getFinalWeight($order);
+                $finalWeight = $weightCalculator->getFinalWeight($order);
+                if ($finalWeight !== null) {
+                    $order['weight'] = $finalWeight;
+                } else {
+                    $order['weight'] = 0;
+                }
+
                 if (
                     (bool)$order['is_ad'] === true &&
                     isset($addressValidationLevels[$order['id_carrier']]) &&
@@ -1469,7 +1487,7 @@ class Packetery extends CarrierModule
 
                         $smarty = new \Smarty();
                         $smarty->assign('trackingNumber', $resultRow[1]);
-                        $smarty->assign('trackingUrl', \Packetery\Core\Helper::getTrackingUrl($resultRow[1]));
+                        $smarty->assign('trackingUrl', \Packetery\Module\Helper::getTrackingUrl($resultRow[1]));
                         $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
 
                         $messages[] = [

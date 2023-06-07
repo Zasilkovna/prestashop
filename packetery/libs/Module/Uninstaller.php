@@ -144,7 +144,8 @@ class Uninstaller
             Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGING_WEIGHT') &&
             Configuration::deleteByName(ConfigHelper::KEY_LAST_FEATURE_CHECK) &&
             Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION) &&
-            Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION_URL)
+            Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION_URL) &&
+            Configuration::deleteByName(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION)
         );
     }
 

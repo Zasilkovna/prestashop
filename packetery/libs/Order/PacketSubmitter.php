@@ -4,9 +4,9 @@ namespace Packetery\Order;
 
 use Order;
 use Packetery;
-use Packetery\Core\Api\Soap\Client;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
+use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
 use PrestaShopDatabaseException;
 use PrestaShopException;
@@ -128,7 +128,7 @@ class PacketSubmitter
      */
     private function validatePacketSoap(array $packetAttributes)
     {
-        $client = new SoapClient(Client::WSDL_URL);
+        $client = new SoapClient(SoapApi::WSDL_URL);
 
         try {
             $validate = $client->packetAttributesValid($this->configHelper->getApiPass(), $packetAttributes);
@@ -148,7 +148,7 @@ class PacketSubmitter
      */
     private function createPacketSoap(array $packetAttributes)
     {
-        $client = new SoapClient(Client::WSDL_URL);
+        $client = new SoapClient(SoapApi::WSDL_URL);
         try {
             $trackingNumber = $client->createPacket($this->configHelper->getApiPass(), $packetAttributes);
             if ($trackingNumber->id) {

@@ -2,7 +2,7 @@
 
 namespace Packetery\Order;
 
-use Packetery\Core\Api\Soap\Client;
+use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
 use SoapClient;
 use SoapFault;
@@ -26,15 +26,15 @@ class Labels
     }
 
     /**
-     * @param array $packets
+     * @param array $packets Used for packeta labels.
      * @param string $type
      * @param int $offset
-     * @param array|null $packetsEnhanced
+     * @param array|null $packetsEnhanced Used for carrier labels.
      * @return string|void
      */
-    public function packetsLabelsPdf($packets, $type, $offset, $packetsEnhanced = null)
+    public function packetsLabelsPdf(array $packets, $type, $offset, $packetsEnhanced = null)
     {
-        $client = new SoapClient(Client::WSDL_URL);
+        $client = new SoapClient(SoapApi::WSDL_URL);
         try {
             if ($type === self::TYPE_CARRIER) {
                 $format = ConfigHelper::get('PACKETERY_CARRIER_LABEL_FORMAT');
