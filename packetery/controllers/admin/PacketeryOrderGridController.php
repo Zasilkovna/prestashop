@@ -265,10 +265,15 @@ class PacketeryOrderGridController extends ModuleAdminController
         $module = $this->getModule();
         /** @var Labels $packeteryLabels */
         $packeteryLabels = $module->diContainer->get(Labels::class);
-        $fileName = $packeteryLabels->packetsLabelsPdf($packetNumbers, $type, $offset, $packetsEnhanced);
+        $pdfContent = $packeteryLabels->packetsLabelsPdf($packetNumbers, $type, $offset, $packetsEnhanced);
         header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="' . $fileName . '"');
-        echo file_get_contents(_PS_MODULE_DIR_ . 'packetery/labels/' . $fileName);
+        header(
+            sprintf(
+                'Content-Disposition: attachment; filename="packeta_%s.pdf"',
+                (new \DateTime())->format('Y-m-d_H-i-s_u')
+            )
+        );
+        echo $pdfContent;
         die();
     }
 

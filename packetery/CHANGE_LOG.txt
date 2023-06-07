@@ -20,6 +20,7 @@
        - Added: ID verification request for adult products upon delivery
        - Added: Packetery/Core API layer
        - Added: settings for "Default package weight" and "Default packaging weight"
+       - Updated: label print action no longer creates temporary file for received PDF
 2.1.17 - Updated: sk "Is COD" translation update
        - Removed: displaying widget button right after shipping method change
        - Updated: increased delay for backup widget button displaying mechanism
