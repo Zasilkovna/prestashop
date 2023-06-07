@@ -443,7 +443,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         }
         $smarty = new Smarty();
         $smarty->assign('trackingNumber', $trackingNumber);
-        $smarty->assign('trackingUrl', \Packetery\Core\Helper::getTrackingUrl($trackingNumber));
+        $smarty->assign('trackingUrl', \Packetery\Module\Helper::getTrackingUrl($trackingNumber));
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/trackingLink.tpl');
     }
