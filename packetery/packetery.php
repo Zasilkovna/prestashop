@@ -1373,10 +1373,10 @@ class Packetery extends CarrierModule
         $cart = $params['cart'];
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
-
-        if ($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
+        if (
+            $packeteryCarrier &&
+            $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
             !$orderRepository->isPickupPointChosenByCart($cart->id)
         ) {
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
