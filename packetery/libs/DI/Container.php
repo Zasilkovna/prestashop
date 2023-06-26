@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionNamedType;
 
 class Container
 {
@@ -13,6 +14,8 @@ class Container
     private $factories;
     /** @var array */
     private $services;
+
+    const EXCEPTION_MESSAGE = 'Param is not a class, extend this method if you need to support other types.';
 
     /**
      * @param string $class
@@ -68,11 +71,21 @@ class Container
         $instances = [];
         $params = $constructorReflection->getParameters();
         foreach ($params as $param) {
-            $paramClass = $param->getClass();
-            if ($paramClass === null) {
-                throw new Exception('Param is not a class, extend this method if you need to support other types.');
+            if (PHP_VERSION_ID >= 70100) {
+                $paramType = $param->getType();
+                if (!$paramType instanceof ReflectionNamedType  || $paramType->isBuiltin()) {
+                    throw new Exception(self::EXCEPTION_MESSAGE);
+                }
+                $className = $paramType->getName();
+            } else {
+                $paramClass = $param->getClass();
+                if ($paramClass === null) {
+                    throw new Exception(self::EXCEPTION_MESSAGE);
+                }
+                $className = $paramClass->name;
             }
-            $instances[] = $this->get($paramClass->name);
+
+            $instances[] = $this->get($className);
         }
 
         return $instances;
