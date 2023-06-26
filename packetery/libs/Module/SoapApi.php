@@ -16,7 +16,7 @@ use SoapFault;
 
 class SoapApi
 {
-    const WSDL_URL = 'http://www.zasilkovna.cz/api/soap.wsdl';
+    const WSDL_URL = 'http://www.zasilkovna.cz/api/soap-php-bugfix.wsdl';
 
     /**
      * @var Packetery
