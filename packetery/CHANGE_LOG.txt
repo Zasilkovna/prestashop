@@ -1,6 +1,5 @@
 2.1.17 - Updated: sk "Is COD" translation update
-       - Removed: displaying widget button right after shipping method change
-       - Updated: increased delay for backup widget button displaying mechanism
+       - Updated: improvements to the display of widget button in the cart
        - Updated: frontend JavaScript and CSS files registered in a way respecting CCC (Combine, Compress and Cache) setting
        - Fixed: proper missing order currency rate handling
        - Removed: loading currency rate from cnb.cz
