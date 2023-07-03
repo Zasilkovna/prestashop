@@ -16,7 +16,7 @@
                 <a href="{$deleteLabelsUrl}" target="_blank">{$deleteLabelsUrl}</a>
             </p>
             <p>
-                {l s='You have also added options to adjust the functionality by adding some extra parameters.' mod='packetery'}
+                {l s='Extended options are also available to modify the functionality using parameters.' mod='packetery'}
             </p>
             <table class="table">
                 <thead>
@@ -25,14 +25,14 @@
                     <th>{l s='Explanation' mod='packetery'}</th>
                 </tr>
                 <tr>
-                    <td>{l s='number_of_days' mod='packetery'}</td>
+                    <td>number_of_days</td>
                     <td>
                         {l s='The parameter tells how old files need to be to be deleted.' mod='packetery'}
                         {l s='This example will delete all PDF labels that are older than %s days.' sprintf=[$numberOfDays] mod='packetery'}
                     </td>
                 </tr>
                 <tr>
-                    <td>{l s='number_of_files' mod='packetery'}</td>
+                    <td>number_of_files</td>
                     <td>
                         {l s='The parameter tells how many PDF labels can be deleted in one CRON call.' mod='packetery'}
                         {l s='This example will delete max %s PDF labels in one batch.' sprintf=[$numberOfFiles] mod='packetery'}
@@ -41,7 +41,7 @@
                 </tr>
                 </thead>
             </table>
-            <p>{l s='* You can also use these two parameters separatelly and also change their values.' mod='packetery'}</p>
+            <p>{l s='* You can also use these two parameters separately and change their values.' mod='packetery'}</p>
         </div>
     </div>
 
