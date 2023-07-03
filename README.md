@@ -97,6 +97,13 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 In case you are using another third-party cart module, please write to [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
 Packeta module may not work with another OPC module.
 
+### PHP compatibility
+
+| Module version | Branch   | PHP version |
+|----------------|----------|-------------|
+| `>= 2.1.17`    | `master` | 5.6 - 7.4   | 
+| `>= 3.0`       | `v3.0.0` | 5.6 - 8.2   | 
+
 ### Further module limitations
 - Module does not currently support multistore.
 
@@ -199,6 +206,12 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 Pokud používáte nějaký jiný modul košíku třetí strany, napište nám [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
 Modul Zásilkovny nemusí být s jiným OPC modulem funkční.
 
+### Kompatibilita s verzemi PHP
+
+| Verze modulu | Větev    | PHP verze |
+|--------------|----------|-----------|
+| `>= 2.1.17`  | `master` | 5.6 - 7.4 | 
+| `>= 3.0`     | `v3.0.0` | 5.6 - 8.2 | 
+
 ### Další omezení modulu
 - Modul v současné době nepodporuje multistore. 
-  
