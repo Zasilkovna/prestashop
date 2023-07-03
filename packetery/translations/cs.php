@@ -92,7 +92,7 @@ $_MODULE['<{packetery}prestashop>generatecroninfoblock_96b5307d5a7608691dc0fc0c9
 $_MODULE['<{packetery}prestashop>generatecroninfoblock_e2aa285d311193473a9c91a47defaf18'] = 'Tato URL adresa níže poskytuje základní funkce pro mazání starých štítků PDF.';
 $_MODULE['<{packetery}prestashop>generatecroninfoblock_7c6f61dbdf09d47fb238511b543e42b8'] = 'Smaže všechny štítky PDF starší než %s dní.';
 $_MODULE['<{packetery}prestashop>generatecroninfoblock_a9f5810ceaa043265511ca0443e94a86'] = 'Chcete-li štítky PDF odstranit automaticky, musíte tuto adresu URL zavolat prostřednictvím úloh CRON.';
-$_MODULE['<{packetery}prestashop>generatecroninfoblock_db49c86da611b8ad3cbd50fd74f4e591'] = 'Jsou zde také rozšířené možnosti, jak upravit funkcionalitu za použití parametrů.';
+$_MODULE['<{packetery}prestashop>generatecroninfoblock_ebdaedbfda244dc012fb8c8417ae3f1c'] = 'Jsou zde také rozšířené možnosti, jak upravit funkcionalitu za použití parametrů.';
 $_MODULE['<{packetery}prestashop>generatecroninfoblock_83f499a540b1323009c200d6f8cc9396'] = 'Parametr';
 $_MODULE['<{packetery}prestashop>generatecroninfoblock_b72ac10807b29c77f5b7e4b80ea40414'] = 'Vysvětlení';
 $_MODULE['<{packetery}prestashop>generatecroninfoblock_a9eb26c1184f0656e0b4947900e55ff3'] = 'Parametr říká, jak staré soubory musí být smazány.';
@@ -157,7 +157,7 @@ $_MODULE['<{packetery}prestashop>carrieradminform_1399f8fce27c5636684948807c9a28
 $_MODULE['<{packetery}prestashop>carrieradminform_9af787002da743589075aa873a322d4d'] = 'Povolené typy výdejních míst';
 $_MODULE['<{packetery}prestashop>carrieradminform_307747191798efa983ed0748f83d0652'] = 'Jde o dobírku?';
 $_MODULE['<{packetery}prestashop>carrieradminform_37fc20ebfb7194883268f64cc5bcdbc8'] = 'ANO - všechny objednávky na tohoto dopravce budou do Zásilkovny exportovány jako dobírka, NE - nastavení dobírky se bude řídit podle nastavení dobírky u platební metody.';
-$_MODULE['<{packetery}prestashop>carrieradminform_a12db23199cc862d523a19f92261d5aa'] = 'Možnost nastavení dobírky podle dopravce je již zastaralá a doporučujeme ji nepoužívat. Brzy bude zcela odstraněna.';
+$_MODULE['<{packetery}prestashop>carrieradminform_2e553a6da95861acbe3a954d03df8ef7'] = 'Možnost nastavení dobírky podle dopravce je již zastaralá a doporučujeme ji nepoužívat. Brzy bude zcela odstraněna.';
 $_MODULE['<{packetery}prestashop>carrieradminform_38983834d12186bbca2fc20a8c4c24bb'] = 'Upravit nastavení dopravce';
 $_MODULE['<{packetery}prestashop>carrieradminform_a9a6f3084bcd2e462f03d0cf0c1afd84'] = 'Dopravce byl uložen.';
 $_MODULE['<{packetery}prestashop>carrieradminform_a2a74e2c942959d67b22af9d3a0b54db'] = 'Nastavení dopravce byla uložena.';

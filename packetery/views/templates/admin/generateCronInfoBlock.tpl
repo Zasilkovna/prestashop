@@ -16,7 +16,7 @@
                 <a href="{$deleteLabelsUrl}" target="_blank">{$deleteLabelsUrl}</a>
             </p>
             <p>
-                {l s='There are also extended options to modify the functionality using parameters.' mod='packetery'}
+                {l s='Extended options are also available to modify the functionality using parameters.' mod='packetery'}
             </p>
             <table class="table">
                 <thead>

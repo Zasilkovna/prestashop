@@ -220,7 +220,7 @@ class CarrierAdminForm
                 'required' => true,
                 'desc' => sprintf('%s %s',
                     $this->module->l('YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.', 'carrieradminform'),
-                    $this->module->l('The option to set cash on delivery according to the carrier is already obsolete and we recommend not using it. It will be completely removed soon.', 'carrieradminform')
+                    $this->module->l('The option to set cash on delivery according to the carrier is already obsolete, and we recommend not using it. It will be completely removed soon.', 'carrieradminform')
                 ),
                 'values' => [
                     [
