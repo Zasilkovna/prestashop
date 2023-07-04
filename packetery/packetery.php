@@ -284,7 +284,7 @@ class Packetery extends CarrierModule
         $packetery_orders_pages = $packetery_orders_array[1];
         $this->context->smarty->assign('po_pages', $packetery_orders_pages);
         $this->context->smarty->assign(array(
-            'packetery_orders' => Tools::jsonEncode(array(
+            'packetery_orders' => json_encode(array(
                 'columns' => array(
                     array('content' => $this->l('Ord.nr.'), 'key' => 'id_order', 'center' => true),
                     array('content' => $this->l('Customer'), 'key' => 'customer', 'center' => true),
@@ -326,7 +326,7 @@ class Packetery extends CarrierModule
         }
 
         $this->context->smarty->assign(array(
-            'packetery_list_ad_carriers' => Tools::jsonEncode(array(
+            'packetery_list_ad_carriers' => json_encode(array(
                 'columns' => array(
                     array('content' => $this->l('ID'), 'key' => 'id_carrier', 'center' => true),
                     array('content' => $this->l('Carrier'), 'key' => 'name'),
@@ -351,7 +351,7 @@ class Packetery extends CarrierModule
         $payment_list = array();
         $payment_list = Packeteryclass::getListPayments();
         $this->context->smarty->assign(array(
-            'payment_list' => Tools::jsonEncode(array(
+            'payment_list' => json_encode(array(
                 'columns' => array(
                     array('content' => $this->l('Module'), 'key' => 'name'),
                     array('content' => $this->l('Is COD'), 'key' => 'is_cod', 'bool' => true, 'center' => true),
@@ -377,7 +377,7 @@ class Packetery extends CarrierModule
         );
         $packetery_branches = array();
         $this->context->smarty->assign(array(
-            'packetery_branches' => Tools::jsonEncode(array(
+            'packetery_branches' => json_encode(array(
                 'columns' => array(
                     array('content' => $this->l('ID'), 'key' => 'id_branch', 'center' => true),
                     array('content' => $this->l('Name'), 'key' => 'name', 'center' => true),
@@ -560,7 +560,7 @@ class Packetery extends CarrierModule
             if (!$zPointCarriers) {
                 $zPointCarriers = [];
             }
-            $zPointCarriersIdsJSON = Tools::jsonEncode(array_column($zPointCarriers, 'id_carrier'));
+            $zPointCarriersIdsJSON = json_encode(array_column($zPointCarriers, 'id_carrier'));
             $this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
             $name_branch = '';
             $currency_branch = '';
