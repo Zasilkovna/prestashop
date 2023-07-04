@@ -64,7 +64,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.17';
+        $this->version = '2.1.18';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -443,6 +443,7 @@ class Packetery extends CarrierModule
         ];
         $this->context->smarty->assign('addressValidationOptions', $addressValidationOptions);
 
+        $this->context->smarty->registerPlugin('modifier', 'packetery_sprintf', 'sprintf');
         $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
         $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/prestui/ps-tags.tpl');
         return $output;
@@ -560,7 +561,7 @@ class Packetery extends CarrierModule
             if (!$zPointCarriers) {
                 $zPointCarriers = [];
             }
-            $zPointCarriersIdsJSON = json_encode(array_column($zPointCarriers, 'id_carrier'));
+            $zPointCarriersIdsJSON = json_encode(array_column($zPointCarriers, 'id_carrier'), JSON_FORCE_OBJECT);
             $this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
             $name_branch = '';
             $currency_branch = '';
