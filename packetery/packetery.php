@@ -569,7 +569,7 @@ class Packetery extends CarrierModule
             if (!$zPointCarriers) {
                 $zPointCarriers = [];
             }
-            $zPointCarriersIdsJSON = json_encode(array_column($zPointCarriers, 'id_carrier'), JSON_FORCE_OBJECT);
+            $zPointCarriersIdsJSON = json_encode(array_column($zPointCarriers, 'id_carrier'));
             $this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
             $name_branch = '';
             $currency_branch = '';
