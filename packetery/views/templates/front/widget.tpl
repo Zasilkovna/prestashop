@@ -22,13 +22,14 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <div id="packetery-carrier-{$carrier_id|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" name="baseuri" id="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" name="baseuri" value="{$baseuri|escape:'htmlall':'UTF-8'}">
     <input type="hidden" name="carrier_id" id="carrier_id" value="{$carrier_id|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" id="shop-language" name="shop-language" value="{$language['iso_code']|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" name="app_identity" value="{$app_identity}">
+    <input type="hidden" name="packeta-api-key" class="packeta-api-key" value="{$packeta_api_key}">
+    <input type="hidden" name="shop-language" value="{$language['iso_code']|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerCountry" name="customerCountry" value="{$customerCountry|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="zpoint_carriers" name="zpoint_carriers" value="{$zpoint_carriers}">
     <input type="hidden" id="widget_carriers" name="widget_carriers" value="{$widget_carriers}">
-    <input type="hidden" id="app_identity" name="app_identity" value="{$app_identity}">
     <!--Packetery widget-->
     <div id="packetery-widget" class="clearfix">
         <div class="widget-left">
@@ -44,8 +45,6 @@
                     </ul>
                     <input type="hidden" id="packeta-branch-id" class="packeta-branch-id" name="packeta-branch-id"
                            value="{$id_branch}">
-                    <input type="hidden" id="packeta-api-key" class="packeta-api-key" name="packeta-api-key"
-                           value="{$packeta_api_key}">
                     <input type="hidden" id="packeta-branch-name" class="packeta-branch-name" name="packeta-branch-name"
                            value="{$name_branch}">
                     <input type="hidden" id="packeta-branch-currency" class="packeta-branch-currency" name="packeta-branch-currency"

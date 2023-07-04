@@ -76,7 +76,7 @@ $(window).load(function () {
 window.initializePacketaWidget = function ()
 {
     // set YOUR Packeta API key
-    var packetaApiKey = $("#packeta-api-key").val();
+    var packetaApiKey = $('input[name="packeta-api-key"]').val();
 
     // no Packetery carrier enabled
     if (typeof packetaApiKey === 'undefined') {
@@ -89,11 +89,11 @@ window.initializePacketaWidget = function ()
         country = customerCountry;
     }
     var language = 'en';
-    var shopLanguage = $('#shop-language').val();
+    var shopLanguage = $('input[name="shop-language"]').val();
     if (shopLanguage !== '') {
         language = shopLanguage;
     }
-    var app_identity = $('#app_identity').val(); // Get module version for widgets
+    var app_identity = $('input[name="app_identity"]').val(); // Get module version for widgets
 
     var module = packeteryModulesManager.detectModule();
     $selectedInput = module.getSelectedInput();
@@ -192,12 +192,11 @@ window.initializePacketaWidget = function ()
         Packeta.Widget.pick(packetaApiKey, function (result) {
             var $selectedDeliveryOption = module.getSelectedInput();
             $widgetParent = packeteryModulesManager.getWidgetParent($selectedDeliveryOption);
+            var $addressValidationResult = $widgetParent.find('.address-validation-result');
 
-            if (result != null && result.address != null) {
+            if (result != null && result.address != null && result.address.country === country) {
                 // there is also property packetaWidgetMessage which is true
                 var address = result.address;
-                var $addressValidationResult = $widgetParent.find('.address-validation-result');
-                if (address.country === country) {
                     packetery.widgetSaveOrderAddress(address);
                     $widgetParent.find('#addressValidated').val(true);
                     $addressValidationResult.addClass('address-validated');
@@ -206,14 +205,15 @@ window.initializePacketaWidget = function ()
                         address.street + ' ' + address.houseNumber + ', ' + address.city + ', ' + address.postcode
                     );
                     module.enableSubmitButton();
-                } else {
-                    $widgetParent.find('#addressValidated').val(false);
-                    $addressValidationResult.removeClass('address-validated');
-                    $addressValidationResult.text($widgetParent.find('#countryDiffersMessage').val());
-                    if (PacketaModule.ui.isAddressValidationUnsatisfied($widgetParent)) {
-                        module.disableSubmitButton();
-                    }
+                    return true;
+            } else {
+                $widgetParent.find('#addressValidated').val(false);
+                $addressValidationResult.removeClass('address-validated');
+                $addressValidationResult.text($widgetParent.find('#addressNotValidatedMessage').val());
+                if (PacketaModule.ui.isAddressValidationUnsatisfied($widgetParent)) {
+                    module.disableSubmitButton();
                 }
+                return false;
             }
         }, widgetOptions);
     });
@@ -388,7 +388,7 @@ packetery = {
 ajaxs = {
     baseuri: function ()
     {
-        return $('#baseuri').val();
+        return $('input[name="baseuri"]').val();
     },
     checkToken: function ()
     {
