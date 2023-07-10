@@ -90,4 +90,24 @@ class ProductAttributeRepository
     {
         return _DB_PREFIX_ . self::$tableName;
     }
+
+    /**
+     * @return string
+     */
+    public function getDropTableSql()
+    {
+        return 'DROP TABLE IF EXISTS `' . $this->getPrefixedTableName() . '`;';
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreateTableSql()
+    {
+        return 'CREATE TABLE `' . $this->getPrefixedTableName() . '` (
+            `id_product` int(11) NOT NULL PRIMARY KEY,
+            `is_adult` tinyint(1) NOT NULL DEFAULT 0
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+    }
+
 }

@@ -3,7 +3,9 @@
 namespace Packetery\Module;
 
 use Packetery;
+use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
+use Packetery\Product\ProductAttributeRepository;
 use Packetery\Tools\DbTools;
 use Language;
 use Packetery\Tools\ConfigHelper;
@@ -176,13 +178,12 @@ class Installer
             `allowed_vendors` text NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
-        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product_attribute`';
-        $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_product_attribute` (
-            `id_product` int(11) NOT NULL PRIMARY KEY,
-            `is_adult` tinyint(1) NOT NULL DEFAULT 0
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+        $productAttributeRepository = $this->module->diContainer->get(ProductAttributeRepository::class);
+        $sql[] = $productAttributeRepository->getDropTableSql();
+        $sql[] = $productAttributeRepository->getCreateTableSql();
 
-        $apiCarrierRepository = $this->module->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
+        $apiCarrierRepository = $this->module->diContainer->get(ApiCarrierRepository::class);
+        $sql[] = $apiCarrierRepository->getDropTableSql();
         $sql[] = $apiCarrierRepository->getCreateTableSql();
 
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText(), true)) {

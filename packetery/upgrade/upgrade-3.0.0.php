@@ -5,6 +5,7 @@ use Packetery\Carrier\CarrierAdminForm;
 use Packetery\Carrier\CarrierRepository;
 use Packetery\Module\Installer;
 use Packetery\Module\Uninstaller;
+use Packetery\Product\ProductAttributeRepository;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\DbTools;
 
@@ -83,6 +84,9 @@ function upgrade_module_3_0_0($module)
             `id_product` int(11) NOT NULL PRIMARY KEY,
             `is_adult` tinyint(1) NOT NULL DEFAULT 0
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+
+    $productAttributeRepository = $module->diContainer->get(ProductAttributeRepository::class);
+    $sql[] = $productAttributeRepository->getCreateTableSql();
 
     $dbTools = $module->diContainer->get(DbTools::class);
     if (!$dbTools->executeQueries($sql, $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.0.0'), true)) {
