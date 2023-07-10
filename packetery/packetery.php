@@ -447,9 +447,10 @@ class Packetery extends CarrierModule
             ],
             'PACKETERY_ESHOP_ID' => [
                 'title' => $this->l('Sender indication'),
-                'desc' => $this->l('You can find the sender indication in the client section') .
-                    ': <a href="https://client.packeta.com/senders/">https://client.packeta.com/senders/</a> ' .
-                    $this->l('in the "indication" field.'),
+                'desc' => sprintf(
+                    $this->l('You can find the sender indication in the client section: %s in the "indication" field.'),
+                    '<a href="https://client.packeta.com/senders/">https://client.packeta.com/senders/</a>'
+                ),
                 'required' => true,
             ],
             'PACKETERY_LABEL_FORMAT' => [
