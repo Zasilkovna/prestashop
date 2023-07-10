@@ -44,7 +44,7 @@
 
 	<label class="control-label col-lg-3"></label>
 	{assign 'clientSectionLink' 'https://client.packeta.com/senders/'}
-	<div class="help-block">{l s='You can find the sender indication in the client section: [1]%s[/1] in the "indication" field.' mod='packetery' tags=['<a href="%s">'|sprintf:$clientSectionLink] sprintf=[$clientSectionLink]}</div>
+	<div class="help-block">{l s='You can find the sender indication in the client section: [1]%s[/1] in the "indication" field.' mod='packetery' tags=['<a href="%s">'|packetery_sprintf:$clientSectionLink] sprintf=[$clientSectionLink]}</div>
 
 	{assign 'labels_format' $settings['PACKETERY_LABEL_FORMAT']}
 	<label class="control-label col-lg-3" for="labels_format">

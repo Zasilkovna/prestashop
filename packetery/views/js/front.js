@@ -269,7 +269,7 @@ tools = {
                 var carrierId = String($extra.find('#carrier_id').val());
                 var zpointCarriers = $extra.find('#zpoint_carriers').val();
                 zpointCarriers = JSON.parse(zpointCarriers);
-                if (!zpointCarriers.includes(carrierId)) {
+                if (!zpointCarriers.includes(parseInt(carrierId))) {
                     $extra.find('#open-packeta-widget').hide();
                     $extra.find('#selected-branch').hide();
                 }

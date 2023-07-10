@@ -35,7 +35,6 @@ require_once(dirname(__FILE__) . '/packetery.php');
 class Packeteryclass
 {
 
-    const APP_IDENTITY_PREFIX = 'prestashop-1.7-packeta-';
     // only for mixing with branch ids
     const ZPOINT = 'zpoint';
     const PP_ALL = 'pp_all';

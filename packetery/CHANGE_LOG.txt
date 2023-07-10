@@ -1,3 +1,4 @@
+2.1.18 - Updated: compatibility with PrestaShop 8 ensured
 2.1.17 - Updated: sk "Is COD" translation update
        - Updated: improvements to the display of widget button in the cart
        - Updated: frontend JavaScript and CSS files registered in a way respecting CCC (Combine, Compress and Cache) setting

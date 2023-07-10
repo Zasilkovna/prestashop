@@ -64,7 +64,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-		$this->version = '2.1.17';
+        $this->version = '2.1.18';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -178,6 +178,14 @@ class Packetery extends CarrierModule
         }
 
         return parent::uninstall();
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppIdentity()
+    {
+        return sprintf('prestashop-%s-packeta-%s', _PS_VERSION_, $this->version);
     }
 
     public function hookActionCarrierUpdate($params)
@@ -443,6 +451,7 @@ class Packetery extends CarrierModule
         ];
         $this->context->smarty->assign('addressValidationOptions', $addressValidationOptions);
 
+        $this->context->smarty->registerPlugin('modifier', 'packetery_sprintf', 'sprintf');
         $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
         $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/prestui/ps-tags.tpl');
         return $output;
@@ -488,7 +497,7 @@ class Packetery extends CarrierModule
         $id_carrier = $params['carrier']['id'];
         $this->context->smarty->assign('carrier_id', $id_carrier);
 
-        $this->context->smarty->assign('app_identity', Packeteryclass::APP_IDENTITY_PREFIX . $this->version);
+        $this->context->smarty->assign('app_identity', $this->getAppIdentity());
         $this->context->smarty->assign('language', (array)$language);
 
         $cart = $params['cart'];
@@ -776,7 +785,7 @@ class Packetery extends CarrierModule
         $employee = Context::getContext()->employee;
         $widgetOptions = [
             'api_key' => $apiKey,
-            'app_identity' => Packeteryclass::APP_IDENTITY_PREFIX . $this->version,
+            'app_identity' => $this->getAppIdentity(),
             'country' => strtolower($packeteryOrder['country']),
             'module_dir' => _MODULE_DIR_,
             'lang' => Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT')),
