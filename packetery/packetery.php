@@ -447,9 +447,10 @@ class Packetery extends CarrierModule
             ],
             'PACKETERY_ESHOP_ID' => [
                 'title' => $this->l('Sender indication'),
-                'desc' => $this->l('You can find the sender indication in the client section') .
-                    ': <a href="https://client.packeta.com/senders/">https://client.packeta.com/senders/</a> ' .
-                    $this->l('in the "indication" field.'),
+                'desc' => sprintf(
+                    $this->l('You can find the sender indication in the client section: %s in the "indication" field.'),
+                    '<a href="https://client.packeta.com/senders/">https://client.packeta.com/senders/</a>'
+                ),
                 'required' => true,
             ],
             'PACKETERY_LABEL_FORMAT' => [
@@ -1606,14 +1607,18 @@ class Packetery extends CarrierModule
             return;
         }
 
-        /** @var Packetery\Product\ProductAttributeRepository $productAttribute */
-        $productAttribute = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
-        $packeteryAgeVerification = $productAttribute->getRow($product->id);
+        $isAdult = null;
+        /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
+        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        $packeteryAgeVerification = $productAttributeRepository->getRow($product->id);
+        if (is_array($packeteryAgeVerification)) {
+            $isAdult = $packeteryAgeVerification['is_adult'];
+        }
 
         $this->context->smarty->assign([
-                'packeteryAgeVerification' => $packeteryAgeVerification['is_adult'],
-                'adminProductUrl' => $this->getAdminLink('AdminProducts'),
-                'isPrestaShop16' => $isPrestaShop16,
+            'packeteryAgeVerification' => $isAdult,
+            'adminProductUrl' => $this->getAdminLink('AdminProducts'),
+            'isPrestaShop16' => $isPrestaShop16,
         ]);
 
         return $this->display(__FILE__, 'display_admin_product_extra.tpl');
