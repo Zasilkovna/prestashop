@@ -76,7 +76,7 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 
 ### Supported versions
 - PrestaShop version 1.7.x.
-- If you have problems using the module, please contact us at [support@packeta.com](mailto:support@packeta.com).
+- If you have problems using the module, please contact us at [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 
 ### Provided functions
 - Integration of [widget v6](https://widget.packeta.com/v6) for selection of pickup points in the e-shop cart.
@@ -94,7 +94,7 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 ### OPC support
 - One Page Supercheckout from [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout) (since version 6.0.9)
 
-In case you are using another third-party cart module, please write to [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
+In case you are using another third-party cart module, please write to [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 Packeta module may not work with another OPC module.
 
 ### PHP compatibility
@@ -186,7 +186,7 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 
 ### Podporovaná verze
 - PrestaShop verze 1.7.x.
-- Při problému s použitím modulu nás kontaktujte na adrese [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
+- Při problému s použitím modulu nás kontaktujte na adrese [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 
 ### Poskytované funkce
 - Integrace [widgetu v6](https://widget.packeta.com/v6) pro výběr výdejních míst v košíku eshopu.
@@ -203,7 +203,7 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 ### Podpora pro OPC
 - One Page Supercheckout od [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout) (od verze 6.0.9)
 
-Pokud používáte nějaký jiný modul košíku třetí strany, napište nám [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
+Pokud používáte nějaký jiný modul košíku třetí strany, napište nám [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 Modul Zásilkovny nemusí být s jiným OPC modulem funkční.
 
 ### Kompatibilita s verzemi PHP
