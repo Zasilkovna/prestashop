@@ -266,10 +266,10 @@ tools = {
             }
 
             if ($extra.find('#open-packeta-widget').length) {
-                var carrierId = String($extra.find('#carrier_id').val());
+                var carrierId = parseInt($extra.find('#carrier_id').val());
                 var zpointCarriers = $extra.find('#zpoint_carriers').val();
                 zpointCarriers = JSON.parse(zpointCarriers);
-                if (!zpointCarriers.includes(parseInt(carrierId))) {
+                if (!zpointCarriers.includes(carrierId)) {
                     $extra.find('#open-packeta-widget').hide();
                     $extra.find('#selected-branch').hide();
                 }

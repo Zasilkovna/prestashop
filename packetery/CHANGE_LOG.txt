@@ -1,3 +1,4 @@
+2.1.19 - Fixed: displaying the widget button and cart validation
 2.1.18 - Updated: compatibility with PrestaShop 8 ensured
 2.1.17 - Updated: sk "Is COD" translation update
        - Updated: improvements to the display of widget button in the cart

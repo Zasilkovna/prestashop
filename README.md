@@ -102,7 +102,7 @@ Packeta module may not work with another OPC module.
 | Module version | Branch   | PHP version |
 |----------------|----------|-------------|
 | `>= 2.1.18`    | `master` | 5.6 - 8.2   | 
-| `>= 3.0`       | `v3.0.0` | 5.6 - 8.2   | 
+| `>= 3.0`       | `v3`     | 5.6 - 8.2   | 
 
 ### Further module limitations
 - Module does not currently support multistore.
@@ -211,7 +211,7 @@ Modul Zásilkovny nemusí být s jiným OPC modulem funkční.
 | Verze modulu | Větev    | PHP verze |
 |--------------|----------|-----------|
 | `>= 2.1.18`  | `master` | 5.6 - 8.2 | 
-| `>= 3.0`     | `v3.0.0` | 5.6 - 8.2 | 
+| `>= 3.0`     | `v3`     | 5.6 - 8.2 | 
 
 ### Další omezení modulu
 - Modul v současné době nepodporuje multistore. 
