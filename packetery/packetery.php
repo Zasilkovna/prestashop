@@ -570,7 +570,7 @@ class Packetery extends CarrierModule
                 $zPointCarriers = [];
             } else {
                 $zPointCarriers = array_column($zPointCarriers, 'id_carrier');
-                $zPointCarriers = Packetery\Module\Helper::typeArrayItemsAsInts($zPointCarriers);
+                $zPointCarriers = Packetery\Module\Helper::typeCastableArrayItemsAsInts($zPointCarriers);
             }
             $zPointCarriersIdsJSON = json_encode($zPointCarriers);
             $this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);

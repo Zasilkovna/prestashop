@@ -10,12 +10,12 @@ class Helper
      *
      * @return bool
      */
-    private static function isReallyInt($value)
+    private static function isCastableToInt($value)
     {
         if (is_int($value)) {
             return true;
         }
-        if (is_string($value) && strlen((float)$value) !== strlen($value)) {
+        if (is_string($value) && strlen((string)(float)$value) !== strlen($value)) {
             return false;
         }
         if (is_float($value) || is_string($value)) {
@@ -34,10 +34,10 @@ class Helper
      *
      * @return array
      */
-    public static function typeArrayItemsAsInts(array $array)
+    public static function typeCastableArrayItemsAsInts(array $array)
     {
         foreach ($array as $key => $value) {
-            if (self::isReallyInt($value)) {
+            if (self::isCastableToInt($value)) {
                 $array[$key] = (int)$value;
             }
         }
