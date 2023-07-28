@@ -1,6 +1,6 @@
 [Návod v češtině](#modul-pro-prestashop-17)
 
-# Module for PrestaShop 1.7
+# Module for PrestaShop 1.7, PrestaShop 8
 
 ### Download link
 [Download the latest version](https://github.com/Zasilkovna/prestashop/releases/latest)
@@ -75,7 +75,7 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 - english
 
 ### Supported versions
-- PrestaShop version 1.7.x.
+- PrestaShop 1.7.x., PrestaShop 8
 - If you have problems using the module, please contact us at [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 
 ### Provided functions
@@ -102,12 +102,12 @@ Packeta module may not work with another OPC module.
 | Module version | Branch   | PHP version |
 |----------------|----------|-------------|
 | `>= 2.1.18`    | `master` | 5.6 - 8.2   | 
-| `>= 3.0`       | `v3.0.0` | 5.6 - 8.2   | 
+| `>= 3.0`       | `v3`     | 5.6 - 8.2   | 
 
 ### Further module limitations
 - Module does not currently support multistore.
 
-# Modul pro PrestaShop 1.7
+# Modul pro PrestaShop 1.7, PrestaShop 8
 
 ### Stažení modulu
 [Aktuální verze (Stáhnout »)](https://github.com/Zasilkovna/prestashop/releases/latest)
@@ -185,7 +185,7 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - angličtina
 
 ### Podporovaná verze
-- PrestaShop verze 1.7.x.
+- PrestaShop 1.7.x., PrestaShop 8
 - Při problému s použitím modulu nás kontaktujte na adrese [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 
 ### Poskytované funkce
@@ -211,7 +211,7 @@ Modul Zásilkovny nemusí být s jiným OPC modulem funkční.
 | Verze modulu | Větev    | PHP verze |
 |--------------|----------|-----------|
 | `>= 2.1.18`  | `master` | 5.6 - 8.2 | 
-| `>= 3.0`     | `v3.0.0` | 5.6 - 8.2 | 
+| `>= 3.0`     | `v3`     | 5.6 - 8.2 | 
 
 ### Další omezení modulu
 - Modul v současné době nepodporuje multistore. 

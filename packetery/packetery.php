@@ -64,7 +64,7 @@ class Packetery extends CarrierModule
     {
 		$this->name = 'packetery';
 		$this->tab = 'shipping_logistics';
-        $this->version = '2.1.18';
+        $this->version = '2.1.19';
 		$this->author = 'Packeta s.r.o.';
 		$this->need_instance = 0;
     	$this->is_configurable = 1;
@@ -568,8 +568,11 @@ class Packetery extends CarrierModule
             );
             if (!$zPointCarriers) {
                 $zPointCarriers = [];
+            } else {
+                $zPointCarriers = array_column($zPointCarriers, 'id_carrier');
+                $zPointCarriers = Packetery\Module\Helper::typeCastableArrayItemsAsInts($zPointCarriers);
             }
-            $zPointCarriersIdsJSON = json_encode(array_column($zPointCarriers, 'id_carrier'));
+            $zPointCarriersIdsJSON = json_encode($zPointCarriers);
             $this->context->smarty->assign('zpoint_carriers', $zPointCarriersIdsJSON);
             $name_branch = '';
             $currency_branch = '';
