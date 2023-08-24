@@ -10,9 +10,13 @@ Po úspěšné instalaci klikněte na tlačítko **Konfigurovat** nebo v hlavní
 V případě, že nemáte uživatelský účet na stránkách Zásilkovny, je možné v rámci testování funkcionality modulu či podávání zásilek požádat o testovací účet na emailu Zákaznického servisu: [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz):
 
 - **API heslo**  - vaše API heslo naleznete v [klientské sekci Zásilkovny](https://client.packeta.com/support/) v části **Klientská podpora**
-- **Označení odesílatele** - označení odesílatele které máte nastaveno v [klientské sekci](https://client.packeta.com/senders/) v seznamu odesílatelů
+![screen3](../assets/cs_api_password.png)
 
+
+- **Označení odesílatele** - označení odesílatele které máte nastaveno v [klientské sekci](https://client.packeta.com/senders/) v seznamu odesílatelů
+![screen4](../assets/cs_sender.png)
 Tyto dva údaje jsou povinné a klíčové pro správné fungování modulu a komunikaci mezi vaším e-shopem a Zásilkovnou.
+
 
 - **Formát štítku Zásilkovny** - vyberte formát štítku, který chcete používat
 - **Formát štítku dopravce** - vyberte formát štítku, který chcete používat
@@ -24,7 +28,8 @@ Tyto dva údaje jsou povinné a klíčové pro správné fungování modulu a ko
 - **Výchozí hmotnost obalového materiálu v kg** - zadejte výchozí hmotnost obalového materiálu v kg, pokud není hmotnost zboží objednávky nulová, bude tato hodnota přičtena k hmotnosti zboží
 - **Platební metody reprezentující dobírku** - z výběru platebních metod vyberte ty, které představují platbu na dobírku
 
-Změněná nastavení je potřeba uložit kliknutím na tlačítko **Uložit**.
-![screen2](../assets/configuration_save.png)
 
-[Konfigurace dopravců &#8594;](carriersConfiguration.md) 
+![screen2](../assets/configuration_save.png)
+Změněná nastavení je potřeba uložit kliknutím na tlačítko **Uložit**.
+
+[&#8592;  Instalace](installation.md) | [Konfigurace dopravců &#8594;](carriersConfiguration.md) 
