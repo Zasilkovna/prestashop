@@ -4,7 +4,10 @@ Postup konfigurace dopravců je popsán v oficiální dokumentaci PrestaShopu [h
 
 #### Nastavení dopravců Zásilkovny
 
-V menu vyberte *Zásilkovna* - *Nastavení dopravců*.![screen](../assets/packeta_carrier_list.png)
+V menu vyberte *Zásilkovna* - *Nastavení dopravců*.
+
+![screen Packeta Carrier List](../assets/packeta_carrier_list.png)
+
 Zobrazí se seznam všech dopravců, které máte v obchodě vytvořené. 
 Je potřeba vytvořeného dopravce napárovat s dopravcem Zásilkovny. Klikněte na tlačítko se symbolem tužky a zobrazí se stránka **Upravit dopravce**.
 
@@ -18,13 +21,13 @@ V případě, že jste vybrali dopravce **Zásilkovna - výdejní místa (Packet
 Je možné zatrhnout **Výdejní místa Zásilkovny** a doručení do **Z-BOXU**. 
 Pro Českou republiku je navíc možné vybrat doručení do **Alzaboxu**.
 
-![screen Packeta pickup points](../assets/edit_carrier_pp.png)
+![screen Packeta pickup points carrier](../assets/edit_carrier_pp.png)
 
 Pokud jste vybrali HD (Home Delivery) dopravce, tzn. dopravce který doručuje na adresu, zobrazí se volby, zda 
 pro ověření adresy použít v pokladně widget Zásilkovny. Možnost **Volitelně** způsobí, že se widget v pokladně zobrazí,
 ale není nutné jej pro ověření adresy použít.
 
-![screen Packeta pickup points](../assets/edit_carrier_hd.png)
+![screen Packeta HD carrier](../assets/edit_carrier_hd.png)
 
 Ověřování adresy widgetem Zásilkovny je možné pouze pro Českou a Slovenskou republiku.
 
@@ -34,6 +37,6 @@ Tato další nastavení je potřeba uložit pomocí tlačítka **Uložit**.
 V této sekci je možné ručně aktualizovat seznam dopravců Zásilkovny pomocí tlačítka.
 Aktualizace není možná, pokud jste nevyplnili API heslo v [konfiguraci modulu](configuration.md).
 
-![screen](../assets/manual_carrier_update.png)
+![screen Manual Carrier update](../assets/manual_carrier_update.png)
 
 [&larr; Konfigurace](configuration.md) | [Objednávky &rarr;](orders.md)
