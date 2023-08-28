@@ -24,6 +24,8 @@ Pokud jste vybrali HD (Home Delivery) dopravce, tzn. dopravce který doručuje n
 pro ověření adresy použít v pokladně widget Zásilkovny. Možnost **Volitelně** způsobí, že se widget v pokladně zobrazí,
 ale není nutné jej pro ověření adresy použít.
 
+![screen Packeta pickup points](../assets/edit_carrier_hd.png)
+
 Ověřování adresy widgetem Zásilkovny je možné pouze pro Českou a Slovenskou republiku.
 
 Tato další nastavení je potřeba uložit pomocí tlačítka **Uložit**.
@@ -31,6 +33,7 @@ Tato další nastavení je potřeba uložit pomocí tlačítka **Uložit**.
 ##### Aktualizace dopravců Zásilkovny
 V této sekci je možné ručně aktualizovat seznam dopravců Zásilkovny pomocí tlačítka.
 Aktualizace není možná, pokud jste nevyplnili API heslo v [konfiguraci modulu](configuration.md).
+
 ![screen](../assets/manual_carrier_update.png)
 
 [&larr; Konfigurace](configuration.md) | [Objednávky &rarr;](orders.md)
