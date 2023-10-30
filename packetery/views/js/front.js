@@ -1,3 +1,5 @@
+(function () {
+
 // non-blocking AJAX loading, speeds up page load
 $.getScript("https://widget.packeta.com/v6/www/js/library.js")
     .fail(function() {
@@ -401,3 +403,5 @@ function onShippingLoadedCallback() {
     initializePacketaWidget();
     tools.fixextracontent();
 }
+
+})();
