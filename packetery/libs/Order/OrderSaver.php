@@ -105,7 +105,7 @@ class OrderSaver
             $data['is_cod'] = ($carrierIsCod || $paymentIsCod);
         }
 
-        $packeteryWeight = $this->weightCalculator->getPacketeryWeight($order);
+        $packeteryWeight = $this->weightCalculator->getComputedOrDefaultWeight($order);
         if ($packeteryWeight) {
             $data['weight'] = $packeteryWeight;
         }
