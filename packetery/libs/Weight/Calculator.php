@@ -10,23 +10,21 @@ class Calculator
      * @param \OrderCore $order
      * @return float|null
      */
-    public function getPacketeryWeight(\OrderCore $order)
+    public function getComputedOrDefaultWeight(\OrderCore $order)
     {
         $packagingWeight = (float)ConfigHelper::get('PACKETERY_DEFAULT_PACKAGING_WEIGHT');
-        $defaultWeight = (float)ConfigHelper::get('PACKETERY_DEFAULT_PACKAGE_WEIGHT');
-
-        if (empty($packagingWeight) && empty($defaultWeight)) {
-            return null;
-        }
-
+        $defaultOrderWeight = (float)ConfigHelper::get('PACKETERY_DEFAULT_PACKAGE_WEIGHT');
         $orderWeight = $this->convertUnits($order->getTotalWeight());
 
-        if ($orderWeight === 0.0) {
-            if ($defaultWeight > 0) {
-                $orderWeight = $defaultWeight;
-            }
-        } else {
+        if ($orderWeight === 0.0 && $defaultOrderWeight > 0) {
+            $orderWeight = $defaultOrderWeight;
+        }
+        if ($packagingWeight > 0) {
             $orderWeight += $packagingWeight;
+        }
+
+        if ($orderWeight === 0.0) {
+            return null;
         }
 
         return $orderWeight;
@@ -46,7 +44,7 @@ class Calculator
 
         $order = new \Order($packeteryOrder['id_order']);
 
-        return $this->getPacketeryWeight($order);
+        return $this->getComputedOrDefaultWeight($order);
     }
 
     /**
