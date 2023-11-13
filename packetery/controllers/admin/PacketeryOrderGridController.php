@@ -523,7 +523,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         $smarty = new Smarty();
         $smarty->assign('weight', $weight);
         $smarty->assign('orderId', $row['id_order']);
-        $smarty->assign('disabled', $row['exported']);
+        $smarty->assign('disabled', $row['tracking_number']);
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/weightEditable.tpl');
     }
