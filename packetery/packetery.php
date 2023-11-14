@@ -833,6 +833,7 @@ class Packetery extends CarrierModule
         $messages = [];
         $orderId = (int)$params['id_order'];
         $this->context->smarty->assign('orderId', $orderId);
+        $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
         $this->processPickupPointChange($messages);
         $this->processPostParcel($messages);
 
@@ -966,7 +967,6 @@ class Packetery extends CarrierModule
             $widgetOptions['street'] = $deliveryAddress->address1;
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
-        $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
     }
 
     /**
@@ -999,7 +999,6 @@ class Packetery extends CarrierModule
             $widgetOptions['carriers'] = 'packeta';
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
-        $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
     }
 
     /**
