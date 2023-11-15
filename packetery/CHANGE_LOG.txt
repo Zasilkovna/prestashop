@@ -1,4 +1,5 @@
 2.1.20 - Fixed: front.js - compatibility with other plugins
+       - Removed: validation of API password using API
 2.1.19 - Fixed: displaying the widget button and cart validation
 2.1.18 - Updated: compatibility with PrestaShop 8 ensured
 2.1.17 - Updated: sk "Is COD" translation update
