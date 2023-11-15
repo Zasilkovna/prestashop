@@ -15,8 +15,6 @@ class Options
     /** @var SoapApi */
     private $soapApi;
 
-    const PACKETA_API_KEY_TEST_URI = 'http://www.zasilkovna.cz/api/%s/test';
-
     public function __construct(Packetery $module, SoapApi $soapApi)
     {
         $this->module = $module;
@@ -103,16 +101,7 @@ class Options
      */
     public function isApiPasswordValid($apiPassword)
     {
-        if (\Tools::strlen($apiPassword) !== 32) {
-            return false;
-        }
-        $apiKey = ConfigHelper::getApiKeyFromApiPass($apiPassword);
-        $url = sprintf(self::PACKETA_API_KEY_TEST_URI, $apiKey);
-
-        /** @var \Packetery\Module\ApiClientFacade $client */
-        $client = $this->module->diContainer->get(ApiClientFacade::class);
-
-        return $client->get($url) === '1';
+        return (\Tools::strlen($apiPassword) === 32);
     }
 
     /**
