@@ -237,8 +237,8 @@ class Packetery extends CarrierModule
         if (!$apiPassword) {
             $error[] = $this->l('Packeta API password is not set.');
             $have_error = true;
-        } elseif (strlen($apiPassword) !== 32) {
-            $error[] = $this->l('Api password is wrong.');
+        } elseif (strlen($apiPassword) !== Packeteryclass::API_PASSWORD_LENGTH) {
+            $error[] = $this->l('Api password must be 32 characters long.');
             $have_error = true;
         }
 
