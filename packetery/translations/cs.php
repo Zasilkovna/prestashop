@@ -123,7 +123,7 @@ $_MODULE['<{packetery}prestashop>orderexporter_4988c308d36d231707ae7e2d1e8d06b2'
 $_MODULE['<{packetery}prestashop>orderexporter_4187014f98a93a8339a9ea26cf78f132'] = 'Nepodařilo se nalézt měnu výdejního místa, objednávka';
 $_MODULE['<{packetery}prestashop>orderexporter_e633b4eefe327cee3b6ce2a2966fe96a'] = 'Nelze najít směnný kurz v nastavení měn PrestaShopu pro cílovou zemi objednávky';
 $_MODULE['<{packetery}prestashop>packetsubmitter_5552dc553d496d4b06866ca45b890b4a'] = 'Vyberte prosím nejdříve objednávky.';
-$_MODULE['<{packetery}prestashop>options_a8aadecdc79bcce492c6b27b78077b02'] = 'Nesprávné API heslo.';
+$_MODULE['<{packetery}prestashop>options_ac4ea9d06af52e534143ed2979c50841'] = 'API heslo musí mít 32 znaků.';
 $_MODULE['<{packetery}prestashop>options_d2cfd13754957b947b1fb129f7f00c4b'] = 'Zadané označení odesílatele neexistuje.';
 $_MODULE['<{packetery}prestashop>options_1e55c11920d6ebc07255263ae03d4974'] = 'Ověření označení odesílatele selhalo';
 $_MODULE['<{packetery}prestashop>options_13c2b3c8f8fcb16a73d7b6848a42c37b'] = 'Vložte prosím výchozí cenu zásilky';

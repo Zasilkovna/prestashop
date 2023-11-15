@@ -9,6 +9,8 @@ use Packetery\Tools\ConfigHelper;
 
 class Options
 {
+    const API_PASSWORD_LENGTH = 32;
+
     /** @var Packetery */
     private $module;
 
@@ -32,8 +34,8 @@ class Options
     {
         switch ($id) {
             case 'PACKETERY_APIPASS':
-                if (!$this->isApiPasswordValid($value)) {
-                    return $this->module->l('Api password is wrong.', 'options');
+                if (\Tools::strlen($value) !== self::API_PASSWORD_LENGTH) {
+                    return $this->module->l('Api password must be 32 characters long.', 'options');
                 }
 
                 return false;
@@ -91,17 +93,6 @@ class Options
             default:
                 return $value;
         }
-    }
-
-    /**
-     * @param string $apiPassword
-     * @return bool
-     * @throws \ReflectionException
-     * @throws \Packetery\Exceptions\ApiClientException
-     */
-    public function isApiPasswordValid($apiPassword)
-    {
-        return (\Tools::strlen($apiPassword) === 32);
     }
 
     /**
