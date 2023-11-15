@@ -26,6 +26,7 @@
        - Updated: The module was tested against PrestaShop 8 and PHP 8.1 and now supports these versions.
        - Updated: API communication has been updated to be better compatible with 32-bit PHP in the future.
        - Fixed: correct order saving for templates that in some cases do not save the carrier id in the cart before confirming the order
+       - Removed: validation of API password using API
 2.1.17 - Updated: sk "Is COD" translation update
        - Removed: displaying widget button right after shipping method change
        - Updated: increased delay for backup widget button displaying mechanism

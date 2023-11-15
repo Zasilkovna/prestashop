@@ -9,13 +9,13 @@ use Packetery\Tools\ConfigHelper;
 
 class Options
 {
+    const API_PASSWORD_LENGTH = 32;
+
     /** @var Packetery */
     private $module;
 
     /** @var SoapApi */
     private $soapApi;
-
-    const PACKETA_API_KEY_TEST_URI = 'http://www.zasilkovna.cz/api/%s/test';
 
     public function __construct(Packetery $module, SoapApi $soapApi)
     {
@@ -34,8 +34,8 @@ class Options
     {
         switch ($id) {
             case 'PACKETERY_APIPASS':
-                if (!$this->isApiPasswordValid($value)) {
-                    return $this->module->l('Api password is wrong.', 'options');
+                if (\Tools::strlen($value) !== self::API_PASSWORD_LENGTH) {
+                    return $this->module->l('Api password must be 32 characters long.', 'options');
                 }
 
                 return false;
@@ -93,26 +93,6 @@ class Options
             default:
                 return $value;
         }
-    }
-
-    /**
-     * @param string $apiPassword
-     * @return bool
-     * @throws \ReflectionException
-     * @throws \Packetery\Exceptions\ApiClientException
-     */
-    public function isApiPasswordValid($apiPassword)
-    {
-        if (\Tools::strlen($apiPassword) !== 32) {
-            return false;
-        }
-        $apiKey = ConfigHelper::getApiKeyFromApiPass($apiPassword);
-        $url = sprintf(self::PACKETA_API_KEY_TEST_URI, $apiKey);
-
-        /** @var \Packetery\Module\ApiClientFacade $client */
-        $client = $this->module->diContainer->get(ApiClientFacade::class);
-
-        return $client->get($url) === '1';
     }
 
     /**
