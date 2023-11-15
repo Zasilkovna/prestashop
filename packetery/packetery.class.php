@@ -39,6 +39,8 @@ class Packeteryclass
     const ZPOINT = 'zpoint';
     const PP_ALL = 'pp_all';
 
+    const API_PASSWORD_LENGTH = 32;
+
     /**
      * Converts price from order currency to branch currency
      * @param string $orderCurrencyIso
@@ -705,22 +707,13 @@ class Packeteryclass
         switch ($id)
         {
             case 'PACKETERY_APIPASS':
-                if (Validate::isString($value))
-                {
-                    if (Tools::strlen($value) !== 32)
-                    {
-                        return $packetery->l('Api password is wrong. Carriers will not be updated.', 'packetery.class');
+                if (Validate::isString($value)) {
+                    if (Tools::strlen($value) !== self::API_PASSWORD_LENGTH) {
+                        return $packetery->l('Api password must be 32 characters long. Carriers will not be updated.', 'packetery.class');
                     }
-                    else
-                    {
-                        return false;
-                    }
+                    return false;
                 }
-                else
-                {
-                    return $packetery->l('Api password must be string', 'packetery.class');
-                }
-                break;
+                return $packetery->l('Api password must be string', 'packetery.class');
             case 'PACKETERY_ESHOP_ID':
                 try {
                     PacketeryApi::senderGetReturnRouting($value);

@@ -17,7 +17,7 @@ $_MODULE['<{packetery}prestashop>packetery_92d4773a9f32fc3333cb8238471cf763'] = 
 $_MODULE['<{packetery}prestashop>packetery_c721b4e2739ac6e4dd5b507696c0a24d'] = 'Aby výber výdajného miesta správne fungoval, musí byť súbor modulu Packeta zapisovatelný.';
 $_MODULE['<{packetery}prestashop>packetery_b1d2b2b5b4d88a9fdc0619ab919713c9'] = 'Na webovom serveri nie je k dispozícii žiaden spôsob prístupu k Packeta API: prosím povolte modul CURL alebo nastavenie allow url fopen.';
 $_MODULE['<{packetery}prestashop>packetery_35c4f71040b3390abc9a98803735e993'] = 'API heslo Packety nie je nastavené.';
-$_MODULE['<{packetery}prestashop>packetery_26ff7eaab2ad87962dbd3d7d6dbaf020'] = 'Nemôžem pristúpiť k API Packety so zadaným kľúčom. Pravdepodobne je heslo API nesprávne.';
+$_MODULE['<{packetery}prestashop>packetery_a8aadecdc79bcce492c6b27b78077b02'] = 'API heslo musí mať 32 znakov.';
 $_MODULE['<{packetery}prestashop>packetery_0b647f6df914903b01f2659f54d90474'] = 'Č. obj.';
 $_MODULE['<{packetery}prestashop>packetery_ce26601dac0dea138b7295f02b7620a7'] = 'Zákazník';
 $_MODULE['<{packetery}prestashop>packetery_f3547ae5e06426d87312eff7dda775aa'] = 'Celková cena';
@@ -78,7 +78,7 @@ $_MODULE['<{packetery}prestashop>packetery.class_ddd6dc80580e42e39480b99a2fd30e1
 $_MODULE['<{packetery}prestashop>packetery.class_029fb74a19c890683f2c2d8e33431d42'] = 'Chyba pri uložení nastavení.';
 $_MODULE['<{packetery}prestashop>packetery.class_8d826acd449cf54a4ddfd37819e728eb'] = 'Najprv prosím nastavte združenie dopravcov.';
 $_MODULE['<{packetery}prestashop>packetery.class_1097d15ac9e833bc9ee47161243ebc93'] = 'Nie je možné aktualizovať nastavenie';
-$_MODULE['<{packetery}prestashop>packetery.class_c417517a9fbdc3a9fb96c306fc27ab81'] = 'Heslo k rozhraniu API je chybné. Dopravcovia nebudú aktualizovaní.';
+$_MODULE['<{packetery}prestashop>packetery.class_c417517a9fbdc3a9fb96c306fc27ab81'] = 'API heslo musí mať 32 znakov. Dopravcovia nebudú aktualizovaní.';
 $_MODULE['<{packetery}prestashop>packetery.class_3a2f7eb090541a1fffae68f276e8d62e'] = 'Api heslo musí byť reťazec';
 $_MODULE['<{packetery}prestashop>packetery.class_d2cfd13754957b947b1fb129f7f00c4b'] = 'Zadané označenie odosielateľa neexistuje.';
 $_MODULE['<{packetery}prestashop>packetery.class_1e55c11920d6ebc07255263ae03d4974'] = 'Overenie označenia odosielateľa zlyhalo';

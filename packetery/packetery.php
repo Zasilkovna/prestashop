@@ -233,19 +233,13 @@ class Packetery extends CarrierModule
             $have_error = true;
         }
 
-        $key = PacketeryApi::getApiKey();
-        if (Tools::strlen($key) < 5) {
-            $key = false;
-        }
-        $test = "http://www.zasilkovna.cz/api/$key/test";
-        if (!$key) {
+        $apiPassword = Configuration::get('PACKETERY_APIPASS');
+        if (!$apiPassword) {
             $error[] = $this->l('Packeta API password is not set.');
             $have_error = true;
-        } elseif (!$error) {
-            if (Tools::file_get_contents($test) != 1) {
-                $error[] = $this->l('Cannot access Packeta API with specified password. Possibly the API password is wrong.');
-                $have_error = true;
-            }
+        } elseif (strlen($apiPassword) !== Packeteryclass::API_PASSWORD_LENGTH) {
+            $error[] = $this->l('Api password must be 32 characters long.');
+            $have_error = true;
         }
 
         return $have_error;
