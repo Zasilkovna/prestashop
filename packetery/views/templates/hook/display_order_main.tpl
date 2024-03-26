@@ -41,8 +41,23 @@
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="address">
                     </p>
+
+                    {if !$isSubmitted}
+                        <div>
+                            <h4>{l s='Size (L x W x H):' mod='packetery'}</h4>
+                            <p>
+                                <input name="length" value="{$orderDetails['length']}" placeholder="{l s='Length' mod='packetery'}">
+                                <label>x</label>
+                                <input name="width" value="{$orderDetails['width']}" placeholder="{l s='Width' mod='packetery'}">
+                                <label>x</label>
+                                <input name="height" value="{$orderDetails['height']}" placeholder="{l s='Height' mod='packetery'}">
+                                <label>(mm)</label>
+                            </p>
+                        </div>
+                    {/if}
+
                     <div class="text-right">
-                        <button class="btn btn-primary" name="address_change">{l s='Save' mod='packetery'}</button>
+                        <button class="btn btn-primary" name="hd_data_update">{l s='Save' mod='packetery'}</button>
                     </div>
                 </form>
             {/if}
@@ -64,8 +79,23 @@
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="pickup_point">
                     </p>
+
+                    {if !$isSubmitted}
+                        <div>
+                            <h4>{l s='Size (L x W x H):' mod='packetery'}</h4>
+                            <p>
+                                <input name="length" value="{$orderDetails['length']}" placeholder="{l s='Length' mod='packetery'}">
+                                <label>x</label>
+                                <input name="width" value="{$orderDetails['width']}" placeholder="{l s='Width' mod='packetery'}">
+                                <label>x</label>
+                                <input name="height" value="{$orderDetails['height']}" placeholder="{l s='Height' mod='packetery'}">
+                                <label>(mm)</label>
+                            </p>
+                        </div>
+                    {/if}
+
                     <div class="text-right">
-                        <button class="btn btn-primary" name="pickup_point_change">{l s='Save' mod='packetery'}</button>
+                        <button class="btn btn-primary" name="pp_data_update">{l s='Save' mod='packetery'}</button>
                     </div>
                 </form>
             {/if}

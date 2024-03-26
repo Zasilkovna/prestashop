@@ -62,7 +62,8 @@ class PacketSubmitter
             'cod' => $exportData['codValue'],
             'value' => $exportData['value'],
             'eshop' => $exportData['senderLabel'],
-            'weight' => $exportData['weight'],
+	        'weight' => $exportData['weight'],
+	        'size' => $exportData['size'],
             'adultContent' => $exportData['adultContent'],
         ];
         foreach (['carrierPickupPoint', 'street', 'houseNumber', 'city', 'zip'] as $key) {

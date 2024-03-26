@@ -849,7 +849,7 @@ class Packetery extends CarrierModule
         }
         $countryDiffersMessage = $this->l('The selected delivery address is in a country other than the country of delivery of the order.');
         $this->processAddressChange($messages, $packeteryOrder, $countryDiffersMessage);
-        if (Tools::isSubmit('address_change')) {
+        if (Tools::isSubmit('hd_data_update')) {
             $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
         }
 
@@ -876,6 +876,18 @@ class Packetery extends CarrierModule
         if (!$packeteryCarrier) {
             return;
         }
+
+		if ( !(bool)$packeteryOrder['exported'] ) {
+			$orderDetails = [
+				'length' => Tools::getValue('length'),
+				'height' => Tools::getValue('height'),
+				'width' => Tools::getValue('width'),
+			];
+			$this->context->smarty->assign('orderDetails', $orderDetails);
+		} else {
+			$this->context->smarty->assign('isSubmitted', true);
+		}
+
         if ($isAddressDelivery) {
             $isAddressValidated = false;
             if (in_array($packeteryCarrier['address_validation'], ['required', 'optional'])) {
@@ -1083,6 +1095,25 @@ class Packetery extends CarrierModule
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         return $orderRepository->updateByOrder($packeteryOrderFields, $orderId);
     }
+
+	/**
+	 * @param array $orderDetails
+	 * @return bool
+	 * @throws ReflectionException
+	 * @throws \Packetery\Exceptions\DatabaseException
+	 */
+	private function saveOrderDetailsChange(array $orderDetails)
+	{
+		$orderId = (int)Tools::getValue('order_id');
+		$packeteryOrderFields = [
+			'length' => $orderDetails['length'],
+			'height' => $orderDetails['height'],
+			'width' => $orderDetails['width'],
+		];
+		/** @var \Packetery\Order\OrderRepository $orderRepository */
+		$orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+		return $orderRepository->updateByOrder($packeteryOrderFields, $orderId, true);
+	}
 
     /**
      * @return bool
@@ -1438,8 +1469,11 @@ class Packetery extends CarrierModule
      */
     private function processPickupPointChange(array &$messages)
     {
+		if (!Tools::isSubmit('pp_data_update')) {
+			return;
+		}
+
         if (
-            Tools::isSubmit('pickup_point_change') &&
             Tools::getIsset('pickup_point') &&
             Tools::getValue('pickup_point') !== ''
         ) {
@@ -1456,6 +1490,8 @@ class Packetery extends CarrierModule
                 ];
             }
         }
+
+	    $this->processOrderDetailChange($messages);
     }
 
     /**
@@ -1509,8 +1545,11 @@ class Packetery extends CarrierModule
      */
     private function processAddressChange(array &$messages, array $packeteryOrder, $countryDiffersMessage)
     {
+		if (!Tools::isSubmit('hd_data_update')) {
+			return;
+		}
+
         if (
-            Tools::isSubmit('address_change') &&
             Tools::getIsset('address') &&
             Tools::getValue('address') !== ''
         ) {
@@ -1541,6 +1580,12 @@ class Packetery extends CarrierModule
                 ];
             }
         }
+
+		if ($packeteryOrder['exported']) {
+			return;
+		}
+
+	    $this->processOrderDetailChange($messages);
     }
 
     /**
@@ -1680,4 +1725,55 @@ class Packetery extends CarrierModule
 			return;
         }
     }
+
+	/**
+	 * @param array $messages
+	 * @return void
+	 */
+	private function processOrderDetailChange(array &$messages)
+	{
+		if (
+			(Tools::getIsset('length') && Tools::getValue('length') !== '') ||
+			(Tools::getIsset('height') && Tools::getValue('height') !== '') ||
+			(Tools::getIsset('width') && Tools::getValue('width') !== '')
+		) {
+			$orderDetails = [];
+			$size = ['length', 'height', 'width'];
+			foreach ($size as $unit) {
+				if (Packetery\Tools\Tools::getValue($unit) !== '') {
+					$orderDetails[$unit] = (int) Packetery\Tools\Tools::getValue($unit);
+				} else {
+					$orderDetails[$unit] = Packetery\Tools\Tools::getValue($unit);
+				}
+			}
+
+		    foreach ($orderDetails as $name => $size) {
+			    if ($size < 1 && $size !== '') {
+				    $messages[] = [
+					    'text' => $this->l(ucfirst($name) . ' must be a number, greater than 0.'),
+					    'class' => 'danger',
+				    ];
+			    }
+		    }
+
+			foreach ($messages as $message) {
+				if ($message['class'] === 'danger') {
+					return;
+				}
+			}
+
+			$updateOrderDetails = $this->saveOrderDetailsChange($orderDetails);
+			if ($updateOrderDetails) {
+				$messages[] = [
+					'text' => $this->l('Order details have been updated'),
+					'class' => 'success'
+				];
+			} else {
+				$messages[] = [
+					'text' => $this->l('Order details could not be updated.'),
+					'class' => 'danger',
+				];
+			}
+		}
+	}
 }
