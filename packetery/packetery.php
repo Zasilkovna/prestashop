@@ -884,9 +884,11 @@ class Packetery extends CarrierModule
 				'width' => Tools::getValue('width'),
 			];
 			$this->context->smarty->assign('orderDetails', $orderDetails);
+			$isExported = false;
 		} else {
-			$this->context->smarty->assign('isSubmitted', true);
+			$isExported = true;
 		}
+		$this->context->smarty->assign('isExported', $isExported);
 
         if ($isAddressDelivery) {
             $isAddressValidated = false;
@@ -1732,48 +1734,42 @@ class Packetery extends CarrierModule
 	 */
 	private function processOrderDetailChange(array &$messages)
 	{
-		if (
-			(Tools::getIsset('length') && Tools::getValue('length') !== '') ||
-			(Tools::getIsset('height') && Tools::getValue('height') !== '') ||
-			(Tools::getIsset('width') && Tools::getValue('width') !== '')
-		) {
-			$orderDetails = [];
-			$size = ['length', 'height', 'width'];
-			foreach ($size as $unit) {
-				if (Packetery\Tools\Tools::getValue($unit) !== '') {
-					$orderDetails[$unit] = (int) Packetery\Tools\Tools::getValue($unit);
-				} else {
-					$orderDetails[$unit] = Packetery\Tools\Tools::getValue($unit);
-				}
-			}
-
-		    foreach ($orderDetails as $name => $size) {
-			    if ($size < 1 && $size !== '') {
-				    $messages[] = [
-					    'text' => $this->l(ucfirst($name) . ' must be a number, greater than 0.'),
-					    'class' => 'danger',
-				    ];
-			    }
-		    }
-
-			foreach ($messages as $message) {
-				if ($message['class'] === 'danger') {
-					return;
-				}
-			}
-
-			$updateOrderDetails = $this->saveOrderDetailsChange($orderDetails);
-			if ($updateOrderDetails) {
-				$messages[] = [
-					'text' => $this->l('Order details have been updated'),
-					'class' => 'success'
-				];
+		$orderDetails = [];
+		$size = ['length', 'height', 'width'];
+		foreach ($size as $unit) {
+			if (Packetery\Tools\Tools::getValue($unit) !== '') {
+				$orderDetails[$unit] = (int) Packetery\Tools\Tools::getValue($unit);
 			} else {
-				$messages[] = [
-					'text' => $this->l('Order details could not be updated.'),
-					'class' => 'danger',
-				];
+				$orderDetails[$unit] = Packetery\Tools\Tools::getValue($unit);
 			}
+		}
+
+	    foreach ($orderDetails as $name => $size) {
+		    if ($size < 1 && $size !== '') {
+			    $messages[] = [
+				    'text' => $this->l(ucfirst($name) . ' must be a number, greater than 0.'),
+				    'class' => 'danger',
+			    ];
+		    }
+	    }
+
+		foreach ($messages as $message) {
+			if ($message['class'] === 'danger') {
+				return;
+			}
+		}
+
+		$updateOrderDetails = $this->saveOrderDetailsChange($orderDetails);
+		if ($updateOrderDetails) {
+			$messages[] = [
+				'text' => $this->l('Order details have been updated'),
+				'class' => 'success'
+			];
+		} else {
+			$messages[] = [
+				'text' => $this->l('Order details could not be updated.'),
+				'class' => 'danger',
+			];
 		}
 	}
 }
