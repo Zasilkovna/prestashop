@@ -96,18 +96,19 @@ class OrderRepository
      * @return bool
      * @throws DatabaseException
      */
-    public function updateByCart(array $fields, int $cartId, bool $nullValues = false)
+    public function updateByCart($fields, $cartId, $nullValues = false)
     {
         $cartId = (int)$cartId;
         return $this->dbTools->update('packetery_order', $fields, '`id_cart` = ' . $cartId, 0, $nullValues);
     }
 
-    /**
-     * @param array $fields
-     * @param int $orderId
-     * @return bool
-     * @throws DatabaseException
-     */
+	/**
+	 * @param array $fields
+	 * @param int $orderId
+	 * @param bool $allowNullValues
+	 * @return bool
+	 * @throws DatabaseException
+	 */
     public function updateByOrder(array $fields, $orderId, $allowNullValues = false)
     {
         $orderId = (int)$orderId;

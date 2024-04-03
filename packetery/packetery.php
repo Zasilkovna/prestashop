@@ -834,7 +834,6 @@ class Packetery extends CarrierModule
         $orderId = (int)$params['id_order'];
         $this->context->smarty->assign('orderId', $orderId);
         $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
-        $this->processPickupPointChange($messages);
         $this->processPostParcel($messages);
 
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
@@ -847,8 +846,13 @@ class Packetery extends CarrierModule
         if (!$apiKey || !$packeteryOrder) {
             return;
         }
+
+	    /** @var \Packetery\Order\DetailsForm $detailsForm */
+	    $detailsForm = $this->diContainer->get(\Packetery\Order\DetailsForm::class);
+
+        $this->processPickupPointChange($messages, $packeteryOrder, $detailsForm);
         $countryDiffersMessage = $this->l('The selected delivery address is in a country other than the country of delivery of the order.');
-        $this->processAddressChange($messages, $packeteryOrder, $countryDiffersMessage);
+        $this->processAddressChange($messages, $packeteryOrder, $countryDiffersMessage, $detailsForm);
         if (Tools::isSubmit('hd_data_update')) {
             $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
         }
@@ -876,6 +880,14 @@ class Packetery extends CarrierModule
         if (!$packeteryCarrier) {
             return;
         }
+
+		if ($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch'])) {
+			$submitButton = 'pp_data_update';
+		} else {
+			$submitButton = 'hd_data_update';
+		}
+
+		$this->context->smarty->assign('submitButton', $submitButton);
 
 		if ( !(bool)$packeteryOrder['exported'] ) {
 			$orderDetails = [
@@ -951,6 +963,7 @@ class Packetery extends CarrierModule
      * @param int $orderId
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     *
      */
     private function prepareAddressChange($apiKey, array $packeteryOrder, $orderId)
     {
@@ -1097,25 +1110,6 @@ class Packetery extends CarrierModule
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         return $orderRepository->updateByOrder($packeteryOrderFields, $orderId);
     }
-
-	/**
-	 * @param array $orderDetails
-	 * @return bool
-	 * @throws ReflectionException
-	 * @throws \Packetery\Exceptions\DatabaseException
-	 */
-	private function saveOrderDetailsChange(array $orderDetails)
-	{
-		$orderId = (int)Tools::getValue('order_id');
-		$packeteryOrderFields = [
-			'length' => $orderDetails['length'],
-			'height' => $orderDetails['height'],
-			'width' => $orderDetails['width'],
-		];
-		/** @var \Packetery\Order\OrderRepository $orderRepository */
-		$orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-		return $orderRepository->updateByOrder($packeteryOrderFields, $orderId, true);
-	}
 
     /**
      * @return bool
@@ -1464,12 +1458,14 @@ class Packetery extends CarrierModule
         $params['completed'] = true;
     }
 
-    /**
-     * @param array $messages
-     * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
-     */
-    private function processPickupPointChange(array &$messages)
+	/**
+	 * @param array $messages
+	 * @param $packeteryOrder
+	 * @param $detailsForm
+	 * @throws ReflectionException
+	 * @throws \Packetery\Exceptions\DatabaseException
+	 */
+    private function processPickupPointChange(array &$messages, $packeteryOrder, $detailsForm)
     {
 		if (!Tools::isSubmit('pp_data_update')) {
 			return;
@@ -1493,7 +1489,7 @@ class Packetery extends CarrierModule
             }
         }
 
-	    $this->processOrderDetailChange($messages);
+	    $detailsForm->processOrderDetailChange($messages, $packeteryOrder);
     }
 
     /**
@@ -1538,14 +1534,15 @@ class Packetery extends CarrierModule
         }
     }
 
-    /**
-     * @param array $messages
-     * @param array $packeteryOrder
-     * @param string $countryDiffersMessage
-     * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
-     */
-    private function processAddressChange(array &$messages, array $packeteryOrder, $countryDiffersMessage)
+	/**
+	 * @param array $messages
+	 * @param array $packeteryOrder
+	 * @param string $countryDiffersMessage
+	 * @param $detailsForm
+	 * @throws ReflectionException
+	 * @throws \Packetery\Exceptions\DatabaseException
+	 */
+    private function processAddressChange(array &$messages, array $packeteryOrder, $countryDiffersMessage, $detailsForm)
     {
 		if (!Tools::isSubmit('hd_data_update')) {
 			return;
@@ -1587,7 +1584,7 @@ class Packetery extends CarrierModule
 			return;
 		}
 
-	    $this->processOrderDetailChange($messages);
+	    $detailsForm->processOrderDetailChange($messages, $packeteryOrder);
     }
 
     /**
@@ -1727,49 +1724,4 @@ class Packetery extends CarrierModule
 			return;
         }
     }
-
-	/**
-	 * @param array $messages
-	 * @return void
-	 */
-	private function processOrderDetailChange(array &$messages)
-	{
-		$orderDetails = [];
-		$size = ['length', 'height', 'width'];
-		foreach ($size as $unit) {
-			if (Packetery\Tools\Tools::getValue($unit) !== '') {
-				$orderDetails[$unit] = (int) Packetery\Tools\Tools::getValue($unit);
-			} else {
-				$orderDetails[$unit] = Packetery\Tools\Tools::getValue($unit);
-			}
-		}
-
-	    foreach ($orderDetails as $name => $size) {
-		    if ($size < 1 && $size !== '') {
-			    $messages[] = [
-				    'text' => $this->l(ucfirst($name) . ' must be a number, greater than 0.'),
-				    'class' => 'danger',
-			    ];
-		    }
-	    }
-
-		foreach ($messages as $message) {
-			if ($message['class'] === 'danger') {
-				return;
-			}
-		}
-
-		$updateOrderDetails = $this->saveOrderDetailsChange($orderDetails);
-		if ($updateOrderDetails) {
-			$messages[] = [
-				'text' => $this->l('Order details have been updated'),
-				'class' => 'success'
-			];
-		} else {
-			$messages[] = [
-				'text' => $this->l('Order details could not be updated.'),
-				'class' => 'danger',
-			];
-		}
-	}
 }

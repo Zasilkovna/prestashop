@@ -29,7 +29,7 @@
                         {l s='GPS' mod='packetery'}: <strong class="packetery-gps">{$validatedAddress['latitude']}, {$validatedAddress['longitude']}</strong><br>
                     </p>
                 {/if}
-                {if isset($widgetOptions)}
+                {if isset($widgetOptions) && !$isExported}
                     {assign var="showSubmitButton" value="true"}
                         <p>
                             <a href="" class="btn btn-outline-secondary btn-default open-packeta-hd-widget"
@@ -55,7 +55,7 @@
                         {/if}
                     </strong>
                 </p>
-                {if $pickupPointChangeAllowed}
+                {if $pickupPointChangeAllowed && !$isExported}
                     {assign var="showSubmitButton" value="true"}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-widget"
@@ -97,7 +97,7 @@
                 {/if}
 
                 <div class="text-right">
-                    <button class="btn btn-primary" name="pp_data_update">{l s='Save' mod='packetery'}</button>
+                    <button class="btn btn-primary" name="{$submitButton}">{l s='Save' mod='packetery'}</button>
                 </div>
             {/if}
         </form>
