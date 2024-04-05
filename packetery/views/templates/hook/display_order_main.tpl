@@ -6,8 +6,6 @@
     </div>
     <div class="card-body">
         <form action="{$returnUrl}" method="post">
-            {assign var="showSubmitButton" value="false"}
-
             {if $isAddressDelivery}
                 <p>
                     {l s='Carrier' mod='packetery'}:
@@ -30,20 +28,19 @@
                     </p>
                 {/if}
                 {if isset($widgetOptions) && !$isExported}
-                    {assign var="showSubmitButton" value="true"}
-                        <p>
-                            <a href="" class="btn btn-outline-secondary btn-default open-packeta-hd-widget"
-                               data-widget-options="{$widgetOptions|@json_encode|escape}">
-                                {if isset($validatedAddress) && $validatedAddress['zip']}
-                                    {l s='Change validated delivery address' mod='packetery'}
-                                {else}
-                                    {l s='Set validated delivery address' mod='packetery'}
-                                {/if}
-                            </a>
+                    <p>
+                        <a href="" class="btn btn-outline-secondary btn-default open-packeta-hd-widget"
+                           data-widget-options="{$widgetOptions|@json_encode|escape}">
+                            {if isset($validatedAddress) && $validatedAddress['zip']}
+                                {l s='Change validated delivery address' mod='packetery'}
+                            {else}
+                                {l s='Set validated delivery address' mod='packetery'}
+                            {/if}
+                        </a>
 
-                            <input type="hidden" name="order_id" value="{$orderId|intval}">
-                            <input type="hidden" name="address">
-                        </p>
+                        <input type="hidden" name="order_id" value="{$orderId|intval}">
+                        <input type="hidden" name="address">
+                    </p>
                 {/if}
             {else}
                 <p>{l s='Pickup point' mod='packetery'}:
@@ -56,50 +53,46 @@
                     </strong>
                 </p>
                 {if $pickupPointChangeAllowed && !$isExported}
-                    {assign var="showSubmitButton" value="true"}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-widget"
                            data-widget-options="{$widgetOptions|@json_encode|escape}">{l s='Change pickup point' mod='packetery'}</a>
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="pickup_point">
                     </p>
-
                 {/if}
             {/if}
 
-            {if $showSubmitButton}
-                {if !$isExported}
-                    <div class="mt-4">
-                        <div class="form-row align-items-center">
-                            <div class="col-sm-2 col-12 my-1">
-                                <label>{l s='Size (L x W x H):' mod='packetery'}</label>
-                            </div>
-                            <div class="col-sm-2 my-1">
-                                <input class="form-control" name="length" value="{$orderDetails['length']}" placeholder="{l s='Length' mod='packetery'}">
-                            </div>
-                            <div class="col-auto my-1">
-                                x
-                            </div>
-                            <div class="col-sm-2 my-1">
-                                <input class="form-control" name="width" value="{$orderDetails['width']}" placeholder="{l s='Width' mod='packetery'}">
-                            </div>
-                            <div class="col-auto my-1">
-                                x
-                            </div>
-                            <div class="col-sm-2 my-1">
-                                <input class="form-control" name="height" value="{$orderDetails['height']}" placeholder="{l s='Height' mod='packetery'}">
-                            </div>
-                            <div class="col-auto my-1">
-                                (mm)
-                            </div>
+            {if !$isExported}
+                <div class="mt-4">
+                    <div class="form-row align-items-center">
+                        <div class="col-sm-2 col-12 my-1">
+                            <label>{l s='Size (L x W x H):' mod='packetery'}</label>
+                        </div>
+                        <div class="col-sm-2 my-1">
+                            <input class="form-control" name="length" value="{$orderDetails['length']}" placeholder="{l s='Length' mod='packetery'}">
+                        </div>
+                        <div class="col-auto my-1">
+                            x
+                        </div>
+                        <div class="col-sm-2 my-1">
+                            <input class="form-control" name="width" value="{$orderDetails['width']}" placeholder="{l s='Width' mod='packetery'}">
+                        </div>
+                        <div class="col-auto my-1">
+                            x
+                        </div>
+                        <div class="col-sm-2 my-1">
+                            <input class="form-control" name="height" value="{$orderDetails['height']}" placeholder="{l s='Height' mod='packetery'}">
+                        </div>
+                        <div class="col-auto my-1">
+                            (mm)
                         </div>
                     </div>
-                {/if}
+                </div>
 
                 <div class="text-right">
                     <button class="btn btn-primary" name="{$submitButton}">{l s='Save' mod='packetery'}</button>
                 </div>
-            {/if}
+            {/if }
         </form>
 
         {* There will be more buttons aka more actions in future. If there is no button hide the divider *}

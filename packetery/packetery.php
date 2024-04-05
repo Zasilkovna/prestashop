@@ -27,6 +27,8 @@
  * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
  */
 
+use Packetery\Order\OrderDetails;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -847,15 +849,65 @@ class Packetery extends CarrierModule
             return;
         }
 
-	    /** @var \Packetery\Order\DetailsForm $detailsForm */
-	    $detailsForm = $this->diContainer->get(\Packetery\Order\DetailsForm::class);
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
+        $showActionButtonsDivider = false;
+        if (!$packeteryCarrier) {
+            return;
+        }
 
-        $this->processPickupPointChange($messages, $packeteryOrder, $detailsForm);
+        if ($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch'])) {
+            $submitButton = 'pp_data_update';
+        } else {
+            $submitButton = 'hd_data_update';
+        }
+
+        $this->context->smarty->assign('submitButton', $submitButton);
+
+        /** @var OrderDetails $orderDetails */
+        $orderDetails = $this->diContainer->get(OrderDetails::class);
+
+
+        $fieldsToUpdate = [];
+        if (Tools::isSubmit('pp_data_update')) {
+            $orderDetails->processPickupPointChange($fieldsToUpdate);
+        }
+
         $countryDiffersMessage = $this->l('The selected delivery address is in a country other than the country of delivery of the order.');
-        $this->processAddressChange($messages, $packeteryOrder, $countryDiffersMessage, $detailsForm);
         if (Tools::isSubmit('hd_data_update')) {
+            $orderDetails->processAddressChange($messages, $fieldsToUpdate,  $packeteryOrder, $countryDiffersMessage);
             $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
         }
+
+        $isExported = (bool) $packeteryOrder['exported'];
+        if (Tools::isSubmit($submitButton) && ($isExported === false)) {
+            $orderDetails->processDimensionsChange($messages, $fieldsToUpdate);
+        }
+
+        if ($fieldsToUpdate) {
+            foreach ($fieldsToUpdate as &$value) {
+                if ((is_int($value) === false) || ($value !== null)) {
+                    $value = $orderRepository->db->escape($value);
+                }
+            }
+            unset($value);
+
+            $isSuccess = $orderRepository->updateByOrder($fieldsToUpdate, $orderId, true);
+
+            if ($isSuccess) {
+                $messages[] = [
+                    'text' => $this->l('Data have been successfully saved', 'detailsform'),
+                    'class' => 'success',
+                ];
+            } else {
+                $messages[] = [
+                    'text' => $this->l('Address could not be changed.', 'detailsform'),
+                    'class' => 'danger',
+                ];
+            }
+        }
+
 
         if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
             $messages[] = [
@@ -873,34 +925,17 @@ class Packetery extends CarrierModule
         $pickupPointChangeAllowed = false;
         $postParcelButtonAllowed = false;
 
-        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
-        $showActionButtonsDivider = false;
-        if (!$packeteryCarrier) {
-            return;
+
+        if ($isExported === false) {
+            $orderDetails = [
+                'length' => Tools::getValue('length'),
+                'height' => Tools::getValue('height'),
+                'width' => Tools::getValue('width'),
+            ];
+            $this->context->smarty->assign('orderDetails', $orderDetails);
         }
 
-		if ($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch'])) {
-			$submitButton = 'pp_data_update';
-		} else {
-			$submitButton = 'hd_data_update';
-		}
-
-		$this->context->smarty->assign('submitButton', $submitButton);
-
-		if ( !(bool)$packeteryOrder['exported'] ) {
-			$orderDetails = [
-				'length' => Tools::getValue('length'),
-				'height' => Tools::getValue('height'),
-				'width' => Tools::getValue('width'),
-			];
-			$this->context->smarty->assign('orderDetails', $orderDetails);
-			$isExported = false;
-		} else {
-			$isExported = true;
-		}
-		$this->context->smarty->assign('isExported', $isExported);
+        $this->context->smarty->assign('isExported', $isExported);
 
         if ($isAddressDelivery) {
             $isAddressValidated = false;
@@ -937,6 +972,7 @@ class Packetery extends CarrierModule
                 $this->prepareAddressChange($apiKey, $packeteryOrder, $orderId);
             }
             $this->context->smarty->assign('isAddressValidated', $isAddressValidated);
+
         } else if ((int)$packeteryOrder['id_carrier'] !== 0) {
             $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
             $pickupPointChangeAllowed = true;
@@ -946,7 +982,7 @@ class Packetery extends CarrierModule
         $weightCalculator = $this->diContainer->get(\Packetery\Weight\Calculator::class);
         $orderWeight = $weightCalculator->getFinalWeight($packeteryOrder);
 
-        if (!(bool)$packeteryOrder['exported'] && $orderWeight !== null && $orderWeight > 0) {
+        if (($isExported === false) && $orderWeight !== null && $orderWeight > 0) {
             $postParcelButtonAllowed = true;
             $showActionButtonsDivider = true;
         }
@@ -954,6 +990,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
         $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider);
+
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
@@ -963,7 +1000,6 @@ class Packetery extends CarrierModule
      * @param int $orderId
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     *
      */
     private function prepareAddressChange($apiKey, array $packeteryOrder, $orderId)
     {
@@ -1458,40 +1494,6 @@ class Packetery extends CarrierModule
         $params['completed'] = true;
     }
 
-	/**
-	 * @param array $messages
-	 * @param $packeteryOrder
-	 * @param $detailsForm
-	 * @throws ReflectionException
-	 * @throws \Packetery\Exceptions\DatabaseException
-	 */
-    private function processPickupPointChange(array &$messages, $packeteryOrder, $detailsForm)
-    {
-		if (!Tools::isSubmit('pp_data_update')) {
-			return;
-		}
-
-        if (
-            Tools::getIsset('pickup_point') &&
-            Tools::getValue('pickup_point') !== ''
-        ) {
-            $updateResult = $this->savePickupPointChange();
-            if ($updateResult) {
-                $messages[] = [
-                    'text' => $this->l('Pickup point has been successfully changed.'),
-                    'class' => 'success',
-                ];
-            } else {
-                $messages[] = [
-                    'text' => $this->l('Pickup point could not be changed.'),
-                    'class' => 'danger',
-                ];
-            }
-        }
-
-	    $detailsForm->processOrderDetailChange($messages, $packeteryOrder);
-    }
-
     /**
      * @param array $messages
      * @throws ReflectionException
@@ -1532,59 +1534,6 @@ class Packetery extends CarrierModule
                 }
             }
         }
-    }
-
-	/**
-	 * @param array $messages
-	 * @param array $packeteryOrder
-	 * @param string $countryDiffersMessage
-	 * @param $detailsForm
-	 * @throws ReflectionException
-	 * @throws \Packetery\Exceptions\DatabaseException
-	 */
-    private function processAddressChange(array &$messages, array $packeteryOrder, $countryDiffersMessage, $detailsForm)
-    {
-		if (!Tools::isSubmit('hd_data_update')) {
-			return;
-		}
-
-        if (
-            Tools::getIsset('address') &&
-            Tools::getValue('address') !== ''
-        ) {
-            $address = json_decode(Packetery\Tools\Tools::getValue('address'));
-            if (!$address) {
-                return;
-            }
-            $address = (array)$address;
-
-            if ($address['country'] !== strtolower($packeteryOrder['ps_country'])) {
-                $messages[] = [
-                    'text' => $countryDiffersMessage,
-                    'class' => 'danger',
-                ];
-                return;
-            }
-
-            $updateResult = $this->saveAddressChange($address);
-            if ($updateResult) {
-                $messages[] = [
-                    'text' => $this->l('Address has been successfully changed.'),
-                    'class' => 'success',
-                ];
-            } else {
-                $messages[] = [
-                    'text' => $this->l('Address could not be changed.'),
-                    'class' => 'danger',
-                ];
-            }
-        }
-
-		if ($packeteryOrder['exported']) {
-			return;
-		}
-
-	    $detailsForm->processOrderDetailChange($messages, $packeteryOrder);
     }
 
     /**
@@ -1721,7 +1670,7 @@ class Packetery extends CarrierModule
         /** @var Packetery\Product\ProductAttributeRepository $dbTools */
         $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
         if ($productAttributeRepository->delete($params['product']->id)) {
-			return;
+            return;
         }
     }
 }
