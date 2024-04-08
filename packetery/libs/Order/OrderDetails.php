@@ -15,8 +15,6 @@ class OrderDetails
         $this->module = $module;
     }
 
-    // TODO: Move over the rest of the logic, that correlates with a purpose of this class, from 'packetery.php'(packeteryHookDisplayAdminOrder()).
-
     public function processDimensionsChange(&$messages, array &$fieldsToUpdate)
     {
         $packageDimensions = [];
