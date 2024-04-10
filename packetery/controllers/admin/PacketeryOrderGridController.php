@@ -18,9 +18,9 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
- *  @copyright 2017 Zlab Solutions
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
+ * @copyright 2017 Zlab Solutions
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
 use Packetery\Exceptions\DatabaseException;
@@ -255,7 +255,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      * @param int $offset
      * @throws ReflectionException
      */
-    private function prepareLabels(array $packetNumbers, $type, $packetsEnhanced = null, $offset = 0)
+    private function prepareLabels(array $packetNumbers, $type, $offset = 0, $packetsEnhanced = null)
     {
         $module = $this->getModule();
         /** @var Labels $packeteryLabels */
@@ -301,7 +301,7 @@ class PacketeryOrderGridController extends ModuleAdminController
                 /** @var SoapApi $soapApi */
                 $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
                 $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
-                $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, $packetsEnhanced, (int)Tools::getValue('offset'));
+                $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, (int)Tools::getValue('offset'), $packetsEnhanced);
             }
         }
     }
