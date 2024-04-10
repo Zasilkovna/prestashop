@@ -32,7 +32,7 @@ class Labels
      * @param array|null $packetsEnhanced Used for carrier labels.
      * @return string|void
      */
-    public function packetsLabelsPdf(array $packets, $type, $offset, $packetsEnhanced = null)
+    public function packetsLabelsPdf(array $packets, $type, $packetsEnhanced = null , $offset = 0)
     {
         $client = new SoapClient(SoapApi::WSDL_URL);
         try {

@@ -255,12 +255,12 @@ class PacketeryOrderGridController extends ModuleAdminController
      * @param int $offset
      * @throws ReflectionException
      */
-    private function prepareLabels(array $packetNumbers, $type, $offset = 0, $packetsEnhanced = null)
+    private function prepareLabels(array $packetNumbers, $type, $packetsEnhanced = null, $offset = 0)
     {
         $module = $this->getModule();
         /** @var Labels $packeteryLabels */
         $packeteryLabels = $module->diContainer->get(Labels::class);
-        $pdfContent = $packeteryLabels->packetsLabelsPdf($packetNumbers, $type, $offset, $packetsEnhanced);
+        $pdfContent = $packeteryLabels->packetsLabelsPdf($packetNumbers, $type, $packetsEnhanced, $offset);
         header('Content-Type: application/pdf');
         header(
             sprintf(
@@ -282,7 +282,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         if (Tools::isSubmit('submitPrepareLabels')) {
             $packetNumbers = $this->preparePacketNumbers($this->boxes);
             if ($packetNumbers) {
-                $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA, (int)Tools::getValue('offset'));
+                $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA, null, (int)Tools::getValue('offset'));
             }
         }
     }
@@ -301,7 +301,7 @@ class PacketeryOrderGridController extends ModuleAdminController
                 /** @var SoapApi $soapApi */
                 $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
                 $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
-                $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, (int)Tools::getValue('offset'), $packetsEnhanced);
+                $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, $packetsEnhanced, (int)Tools::getValue('offset'));
             }
         }
     }
