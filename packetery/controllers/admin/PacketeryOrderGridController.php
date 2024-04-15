@@ -260,7 +260,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         $module = $this->getModule();
         /** @var Labels $packeteryLabels */
         $packeteryLabels = $module->diContainer->get(Labels::class);
-        $pdfContent = $packeteryLabels->packetsLabelsPdf($packetNumbers, $type, $offset, $packetsEnhanced);
+        $pdfContent = $packeteryLabels->packetsLabelsPdf($packetNumbers, $type, $packetsEnhanced, $offset);
         header('Content-Type: application/pdf');
         header(
             sprintf(
@@ -282,7 +282,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         if (Tools::isSubmit('submitPrepareLabels')) {
             $packetNumbers = $this->preparePacketNumbers($this->boxes);
             if ($packetNumbers) {
-                $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA, (int)Tools::getValue('offset'));
+                $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA, null, (int)Tools::getValue('offset'));
             }
         }
     }
