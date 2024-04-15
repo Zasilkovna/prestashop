@@ -5,16 +5,96 @@ namespace Packetery\Order;
 use Packetery\Tools\Tools;
 use Packetery;
 
+/**
+ * Class OrderDetails
+ */
 class OrderDetails
 {
     /** @var Packetery */
     private $module;
 
-    public function __construct(Packetery $module)
+    /**
+     * @var OrderRepository
+     */
+    private $orderRepository;
+
+    /**
+     * @param Packetery $module
+     * @param OrderRepository $orderRepository
+     */
+    public function __construct(Packetery $module, OrderRepository $orderRepository)
     {
         $this->module = $module;
+        $this->orderRepository = $orderRepository;
     }
 
+    /**
+     * @param array $messages
+     * @param array|bool|null|object $packeteryOrder
+     * @param int $orderId
+     * @return void
+     * @throws Packetery\Exceptions\DatabaseException
+     */
+    public function orderUpdate(&$messages, $packeteryOrder, $orderId)
+    {
+        if (!Tools::isSubmit('order_update')) {
+            return;
+        }
+
+        $fieldsToUpdate = [];
+        if (! $packeteryOrder['is_ad']) {
+            $this->processPickupPointChange($fieldsToUpdate);
+        } else {
+            $countryDiffersMessage = $this->module->l('The selected delivery address is in a country other than the country of delivery of the order.');
+            $this->processAddressChange($messages, $fieldsToUpdate,  $packeteryOrder, $countryDiffersMessage);
+            // We need to fetch the Order with a country, so we can compare the change of address and see if it matches the original country selected for delivery.
+            $packeteryOrder = $this->orderRepository->getOrderWithCountry($orderId);
+        }
+
+        $isExported = (bool) $packeteryOrder['exported'];
+        if ($isExported === false && Tools::isSubmit('order_update')) {
+            $this->processDimensionsChange($messages, $fieldsToUpdate);
+        }
+
+        if ($fieldsToUpdate) {
+            foreach ($fieldsToUpdate as &$value) {
+                if ((is_int($value) === false) || ($value !== null)) {
+                    $value = $this->orderRepository->db->escape($value);
+                }
+            }
+            unset($value);
+
+            $isSuccess = $this->orderRepository->updateByOrder($fieldsToUpdate, $orderId, true);
+
+            if ($isSuccess) {
+                $messages[] = [
+                    'text' => $this->module->l('Data have been successfully saved', 'detailsform'),
+                    'class' => 'success',
+                ];
+            } else {
+                $messages[] = [
+                    'text' => $this->module->l('Address could not be changed.', 'detailsform'),
+                    'class' => 'danger',
+                ];
+            }
+        }
+
+        if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
+            $messages[] = [
+                'text' => $this->module->l(
+                    'No pickup point selected for the order. It will not be possible to export the order to Packeta.'
+                ),
+                'class' => 'danger',
+            ];
+            // TODO try to open widget automatically
+        }
+    }
+
+    /**
+     * @param array $messages
+     * @param array $fieldsToUpdate
+     * @return void
+     */
     public function processDimensionsChange(&$messages, array &$fieldsToUpdate)
     {
         $packageDimensions = [];
@@ -44,12 +124,7 @@ class OrderDetails
         }
 
         if ($invalidFields !== []) {
-            $translatedFieldNames = array_map(function ($fieldName) {
-                return $this->module->l($fieldName, 'detailsform');
-            }, $invalidFields);
-
-            $fieldNamesList = implode(', ', $translatedFieldNames);
-
+            $fieldNamesList = implode(', ', $invalidFields);
             $messages[] = [
                 'text' => sprintf(
                     $this->module->l('%s must be a number, greater than 0.', 'detailsform'),
@@ -69,6 +144,10 @@ class OrderDetails
     }
 
 
+    /**
+     * @param array $fieldsToUpdate
+     * @return void
+     */
     public function processPickupPointChange(array &$fieldsToUpdate)
     {
         if (
@@ -97,6 +176,13 @@ class OrderDetails
         }
     }
 
+    /**
+     * @param array  $messages
+     * @param array  $fieldsToUpdate
+     * @param array  $packeteryOrder
+     * @param string $countryDiffersMessage
+     * @return void
+     */
     public function processAddressChange(array &$messages, array &$fieldsToUpdate, array $packeteryOrder, $countryDiffersMessage)
     {
         if (

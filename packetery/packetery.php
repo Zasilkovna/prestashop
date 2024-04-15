@@ -27,8 +27,6 @@
  * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
  */
 
-use Packetery\Order\OrderDetails;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -857,74 +855,18 @@ class Packetery extends CarrierModule
             return;
         }
 
-        if ($carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch'])) {
-            $submitButton = 'pp_data_update';
-        } else {
-            $submitButton = 'hd_data_update';
-        }
+        $this->context->smarty->assign('submitButton', 'order_update');
 
-        $this->context->smarty->assign('submitButton', $submitButton);
-
-        /** @var OrderDetails $orderDetails */
-        $orderDetails = $this->diContainer->get(OrderDetails::class);
-
-
-        $fieldsToUpdate = [];
-        if (Tools::isSubmit('pp_data_update')) {
-            $orderDetails->processPickupPointChange($fieldsToUpdate);
-        }
-
-        $countryDiffersMessage = $this->l('The selected delivery address is in a country other than the country of delivery of the order.');
-        if (Tools::isSubmit('hd_data_update')) {
-            $orderDetails->processAddressChange($messages, $fieldsToUpdate,  $packeteryOrder, $countryDiffersMessage);
-            $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
-        }
-
-        $isExported = (bool) $packeteryOrder['exported'];
-        if (Tools::isSubmit($submitButton) && ($isExported === false)) {
-            $orderDetails->processDimensionsChange($messages, $fieldsToUpdate);
-        }
-
-        if ($fieldsToUpdate) {
-            foreach ($fieldsToUpdate as &$value) {
-                if ((is_int($value) === false) || ($value !== null)) {
-                    $value = $orderRepository->db->escape($value);
-                }
-            }
-            unset($value);
-
-            $isSuccess = $orderRepository->updateByOrder($fieldsToUpdate, $orderId, true);
-
-            if ($isSuccess) {
-                $messages[] = [
-                    'text' => $this->l('Data have been successfully saved', 'detailsform'),
-                    'class' => 'success',
-                ];
-            } else {
-                $messages[] = [
-                    'text' => $this->l('Address could not be changed.', 'detailsform'),
-                    'class' => 'danger',
-                ];
-            }
-        }
-
-
-        if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
-            $messages[] = [
-                'text' => $this->l(
-                    'No pickup point selected for the order. It will not be possible to export the order to Packeta.'
-                ),
-                'class' => 'danger',
-            ];
-            // TODO try to open widget automatically
-        }
+        /** @var \Packetery\Order\OrderDetails $orderDetails */
+        $orderDetails = $this->diContainer->get(\Packetery\Order\OrderDetails::class);
+        $orderDetails->orderUpdate($messages, $packeteryOrder, $orderId);
 
         $isAddressDelivery = (bool)$packeteryOrder['is_ad'];
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
         $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $packeteryOrder['name_branch']);
         $pickupPointChangeAllowed = false;
         $postParcelButtonAllowed = false;
-
+        $isExported = (bool) $packeteryOrder['exported'];
 
         if ($isExported === false) {
             $orderDetails = [
@@ -972,7 +914,6 @@ class Packetery extends CarrierModule
                 $this->prepareAddressChange($apiKey, $packeteryOrder, $orderId);
             }
             $this->context->smarty->assign('isAddressValidated', $isAddressValidated);
-
         } else if ((int)$packeteryOrder['id_carrier'] !== 0) {
             $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
             $pickupPointChangeAllowed = true;
@@ -982,7 +923,7 @@ class Packetery extends CarrierModule
         $weightCalculator = $this->diContainer->get(\Packetery\Weight\Calculator::class);
         $orderWeight = $weightCalculator->getFinalWeight($packeteryOrder);
 
-        if (($isExported === false) && $orderWeight !== null && $orderWeight > 0) {
+        if ($isExported === false && $orderWeight !== null && $orderWeight > 0) {
             $postParcelButtonAllowed = true;
             $showActionButtonsDivider = true;
         }

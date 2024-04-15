@@ -59,7 +59,7 @@ function upgrade_module_3_0_0($module)
     $sql = [];
     $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
         ADD `carrier_number` varchar(255) NULL AFTER `longitude`,
-		ADD `length` int NULL AFTER `weight`,
+        ADD `length` int NULL AFTER `weight`,
         ADD `height` int NULL AFTER `length`,
         ADD `width` int NULL AFTER `height`;';
 
