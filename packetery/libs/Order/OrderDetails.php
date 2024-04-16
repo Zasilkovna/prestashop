@@ -5,9 +5,6 @@ namespace Packetery\Order;
 use Packetery\Tools\Tools;
 use Packetery;
 
-/**
- * Class OrderDetails
- */
 class OrderDetails
 {
     /** @var Packetery */
@@ -45,7 +42,7 @@ class OrderDetails
         if (! $packeteryOrder['is_ad']) {
             $this->processPickupPointChange($fieldsToUpdate);
         } else {
-            $countryDiffersMessage = $this->module->l('The selected delivery address is in a country other than the country of delivery of the order.');
+            $countryDiffersMessage = $this->module->l('The selected delivery address is in a country other than the country of delivery of the order.', 'orderdetails');
             $this->processAddressChange($messages, $fieldsToUpdate,  $packeteryOrder, $countryDiffersMessage);
             // We need to fetch the Order with a country, so we can compare the change of address and see if it matches the original country selected for delivery.
             $packeteryOrder = $this->orderRepository->getOrderWithCountry($orderId);
@@ -68,12 +65,12 @@ class OrderDetails
 
             if ($isSuccess) {
                 $messages[] = [
-                    'text' => $this->module->l('Data have been successfully saved', 'detailsform'),
+                    'text' => $this->module->l('Data have been successfully saved', 'orderdetails'),
                     'class' => 'success',
                 ];
             } else {
                 $messages[] = [
-                    'text' => $this->module->l('Address could not be changed.', 'detailsform'),
+                    'text' => $this->module->l('Address could not be changed.', 'orderdetails'),
                     'class' => 'danger',
                 ];
             }
@@ -86,7 +83,6 @@ class OrderDetails
                 ),
                 'class' => 'danger',
             ];
-            // TODO try to open widget automatically
         }
     }
 
@@ -100,7 +96,12 @@ class OrderDetails
         $packageDimensions = [];
         $invalidFields = [];
 
-        $size = ['length', 'height', 'width'];
+        $size = [
+            $this->module->l('length', 'orderdetails'),
+            $this->module->l('height', 'orderdetails'),
+            $this->module->l('width', 'orderdetails'),
+        ];
+
         foreach ($size as $dimension) {
             $rawValue = Tools::getValue($dimension);
 
@@ -127,7 +128,7 @@ class OrderDetails
             $fieldNamesList = implode(', ', $invalidFields);
             $messages[] = [
                 'text' => sprintf(
-                    $this->module->l('%s must be a number, greater than 0.', 'detailsform'),
+                    $this->module->l('%s must be a number, greater than 0.', 'orderdetails'),
                     ucfirst($fieldNamesList)
                 ),
                 'class' => 'danger',
