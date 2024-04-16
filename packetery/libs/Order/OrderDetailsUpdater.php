@@ -5,7 +5,7 @@ namespace Packetery\Order;
 use Packetery\Tools\Tools;
 use Packetery;
 
-class OrderDetails
+class OrderDetailsUpdater
 {
     /** @var Packetery */
     private $module;
@@ -38,7 +38,7 @@ class OrderDetails
             return;
         }
 
-        if (false === (bool) $packeteryOrder['exported']) {
+        if ($packeteryOrder['exported']) {
             return;
         }
 
@@ -46,7 +46,7 @@ class OrderDetails
         if (! $packeteryOrder['is_ad']) {
             $this->processPickupPointChange($fieldsToUpdate);
         } else {
-            $countryDiffersMessage = $this->module->l('The selected delivery address is in a country other than the country of delivery of the order.', 'orderdetails');
+            $countryDiffersMessage = $this->module->l('The selected delivery address is in a country other than the country of delivery of the order.', 'orderdetailsupdater');
             $this->processAddressChange($messages, $fieldsToUpdate,  $packeteryOrder, $countryDiffersMessage);
             // We need to fetch the Order with a country, so we can compare the change of address and see if it matches the original country selected for delivery.
             $packeteryOrder = $this->orderRepository->getOrderWithCountry($orderId);
@@ -65,12 +65,12 @@ class OrderDetails
 
             if ($isSuccess) {
                 $messages[] = [
-                    'text' => $this->module->l('Data have been successfully saved', 'orderdetails'),
+                    'text' => $this->module->l('Data has been successfully saved', 'orderdetailsupdater'),
                     'class' => 'success',
                 ];
             } else {
                 $messages[] = [
-                    'text' => $this->module->l('Address could not be changed.', 'orderdetails'),
+                    'text' => $this->module->l('Address could not be changed.', 'orderdetailsupdater'),
                     'class' => 'danger',
                 ];
             }
@@ -79,7 +79,7 @@ class OrderDetails
         if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
             $messages[] = [
                 'text' => $this->module->l(
-                    'No pickup point selected for the order. It will not be possible to export the order to Packeta.', 'orderdetails'
+                    'No pickup point selected for the order. It will not be possible to export the order to Packeta.', 'orderdetailsupdater'
                 ),
                 'class' => 'danger',
             ];
@@ -97,9 +97,9 @@ class OrderDetails
         $invalidFields = [];
 
         $size = [
-            $this->module->l('length', 'orderdetails'),
-            $this->module->l('height', 'orderdetails'),
-            $this->module->l('width', 'orderdetails'),
+            $this->module->l('length', 'orderdetailsupdater'),
+            $this->module->l('height', 'orderdetailsupdater'),
+            $this->module->l('width', 'orderdetailsupdater'),
         ];
 
         foreach ($size as $dimension) {
@@ -128,7 +128,7 @@ class OrderDetails
             $fieldNamesList = implode(', ', $invalidFields);
             $messages[] = [
                 'text' => sprintf(
-                    $this->module->l('%s must be a number, greater than 0.', 'orderdetails'),
+                    $this->module->l('%s must be a number, greater than 0.', 'orderdetailsupdater'),
                     ucfirst($fieldNamesList)
                 ),
                 'class' => 'danger',

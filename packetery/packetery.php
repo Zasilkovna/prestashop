@@ -857,8 +857,8 @@ class Packetery extends CarrierModule
 
         $this->context->smarty->assign('submitButton', 'order_update');
 
-        /** @var \Packetery\Order\OrderDetails $orderDetails */
-        $orderDetails = $this->diContainer->get(\Packetery\Order\OrderDetails::class);
+        /** @var \Packetery\Order\OrderDetailsUpdater $orderDetails */
+        $orderDetails = $this->diContainer->get(\Packetery\Order\OrderDetailsUpdater::class);
         $orderDetails->orderUpdate($messages, $packeteryOrder, $orderId);
 
         $isAddressDelivery = (bool)$packeteryOrder['is_ad'];
@@ -904,14 +904,14 @@ class Packetery extends CarrierModule
                     ];
                     if ($packeteryOrder['country'] !== strtolower($packeteryOrder['ps_country'])) {
                         $messages[] = [
-                            'text' => $countryDiffersMessage,
+                            'text' => $this->l('The selected delivery address is in a country other than the country of delivery of the order.'),
                             'class' => 'danger',
                         ];
                     }
                     $isAddressValidated = true;
                 }
                 $this->context->smarty->assign('validatedAddress', $validatedAddress);
-                $this->prepareAddressChange($apiKey, $packeteryOrder, $orderId);
+                $this->prepareAddressChange($apiKey, $packeteryOrder);
             }
             $this->context->smarty->assign('isAddressValidated', $isAddressValidated);
         } else if ((int)$packeteryOrder['id_carrier'] !== 0) {
@@ -938,11 +938,10 @@ class Packetery extends CarrierModule
     /**
      * @param string $apiKey
      * @param array $packeteryOrder
-     * @param int $orderId
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
-    private function prepareAddressChange($apiKey, array $packeteryOrder, $orderId)
+    private function prepareAddressChange($apiKey, array $packeteryOrder)
     {
         if (!in_array($packeteryOrder['ps_country'], \Packetery\Carrier\CarrierRepository::ADDRESS_VALIDATION_COUNTRIES, true)) {
             return;
