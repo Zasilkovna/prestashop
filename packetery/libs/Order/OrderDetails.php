@@ -38,6 +38,10 @@ class OrderDetails
             return;
         }
 
+        if (false === (bool) $packeteryOrder['exported']) {
+            return;
+        }
+
         $fieldsToUpdate = [];
         if (! $packeteryOrder['is_ad']) {
             $this->processPickupPointChange($fieldsToUpdate);
@@ -48,11 +52,7 @@ class OrderDetails
             $packeteryOrder = $this->orderRepository->getOrderWithCountry($orderId);
         }
 
-        $isExported = (bool) $packeteryOrder['exported'];
-        if ($isExported === false && Tools::isSubmit('order_update')) {
-            $this->processDimensionsChange($messages, $fieldsToUpdate);
-        }
-
+        $this->processDimensionsChange($messages, $fieldsToUpdate);
         if ($fieldsToUpdate) {
             foreach ($fieldsToUpdate as &$value) {
                 if ((is_int($value) === false) || ($value !== null)) {
@@ -79,7 +79,7 @@ class OrderDetails
         if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
             $messages[] = [
                 'text' => $this->module->l(
-                    'No pickup point selected for the order. It will not be possible to export the order to Packeta.'
+                    'No pickup point selected for the order. It will not be possible to export the order to Packeta.', 'orderdetails'
                 ),
                 'class' => 'danger',
             ];
