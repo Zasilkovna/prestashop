@@ -105,13 +105,14 @@ class OrderRepository
     /**
      * @param array $fields
      * @param int $orderId
+     * @param bool $allowNullValues
      * @return bool
      * @throws DatabaseException
      */
-    public function updateByOrder(array $fields, $orderId)
+    public function updateByOrder(array $fields, $orderId, $allowNullValues = false)
     {
         $orderId = (int)$orderId;
-        return $this->dbTools->update('packetery_order', $fields, '`id_order` = ' . $orderId);
+        return $this->dbTools->update('packetery_order', $fields, '`id_order` = ' . $orderId, 0, $allowNullValues);
     }
 
     /**
@@ -214,6 +215,9 @@ class OrderRepository
                    `po`.`latitude`, 
                    `po`.`longitude`,
                    `po`.`weight`,
+                   `po`.`length`,
+                   `po`.`height`,
+                   `po`.`width`,
                    `po`.`exported`,
                    `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
@@ -244,7 +248,10 @@ class OrderRepository
                    `carrier_pickup_point`,
                    `tracking_number`,
                    `carrier_pickup_point`,
-                   `weight`, 
+                   `weight`,
+                   `length`,
+                   `height`,
+                   `width`,
                    `zip`,
                    `city`,
                    `street`,
@@ -274,7 +281,10 @@ class OrderRepository
                    `po`.`carrier_pickup_point`,
                    `po`.`tracking_number`,
                    `po`.`carrier_pickup_point`,
-                   `po`.`weight`, 
+                   `po`.`weight`,
+                   `po`.`length`,
+                   `po`.`height`,
+                   `po`.`width`,
                    `po`.`zip`,
                    `po`.`city`,
                    `po`.`street`,

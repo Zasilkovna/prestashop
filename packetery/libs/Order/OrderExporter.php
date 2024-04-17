@@ -113,12 +113,21 @@ class OrderExporter
         $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
         $customer = $order->getCustomer();
 
+        $size = [];
+        $dimensions = ['length', 'height', 'width'];
+        foreach ($dimensions as $dimension) {
+            if (isset($packeteryOrder[$dimension])) {
+                $size[$dimension] = (int)$packeteryOrder[$dimension];
+            }
+        }
+
         $data = [
             'number' => $number,
             'currency' => $exportCurrency,
             'value' => $total,
             'codValue' => $codValue,
             'weight' => $weight,
+            'size' => $size,
 
             'senderLabel' => $senderLabel,
             'pickupPointOrCarrier' => $packeteryOrder['id_branch'],

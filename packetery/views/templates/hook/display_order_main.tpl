@@ -5,71 +5,96 @@
         </h3>
     </div>
     <div class="card-body">
-        {if $isAddressDelivery}
-            <p>
-                {l s='Carrier' mod='packetery'}:
-                <strong class="picked-delivery-place" data-validated="{$isAddressValidated}">
-                    {if $pickupPointOrAddressDeliveryName}
-                        {$pickupPointOrAddressDeliveryName}
-                    {else}
-                        {l s='Please select shipment method again' mod='packetery'}
-                    {/if}
-                </strong>
-            </p>
-            {if $isAddressValidated && isset($validatedAddress)}
-                <p class="validatedAddress">
-                    {l s='Delivery address verified for order' mod='packetery'}:<br>
-                    {l s='Street' mod='packetery'}: <strong class="packetery-street">{$validatedAddress['street']} {$validatedAddress['houseNumber']}</strong><br>
-                    {l s='City' mod='packetery'}: <strong class="packetery-city">{$validatedAddress['city']}</strong><br>
-                    {l s='Zip' mod='packetery'}: <strong class="packetery-zip">{$validatedAddress['zip']}</strong><br>
-                    {l s='County' mod='packetery'}: <strong class="packetery-county">{$validatedAddress['county']}</strong><br>
-                    {l s='GPS' mod='packetery'}: <strong class="packetery-gps">{$validatedAddress['latitude']}, {$validatedAddress['longitude']}</strong><br>
+        <form action="{$returnUrl}" method="post">
+            {if $isAddressDelivery}
+                <p>
+                    {l s='Carrier' mod='packetery'}:
+                    <strong class="picked-delivery-place" data-validated="{$isAddressValidated}">
+                        {if $pickupPointOrAddressDeliveryName}
+                            {$pickupPointOrAddressDeliveryName}
+                        {else}
+                            {l s='Please select shipment method again' mod='packetery'}
+                        {/if}
+                    </strong>
                 </p>
-            {/if}
-            {if isset($widgetOptions)}
-                <form action="{$returnUrl}" method="post">
+                {if $isAddressValidated && isset($validatedAddress)}
+                    <p class="validatedAddress">
+                        {l s='Delivery address verified for order' mod='packetery'}:<br>
+                        {l s='Street' mod='packetery'}: <strong class="packetery-street">{$validatedAddress['street']} {$validatedAddress['houseNumber']}</strong><br>
+                        {l s='City' mod='packetery'}: <strong class="packetery-city">{$validatedAddress['city']}</strong><br>
+                        {l s='Zip' mod='packetery'}: <strong class="packetery-zip">{$validatedAddress['zip']}</strong><br>
+                        {l s='County' mod='packetery'}: <strong class="packetery-county">{$validatedAddress['county']}</strong><br>
+                        {l s='GPS' mod='packetery'}: <strong class="packetery-gps">{$validatedAddress['latitude']}, {$validatedAddress['longitude']}</strong><br>
+                    </p>
+                {/if}
+                {if isset($widgetOptions) && !$isExported}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-hd-widget"
                            data-widget-options="{$widgetOptions|@json_encode|escape}">
                             {if isset($validatedAddress) && $validatedAddress['zip']}
-                            {l s='Change validated delivery address' mod='packetery'}
+                                {l s='Change validated delivery address' mod='packetery'}
                             {else}
-                            {l s='Set validated delivery address' mod='packetery'}
+                                {l s='Set validated delivery address' mod='packetery'}
                             {/if}
                         </a>
 
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="address">
                     </p>
-                    <div class="text-right">
-                        <button class="btn btn-primary" name="address_change">{l s='Save' mod='packetery'}</button>
-                    </div>
-                </form>
-            {/if}
-        {else}
-            <p>{l s='Pickup point' mod='packetery'}:
-                <strong class="picked-delivery-place">
-                    {if $pickupPointOrAddressDeliveryName}
-                        {$pickupPointOrAddressDeliveryName}
-                    {else}
-                        {l s='Please select pickup point' mod='packetery'}
-                    {/if}
-                </strong>
-            </p>
-            {if $pickupPointChangeAllowed}
-                <form action="{$returnUrl}" method="post">
+                {/if}
+            {else}
+                <p>{l s='Pickup point' mod='packetery'}:
+                    <strong class="picked-delivery-place">
+                        {if $pickupPointOrAddressDeliveryName}
+                            {$pickupPointOrAddressDeliveryName}
+                        {else}
+                            {l s='Please select pickup point' mod='packetery'}
+                        {/if}
+                    </strong>
+                </p>
+                {if $pickupPointChangeAllowed && !$isExported}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-widget"
                            data-widget-options="{$widgetOptions|@json_encode|escape}">{l s='Change pickup point' mod='packetery'}</a>
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="pickup_point">
                     </p>
-                    <div class="text-right">
-                        <button class="btn btn-primary" name="pickup_point_change">{l s='Save' mod='packetery'}</button>
-                    </div>
-                </form>
+                {/if}
             {/if}
-        {/if}
+
+            {if !$isExported}
+                <div class="mt-4">
+                    <div class="form-row align-items-center">
+                        <div class="col-sm-2 col-12 my-1">
+                            <label>{l s='Size (L x W x H):' mod='packetery'}</label>
+                        </div>
+                        <div class="col-sm-2 my-1">
+                            <input class="form-control" name="length" value="{$orderDetails['length']}" placeholder="{l s='Length' mod='packetery'}">
+                        </div>
+                        <div class="col-auto my-1">
+                            x
+                        </div>
+                        <div class="col-sm-2 my-1">
+                            <input class="form-control" name="width" value="{$orderDetails['width']}" placeholder="{l s='Width' mod='packetery'}">
+                        </div>
+                        <div class="col-auto my-1">
+                            x
+                        </div>
+                        <div class="col-sm-2 my-1">
+                            <input class="form-control" name="height" value="{$orderDetails['height']}" placeholder="{l s='Height' mod='packetery'}">
+                        </div>
+                        <div class="col-auto my-1">
+                            (mm)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-right">
+                    <button class="btn btn-primary" name="{$submitButton}">{l s='Save' mod='packetery'}</button>
+                </div>
+            {/if }
+        </form>
+
         {* There will be more buttons aka more actions in future. If there is no button hide the divider *}
         {if $showActionButtonsDivider}
             <hr />
