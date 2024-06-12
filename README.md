@@ -1,6 +1,6 @@
 [Návod v češtině](#modul-pro-prestashop-17)
 
-# Module for PrestaShop 1.7
+# Module for PrestaShop 1.7, PrestaShop 8
 
 ### Download link
 [Download the latest version](https://github.com/Zasilkovna/prestashop/releases/latest)
@@ -23,7 +23,7 @@ After successful installation, click on the **Orders** -> **Packeta Orders** tab
 
 #### Module configuration
 All settings are saved automatically whenever you leave the edited data. If you do not have a user account
-on the Packeta site, it is possible to request a test account at the Customer Service email [info@zasilkovna.cz](mailto:info@zasilkovna.cz):
+on the Packeta site, it is possible to request a test account at the Customer Service email [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com):
 - **API key** – you can find your key in the client section of Packeta in the *Client support* tab
 - **Sender name** - the sender name you have set in the client section of the list of senders
 - **As the order ID, use** - select whether to use ID or Reference as order ID in export
@@ -77,7 +77,7 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 
 ### Supported versions
 - PrestaShop version 1.7.x.
-- If you have problems using the module, please contact us at [support@packeta.com](mailto:support@packeta.com).
+- If you have problems using the module, please contact us at [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 
 ### Provided functions
 - Integration of [widget v6](https://widget.packeta.com/v6) for selection of pickup points in the e-shop cart.
@@ -96,17 +96,17 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 ### OPC support
 - One Page Supercheckout from [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout) (since version 6.0.9)
 
-In case you are using another third-party cart module, please write to [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
+In case you are using another third-party cart module, please write to [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 Packeta module may not work with another OPC module.
 
 ### PHP compatibility
 
 | Module version | Branch   | PHP version |
 |----------------|----------|-------------|
-| `>= 2.1.17`    | `master` | 5.6 - 7.4   | 
-| `>= 3.0`       | `v3.0.0` | 5.6 - 8.2   | 
+| `3.0`          | `v3`     | 7.4 - 8.2   | 
+| `>= 2.1.19`    | `master` | 5.6 - 8.2   | 
 
-# Modul pro PrestaShop 1.7
+# Modul pro PrestaShop 1.7, PrestaShop 8
 
 ### Stažení modulu
 [Aktuální verze (Stáhnout »)](https://github.com/Zasilkovna/prestashop/releases/latest)
@@ -186,7 +186,7 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 
 ### Podporovaná verze
 - PrestaShop verze 1.7.x.
-- Při problému s použitím modulu nás kontaktujte na adrese [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
+- Při problému s použitím modulu nás kontaktujte na adrese [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 
 ### Poskytované funkce
 - Integrace [widgetu v6](https://widget.packeta.com/v6) pro výběr výdejních míst v košíku eshopu.
@@ -204,12 +204,12 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 ### Podpora pro OPC
 - One Page Supercheckout od [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout) (od verze 6.0.9)
 
-Pokud používáte nějaký jiný modul košíku třetí strany, napište nám [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz).
+Pokud používáte nějaký jiný modul košíku třetí strany, napište nám [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 Modul Zásilkovny nemusí být s jiným OPC modulem funkční.
 
 ### Kompatibilita s verzemi PHP
 
 | Verze modulu | Větev    | PHP verze |
 |--------------|----------|-----------|
-| `>= 2.1.17`  | `master` | 5.6 - 7.4 | 
-| `>= 3.0`     | `v3.0.0` | 5.6 - 8.2 | 
+| `3.0`        | `v3`     | 7.4 - 8.2 | 
+| `>= 2.1.19`  | `master` | 5.6 - 8.2 |  
