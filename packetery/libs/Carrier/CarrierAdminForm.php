@@ -203,7 +203,7 @@ class CarrierAdminForm
         } else if (!empty($possibleVendors)) {
             $formInputs[] = [
                 'name' => 'allowed_vendors',
-                'label' => $this->module->l('Allowed pickup point types'),
+                'label' => $this->module->l('Allowed pickup point types', 'carrieradminform'),
                 'type' => 'html',
                 'html_content' => $this->getVendorsHtml(
                     $possibleVendors,
