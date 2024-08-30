@@ -175,8 +175,7 @@ class Packetery extends CarrierModule
 
         if (!self::transportMethod()) {
             $error[] = $this->l(
-                'No way to access Packeta API is available on the web server:
-                please allow CURL module or allow_url_fopen setting.'
+                'No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.'
             );
             $have_error = true;
         }
