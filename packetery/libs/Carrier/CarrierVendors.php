@@ -45,7 +45,6 @@ class CarrierVendors
     {
         $zpointName = $this->module->l('Packeta Pick-up Points', 'carriervendors');
         $zboxName = $this->module->l('Packeta', 'carriervendors') . ' Z-BOX';
-        $alzaBoxName = $this->module->l('AlzaBox via Packeta', 'carriervendors');
 
         return [
             'cz' => [
@@ -58,11 +57,6 @@ class CarrierVendors
                     'group' => 'zbox',
                     'country' => 'cz',
                     'name' => $zboxName,
-                ],
-                [
-                    'group' => 'alzabox',
-                    'country' => 'cz',
-                    'name' => $alzaBoxName,
                 ],
             ],
             'sk' => [
