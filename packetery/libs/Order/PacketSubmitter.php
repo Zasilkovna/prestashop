@@ -63,9 +63,13 @@ class PacketSubmitter
             'value' => $exportData['value'],
             'eshop' => $exportData['senderLabel'],
             'weight' => $exportData['weight'],
-            'size' => $exportData['size'],
             'adultContent' => $exportData['adultContent'],
         ];
+
+        if (count($exportData['size']) > 0) {
+            $packetAttributes['size'] = $exportData['size'];
+        }
+
         foreach (['carrierPickupPoint', 'street', 'houseNumber', 'city', 'zip'] as $key) {
             if (!empty($exportData[$key])) {
                 $packetAttributes[$key] = $exportData[$key];
