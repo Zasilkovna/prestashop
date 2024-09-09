@@ -65,9 +65,9 @@ class CsvExporter
                 'city' => '',
                 'zip' => '',
                 'carrierPickupPoint' => '',
-                'width' => '',
-                'height' => '',
-                'depth' => '',
+                'width' => isset($exportData['size']['width']) ? $exportData['size']['width'] : '',
+                'height' => isset($exportData['size']['length']) ? $exportData['size']['length'] : '',
+                'depth' => isset($exportData['size']['height']) ? $exportData['size']['height'] : '',
                 'note' => '',
             ];
             foreach (['carrierPickupPoint', 'street', 'houseNumber', 'city', 'zip'] as $key) {
