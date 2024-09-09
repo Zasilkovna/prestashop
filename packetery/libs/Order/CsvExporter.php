@@ -31,7 +31,9 @@ class CsvExporter
      */
     private function collectOrdersDataForCsvExport(array $order_ids)
     {
+        /** @var OrderRepository $orderRepository */
         $orderRepository = $this->module->diContainer->get(OrderRepository::class);
+        /** @var OrderExporter $orderExporter */
         $orderExporter = $this->module->diContainer->get(OrderExporter::class);
         $data = [];
         foreach ($order_ids as $order_id) {
