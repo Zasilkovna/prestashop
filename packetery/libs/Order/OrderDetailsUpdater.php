@@ -97,9 +97,9 @@ class OrderDetailsUpdater
         $invalidFields = [];
 
         $size = [
-            $this->module->l('length', 'orderdetailsupdater'),
-            $this->module->l('height', 'orderdetailsupdater'),
-            $this->module->l('width', 'orderdetailsupdater'),
+            'length',
+            'height',
+            'width',
         ];
 
         foreach ($size as $dimension) {
@@ -120,7 +120,7 @@ class OrderDetailsUpdater
             if ($isValid) {
                 $packageDimensions[$dimension] = $value;
             } else {
-                $invalidFields[] = $dimension;
+                $invalidFields[] = $this->module->l($dimension, 'orderdetailsupdater');
             }
         }
 
