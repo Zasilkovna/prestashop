@@ -869,9 +869,9 @@ class Packetery extends CarrierModule
 
         if ($isExported === false) {
             $orderDetails = [
-                'length' => Tools::getValue('length'),
-                'height' => Tools::getValue('height'),
-                'width' => Tools::getValue('width'),
+                'length' => Tools::getValue('length') ?: $packeteryOrder['length'],
+                'height' => Tools::getValue('height') ?: $packeteryOrder['height'],
+                'width' => Tools::getValue('width') ?: $packeteryOrder['width'],
             ];
             $this->context->smarty->assign('orderDetails', $orderDetails);
         }
