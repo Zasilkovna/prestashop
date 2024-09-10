@@ -31,7 +31,9 @@ class CsvExporter
      */
     private function collectOrdersDataForCsvExport(array $order_ids)
     {
+        /** @var OrderRepository $orderRepository */
         $orderRepository = $this->module->diContainer->get(OrderRepository::class);
+        /** @var OrderExporter $orderExporter */
         $orderExporter = $this->module->diContainer->get(OrderExporter::class);
         $data = [];
         foreach ($order_ids as $order_id) {
@@ -63,9 +65,9 @@ class CsvExporter
                 'city' => '',
                 'zip' => '',
                 'carrierPickupPoint' => '',
-                'width' => '',
-                'height' => '',
-                'depth' => '',
+                'width' => isset($exportData['size']['width']) ? $exportData['size']['width'] : '',
+                'height' => isset($exportData['size']['length']) ? $exportData['size']['length'] : '',
+                'depth' => isset($exportData['size']['height']) ? $exportData['size']['height'] : '',
                 'note' => '',
             ];
             foreach (['carrierPickupPoint', 'street', 'houseNumber', 'city', 'zip'] as $key) {

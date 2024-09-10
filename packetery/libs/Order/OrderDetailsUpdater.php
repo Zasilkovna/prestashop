@@ -96,13 +96,13 @@ class OrderDetailsUpdater
         $packageDimensions = [];
         $invalidFields = [];
 
-        $size = [
-            $this->module->l('length', 'orderdetailsupdater'),
-            $this->module->l('height', 'orderdetailsupdater'),
-            $this->module->l('width', 'orderdetailsupdater'),
+        $translatedDimensions = [
+            'length' => $this->module->l('length', 'orderdetailsupdater'),
+            'height' => $this->module->l('height', 'orderdetailsupdater'),
+            'width' => $this->module->l('width', 'orderdetailsupdater'),
         ];
 
-        foreach ($size as $dimension) {
+        foreach ($translatedDimensions as $dimension => $translation) {
             $rawValue = Tools::getValue($dimension);
 
             $value = null;
@@ -120,7 +120,7 @@ class OrderDetailsUpdater
             if ($isValid) {
                 $packageDimensions[$dimension] = $value;
             } else {
-                $invalidFields[] = $dimension;
+                $invalidFields[] = $translation;
             }
         }
 
