@@ -856,9 +856,9 @@ class Packetery extends CarrierModule
 
         $this->context->smarty->assign('submitButton', 'order_update');
 
-        /** @var \Packetery\Order\OrderDetailsUpdater $orderDetails */
-        $orderDetails = $this->diContainer->get(\Packetery\Order\OrderDetailsUpdater::class);
-        $orderDetails->orderUpdate($messages, $packeteryOrder, $orderId);
+        /** @var \Packetery\Order\OrderDetailsUpdater $orderDetailsUpdater */
+        $orderDetailsUpdater = $this->diContainer->get(\Packetery\Order\OrderDetailsUpdater::class);
+        $orderDetailsUpdater->orderUpdate($messages, $packeteryOrder, $orderId);
 
         $isAddressDelivery = (bool)$packeteryOrder['is_ad'];
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
