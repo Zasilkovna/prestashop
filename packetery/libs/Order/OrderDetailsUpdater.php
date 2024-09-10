@@ -97,8 +97,8 @@ class OrderDetailsUpdater
         $invalidFields = [];
 
         $translatedDimensions = [
-            'length' =>  $this->module->l('length', 'orderdetailsupdater'),
-            'height' =>  $this->module->l('height', 'orderdetailsupdater'),
+            'length' => $this->module->l('length', 'orderdetailsupdater'),
+            'height' => $this->module->l('height', 'orderdetailsupdater'),
             'width' => $this->module->l('width', 'orderdetailsupdater'),
         ];
 
