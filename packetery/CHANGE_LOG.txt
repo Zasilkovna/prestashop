@@ -28,9 +28,12 @@
        - Fixed: correct order saving for templates that in some cases do not save the carrier id in the cart before confirming the order
        - Removed: validation of API password using API
        - Added: In the order detail it is now possible to set the dimensions of the shipment
+2.1.20 - Fixed: front.js - compatibility with other plugins
+       - Removed: validation of API password using API
+2.1.19 - Fixed: displaying the widget button and cart validation
+2.1.18 - Updated: compatibility with PrestaShop 8 ensured
 2.1.17 - Updated: sk "Is COD" translation update
-       - Removed: displaying widget button right after shipping method change
-       - Updated: increased delay for backup widget button displaying mechanism
+       - Updated: improvements to the display of widget button in the cart
        - Updated: frontend JavaScript and CSS files registered in a way respecting CCC (Combine, Compress and Cache) setting
        - Fixed: proper missing order currency rate handling
        - Removed: loading currency rate from cnb.cz
