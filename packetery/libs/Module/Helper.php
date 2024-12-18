@@ -4,7 +4,7 @@ namespace Packetery\Module;
 
 class Helper
 {
-    const TRACKING_URL = 'https://tracking.packeta.com/?id=%s';
+    const TRACKING_URL = 'https://tracking.app.packeta.com/%s';
 
     /**
      * @param string $packetId
