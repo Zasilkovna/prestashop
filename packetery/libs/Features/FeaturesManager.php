@@ -47,6 +47,8 @@ class FeaturesManager
     }
 
     /**
+     * The method is temporarily disabled due to Packeta endpoint instability.
+     *
      * @return void
      */
     public function checkForUpdate()
