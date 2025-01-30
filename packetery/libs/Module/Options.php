@@ -2,8 +2,10 @@
 
 namespace Packetery\Module;
 
+use Context;
 use Packetery;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
+use Packetery\Log\LogRepository;
 use Validate;
 use Packetery\Tools\ConfigHelper;
 
@@ -17,10 +19,18 @@ class Options
     /** @var SoapApi */
     private $soapApi;
 
-    public function __construct(Packetery $module, SoapApi $soapApi)
+    /** @var LogRepository */
+    private $logRepository;
+
+    public function __construct(
+        Packetery $module,
+        SoapApi $soapApi,
+        LogRepository $logRepository
+    )
     {
         $this->module = $module;
         $this->soapApi = $soapApi;
+        $this->logRepository = $logRepository;
     }
 
     /**
@@ -47,11 +57,29 @@ class Options
                 }
                 try {
                     $this->soapApi->senderGetReturnRouting($value);
+                    $this->logRepository->insertRow(
+                        LogRepository::ACTION_SENDER_VALIDATION,
+                        [
+                            'value' => $value,
+                        ],
+                        LogRepository::STATUS_SUCCESS
+                    );
+
                     return false;
                 } catch (SenderGetReturnRoutingException $e) {
                     if ($e->senderNotExists === true) {
                         return $this->module->l('Provided sender indication does not exist.', 'options');
                     }
+
+                    $this->logRepository->insertRow(
+                        LogRepository::ACTION_SENDER_VALIDATION,
+                        [
+                            'value' => $value,
+                            'senderNotExists' => $e->senderNotExists,
+                        ],
+                        LogRepository::STATUS_ERROR
+                    );
+
                     return sprintf(
                         '%s: %s',
                         $this->module->l('Sender indication validation failed', 'options'),

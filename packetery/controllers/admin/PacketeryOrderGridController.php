@@ -265,7 +265,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         header(
             sprintf(
                 'Content-Disposition: attachment; filename="packeta_%s.pdf"',
-                (new \DateTime())->format('Y-m-d_H-i-s_u')
+                (new \DateTimeImmutable())->format('Y-m-d_H-i-s_u')
             )
         );
         echo $pdfContent;

@@ -2,6 +2,7 @@
 
 use Packetery\Cron\Tasks\DeleteLabels;
 use Packetery\Cron\Tasks\DownloadCarriers;
+use Packetery\Cron\Tasks\PurgeLogs;
 use Packetery\Tools\ConfigHelper;
 
 class PacketeryCronModuleFrontController extends ModuleFrontController
@@ -67,6 +68,10 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
                 break;
             case DownloadCarriers::getTaskName():
                 $errors = (new DownloadCarriers($this->module))->execute();
+                $this->renderErrors($errors);
+                break;
+            case PurgeLogs::getTaskName():
+                $errors = (new PurgeLogs($this->module))->execute();
                 $this->renderErrors($errors);
                 break;
             default:

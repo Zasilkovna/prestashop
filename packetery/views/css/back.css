@@ -90,3 +90,13 @@
 .packeteryordergrid .column-weight input {
     padding: 8px;
 }
+
+.packeteryloggrid-success {
+    color: #00a32a;
+    font-weight: 700;
+}
+
+.packeteryloggrid-error {
+    color: #ba1b02;
+    font-weight: 700;
+}

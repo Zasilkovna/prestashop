@@ -26,7 +26,7 @@ class Tracking
         $tracking = [];
         if ($result) {
             foreach ($result as $tn) {
-                $tracking[] = $tn['tracking_number'];
+                $tracking[$tn['id_order']] = $tn['tracking_number'];
             }
         }
         return $tracking;

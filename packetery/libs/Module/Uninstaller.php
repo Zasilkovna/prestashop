@@ -3,6 +3,7 @@
 namespace Packetery\Module;
 
 use Packetery;
+use Packetery\Log\LogRepository;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\DbTools;
 use PrestaShopException;
@@ -50,7 +51,8 @@ class Uninstaller
         return $this->deleteTab('Packetery') &&
             $this->deleteTab('PacketerySetting') &&
             $this->deleteTab('PacketeryCarrierGrid') &&
-            $this->deleteTab('PacketeryOrderGrid');
+            $this->deleteTab('PacketeryOrderGrid') &&
+            $this->deleteTab('PacketeryLogGrid');
     }
 
     /**
@@ -97,6 +99,9 @@ class Uninstaller
 
         $apiCarrierRepository = $this->module->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
         $sql[] = $apiCarrierRepository->getDropTableSql();
+
+        $logRepository = $this->module->diContainer->get(LogRepository::class);
+        $sql[] = $logRepository->getDropTableSql();
 
         // keep order table backup
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_order_backup`';
