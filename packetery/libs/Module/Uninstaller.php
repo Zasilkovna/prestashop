@@ -90,9 +90,7 @@ class Uninstaller
 
         $sql[] =
             'UPDATE `' . _DB_PREFIX_ . 'carrier` SET `is_module` = 0, `external_module_name` = NULL, `need_range` = 0
-                WHERE `id_carrier` IN (
-                    SELECT `id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
-                )';
+                WHERE `external_module_name` = "packetery"';
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
 
         $apiCarrierRepository = $this->module->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
@@ -103,6 +101,9 @@ class Uninstaller
         $sql[] = 'RENAME TABLE `' . _DB_PREFIX_ . 'packetery_order` TO `' . _DB_PREFIX_ . 'packetery_order_backup`';
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product_attribute`';
+        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product`';
+        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_branch`';
+        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_order_old`';
 
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText())) {
             return false;
