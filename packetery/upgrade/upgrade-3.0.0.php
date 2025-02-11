@@ -3,6 +3,7 @@
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Carrier\CarrierAdminForm;
 use Packetery\Carrier\CarrierRepository;
+use Packetery\Log\LogRepository;
 use Packetery\Module\Installer;
 use Packetery\Module\Uninstaller;
 use Packetery\Product\ProductAttributeRepository;
@@ -90,6 +91,9 @@ function upgrade_module_3_0_0($module)
 
     $productAttributeRepository = $module->diContainer->get(ProductAttributeRepository::class);
     $sql[] = $productAttributeRepository->getCreateTableSql();
+
+    $logRepository = $module->diContainer->get(LogRepository::class);
+    $sql[] = $logRepository->getCreateTableSql();
 
     $dbTools = $module->diContainer->get(DbTools::class);
     if (!$dbTools->executeQueries($sql, $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.0.0'), true)) {

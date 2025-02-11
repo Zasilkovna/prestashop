@@ -5,6 +5,7 @@ namespace Packetery\Module;
 use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
+use Packetery\Log\LogRepository;
 use Packetery\Product\ProductAttributeRepository;
 use Packetery\Tools\DbTools;
 use Language;
@@ -87,6 +88,12 @@ class Installer
                 'class' => 'PacketerySetting',
                 'name' => 'Configuration',
                 'translatedName' => $this->module->l('Configuration', 'installer')
+            ],
+            [
+                'parentClass' => 'Packetery',
+                'class' => 'PacketeryLogGrid',
+                'name' => 'Log',
+                'translatedName' => $this->module->l('Log', 'installer')
             ],
         ];
 
@@ -188,6 +195,10 @@ class Installer
         $apiCarrierRepository = $this->module->diContainer->get(ApiCarrierRepository::class);
         $sql[] = $apiCarrierRepository->getDropTableSql();
         $sql[] = $apiCarrierRepository->getCreateTableSql();
+
+        $logRepository = $this->module->diContainer->get(LogRepository::class);
+        $sql[] = $logRepository->getDropTableSql();
+        $sql[] = $logRepository->getCreateTableSql();
 
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText(), true)) {
             return false;

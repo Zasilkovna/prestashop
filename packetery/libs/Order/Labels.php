@@ -2,6 +2,9 @@
 
 namespace Packetery\Order;
 
+use Context;
+use Packetery;
+use Packetery\Log\LogRepository;
 use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
 use SoapClient;
@@ -17,12 +20,21 @@ class Labels
      */
     private $configHelper;
 
-    /**
-     * @param ConfigHelper $configHelper
-     */
-    public function __construct(ConfigHelper $configHelper)
+    /** @var LogRepository  */
+    private $logRepository;
+
+    /** @var Packetery */
+    private $module;
+
+    public function __construct(
+        ConfigHelper $configHelper,
+        LogRepository $logRepository,
+        Packetery $module
+    )
     {
+        $this->logRepository = $logRepository;
         $this->configHelper = $configHelper;
+        $this->module = $module;
     }
 
     /**
@@ -41,10 +53,36 @@ class Labels
                 $pdf = $client->packetsCourierLabelsPdf($this->configHelper->getApiPass(), $packetsEnhanced, $offset, $format);
             } else {
                 $format = ConfigHelper::get('PACKETERY_LABEL_FORMAT');
-                $pdf = $client->packetsLabelsPdf($this->configHelper->getApiPass(), $packets, $format, $offset);
+                $pdf = $client->packetsLabelsPdf($this->configHelper->getApiPass(), array_values( $packets ), $format, $offset);
             }
             if ($pdf) {
+                foreach ($packets as $orderId => $packetNumber) {
+                    $this->logRepository->insertRow(
+                        LogRepository::ACTION_LABEL_PRINT,
+                        [
+                            'packetNumber' => $packetNumber,
+                            'format' => $format,
+                            'type' => $type,
+                        ],
+                        LogRepository::STATUS_SUCCESS,
+                        $orderId
+                    );
+                }
+
                 return $pdf;
+            }
+
+            foreach ($packets as $orderId => $packetNumber) {
+                $this->logRepository->insertRow(
+                    LogRepository::ACTION_LABEL_PRINT,
+                    [
+                        'packetNumber' => $packetNumber,
+                        'format' => $format,
+                        'type' => $type,
+                    ],
+                    LogRepository::STATUS_ERROR,
+                    $orderId
+                );
             }
 
             echo "\n error \n";
@@ -54,6 +92,20 @@ class Labels
                 $error_msg = $e->faultstring;
                 echo "\n$error_msg\n";
             }
+
+            foreach ($packets as $orderId => $packetNumber) {
+                $this->logRepository->insertRow(
+                    LogRepository::ACTION_LABEL_PRINT,
+                    [
+                        'packetNumber' => $packetNumber,
+                        'type' => $type,
+                        'exception' => $e->getMessage(),
+                    ],
+                    LogRepository::STATUS_ERROR,
+                    $orderId
+                );
+            }
+
             exit;
         }
     }

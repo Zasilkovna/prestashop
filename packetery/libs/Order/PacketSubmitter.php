@@ -2,10 +2,12 @@
 
 namespace Packetery\Order;
 
+use Context;
 use Order;
 use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
+use Packetery\Log\LogRepository;
 use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
 use PrestaShopDatabaseException;
@@ -19,6 +21,8 @@ class PacketSubmitter
 {
     /** @var OrderRepository */
     private $orderRepository;
+    /** @var LogRepository */
+    private $logRepository;
     /** @var Packetery */
     private $module;
     /** @var ConfigHelper */
@@ -26,12 +30,14 @@ class PacketSubmitter
 
     /**
      * @param OrderRepository $orderRepository
+     * @param LogRepository $logRepository
      * @param Packetery $module
      * @param ConfigHelper $configHelper
      */
-    public function __construct(OrderRepository $orderRepository, Packetery $module, ConfigHelper $configHelper)
+    public function __construct(OrderRepository $orderRepository, LogRepository $logRepository, Packetery $module, ConfigHelper $configHelper)
     {
         $this->orderRepository = $orderRepository;
+        $this->logRepository = $logRepository;
         $this->module = $module;
         $this->configHelper = $configHelper;
     }
@@ -80,10 +86,42 @@ class PacketSubmitter
         if ($validate[0]) {
             $tracking_number = $this->createPacketSoap($packetAttributes);
             if (($tracking_number[0]) && (Tools::strlen($tracking_number[1]) > 0)) {
+                $this->logRepository->insertRow(
+                    LogRepository::ACTION_PACKET_SENDING,
+                    [
+                        'trackingNumber' => $tracking_number[1],
+                        'packetAttributes' => $packetAttributes,
+                    ],
+                    LogRepository::STATUS_SUCCESS,
+                    $order->id
+                );
+
                 return [1, $tracking_number[1]];
             }
+
+            $this->logRepository->insertRow(
+                LogRepository::ACTION_PACKET_SENDING,
+                [
+                    'trackingNumber' => $tracking_number[1],
+                    'packetAttributes' => $packetAttributes,
+                ],
+                LogRepository::STATUS_ERROR,
+                $order->id
+            );
+
             return [0, $tracking_number[1]];
         }
+
+        $this->logRepository->insertRow(
+            LogRepository::ACTION_PACKET_SENDING,
+            [
+                'validate' => $validate,
+                'packetAttributes' => $packetAttributes,
+            ],
+            LogRepository::STATUS_ERROR,
+            $order->id
+        );
+
         return [0, $validate[1]];
     }
 

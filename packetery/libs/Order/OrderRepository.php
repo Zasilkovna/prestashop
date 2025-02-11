@@ -319,7 +319,7 @@ class OrderRepository
     public function getTrackingNumbers($orderIds)
     {
         return $this->dbTools->getRows(
-            'SELECT `tracking_number`
+            'SELECT `id_order`, `tracking_number`
                 FROM `' . _DB_PREFIX_ . 'packetery_order` 
                 WHERE `id_order` IN(' . $this->db->escape($orderIds) . ') AND `tracking_number` != ""'
         );

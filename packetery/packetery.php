@@ -27,6 +27,8 @@
  * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
  */
 
+use Packetery\Log\LogRepository;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -217,7 +219,7 @@ class Packetery extends CarrierModule
 
         $lastCarriersUpdate = \Packetery\Tools\ConfigHelper::get('PACKETERY_LAST_CARRIERS_UPDATE');
         if ((bool)$lastCarriersUpdate !== false) {
-            $date = new DateTime();
+            $date = new DateTimeImmutable();
             $date->setTimestamp($lastCarriersUpdate);
             $lastCarriersUpdate = $date->format('d.m.Y H:i:s');
         }
@@ -930,6 +932,10 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
         $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider);
+
+        if($this->diContainer->get(LogRepository::class)->hasAnyByOrderId($orderId)) {
+            $this->context->smarty->assign('logLink', $this->getAdminLink('PacketeryLogGrid', ['id_order' => $orderId]));
+        }
 
         return $this->display(__FILE__, 'display_order_main.tpl');
     }

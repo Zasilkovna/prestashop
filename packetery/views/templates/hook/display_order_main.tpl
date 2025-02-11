@@ -5,6 +5,10 @@
         </h3>
     </div>
     <div class="card-body">
+        {if isset($logLink)}
+            <a href="{$logLink}">{l s='Show log' mod='packetery'}</a>
+        {/if}
+
         <form action="{$returnUrl}" method="post">
             {if $isAddressDelivery}
                 <p>
