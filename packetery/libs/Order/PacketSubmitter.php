@@ -82,47 +82,32 @@ class PacketSubmitter
             }
         }
 
-        $validate = $this->validatePacketSoap($packetAttributes);
-        if ($validate[0]) {
-            $tracking_number = $this->createPacketSoap($packetAttributes);
-            if (($tracking_number[0]) && (Tools::strlen($tracking_number[1]) > 0)) {
-                $this->logRepository->insertRow(
-                    LogRepository::ACTION_PACKET_SENDING,
-                    [
-                        'trackingNumber' => $tracking_number[1],
-                        'packetAttributes' => $packetAttributes,
-                    ],
-                    LogRepository::STATUS_SUCCESS,
-                    $order->id
-                );
-
-                return [1, $tracking_number[1]];
-            }
-
+        $trackingNumber = $this->createPacketSoap($packetAttributes);
+        if (($trackingNumber[0]) && (Tools::strlen($trackingNumber[1]) > 0)) {
             $this->logRepository->insertRow(
                 LogRepository::ACTION_PACKET_SENDING,
                 [
-                    'trackingNumber' => $tracking_number[1],
+                    'trackingNumber' => $trackingNumber[1],
                     'packetAttributes' => $packetAttributes,
                 ],
-                LogRepository::STATUS_ERROR,
+                LogRepository::STATUS_SUCCESS,
                 $order->id
             );
 
-            return [0, $tracking_number[1]];
+            return [1, $trackingNumber[1]];
         }
 
         $this->logRepository->insertRow(
             LogRepository::ACTION_PACKET_SENDING,
             [
-                'validate' => $validate,
+                'trackingNumber' => $trackingNumber[1],
                 'packetAttributes' => $packetAttributes,
             ],
             LogRepository::STATUS_ERROR,
             $order->id
         );
 
-        return [0, $validate[1]];
+        return [0, $trackingNumber[1]];
     }
 
     /**
@@ -163,26 +148,6 @@ class PacketSubmitter
         }
 
         return $packets;
-    }
-
-    /**
-     * @param array $packetAttributes
-     * @return array
-     */
-    private function validatePacketSoap(array $packetAttributes)
-    {
-        $client = new SoapClient(SoapApi::WSDL_URL);
-
-        try {
-            $validate = $client->packetAttributesValid($this->configHelper->getApiPass(), $packetAttributes);
-            if (!$validate) {
-                return [1];
-            }
-            return [0, 'error validate'];
-        } catch (SoapFault $e) {
-            $errorMessage = $this->getErrorMessage($e);
-            return [0, "$errorMessage\n"];
-        }
     }
 
     /**
