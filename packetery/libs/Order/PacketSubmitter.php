@@ -82,32 +82,33 @@ class PacketSubmitter
             }
         }
 
-        $trackingNumber = $this->createPacketSoap($packetAttributes);
-        if ($trackingNumber[0] && Tools::strlen($trackingNumber[1]) > 0) {
+        list($isSuccess, $trackingNumber, $error) = $this->createPacketSoap($packetAttributes);
+        if ($isSuccess && Tools::strlen($trackingNumber) > 0) {
             $this->logRepository->insertRow(
                 LogRepository::ACTION_PACKET_SENDING,
                 [
-                    'trackingNumber' => $trackingNumber[1],
+                    'trackingNumber' => $trackingNumber,
                     'packetAttributes' => $packetAttributes,
                 ],
                 LogRepository::STATUS_SUCCESS,
                 $order->id
             );
 
-            return [1, $trackingNumber[1]];
+            return [$isSuccess, $trackingNumber];
         }
 
         $this->logRepository->insertRow(
             LogRepository::ACTION_PACKET_SENDING,
             [
-                'trackingNumber' => $trackingNumber[1],
+                'trackingNumber' => $trackingNumber,
+                'error' => $error,
                 'packetAttributes' => $packetAttributes,
             ],
             LogRepository::STATUS_ERROR,
             $order->id
         );
 
-        return [0, $trackingNumber[1]];
+        return [$isSuccess, $error];
     }
 
     /**
@@ -160,12 +161,12 @@ class PacketSubmitter
         try {
             $trackingNumber = $client->createPacket($this->configHelper->getApiPass(), $packetAttributes);
             if ($trackingNumber->id) {
-                return [1, $trackingNumber->id];
+                return [1, $trackingNumber->id, null];
             }
-            return [0, "\nError create packet \n"];
+            return [0, null, "\nError create packet \n"];
         } catch (SoapFault $e) {
             $errorMessage = $this->getErrorMessage($e);
-            return [0, "$errorMessage\n"];
+            return [0, null, "$errorMessage\n"];
         }
     }
 
