@@ -23,6 +23,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use Packetery\Exceptions\AggregatedException;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Module\SoapApi;
 use Packetery\Module\VersionChecker;
@@ -216,12 +217,11 @@ class PacketeryOrderGridController extends ModuleAdminController
         $module = $this->getModule();
         /** @var PacketSubmitter $packetSubmitter */
         $packetSubmitter = $module->diContainer->get(PacketSubmitter::class);
-        $exportResult = $packetSubmitter->ordersExport($ids);
-        if (is_array($exportResult)) {
-            foreach ($exportResult as $resultRow) {
-                if (!$resultRow[0]) {
-                    $this->errors[] = $resultRow[1];
-                }
+        try {
+            $packetSubmitter->ordersExport($ids);
+        } catch (AggregatedException $aggregatedException) {
+            foreach ($aggregatedException->getExceptions() as $exception) {
+                $this->errors[] = $exception->getMessage();
             }
         }
         if ($this->errors) {
