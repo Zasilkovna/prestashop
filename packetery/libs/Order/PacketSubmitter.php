@@ -83,7 +83,7 @@ class PacketSubmitter
         }
 
         $trackingNumber = $this->createPacketSoap($packetAttributes);
-        if (($trackingNumber[0]) && (Tools::strlen($trackingNumber[1]) > 0)) {
+        if ($trackingNumber[0] && Tools::strlen($trackingNumber[1]) > 0) {
             $this->logRepository->insertRow(
                 LogRepository::ACTION_PACKET_SENDING,
                 [
