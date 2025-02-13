@@ -1,0 +1,75 @@
+<?php
+
+namespace Packetery\PacketTracking;
+
+use Packetery\Tools\DbTools;
+
+class PacketTrackingRepository {
+
+    public static $tableName = 'packetery_packet_status';
+
+    /**
+     * @var DbTools
+     */
+    private $dbTools;
+
+    /**
+     * @param DbTools $dbTools
+     */
+    public function __construct(DbTools $dbTools) {
+        $this->dbTools = $dbTools;
+    }
+
+    /**
+     * @return string
+     */
+    private function getPrefixedTableName() {
+        return _DB_PREFIX_ . self::$tableName;
+    }
+
+    /**
+     * @param int $orderId
+     * @param string $packetId
+     * @param string $eventDatetime
+     * @param int $statusCode
+     * @param string $statusText
+     * @return bool
+     */
+    public function insert($orderId, $packetId, $eventDatetime, $statusCode, $statusText) {
+        return $this->dbTools->insert(
+            self::$tableName,
+            [
+                'id_order' => $orderId,
+                'packet_id' => $packetId,
+                'event_datetime' => $eventDatetime,
+                'status_code' => $statusCode,
+                'status_text' => $statusText,
+            ]
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getDropTableSql() {
+        return 'DROP TABLE IF EXISTS `' . $this->getPrefixedTableName() . '`;';
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreateTableSql() {
+        return 'CREATE TABLE `' . $this->getPrefixedTableName() . '` (
+          `id` int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+          `id_order` int unsigned NOT NULL,
+          `packet_id` varchar(15) NOT NULL,
+          `event_datetime` datetime NOT NULL,
+          `status_code` tinyint unsigned NOT NULL,
+          `status_text` text NOT NULL,
+          `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          KEY `id_order` (`id_order`),
+          KEY `packet_id` (`packet_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+    }
+
+}
