@@ -6,6 +6,7 @@ use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Log\LogRepository;
+use Packetery\PacketTracking\PacketTrackingRepository;
 use Packetery\Product\ProductAttributeRepository;
 use Packetery\Tools\DbTools;
 use Language;
@@ -199,6 +200,10 @@ class Installer
         $logRepository = $this->module->diContainer->get(LogRepository::class);
         $sql[] = $logRepository->getDropTableSql();
         $sql[] = $logRepository->getCreateTableSql();
+
+        $packetTrackingRepository = $this->module->diContainer->get(PacketTrackingRepository::class);
+        $sql[] = $packetTrackingRepository->getDropTableSql();
+        $sql[] = $packetTrackingRepository->getCreateTableSql();
 
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText(), true)) {
             return false;
