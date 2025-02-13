@@ -27,6 +27,7 @@
        - Updated: API communication has been updated to be better compatible with 32-bit PHP in the future.
        - Fixed: correct order saving for templates that in some cases do not save the carrier id in the cart before confirming the order
        - Removed: validation of API password using API
+       - Updated: during uninstallation, the module version 2.x tables and links to the PS carriers are also correctly removed
        - Added: In the order detail it is now possible to set the dimensions of the shipment
        - Updated: New tracking URL address
        - Added: API logging
