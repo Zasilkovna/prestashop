@@ -66,4 +66,27 @@
             </div>
         </div>
     </div>
+
+    <div class="panel">
+        <div class="panel-heading">
+            {l s='Packet status tracking' mod='packetery'}
+        </div>
+        <div class="clearfix">
+            <div class="col-lg-12">
+                {if isset($updatePacketStatusesUrl)}
+                    <p>
+                        {l s='To automatically update packet statuses regularly, you need to call this URL via CRON jobs.' mod='packetery'}
+                    </p>
+                    <p>
+                        <a href="{$updatePacketStatusesUrl}" target="_blank">{$updatePacketStatusesUrl}</a>
+                    </p>
+                {else}
+                    <p>
+                        {l s='It is not possible to use the task for updating packet statuses. First, set an API password.' mod='packetery'}
+                    </p>
+                {/if}
+            </div>
+        </div>
+    </div>
+
 </div>
