@@ -285,10 +285,12 @@ class Packetery extends CarrierModule
             foreach ($packetStatusTrackingOptions as $option => $optionConf) {
                 try {
                     if ($optionConf['type'] === 'checkbox') {
+                        $values = [];
                         foreach ($optionConf['values']['query'] as $checkboxItem) {
                             $value = Tools::getValue($option . '_' . $checkboxItem['id']);
-                            $this->persistFormData($option . '_' . $checkboxItem['id'], $value);
+                            $values[$checkboxItem['id']] = $value;
                         }
+                        $this->persistFormData($option, serialize($values));
                     } else {
                         $value = Tools::getValue($option);
                         $this->persistFormData($option, $value);
@@ -449,22 +451,18 @@ class Packetery extends CarrierModule
             $packetStatusTrackingFormInputs[] = $itemConfiguration;
 
             if ($itemConfiguration['type'] === 'checkbox') {
-                $packeterySettingsCheckbox = \Packetery\Tools\ConfigHelper::getMultiple(
-                    array_map(
-                        static function ($checkboxItemId) use ($itemKey) {
-                            return $itemKey . '_' . $checkboxItemId;
-                        },
-                        array_column($itemConfiguration['values']['query'], 'id')
-                    )
-                );
+                $persistedValue = $packeterySettings[$itemKey];
+                if ($persistedValue === false) {
+                    $persistedValue = serialize([]);
+                }
+
+                $value = Tools::getValue($itemKey, $persistedValue);
+                $rawValues = unserialize($value);
 
                 foreach ($itemConfiguration['values']['query'] as $checkboxItem) {
-                    $defaultValue = 0;
-                    if (isset($packeterySettingsCheckbox[$itemKey . '_' . $checkboxItem['id']])) {
-                        $defaultValue = $packeterySettingsCheckbox[$itemKey . '_' . $checkboxItem['id']];
+                    if (isset($rawValues[$checkboxItem['id']])) {
+                        $pstHelper->fields_value[$itemKey . '_' . $checkboxItem['id']] = $rawValues[$checkboxItem['id']];
                     }
-
-                    $pstHelper->fields_value[$itemKey . '_' . $checkboxItem['id']] = Tools::getValue($itemKey . '_' . $checkboxItem['id'], $defaultValue);
                 }
             } else {
                 $defaultValue = null;
