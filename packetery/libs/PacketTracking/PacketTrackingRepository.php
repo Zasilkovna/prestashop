@@ -49,6 +49,23 @@ class PacketTrackingRepository {
     }
 
     /**
+     * @param int $orderId
+     * @param string $packetId
+     * @return int|null
+     */
+    public function getLastStatusCodeByOrderAndPacketId($orderId, $packetId) {
+        $value = $this->dbTools->getValue('SELECT `status_code` FROM `' . $this->getPrefixedTableName() . '`
+            WHERE `id_order` = ' . (int)$orderId . ' AND `packet_id` = "' . $this->dbTools->db->escape($packetId) . '"
+            ORDER BY `event_datetime` DESC');
+
+        if ($value > 0) {
+            return (int)$value;
+        }
+
+        return null;
+    }
+
+    /**
      * @return string
      */
     public function getDropTableSql() {

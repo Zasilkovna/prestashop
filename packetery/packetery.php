@@ -937,6 +937,21 @@ class Packetery extends CarrierModule
             $this->context->smarty->assign('logLink', $this->getAdminLink('PacketeryLogGrid', ['id_order' => $orderId]));
         }
 
+        if ($packeteryOrder['tracking_number']) {
+            /** @var \Packetery\PacketTracking\PacketTrackingRepository $packetStatusRepository */
+            $packetStatusRepository = $this->diContainer->get(\Packetery\PacketTracking\PacketTrackingRepository::class);
+            $statusCode = $packetStatusRepository->getLastStatusCodeByOrderAndPacketId($packeteryOrder['id_order'], $packeteryOrder['tracking_number']);
+            if ($statusCode !== null) {
+                /** @var \Packetery\PacketTracking\PacketStatusMapper $packetStatusMapper */
+                $packetStatusMapper = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusMapper::class);
+                $packetStatuses = $packetStatusMapper->getPacketStatuses();
+                $packetStatusTranslatedName = $packetStatuses[$statusCode]['translated'] ?: null;
+                $statusClass = $packetStatuses[$statusCode]['status'] ? str_replace(' ', '-', $packetStatuses[$statusCode]['status']) : null;
+                $this->context->smarty->assign('packetStatusTranslatedName', $packetStatusTranslatedName);
+                $this->context->smarty->assign('statusClass', $statusClass);
+            }
+        }
+
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 

@@ -31,6 +31,7 @@ use Packetery\Order\Labels;
 use Packetery\Order\OrderRepository;
 use Packetery\Order\PacketSubmitter;
 use Packetery\Order\Tracking;
+use Packetery\PacketTracking\PacketStatusMapper;
 use Packetery\Tools\ConfigHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
@@ -63,13 +64,23 @@ class PacketeryOrderGridController extends ModuleAdminController
             IF(`a`.`valid`, 1, 0) AS `badge_success`,
             CAST(`po`.`weight` AS DECIMAL(10,2)) AS `weight`,
             `osl`.`name` AS `osname`,
-            `os`.`color`
+            `os`.`color`,
+            `ps`.`status_code`
         ';
         $this->_join = '
             JOIN `' . _DB_PREFIX_ . 'packetery_order` `po` ON `po`.`id_order` = `a`.`id_order`
             JOIN `' . _DB_PREFIX_ . 'customer` `c` ON `c`.`id_customer` = `a`.`id_customer`
             LEFT JOIN `' . _DB_PREFIX_ . 'order_state` `os` ON `os`.`id_order_state` = `a`.`current_state`
             LEFT JOIN `' . _DB_PREFIX_ . 'order_state_lang` `osl` ON (`os`.`id_order_state` = `osl`.`id_order_state` AND `osl`.`id_lang` = ' . (int)$this->context->language->id . ')
+            LEFT JOIN (
+                SELECT `id_order`, `status_code`, `packet_id`
+                FROM `' . _DB_PREFIX_ . 'packetery_packet_status` 
+                WHERE (`id_order`, `event_datetime`) IN (
+                    SELECT `id_order`, MAX(`event_datetime`)
+                    FROM `' . _DB_PREFIX_ . 'packetery_packet_status`
+                    GROUP BY `id_order`, `packet_id`
+                )
+            ) `ps` ON `ps`.`id_order` = `a`.`id_order` AND `ps`.`packet_id` = `po`.`tracking_number`
         ';
 
         // Show and/or export only relevant orders from order list.
@@ -149,6 +160,11 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'filter_key' => 'po!tracking_number',
                 'search' => true,
                 'orderby' => false,
+            ],
+            'status_code' => [
+                'title' => $this->l('Packet status', 'packeteryordergridcontroller'),
+                'search' => false,
+                'callback' => 'getTranslatedPacketStatus',
             ],
             'weight' => [
                 'title' => $this->l('Weight (kg)', 'packeteryordergridcontroller'),
@@ -526,6 +542,25 @@ class PacketeryOrderGridController extends ModuleAdminController
         $smarty->assign('disabled', $row['tracking_number']);
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/weightEditable.tpl');
+    }
+
+    /**
+     * @param int $packetStatusCode
+     * @return string
+     */
+    public function getTranslatedPacketStatus($packetStatusCode)
+    {
+        $module = $this->getModule();
+        /** @var PacketStatusMapper $packetStatusMapper */
+        $packetStatusMapper = $module->diContainer->get(PacketStatusMapper::class);
+        $packetStatuses = $packetStatusMapper->getPacketStatuses();
+
+        if (isset($packetStatuses[$packetStatusCode])) {
+            $statusClass = str_replace(' ', '-', $packetStatuses[$packetStatusCode]['status']);
+            return '<p class="packetery-order-status ' . $statusClass . '">' . $packetStatuses[$packetStatusCode]['translated'] . '</p>' ?: '';
+        }
+
+        return '';
     }
 
     /**
