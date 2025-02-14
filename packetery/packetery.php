@@ -237,6 +237,19 @@ class Packetery extends CarrierModule
         return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriers_info.tpl');
     }
 
+    private function persistFormData($option, $value)
+    {
+        /** @var \Packetery\Module\Options $packeteryOptions */
+        $packeteryOptions = $this->diContainer->get(\Packetery\Module\Options::class);
+        $configValue = $packeteryOptions->formatOption($option, $value);
+        $errorMessage = $packeteryOptions->validate($option, $configValue);
+        if ($errorMessage !== false) {
+            throw new \Exception($errorMessage);
+        }
+
+        \Packetery\Tools\ConfigHelper::update($option, $configValue);
+    }
+
     /**
      * Load the configuration form
      * @return string
@@ -266,9 +279,29 @@ class Packetery extends CarrierModule
             ));
         }
 
+        $error = false;
+        if (Tools::isSubmit('packetStatusTrackingSubmit')) {
+            $packetStatusTrackingOptions = $this->getConfigurationOptionsForPacketStatus();
+            foreach ($packetStatusTrackingOptions as $option => $optionConf) {
+                try {
+                    if ($optionConf['type'] === 'checkbox') {
+                        foreach ($optionConf['values']['query'] as $checkboxItem) {
+                            $value = Tools::getValue($option . '_' . $checkboxItem['id']);
+                            $this->persistFormData($option . '_' . $checkboxItem['id'], $value);
+                        }
+                    } else {
+                        $value = Tools::getValue($option);
+                        $this->persistFormData($option, $value);
+                    }
+                } catch (\Exception $e) {
+                    $output .= $this->displayError($e->getMessage());
+                    $error = true;
+                }
+            }
+        }
+
         if (Tools::isSubmit('submit' . $this->name)) {
             $confOptions = $this->getConfigurationOptions();
-            $error = false;
             /** @var \Packetery\Module\Options $packeteryOptions */
             $packeteryOptions = $this->diContainer->get(\Packetery\Module\Options::class);
             foreach ($confOptions as $option => $optionConf) {
@@ -293,10 +326,12 @@ class Packetery extends CarrierModule
                     }
                 }
             }
-            if (!$error) {
-                $output .= $this->displayConfirmation($this->l('Settings updated'));
-            }
         }
+
+        if (!$error) {
+            $output .= $this->displayConfirmation($this->l('Settings updated'));
+        }
+
         $output .= $this->displayForm();
 
         return $output;
@@ -396,7 +431,68 @@ class Packetery extends CarrierModule
             }
         }
 
-        return $helper->generateForm([$form]) . $this->generateCronInfoBlock();
+        $pstHelper = new HelperForm();
+        $pstHelper->table = $this->table;
+        $pstHelper->name_controller = $this->name;
+        $pstHelper->token = Tools::getAdminTokenLite('AdminModules');
+        $pstHelper->currentIndex = AdminController::$currentIndex . '&' . http_build_query(['configure' => $this->name]);
+        $pstHelper->submit_action = 'submitPacketStatusTracking' . $this->name;
+        $pstHelper->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
+
+        $pstConfig = $this->getConfigurationOptionsForPacketStatus();
+        $packeterySettings = \Packetery\Tools\ConfigHelper::getMultiple(
+            array_keys($pstConfig)
+        );
+
+        $packetStatusTrackingFormInputs = [];
+        foreach ($pstConfig as $itemKey => $itemConfiguration) {
+            $packetStatusTrackingFormInputs[] = $itemConfiguration;
+
+            if ($itemConfiguration['type'] === 'checkbox') {
+                $packeterySettingsCheckbox = \Packetery\Tools\ConfigHelper::getMultiple(
+                    array_map(
+                        static function ($checkboxItemId) use ($itemKey) {
+                            return $itemKey . '_' . $checkboxItemId;
+                        },
+                        array_column($itemConfiguration['values']['query'], 'id')
+                    )
+                );
+
+                foreach ($itemConfiguration['values']['query'] as $checkboxItem) {
+                    $defaultValue = 0;
+                    if (isset($packeterySettingsCheckbox[$itemKey . '_' . $checkboxItem['id']])) {
+                        $defaultValue = $packeterySettingsCheckbox[$itemKey . '_' . $checkboxItem['id']];
+                    }
+
+                    $pstHelper->fields_value[$itemKey . '_' . $checkboxItem['id']] = Tools::getValue($itemKey . '_' . $checkboxItem['id'], $defaultValue);
+                }
+            } else {
+                $defaultValue = null;
+                if (isset($packeterySettings[$itemKey]) && $packeterySettings[$itemKey] !== false) {
+                    $defaultValue = $packeterySettings[$itemKey];
+                } elseif (isset($itemConfiguration['defaultValue'])) {
+                    $defaultValue = $itemConfiguration['defaultValue'];
+                }
+
+                $pstHelper->fields_value[$itemKey] = Tools::getValue($itemKey, $defaultValue);;
+            }
+        }
+
+        $packetStatusTrackingForm = [
+            'form' => [
+                'legend' => [
+                    'title' => $this->l('Packet status tracking settings'),
+                ],
+                'input' => $packetStatusTrackingFormInputs,
+                'submit' => [
+                    'title' => $this->l('Save'),
+                    'class' => 'btn btn-default pull-right',
+                    'name' => 'packetStatusTrackingSubmit',
+                ],
+            ],
+        ];
+
+        return $helper->generateForm([$form]) . $pstHelper->generateForm([$packetStatusTrackingForm]) . $this->generateCronInfoBlock() ;
     }
 
     /**
@@ -505,6 +601,150 @@ class Packetery extends CarrierModule
                 'title' => $this->l('Default packaging weight in kg'),
                 'required' => false,
                 'desc' => $this->l('Enter the default weight of the packaging in kg if the order weight is non-zero'),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array<string, string>>
+     */
+    private function getOrderStatuses()
+    {
+        $orderStates = OrderState::getOrderStates((int)Context::getContext()->language->id);
+
+        $orderStatuses = [];
+
+        foreach ($orderStates as $orderState) {
+            $orderStatuses[] = [
+                'id' => $orderState['id_order_state'],
+                'name' => $orderState['name'],
+            ];
+        }
+
+        return $orderStatuses;
+    }
+
+    /**
+     * @return array<array<string, string>>
+     */
+    public function getPacketStatuses() {
+        return [
+            [
+                'id' => 'RECEIVED_DATA',
+                'name' => $this->l('Awaiting consignment'),
+            ],
+            [
+                'id' => 'ARRIVED',
+                'name' => $this->l('Accepted at depot'),
+            ],
+            [
+                'id' => 'PREPARED_FOR_DEPARTURE',
+                'name' => $this->l('On the way'),
+            ],
+            [
+                'id' => 'DEPARTED',
+                'name' => $this->l('Departed from depot'),
+            ],
+            [
+                'id' => 'READY_FOR_PICKUP',
+                'name' => $this->l('Ready for pick-up'),
+            ],
+            [
+                'id' => 'HANDED_TO_CARRIER',
+                'name' => $this->l('Handed over to carrier company'),
+            ],
+            [
+                'id' => 'POSTED_BACK',
+                'name' => $this->l('Return (on the way back)'),
+            ],
+            [
+                'id' => 'COLLECTED',
+                'name' => $this->l('Parcel has been collected'),
+            ],
+            [
+                'id' => 'CUSTOMS',
+                'name' => $this->l('Customs declaration process'),
+            ],
+            [
+                'id' => 'REVERSE_PACKET_ARRIVED',
+                'name' => $this->l('Reverse parcel has been accepted at our pick up point'),
+            ],
+            [
+                'id' => 'DELIVERY_ATTEMPT',
+                'name' => $this->l('Unsuccessful delivery attempt of parcel'),
+            ],
+            [
+                'id' => 'REJECTED_BY_RECIPIENT',
+                'name' => $this->l('Rejected by recipient response'),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function getConfigurationOptionsForPacketStatus() {
+        return [
+            'PACKETERY_PACKET_STATUS_TRACKING_ENABLED' => [
+                'type' => 'radio',
+                'size' => 2,
+                'label' => $this->l('Enabled'),
+                'name' => 'PACKETERY_PACKET_STATUS_TRACKING_ENABLED',
+                'values' => [
+                    [
+                        'id' => 1,
+                        'value' => 1,
+                        'label' => $this->l('Yes'),
+                    ],
+                    [
+                        'id' => 0,
+                        'value' => 0,
+                        'label' => $this->l('No'),
+                    ],
+                ],
+                'title' => $this->l('Enabled'),
+                'required' => false,
+                'defaultValue' => 0,
+            ],
+            'PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS' => [
+                'type' => 'text',
+                'label' => $this->l('Max processed orders'),
+                'name' => 'PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS',
+                'required' => true,
+                'defaultValue' => '100',
+                'validation' => 'isInt',
+                'cast' => 'intval',
+            ],
+            'PACKETERY_PACKET_STATUS_TRACKING_MAX_ORDER_AGE_DAYS' => [
+                'type' => 'text',
+                'label' => $this->l('Max order age in days'),
+                'name' => 'PACKETERY_PACKET_STATUS_TRACKING_MAX_ORDER_AGE_DAYS',
+                'required' => true,
+                'defaultValue' => '14',
+                'validation' => 'isInt',
+                'cast' => 'intval',
+            ],
+            'PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATUSES' => [
+                'type' => 'checkbox',
+                'label' => $this->l('Order statuses'),
+                'name' => 'PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATUSES',
+                'multiple' => true,
+                'values' => [
+                    'query' => $this->getOrderStatuses(),
+                    'id' => 'id',
+                    'name' => 'name'
+                ]
+            ],
+            'PACKETERY_PACKET_STATUS_TRACKING_PACKET_STATUSES' => [
+                'type' => 'checkbox',
+                'label' => $this->l('Packet statuses'),
+                'name' => 'PACKETERY_PACKET_STATUS_TRACKING_PACKET_STATUSES',
+                'multiple' => true,
+                'values' => [
+                    'query' => $this->getPacketStatuses(),
+                    'id' => 'id',
+                    'name' => 'name'
+                ]
             ],
         ];
     }
