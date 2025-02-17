@@ -6,7 +6,9 @@
     </div>
     <div class="card-body">
         {if isset($packetStatusTranslatedName)}
-            <p class="packetery-order-status {$statusClass}">{$packetStatusTranslatedName}</p>
+            <p>
+                <span class="packetery-order-status {$statusClass}">{$packetStatusTranslatedName}</span>
+            </p>
         {/if}
 
         {if isset($logLink)}

@@ -557,7 +557,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         if (isset($packetStatuses[$packetStatusCode])) {
             $statusClass = str_replace(' ', '-', $packetStatuses[$packetStatusCode]['status']);
-            return '<p class="packetery-order-status ' . $statusClass . '">' . $packetStatuses[$packetStatusCode]['translated'] . '</p>' ?: '';
+            return '<p><span class="packetery-order-status ' . $statusClass . '">' . $packetStatuses[$packetStatusCode]['translated'] . '</span></p>' ?: '';
         }
 
         return '';
