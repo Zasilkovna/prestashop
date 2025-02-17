@@ -5,6 +5,10 @@
         </h3>
     </div>
     <div class="card-body">
+        {if isset($packetStatusTranslatedName)}
+            <p class="packetery-order-status {$statusClass}">{$packetStatusTranslatedName}</p>
+        {/if}
+
         {if isset($logLink)}
             <a href="{$logLink}">{l s='Show log' mod='packetery'}</a>
         {/if}
