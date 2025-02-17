@@ -606,7 +606,7 @@ class Packetery extends CarrierModule
     /**
      * @return array<array<string, string>>
      */
-    private function getOrderStatuses()
+    private function getOrderStates()
     {
         $orderStates = OrderState::getOrderStates((int)Context::getContext()->language->id);
 
@@ -722,13 +722,13 @@ class Packetery extends CarrierModule
                 'validation' => 'isInt',
                 'cast' => 'intval',
             ],
-            'PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATUSES' => [
+            'PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATES' => [
                 'type' => 'checkbox',
                 'label' => $this->l('Order statuses'),
-                'name' => 'PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATUSES',
+                'name' => 'PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATES',
                 'multiple' => true,
                 'values' => [
-                    'query' => $this->getOrderStatuses(),
+                    'query' => $this->getOrderStates(),
                     'id' => 'id',
                     'name' => 'name'
                 ]
