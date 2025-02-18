@@ -27,9 +27,6 @@
  * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
  */
 
-use Packetery\Exceptions\AggregatedException;
-use Packetery\Log\LogRepository;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -934,7 +931,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
         $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider);
 
-        if($this->diContainer->get(LogRepository::class)->hasAnyByOrderId($orderId)) {
+        if($this->diContainer->get(\Packetery\Log\LogRepository::class)->hasAnyByOrderId($orderId)) {
             $this->context->smarty->assign('logLink', $this->getAdminLink('PacketeryLogGrid', ['id_order' => $orderId]));
         }
 
@@ -1468,7 +1465,7 @@ class Packetery extends CarrierModule
                     'class' => 'success',
                 ];
             }
-        } catch (AggregatedException $aggregatedException) {
+        } catch (Packetery\Exceptions\AggregatedException $aggregatedException) {
             foreach ($aggregatedException->getExceptions() as $exception) {
                 $messages[] = [
                     'text' => $exception->getMessage(),

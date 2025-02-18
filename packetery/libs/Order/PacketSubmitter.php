@@ -2,7 +2,6 @@
 
 namespace Packetery\Order;
 
-use Context;
 use Order;
 use Packetery;
 use Packetery\Exceptions\AggregatedException;
@@ -49,7 +48,7 @@ class PacketSubmitter
      * @return string
      * @throws ReflectionException
      * @throws ExportException
-     * @throws Packetery\Exceptions\ApiClientException
+     * @throws ApiClientException
      */
     private function createPacket(Order $order)
     {
@@ -98,7 +97,7 @@ class PacketSubmitter
 
                 return $trackingNumber;
             }
-        } catch (Packetery\Exceptions\ApiClientException $apiClientException) {
+        } catch (ApiClientException $apiClientException) {
             $this->logRepository->insertRow(
                 LogRepository::ACTION_PACKET_SENDING,
                 [
@@ -170,7 +169,7 @@ class PacketSubmitter
     /**
      * @param array $packetAttributes
      * @return array
-     * @throws Packetery\Exceptions\ApiClientException
+     * @throws ApiClientException
      */
     private function createPacketSoap(array $packetAttributes)
     {

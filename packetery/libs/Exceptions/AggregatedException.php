@@ -2,15 +2,17 @@
 
 namespace Packetery\Exceptions;
 
-class AggregatedException extends \Exception
+use Exception;
+
+class AggregatedException extends Exception
 {
-    /** @var \Exception[] */
+    /** @var Exception[] */
     private $exceptions = [];
 
     /**
      * AggregatedException constructor.
      *
-     * @param \Exception[] $exceptions
+     * @param Exception[] $exceptions
      */
     public function __construct(array $exceptions)
     {
@@ -19,9 +21,9 @@ class AggregatedException extends \Exception
     }
 
     /**
-     * @return \Exception[]
+     * @return Exception[]
      */
-    public function getExceptions(): array
+    public function getExceptions()
     {
         return $this->exceptions;
     }
