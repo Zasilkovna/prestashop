@@ -44,18 +44,16 @@ class PacketSubmitter
 
     /**
      * @param Order $order
-     * @return array
+     * @return string
      * @throws ReflectionException
+     * @throws ExportException
+     * @throws Packetery\Exceptions\ApiClientException
      */
     private function createPacket(Order $order)
     {
         /** @var OrderExporter $orderExporter */
         $orderExporter = $this->module->diContainer->get(OrderExporter::class);
-        try {
-            $exportData = $orderExporter->prepareData($order);
-        } catch (ExportException $exception) {
-            return [0, $exception->getMessage()];
-        }
+        $exportData = $orderExporter->prepareData($order);
 
         $packetAttributes = [
             'number' => $exportData['number'],
@@ -82,33 +80,38 @@ class PacketSubmitter
             }
         }
 
-        list($isSuccess, $trackingNumber, $error) = $this->createPacketSoap($packetAttributes);
-        if ($isSuccess && Tools::strlen($trackingNumber) > 0) {
+        $trackingNumber = null;
+        try {
+            $trackingNumber = $this->createPacketSoap($packetAttributes);
+            if (is_string($trackingNumber) && Tools::strlen($trackingNumber) > 0) {
+                $this->logRepository->insertRow(
+                    LogRepository::ACTION_PACKET_SENDING,
+                    [
+                        'trackingNumber' => $trackingNumber,
+                        'packetAttributes' => $packetAttributes,
+                    ],
+                    LogRepository::STATUS_SUCCESS,
+                    $order->id
+                );
+
+                return $trackingNumber;
+            }
+        } catch (Packetery\Exceptions\ApiClientException $apiClientException) {
             $this->logRepository->insertRow(
                 LogRepository::ACTION_PACKET_SENDING,
                 [
                     'trackingNumber' => $trackingNumber,
+                    'error' => $apiClientException->getMessage(),
                     'packetAttributes' => $packetAttributes,
                 ],
-                LogRepository::STATUS_SUCCESS,
+                LogRepository::STATUS_ERROR,
                 $order->id
             );
 
-            return [$isSuccess, $trackingNumber];
+            throw $apiClientException;
         }
 
-        $this->logRepository->insertRow(
-            LogRepository::ACTION_PACKET_SENDING,
-            [
-                'trackingNumber' => $trackingNumber,
-                'error' => $error,
-                'packetAttributes' => $packetAttributes,
-            ],
-            LogRepository::STATUS_ERROR,
-            $order->id
-        );
-
-        return [$isSuccess, $error];
+        throw new Packetery\Exceptions\ApiClientException('Tracking number not returned');
     }
 
     /**
@@ -136,15 +139,21 @@ class PacketSubmitter
             }
 
             $order = new Order($orderId);
-            $packetResponse = $this->createPacket($order);
-            if ($packetResponse[0] === 1) {
-                $trackingNumber = $packetResponse[1];
-                $trackingUpdate = $packeteryTracking->updateOrderTrackingNumber($orderId, $trackingNumber);
-                if ($trackingUpdate) {
-                    $packets[] = [1, $trackingNumber];
+
+            try {
+                $trackingNumber = $this->createPacket($order);
+                if ($trackingNumber) {
+                    $trackingUpdate = $packeteryTracking->updateOrderTrackingNumber($orderId, $trackingNumber);
+                    if ($trackingUpdate) {
+                        $packets[] = [1, $trackingNumber];
+                    }
+                } else {
+                    $packets[] = [0, 'error'];
                 }
-            } else {
-                $packets[] = [0, $packetResponse[1]];
+            } catch (ExportException $exportException) {
+                $packets[] = [0, $exportException->getMessage()];
+            } catch (Packetery\Exceptions\ApiClientException $apiClientException) {
+                $packets[] = [0, $apiClientException->getMessage()];
             }
         }
 
@@ -154,6 +163,7 @@ class PacketSubmitter
     /**
      * @param array $packetAttributes
      * @return array
+     * @throws Packetery\Exceptions\ApiClientException
      */
     private function createPacketSoap(array $packetAttributes)
     {
@@ -161,12 +171,12 @@ class PacketSubmitter
         try {
             $trackingNumber = $client->createPacket($this->configHelper->getApiPass(), $packetAttributes);
             if ($trackingNumber->id) {
-                return [1, $trackingNumber->id, null];
+                return $trackingNumber->id;
             }
-            return [0, null, "\nError create packet \n"];
+
+            throw new Packetery\Exceptions\ApiClientException('Tracking number not returned');
         } catch (SoapFault $e) {
-            $errorMessage = $this->getErrorMessage($e);
-            return [0, null, "$errorMessage\n"];
+            throw new Packetery\Exceptions\ApiClientException($this->getErrorMessage($e));
         }
     }
 
