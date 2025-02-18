@@ -5,6 +5,8 @@ namespace Packetery\Order;
 use Context;
 use Order;
 use Packetery;
+use Packetery\Exceptions\AggregatedException;
+use Packetery\Exceptions\ApiClientException;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
 use Packetery\Log\LogRepository;
@@ -111,7 +113,7 @@ class PacketSubmitter
             throw $apiClientException;
         }
 
-        throw new Packetery\Exceptions\ApiClientException('Tracking number not returned');
+        throw new ApiClientException('Tracking number not returned');
     }
 
     /**
@@ -121,6 +123,7 @@ class PacketSubmitter
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
+     * @throws AggregatedException
      */
     public function ordersExport(array $orderIds)
     {
@@ -129,7 +132,8 @@ class PacketSubmitter
             return false;
         }
 
-        $packets = [];
+        $errors = [];
+        $trackingNumbers = [];
         /** @var Tracking $packeteryTracking */
         $packeteryTracking = $this->module->diContainer->get(Tracking::class);
         foreach ($orderIds as $orderId) {
@@ -139,25 +143,28 @@ class PacketSubmitter
             }
 
             $order = new Order($orderId);
-
             try {
                 $trackingNumber = $this->createPacket($order);
                 if ($trackingNumber) {
                     $trackingUpdate = $packeteryTracking->updateOrderTrackingNumber($orderId, $trackingNumber);
                     if ($trackingUpdate) {
-                        $packets[] = [1, $trackingNumber];
+                        $trackingNumbers[] = $trackingNumber;
                     }
                 } else {
-                    $packets[] = [0, 'error'];
+                    $errors[] = new \RuntimeException('error');
                 }
             } catch (ExportException $exportException) {
-                $packets[] = [0, $exportException->getMessage()];
-            } catch (Packetery\Exceptions\ApiClientException $apiClientException) {
-                $packets[] = [0, $apiClientException->getMessage()];
+                $errors[] = $exportException;
+            } catch (ApiClientException $apiClientException) {
+                $errors[] = $apiClientException;
             }
         }
 
-        return $packets;
+        if ($errors !== []) {
+            throw new AggregatedException($errors);
+        }
+
+        return $trackingNumbers;
     }
 
     /**
@@ -174,9 +181,9 @@ class PacketSubmitter
                 return $trackingNumber->id;
             }
 
-            throw new Packetery\Exceptions\ApiClientException('Tracking number not returned');
+            throw new ApiClientException('Tracking number not returned');
         } catch (SoapFault $e) {
-            throw new Packetery\Exceptions\ApiClientException($this->getErrorMessage($e));
+            throw new ApiClientException($this->getErrorMessage($e));
         }
     }
 
