@@ -2,6 +2,7 @@
 
 use Packetery\Cron\Tasks\DeleteLabels;
 use Packetery\Cron\Tasks\DownloadCarriers;
+use Packetery\Cron\Tasks\UpdatePacketStatus;
 use Packetery\Cron\Tasks\PurgeLogs;
 use Packetery\Tools\ConfigHelper;
 
@@ -49,6 +50,9 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
             case DownloadCarriers::getTaskName():
                 $taskName = $this->module->l('Carrier list update', 'cron');
                 break;
+            case UpdatePacketStatus::getTaskName():
+                $taskName = $this->module->l('Packet tracking status update', 'cron');
+                break;
             default:
                 $taskName = $task;
         }
@@ -72,6 +76,10 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
                 break;
             case PurgeLogs::getTaskName():
                 $errors = (new PurgeLogs($this->module))->execute();
+                $this->renderErrors($errors);
+                break;
+            case UpdatePacketStatus::getTaskName():
+                $errors = (new UpdatePacketStatus($this->module))->execute();
                 $this->renderErrors($errors);
                 break;
             default:

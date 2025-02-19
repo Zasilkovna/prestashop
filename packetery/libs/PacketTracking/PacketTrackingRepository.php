@@ -2,7 +2,9 @@
 
 namespace Packetery\PacketTracking;
 
+use mysqli_result;
 use Packetery\Tools\DbTools;
+use PDOStatement;
 
 class PacketTrackingRepository {
 
@@ -70,6 +72,25 @@ class PacketTrackingRepository {
           KEY `id_order` (`id_order`),
           KEY `packet_id` (`packet_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+    }
+
+    /**
+     * @param int $orderId
+     * @return bool
+     */
+    public function delete($orderId) {
+        return $this->dbTools->delete(self::$tableName, '`id_order` = ' . (int)$orderId);
+    }
+
+    /**
+     * @param int $orderId
+     * @return array|bool|mysqli_result|PDOStatement|resource|null
+     */
+    public function getPacketStatusesByOrderId($orderId) {
+        $sql = 'SELECT `id`, `id_order`, `packet_id`, `event_datetime`, `status_code`, `status_text` 
+                FROM `' . $this->getPrefixedTableName() . '`
+                WHERE `id_order` = ' . (int)$orderId;
+        return $this->dbTools->getRows($sql);
     }
 
 }
