@@ -98,6 +98,9 @@ $_MODULE['<{packetery}prestashop>generatecroninfoblock_aaa32f0174f94c155fae17b93
 $_MODULE['<{packetery}prestashop>generatecroninfoblock_83da76284b32119b3e3833c8d8a74392'] = 'Aktualizace Zásilkovna dopravců';
 $_MODULE['<{packetery}prestashop>generatecroninfoblock_1c80df02fb6b1411d45df629245a9cd0'] = 'Odkaz na aktualizaci Zásilkovna dopravců pomocí CRON';
 $_MODULE['<{packetery}prestashop>generatecroninfoblock_ff7008e17044128984c90f92fef65368'] = 'Aktualizaci dopravců nelze využít. Nejprve nastavte heslo API.';
+$_MODULE['<{packetery}prestashop>generatecroninfoblock_4a65c9986d5bd7296b865722de481cfd'] = 'Sledování stavu zásilek';
+$_MODULE['<{packetery}prestashop>generatecroninfoblock_2dd680c046e2fdc36cfd8f2239689be7'] = 'Chcete-li automaticky pravidelně aktualizovat stavy zásilek, musíte tuto adresu URL zavolat prostřednictvím úloh CRON.';
+$_MODULE['<{packetery}prestashop>generatecroninfoblock_1c8bc5f9be7d2391527caba53f09b032'] = 'Nelze použít úlohu pro aktualizaci stavů zásilek. Nejprve nastavte heslo API.';
 $_MODULE['<{packetery}prestashop>newversionmessage_fd3510c1f57ee8be21bd3dcffe5041a0'] = 'K dispozici je nová verze modulu Zásilkovna: %newVersion% (aktuální verze: %currentVersion%).';
 $_MODULE['<{packetery}prestashop>newversionmessage_14875e5c41ab2e37ac073397510ba1bf'] = 'Stáhněte ji';
 $_MODULE['<{packetery}prestashop>newversionmessage_6c92285fa6d3e827b198d120ea3ac674'] = 'zde';
