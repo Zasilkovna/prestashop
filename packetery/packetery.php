@@ -266,9 +266,26 @@ class Packetery extends CarrierModule
             ));
         }
 
+        $error = false;
+        $isSubmit = false;
+        /** @var \Packetery\PacketTracking\PacketStatusTrackingFormService $packetStatusTracking */
+        $packetStatusTracking = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
+        if (Tools::isSubmit('packetStatusTrackingSubmit')) {
+            $isSubmit = true;
+            $packetStatusTrackingOptions = $packetStatusTracking->getConfigurationFormFields();
+            foreach ($packetStatusTrackingOptions as $fieldName => $fieldConfig) {
+                try {
+                    $packetStatusTracking->handleConfigOption($fieldName, $fieldConfig);
+                } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
+                    $output .= $this->displayError($formDataPersistException->getMessage());
+                    $error = true;
+                }
+            }
+        }
+
         if (Tools::isSubmit('submit' . $this->name)) {
+            $isSubmit = true;
             $confOptions = $this->getConfigurationOptions();
-            $error = false;
             /** @var \Packetery\Module\Options $packeteryOptions */
             $packeteryOptions = $this->diContainer->get(\Packetery\Module\Options::class);
             foreach ($confOptions as $option => $optionConf) {
@@ -293,10 +310,12 @@ class Packetery extends CarrierModule
                     }
                 }
             }
-            if (!$error) {
-                $output .= $this->displayConfirmation($this->l('Settings updated'));
-            }
         }
+
+        if ($isSubmit && !$error) {
+            $output .= $this->displayConfirmation($this->l('Settings updated'));
+        }
+
         $output .= $this->displayForm();
 
         return $output;
@@ -396,7 +415,26 @@ class Packetery extends CarrierModule
             }
         }
 
-        return $helper->generateForm([$form]) . $this->generateCronInfoBlock();
+        $packetStatusTracking = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
+        $packetStatusTrackingHelper = $packetStatusTracking->createPacketStatusTrackingHelperForm($this->name, $this->table);
+        $packetStatusTrackingConfig = $packetStatusTracking->getConfigurationFormFields();
+        $packetStatusTracking->fillPacketStatusTrackingHelperForm($packetStatusTrackingHelper, $packetStatusTrackingConfig);
+
+        $packetStatusTrackingForm = [
+            'form' => [
+                'legend' => [
+                    'title' => $this->l('Packet status tracking settings'),
+                ],
+                'input' => $packetStatusTrackingConfig,
+                'submit' => [
+                    'title' => $this->l('Save'),
+                    'class' => 'btn btn-default pull-right',
+                    'name' => 'packetStatusTrackingSubmit',
+                ],
+            ],
+        ];
+
+        return $helper->generateForm([$form]) . $packetStatusTrackingHelper->generateForm([$packetStatusTrackingForm]) . $this->generateCronInfoBlock() ;
     }
 
     /**
@@ -1624,4 +1662,5 @@ class Packetery extends CarrierModule
             return;
         }
     }
+
 }

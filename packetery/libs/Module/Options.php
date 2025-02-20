@@ -101,6 +101,16 @@ class Options
                     return false;
                 }
                 return $this->module->l('Please insert default packaging weight in kg', 'options');
+            case 'PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS':
+                if ($this->isNonNegative($value)) {
+                    return false;
+                }
+                return $this->module->l('Insert maximum number of orders that will be processed', 'options');
+            case 'PACKETERY_PACKET_STATUS_TRACKING_MAX_ORDER_AGE_DAYS':
+                if ($this->isNonNegative($value)) {
+                    return false;
+                }
+                return $this->module->l('Insert maximum order age in days', 'options');
             default:
                 return false;
         }
