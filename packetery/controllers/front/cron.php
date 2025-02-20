@@ -67,19 +67,23 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
         switch ($task) {
             case DeleteLabels::getTaskName():
-                $errors = (new DeleteLabels($this->module))->execute();
+                $deleteLabels = $this->module->diContainer->get(DeleteLabels::class);
+                $errors = $deleteLabels->execute();
                 $this->renderErrors($errors);
                 break;
             case DownloadCarriers::getTaskName():
-                $errors = (new DownloadCarriers($this->module))->execute();
+                $downloadCarriers = $this->module->diContainer->get(DownloadCarriers::class);
+                $errors = $downloadCarriers->execute();
                 $this->renderErrors($errors);
                 break;
             case PurgeLogs::getTaskName():
-                $errors = (new PurgeLogs($this->module))->execute();
+                $purgeLogs = $this->module->diContainer->get(PurgeLogs::class);
+                $errors = $purgeLogs->execute();
                 $this->renderErrors($errors);
                 break;
             case UpdatePacketStatus::getTaskName():
-                $errors = (new UpdatePacketStatus($this->module))->execute();
+                $updatePacketStatus = $this->module->diContainer->get(UpdatePacketStatus::class);
+                $errors = $updatePacketStatus->execute();
                 $this->renderErrors($errors);
                 break;
             default:

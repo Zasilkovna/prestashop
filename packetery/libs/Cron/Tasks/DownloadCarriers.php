@@ -15,14 +15,13 @@ class DownloadCarriers extends Base
     private $downloader;
 
     /**
-     * DownloadCarriers constructor.
      * @param Packetery $module
-     * @throws \ReflectionException
+     * @param Downloader $downloader
      */
-    public function __construct(Packetery $module)
+    public function __construct(Packetery $module, Downloader $downloader)
     {
         $this->module = $module;
-        $this->downloader = $this->module->diContainer->get(Downloader::class);
+        $this->downloader = $downloader;
     }
 
     /**

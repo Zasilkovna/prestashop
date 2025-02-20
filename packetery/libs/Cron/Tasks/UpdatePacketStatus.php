@@ -15,11 +15,12 @@ class UpdatePacketStatus extends Base
 
     /**
      * @param Packetery $module
+     * @param PacketTrackingCron $packetTrackingCron
      */
-    public function __construct(Packetery $module)
+    public function __construct(Packetery $module, PacketTrackingCron $packetTrackingCron)
     {
         $this->module = $module;
-        $this->packetTrackingCron = $this->module->diContainer->get(PacketTrackingCron::class);
+        $this->packetTrackingCron = $packetTrackingCron;
     }
 
     /**
