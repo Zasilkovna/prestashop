@@ -9,9 +9,6 @@ use Packetery\Module\Helper;
 use Packetery\Order\OrderRepository;
 use Packetery\Tools\ConfigHelper;
 
-/**
- * @package Packetery
- */
 class PacketTrackingCron
 {
     /** @var Packetery */
