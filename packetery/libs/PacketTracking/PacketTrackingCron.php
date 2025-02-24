@@ -4,6 +4,7 @@ namespace Packetery\PacketTracking;
 
 use DateTimeImmutable;
 use Packetery;
+use Packetery\Log\LogRepository;
 use Packetery\Module\SoapApi;
 use Packetery\Module\Helper;
 use Packetery\Order\OrderRepository;
@@ -27,25 +28,31 @@ class PacketTrackingCron
     /** @var PacketStatusComparator */
     private $packetStatusComparator;
 
+    /** @var LogRepository */
+    private $logRepository;
+
     /**
      * @param Packetery $module
      * @param OrderRepository $orderRepository
      * @param SoapApi $soapApi
      * @param PacketTrackingRepository $packetTrackingRepository
      * @param PacketStatusComparator $packetStatusComparator
+     * @param LogRepository $logRepository
      */
     public function __construct(
         Packetery $module,
         OrderRepository $orderRepository,
         SoapApi $soapApi,
         PacketTrackingRepository $packetTrackingRepository,
-        PacketStatusComparator $packetStatusComparator
+        PacketStatusComparator $packetStatusComparator,
+        LogRepository $logRepository
     ) {
         $this->module = $module;
         $this->orderRepository = $orderRepository;
         $this->soapApi = $soapApi;
         $this->packetTrackingRepository = $packetTrackingRepository;
         $this->packetStatusComparator = $packetStatusComparator;
+        $this->logRepository = $logRepository;
     }
 
     public function run()
@@ -85,7 +92,24 @@ class PacketTrackingCron
             if (!is_string($statusRecordsOrErrorMessage)) {
                 /** @var stdClass $statusRecords */
                 $statusRecords = $statusRecordsOrErrorMessage;
+
+                $this->logRepository->insertRow(
+                    LogRepository::ACTION_PACKET_TRACKING,
+                    [
+                        'response' => (array)$statusRecords,
+                    ],
+                    LogRepository::STATUS_SUCCESS,
+                    $order['id_order']
+                );
             } else {
+                $this->logRepository->insertRow(
+                    LogRepository::ACTION_PACKET_TRACKING,
+                    [
+                        'faultString' => $statusRecordsOrErrorMessage,
+                    ],
+                    LogRepository::STATUS_ERROR,
+                    $order['id_order']
+                );
                 continue;
             }
 

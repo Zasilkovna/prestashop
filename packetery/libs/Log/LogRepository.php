@@ -16,6 +16,7 @@ class LogRepository
     const ACTION_PACKET_SENDING = 'packet-sending';
     const ACTION_LABEL_PRINT = 'label-print';
     const ACTION_SENDER_VALIDATION = 'sender-validation';
+    const ACTION_PACKET_TRACKING = 'packet-tracking';
 
     /** @var DbTools */
     private $dbTools;
@@ -59,6 +60,7 @@ class LogRepository
             self::ACTION_LABEL_PRINT => $this->module->l('Label print', 'logrepository'),
             self::ACTION_SENDER_VALIDATION => $this->module->l('Sender validation', 'logrepository'),
             self::ACTION_PACKET_SENDING => $this->module->l('Packet sending', 'logrepository'),
+            self::ACTION_PACKET_TRACKING => $this->module->l('Packet tracking', 'logrepository'),
         ];
     }
 
