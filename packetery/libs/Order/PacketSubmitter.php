@@ -14,6 +14,7 @@ use Packetery\Tools\ConfigHelper;
 use PrestaShopDatabaseException;
 use PrestaShopException;
 use ReflectionException;
+use RuntimeException;
 use SoapClient;
 use SoapFault;
 use Tools;
@@ -127,8 +128,11 @@ class PacketSubmitter
     public function ordersExport(array $orderIds)
     {
         if (!$orderIds) {
-            echo $this->module->l('Please choose orders first.', 'packetsubmitter');
-            return false;
+            throw new AggregatedException(
+                [
+                    new RuntimeException($this->module->l('Please choose orders first.', 'packetsubmitter'))
+                ]
+            );
         }
 
         $errors = [];
@@ -150,7 +154,7 @@ class PacketSubmitter
                         $trackingNumbers[] = $trackingNumber;
                     }
                 } else {
-                    $errors[] = new \RuntimeException('error');
+                    $errors[] = new RuntimeException('error');
                 }
             } catch (ExportException $exportException) {
                 $errors[] = $exportException;
@@ -159,7 +163,7 @@ class PacketSubmitter
             }
         }
 
-        if ($errors !== []) {
+        if (is_array($errors) && $errors !== []) {
             throw new AggregatedException($errors);
         }
 
