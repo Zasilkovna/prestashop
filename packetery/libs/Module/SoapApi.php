@@ -186,4 +186,18 @@ class SoapApi
         return $exception->faultstring;
     }
 
+    /**
+     * @param string $packetId
+     * @return array|string
+     */
+    public function getPacketTracking($packetId)
+    {
+        $client = new SoapClient(self::WSDL_URL);
+        try {
+            $response = $client->packetTracking($this->configHelper->getApiPass(), $packetId);
+        } catch (SoapFault $exception) {
+            return $exception->faultstring;
+        }
+        return $response;
+    }
 }

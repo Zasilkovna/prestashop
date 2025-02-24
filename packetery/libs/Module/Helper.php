@@ -15,4 +15,17 @@ class Helper
         return sprintf(self::TRACKING_URL, rawurlencode($packetId));
     }
 
+    /**
+     * @param string $data
+     * @return mixed|null
+     */
+    public static function unserialize($data)
+    {
+        if (PHP_VERSION_ID >= 70000) {
+            return unserialize($data, ['allowed_classes' => false]);
+        }
+
+        return is_string($data) ? @unserialize($data) : null;
+    }
+
 }

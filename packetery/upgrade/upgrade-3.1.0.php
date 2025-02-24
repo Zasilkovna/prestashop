@@ -14,8 +14,11 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_3_1_0($module) {
     $sql = [];
 
+    /** @var PacketTrackingRepository $packetTrackingRepository */
     $packetTrackingRepository = $module->diContainer->get(PacketTrackingRepository::class);
-    $sql[] = $packetTrackingRepository->getCreateSql();
+    $sql[] = $packetTrackingRepository->getCreateTableSql();
+    $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
+        ADD `last_update_tracking_status` datetime NULL;';
 
     $dbTools = $module->diContainer->get(DbTools::class);
     $executeResult = $dbTools->executeQueries(

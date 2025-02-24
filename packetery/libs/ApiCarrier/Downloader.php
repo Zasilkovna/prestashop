@@ -11,11 +11,6 @@ use Packetery\Exceptions\DownloadException;
 use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
 
-/**
- * Class Downloader
- *
- * @package Packetery
- */
 class Downloader
 {
     const API_URL = 'https://www.zasilkovna.cz/api/v4/%s/branch.json?address-delivery';
