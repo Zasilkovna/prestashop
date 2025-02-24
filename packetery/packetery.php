@@ -476,7 +476,7 @@ class Packetery extends CarrierModule
                 'cron',
                 [
                     'token' => $token,
-                    'task' => 'UpdatePacketStatuses'
+                    'task' => 'UpdatePacketStatus'
                 ]
             );
             $this->context->smarty->assign('updatePacketStatusesUrl', $updatePacketStatusesUrl);

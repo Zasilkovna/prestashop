@@ -107,8 +107,8 @@ class PacketeryLogGridController extends ModuleAdminController
      */
     public function renderOrderId($value, array $row)
     {
-        if ($value === '0') {
-            return '-';
+        if ((int)$value === 0) {
+            return '';
         }
 
         return $this->getReferenceColumnValue($value, $row);

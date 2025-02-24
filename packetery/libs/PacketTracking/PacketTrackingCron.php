@@ -8,6 +8,7 @@ use Packetery\Module\SoapApi;
 use Packetery\Module\Helper;
 use Packetery\Order\OrderRepository;
 use Packetery\Tools\ConfigHelper;
+use stdClass;
 
 class PacketTrackingCron
 {
@@ -31,20 +32,20 @@ class PacketTrackingCron
      * @param OrderRepository $orderRepository
      * @param SoapApi $soapApi
      * @param PacketTrackingRepository $packetTrackingRepository
-     * @param PacketStatusComparator $packetStatusFacade
+     * @param PacketStatusComparator $packetStatusComparator
      */
     public function __construct(
         Packetery $module,
         OrderRepository $orderRepository,
         SoapApi $soapApi,
         PacketTrackingRepository $packetTrackingRepository,
-        PacketStatusComparator $packetStatusFacade
+        PacketStatusComparator $packetStatusComparator
     ) {
         $this->module = $module;
         $this->orderRepository = $orderRepository;
         $this->soapApi = $soapApi;
         $this->packetTrackingRepository = $packetTrackingRepository;
-        $this->packetStatusComparator = $packetStatusFacade;
+        $this->packetStatusComparator = $packetStatusComparator;
     }
 
     public function run()
@@ -59,14 +60,17 @@ class PacketTrackingCron
 
         $maxProcessedOrders = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS');
         $maxOrderAgeDays = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_MAX_ORDER_AGE_DAYS');
-        $configOrderStatuses = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATUSES');
+        $configOrderStatuses = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATES');
         $configPacketStatuses = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_PACKET_STATUSES');
 
         $orderStatuses = Helper::unserialize($configOrderStatuses);
         $packetStatuses = Helper::unserialize($configPacketStatuses);
 
         if (!is_array($orderStatuses)) {
-            $orderStatuses = [];
+            return [
+                'text' => $this->module->l('No order statuses configured for packet tracking', 'packetracking'),
+                'class' => 'danger',
+            ];
         }
         if (!is_array($packetStatuses)) {
             $packetStatuses = [];
@@ -79,6 +83,7 @@ class PacketTrackingCron
             $statusRecordsOrErrorMessage = $this->soapApi->getPacketTracking($order['tracking_number']);
 
             if (!is_string($statusRecordsOrErrorMessage)) {
+                /** @var stdClass $statusRecords */
                 $statusRecords = $statusRecordsOrErrorMessage;
             } else {
                 continue;
@@ -94,7 +99,7 @@ class PacketTrackingCron
                 $lastRecord = $statusRecords->record;
             }
 
-            if (!in_array($lastRecord->statusCode, $packetStatuses, true)) {
+            if (!in_array($lastRecord->statusCode, array_keys($packetStatuses, 'on', true), false)) {
                 continue;
             }
 
