@@ -985,6 +985,10 @@ class Packetery extends CarrierModule
             $this->context->smarty->assign('logLink', $this->getAdminLink('PacketeryLogGrid', ['id_order' => $orderId]));
         }
 
+        /** @var \Packetery\Order\OrderDetailView $orderDetailView */
+        $orderDetailView = $this->diContainer->get(\Packetery\Order\OrderDetailView::class);
+        $orderDetailView->addPacketStatus($this->context->smarty, $packeteryOrder);
+
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
