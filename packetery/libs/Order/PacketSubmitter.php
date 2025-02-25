@@ -85,19 +85,17 @@ class PacketSubmitter
         $trackingNumber = null;
         try {
             $trackingNumber = $this->createPacketSoap($packetAttributes);
-            if (is_string($trackingNumber) && Tools::strlen($trackingNumber) > 0) {
-                $this->logRepository->insertRow(
-                    LogRepository::ACTION_PACKET_SENDING,
-                    [
-                        'trackingNumber' => $trackingNumber,
-                        'packetAttributes' => $packetAttributes,
-                    ],
-                    LogRepository::STATUS_SUCCESS,
-                    $order->id
-                );
+            $this->logRepository->insertRow(
+                LogRepository::ACTION_PACKET_SENDING,
+                [
+                    'trackingNumber' => $trackingNumber,
+                    'packetAttributes' => $packetAttributes,
+                ],
+                LogRepository::STATUS_SUCCESS,
+                $order->id
+            );
 
-                return $trackingNumber;
-            }
+            return $trackingNumber;
         } catch (ApiClientException $apiClientException) {
             $this->logRepository->insertRow(
                 LogRepository::ACTION_PACKET_SENDING,
@@ -112,8 +110,6 @@ class PacketSubmitter
 
             throw $apiClientException;
         }
-
-        throw new ApiClientException('Tracking number not returned');
     }
 
     /**
@@ -148,13 +144,9 @@ class PacketSubmitter
             $order = new Order($orderId);
             try {
                 $trackingNumber = $this->createPacket($order);
-                if ($trackingNumber) {
-                    $trackingUpdate = $packeteryTracking->updateOrderTrackingNumber($orderId, $trackingNumber);
-                    if ($trackingUpdate) {
-                        $trackingNumbers[] = $trackingNumber;
-                    }
-                } else {
-                    $errors[] = new RuntimeException('error');
+                $trackingUpdate = $packeteryTracking->updateOrderTrackingNumber($orderId, $trackingNumber);
+                if ($trackingUpdate) {
+                    $trackingNumbers[] = $trackingNumber;
                 }
             } catch (ExportException $exportException) {
                 $errors[] = $exportException;
@@ -171,8 +163,8 @@ class PacketSubmitter
     }
 
     /**
-     * @param array $packetAttributes
-     * @return array
+     * @param array<string, string> $packetAttributes
+     * @return string
      * @throws ApiClientException
      */
     private function createPacketSoap(array $packetAttributes)
@@ -180,11 +172,11 @@ class PacketSubmitter
         $client = new SoapClient(SoapApi::WSDL_URL);
         try {
             $trackingNumber = $client->createPacket($this->configHelper->getApiPass(), $packetAttributes);
-            if ($trackingNumber->id) {
+            if (isset($trackingNumber->id) && is_string($trackingNumber->id) && Tools::strlen($trackingNumber->id) > 0) {
                 return $trackingNumber->id;
             }
 
-            throw new ApiClientException('Tracking number not returned');
+            throw new ApiClientException($this->module->l(sprintf('Tracking number not returned for order %s', $packetAttributes['number']), 'packetsubmitter'));
         } catch (SoapFault $e) {
             throw new ApiClientException($this->getErrorMessage($e));
         }
