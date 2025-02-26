@@ -2,6 +2,8 @@
 
 namespace Packetery\Log;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
@@ -14,6 +16,7 @@ class LogRepository
     const ACTION_PACKET_SENDING = 'packet-sending';
     const ACTION_LABEL_PRINT = 'label-print';
     const ACTION_SENDER_VALIDATION = 'sender-validation';
+    const ACTION_PACKET_TRACKING = 'packet-tracking';
 
     /** @var DbTools */
     private $dbTools;
@@ -24,9 +27,8 @@ class LogRepository
     public static $tableName = 'packetery_log';
 
     /**
-     * ProductRepository constructor.
-     *
      * @param DbTools $dbTools
+     * @param Packetery $module
      */
     public function __construct(DbTools $dbTools, Packetery $module)
     {
@@ -55,15 +57,16 @@ class LogRepository
     public function getActionTranslations()
     {
         return [
-            LogRepository::ACTION_LABEL_PRINT => $this->module->l('Packet sending', 'logrepository'),
-            LogRepository::ACTION_SENDER_VALIDATION => $this->module->l('Label print', 'logrepository'),
-            LogRepository::ACTION_PACKET_SENDING => $this->module->l('Sender validation', 'logrepository'),
+            self::ACTION_LABEL_PRINT => $this->module->l('Label print', 'logrepository'),
+            self::ACTION_SENDER_VALIDATION => $this->module->l('Sender validation', 'logrepository'),
+            self::ACTION_PACKET_SENDING => $this->module->l('Packet sending', 'logrepository'),
+            self::ACTION_PACKET_TRACKING => $this->module->l('Packet tracking', 'logrepository'),
         ];
     }
 
     /**
      * @param string $action
-     * @param array<mixed> $params
+     * @param array<string, mixed> $params
      * @param string $status
      * @param string|int|null $orderId
      * @return bool
@@ -78,7 +81,7 @@ class LogRepository
                 'params' => json_encode($params, JSON_UNESCAPED_UNICODE),
                 'status' => $status,
                 'action' => $action,
-                'date' => (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
+                'date' => (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
             ]
         );
     }
@@ -118,19 +121,19 @@ class LogRepository
     public function getCreateTableSql()
     {
         return 'CREATE TABLE ' . $this->getPrefixedTableName() . ' (
-			`id` int(11) NOT NULL AUTO_INCREMENT,
-			`order_id` int(10) NULL,
-			`params` text NOT NULL,
-			`status` varchar(20) NOT NULL DEFAULT \'\',
-			`action` varchar(45) NOT NULL DEFAULT \'\',
-			`date` datetime NOT NULL,
-			PRIMARY KEY  (`id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `order_id` int(10) NULL,
+            `params` text NOT NULL,
+            `status` varchar(20) NOT NULL DEFAULT \'\',
+            `action` varchar(45) NOT NULL DEFAULT \'\',
+            `date` datetime NOT NULL,
+            PRIMARY KEY  (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
     }
 
     /**
      * @param int $logExpirationDays
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws DatabaseException
      */
     public function purge($logExpirationDays)
     {

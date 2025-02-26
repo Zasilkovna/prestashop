@@ -410,16 +410,19 @@ class OrderRepository
         return (bool) $this->dbTools->getValue($sql);
     }
 
-
     /**
-     * @param int[] $orderStatuses
+     * @param array<int, 'on'|'false'> $orderStatuses
      * @param int $maxProcessedOrdersLimit
      * @param DateTimeImmutable $oldestOrderDate
      * @return array|bool|mysqli_result|PDOStatement|resource|null
      */
-    public function getOrdersByStateAndLastUpdate(array $orderStatuses, $maxProcessedOrdersLimit, $oldestOrderDate)
-    {
-        $implodedOrderStatuses = implode(',', $orderStatuses);
+    public function getOrdersByStateAndLastUpdate(
+        array $orderStatuses,
+        $maxProcessedOrdersLimit,
+        DateTimeImmutable $oldestOrderDate
+    ) {
+        $implodedOrderStatuses = implode(',', array_keys($orderStatuses, 'on', true));
+
         $sql = 'SELECT DISTINCT
             `po`.`id_order`,
             `po`.`last_update_tracking_status`,
@@ -436,6 +439,7 @@ class OrderRepository
             AND `po`.`exported` = 1
         ORDER BY `po`.`last_update_tracking_status` ASC
         LIMIT ' . (int) $maxProcessedOrdersLimit;
+
         return $this->dbTools->getRows($sql);
     }
 
