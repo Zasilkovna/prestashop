@@ -271,7 +271,10 @@ class Packetery extends CarrierModule
         /** @var \Packetery\Order\OrderStatusChangeFormService $orderStatusChangeFormService */
         $orderStatusChangeFormService = $this->diContainer->get(\Packetery\Order\OrderStatusChangeFormService::class);
         try {
-            $orderStatusChangeFormService->handleSubmit($isSubmit);
+            if (Tools::isSubmit($orderStatusChangeFormService->getSubmitActionKey())) {
+                $isSubmit = true;
+                $orderStatusChangeFormService->handleSubmit();
+            }
         } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
             $output .= $this->displayError($formDataPersistException->getMessage());
             $error = true;
@@ -280,7 +283,10 @@ class Packetery extends CarrierModule
         /** @var \Packetery\PacketTracking\PacketStatusTrackingFormService $packetStatusTrackingFormService */
         $packetStatusTrackingFormService = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
         try {
-            $packetStatusTrackingFormService->handleSubmit($isSubmit);
+            if (Tools::isSubmit($packetStatusTrackingFormService->getSubmitActionKey())) {
+                $isSubmit = true;
+                $packetStatusTrackingFormService->handleSubmit();
+            }
         } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
             $output .= $this->displayError($formDataPersistException->getMessage());
             $error = true;

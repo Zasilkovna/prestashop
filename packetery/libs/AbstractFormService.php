@@ -23,18 +23,13 @@ abstract class AbstractFormService
     }
 
     /**
-     * @param bool $isSubmit
      * @throws FormDataPersistException
      */
-    public function handleSubmit(&$isSubmit)
+    public function handleSubmit()
     {
-        if (Tools::isSubmit($this->getSubmitActionKey())) {
-            $isSubmit = true;
-
-            $packetStatusTrackingOptions = $this->getConfigurationFormFields();
-            foreach ($packetStatusTrackingOptions as $fieldName => $fieldConfig) {
-                $this->handleConfigOption($fieldName, $fieldConfig);
-            }
+        $formFields = $this->getConfigurationFormFields();
+        foreach ($formFields as $fieldName => $fieldConfig) {
+            $this->handleConfigOption($fieldName, $fieldConfig);
         }
     }
 
@@ -48,7 +43,7 @@ abstract class AbstractFormService
     {
         $configValue = $this->options->formatOption($option, $value);
         $errorMessage = $this->options->validate($option, $configValue);
-        if ($errorMessage !== false) {
+        if (is_string($errorMessage)) {
             throw new FormDataPersistException($errorMessage);
         }
 
