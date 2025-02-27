@@ -270,32 +270,20 @@ class Packetery extends CarrierModule
         $isSubmit = false;
         /** @var \Packetery\Order\OrderStatusChangeFormService $orderStatusChangeFormService */
         $orderStatusChangeFormService = $this->diContainer->get(\Packetery\Order\OrderStatusChangeFormService::class);
-        if (Tools::isSubmit('orderStatusChangeSubmit')) {
-            $isSubmit = true;
-            $packetStatusTrackingOptions = $orderStatusChangeFormService->getConfigurationFormFields();
-            foreach ($packetStatusTrackingOptions as $fieldName => $fieldConfig) {
-                try {
-                    $orderStatusChangeFormService->handleConfigOption($fieldName, $fieldConfig);
-                } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
-                    $output .= $this->displayError($formDataPersistException->getMessage());
-                    $error = true;
-                }
-            }
+        try {
+            $orderStatusChangeFormService->handleSubmit($isSubmit);
+        } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
+            $output .= $this->displayError($formDataPersistException->getMessage());
+            $error = true;
         }
 
-        /** @var \Packetery\PacketTracking\PacketStatusTrackingFormService $packetStatusTracking */
-        $packetStatusTracking = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
-        if (Tools::isSubmit('packetStatusTrackingSubmit')) {
-            $isSubmit = true;
-            $packetStatusTrackingOptions = $packetStatusTracking->getConfigurationFormFields();
-            foreach ($packetStatusTrackingOptions as $fieldName => $fieldConfig) {
-                try {
-                    $packetStatusTracking->handleConfigOption($fieldName, $fieldConfig);
-                } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
-                    $output .= $this->displayError($formDataPersistException->getMessage());
-                    $error = true;
-                }
-            }
+        /** @var \Packetery\PacketTracking\PacketStatusTrackingFormService $packetStatusTrackingFormService */
+        $packetStatusTrackingFormService = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
+        try {
+            $packetStatusTrackingFormService->handleSubmit($isSubmit);
+        } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
+            $output .= $this->displayError($formDataPersistException->getMessage());
+            $error = true;
         }
 
         if (Tools::isSubmit('submit' . $this->name)) {
@@ -430,47 +418,22 @@ class Packetery extends CarrierModule
             }
         }
 
-        $packetStatusTracking = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
-        $packetStatusTrackingHelper = $packetStatusTracking->createPacketStatusTrackingHelperForm($this->name, $this->table);
-        $packetStatusTrackingConfig = $packetStatusTracking->getConfigurationFormFields();
-        $packetStatusTracking->fillPacketStatusTrackingHelperForm($packetStatusTrackingHelper, $packetStatusTrackingConfig);
-
-        $packetStatusTrackingForm = [
-            'form' => [
-                'legend' => [
-                    'title' => $this->l('Packet status tracking settings'),
-                ],
-                'input' => $packetStatusTrackingConfig,
-                'submit' => [
-                    'title' => $this->l('Save'),
-                    'class' => 'btn btn-default pull-right',
-                    'name' => 'packetStatusTrackingSubmit',
-                ],
-            ],
-        ];
-
+        $packetStatusTrackingFormService = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
         $orderStatusChangeFormService = $this->diContainer->get(\Packetery\Order\OrderStatusChangeFormService::class);
-        $orderStatusChangeHelperForm = $orderStatusChangeFormService->createHelperForm($this->name, $this->table);
-        $orderStatusChangeFormConfig = $orderStatusChangeFormService->getConfigurationFormFields();
-        $orderStatusChangeFormService->fillPacketStatusTrackingHelperForm($orderStatusChangeHelperForm, $orderStatusChangeFormConfig);
-
-        $orderStatusChangeForm = [
-            'form' => [
-                'legend' => [
-                    'title' => $this->l('Order status change'),
-                ],
-                'input' => $orderStatusChangeFormConfig,
-                'submit' => [
-                    'title' => $this->l('Save'),
-                    'class' => 'btn btn-default pull-right',
-                    'name' => 'orderStatusChangeSubmit',
-                ],
-            ],
-        ];
 
         return $helper->generateForm([$form]) .
-            $packetStatusTrackingHelper->generateForm([$packetStatusTrackingForm]) .
-            $orderStatusChangeHelperForm->generateForm([$orderStatusChangeForm]) .
+            $packetStatusTrackingFormService->generateForm(
+                $this->name,
+                $this->table,
+                $this->l('Packet status tracking'),
+                $this->l('Save')
+            ) .
+            $orderStatusChangeFormService->generateForm(
+                $this->name,
+                $this->table,
+                $this->l('Order status change'),
+                $this->l('Save')
+            ) .
             $this->generateCronInfoBlock();
     }
 
