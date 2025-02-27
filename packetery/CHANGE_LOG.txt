@@ -31,6 +31,7 @@
        - Added: In the order detail it is now possible to set the dimensions of the shipment
        - Updated: New tracking URL address
        - Added: API logging
+       - Updated: packet is no longer validated separately
 2.1.20 - Fixed: front.js - compatibility with other plugins
        - Removed: validation of API password using API
 2.1.19 - Fixed: displaying the widget button and cart validation
