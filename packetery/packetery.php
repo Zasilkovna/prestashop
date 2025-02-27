@@ -268,6 +268,21 @@ class Packetery extends CarrierModule
 
         $error = false;
         $isSubmit = false;
+        /** @var \Packetery\Order\OrderStatusChangeFormService $orderStatusChangeFormService */
+        $orderStatusChangeFormService = $this->diContainer->get(\Packetery\Order\OrderStatusChangeFormService::class);
+        if (Tools::isSubmit('orderStatusChangeSubmit')) {
+            $isSubmit = true;
+            $packetStatusTrackingOptions = $orderStatusChangeFormService->getConfigurationFormFields();
+            foreach ($packetStatusTrackingOptions as $fieldName => $fieldConfig) {
+                try {
+                    $orderStatusChangeFormService->handleConfigOption($fieldName, $fieldConfig);
+                } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
+                    $output .= $this->displayError($formDataPersistException->getMessage());
+                    $error = true;
+                }
+            }
+        }
+
         /** @var \Packetery\PacketTracking\PacketStatusTrackingFormService $packetStatusTracking */
         $packetStatusTracking = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
         if (Tools::isSubmit('packetStatusTrackingSubmit')) {
@@ -434,7 +449,29 @@ class Packetery extends CarrierModule
             ],
         ];
 
-        return $helper->generateForm([$form]) . $packetStatusTrackingHelper->generateForm([$packetStatusTrackingForm]) . $this->generateCronInfoBlock() ;
+        $orderStatusChangeFormService = $this->diContainer->get(\Packetery\Order\OrderStatusChangeFormService::class);
+        $orderStatusChangeHelperForm = $orderStatusChangeFormService->createHelperForm($this->name, $this->table);
+        $orderStatusChangeFormConfig = $orderStatusChangeFormService->getConfigurationFormFields();
+        $orderStatusChangeFormService->fillPacketStatusTrackingHelperForm($orderStatusChangeHelperForm, $orderStatusChangeFormConfig);
+
+        $orderStatusChangeForm = [
+            'form' => [
+                'legend' => [
+                    'title' => $this->l('Order status change'),
+                ],
+                'input' => $orderStatusChangeFormConfig,
+                'submit' => [
+                    'title' => $this->l('Save'),
+                    'class' => 'btn btn-default pull-right',
+                    'name' => 'orderStatusChangeSubmit',
+                ],
+            ],
+        ];
+
+        return $helper->generateForm([$form]) .
+            $packetStatusTrackingHelper->generateForm([$packetStatusTrackingForm]) .
+            $orderStatusChangeHelperForm->generateForm([$orderStatusChangeForm]) .
+            $this->generateCronInfoBlock();
     }
 
     /**
