@@ -2,35 +2,32 @@
 
 namespace Packetery\PacketTracking;
 
-use AdminController;
-use Configuration;
-use Context;
-use HelperForm;
-use OrderState;
 use Packetery;
-use Packetery\Exceptions\FormDataPersistException;
+use Packetery\AbstractFormService;
 use Packetery\Module\Options;
-use Packetery\Tools\ConfigHelper;
-use Tools;
 
-class PacketStatusTrackingFormService
+class PacketStatusTrackingFormService extends AbstractFormService
 {
+    const SUBMIT_ACTION_KEY = 'submitPacketStatusTrackingSubmit';
+
     /** @var Packetery */
     private $module;
 
     /** @var PacketStatusMapper */
     private $packetStatusMapper;
 
-    /** @var Options */
-    private $options;
-
-    /**
-     * @param Packetery $module
-     */
     public function __construct(Packetery $module, PacketStatusMapper $packetStatusMapper, Options $options) {
+        parent::__construct($options);
         $this->module = $module;
         $this->packetStatusMapper = $packetStatusMapper;
-        $this->options = $options;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubmitActionKey()
+    {
+        return self::SUBMIT_ACTION_KEY;
     }
 
     /**
@@ -100,125 +97,5 @@ class PacketStatusTrackingFormService
                 ]
             ],
         ];
-    }
-
-    /**
-     * @param string $fieldName
-     * @param string $checkboxItemId
-     * @return string
-     */
-    private function getCheckboxKeyName($fieldName, $checkboxItemId)
-    {
-        return $fieldName . '_' . $checkboxItemId;
-    }
-
-    /**
-     * @param string $option
-     * @param string $value
-     * @return void
-     * @throws FormDataPersistException
-     */
-    private function persistFormData($option, $value)
-    {
-        $configValue = $this->options->formatOption($option, $value);
-        $errorMessage = $this->options->validate($option, $configValue);
-        if ($errorMessage !== false) {
-            throw new FormDataPersistException($errorMessage);
-        }
-
-        ConfigHelper::update($option, $configValue);
-    }
-
-    /**
-     * @param string $option
-     * @param array $optionConf
-     * @return void
-     * @throws FormDataPersistException
-     */
-    public function handleConfigOption($option, array $optionConf)
-    {
-        if ($optionConf['type'] === 'checkbox') {
-            $values = [];
-            foreach ($optionConf['values']['query'] as $checkboxItem) {
-                $value = Tools::getValue($this->getCheckboxKeyName($option, $checkboxItem['id']));
-                $values[$checkboxItem['id']] = $value;
-            }
-            $this->persistFormData($option, serialize($values));
-        } else {
-            $value = Tools::getValue($option);
-            $this->persistFormData($option, $value);
-        }
-    }
-
-    /**
-     * @return array<array<string, string>>
-     */
-    private function getOrderStates()
-    {
-        $orderStates = OrderState::getOrderStates((int)Context::getContext()->language->id);
-
-        $orderStatuses = [];
-
-        foreach ($orderStates as $orderState) {
-            $orderStatuses[] = [
-                'id' => $orderState['id_order_state'],
-                'name' => $orderState['name'],
-            ];
-        }
-
-        return $orderStatuses;
-    }
-
-    /**
-     * @param string $name
-     * @param string $table
-     * @return \HelperForm
-     */
-    public function createPacketStatusTrackingHelperForm($name, $table)
-    {
-        $packetStatusTrackingHelper = new HelperForm();
-        $packetStatusTrackingHelper->table = $table;
-        $packetStatusTrackingHelper->name_controller = $name;
-        $packetStatusTrackingHelper->token = Tools::getAdminTokenLite('AdminModules');
-        $packetStatusTrackingHelper->currentIndex = AdminController::$currentIndex . '&' . http_build_query(['configure' => $name]);
-        $packetStatusTrackingHelper->submit_action = 'submitPacketStatusTracking' . $name;
-        $packetStatusTrackingHelper->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
-
-        return $packetStatusTrackingHelper;
-    }
-
-    public function fillPacketStatusTrackingHelperForm(HelperForm $packetStatusTrackingHelper, array $packetStatusTrackingConfig)
-    {
-        $packeterySettings = ConfigHelper::getMultiple(
-            array_keys($packetStatusTrackingConfig)
-        );
-
-        foreach ($packetStatusTrackingConfig as $itemKey => $itemConfiguration) {
-
-            if ($itemConfiguration['type'] === 'checkbox') {
-                $persistedValue = $packeterySettings[$itemKey];
-                if ($persistedValue === false) {
-                    $persistedValue = serialize([]);
-                }
-
-                $value = Tools::getValue($itemKey, $persistedValue);
-                $rawValues = unserialize($value);
-
-                foreach ($itemConfiguration['values']['query'] as $checkboxItem) {
-                    if (isset($rawValues[$checkboxItem['id']])) {
-                        $packetStatusTrackingHelper->fields_value[$this->getCheckboxKeyName($itemKey, $checkboxItem['id'])] = $rawValues[$checkboxItem['id']];
-                    }
-                }
-            } else {
-                $defaultValue = null;
-                if (isset($packeterySettings[$itemKey]) && $packeterySettings[$itemKey] !== false) {
-                    $defaultValue = $packeterySettings[$itemKey];
-                } elseif (isset($itemConfiguration['defaultValue'])) {
-                    $defaultValue = $itemConfiguration['defaultValue'];
-                }
-
-                $packetStatusTrackingHelper->fields_value[$itemKey] = Tools::getValue($itemKey, $defaultValue);;
-            }
-        }
     }
 }
