@@ -188,5 +188,8 @@ abstract class AbstractFormService
         return $orderStatuses;
     }
 
+    /**
+     * @return string
+     */
     abstract public function getSubmitActionKey();
 }

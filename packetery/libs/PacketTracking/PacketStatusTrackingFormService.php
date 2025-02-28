@@ -22,6 +22,9 @@ class PacketStatusTrackingFormService extends AbstractFormService
         $this->packetStatusMapper = $packetStatusMapper;
     }
 
+    /**
+     * @return string
+     */
     public function getSubmitActionKey()
     {
         return self::SUBMIT_ACTION_KEY;
