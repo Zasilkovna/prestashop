@@ -8,6 +8,8 @@ use Packetery\Module\Options;
 
 class PacketStatusTrackingFormService extends AbstractFormService
 {
+    const SUBMIT_ACTION_KEY = 'submitPacketStatusTrackingSubmit';
+
     /** @var Packetery */
     private $module;
 
@@ -22,7 +24,7 @@ class PacketStatusTrackingFormService extends AbstractFormService
 
     public function getSubmitActionKey()
     {
-        return 'submitPacketStatusTrackingSubmit';
+        return self::SUBMIT_ACTION_KEY;
     }
 
     /**

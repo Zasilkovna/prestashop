@@ -9,6 +9,8 @@ use Packetery\PacketTracking\PacketStatusMapper;
 
 class OrderStatusChangeFormService extends AbstractFormService
 {
+    const SUBMIT_ACTION_KEY = 'submitOrderStatusChangeSubmit';
+
     /** @var Packetery */
     private $module;
 
@@ -23,7 +25,7 @@ class OrderStatusChangeFormService extends AbstractFormService
 
     public function getSubmitActionKey()
     {
-        return 'submitOrderStatusChangeSubmit';
+        return self::SUBMIT_ACTION_KEY;
     }
 
     /**
