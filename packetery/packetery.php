@@ -27,8 +27,6 @@
  * Do not use "use" PHP keyword. PS 1.6 can not load main plugin files with the keyword in them.
  */
 
-use Packetery\Log\LogRepository;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -987,7 +985,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
         $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider);
 
-        if($this->diContainer->get(LogRepository::class)->hasAnyByOrderId($orderId)) {
+        if($this->diContainer->get(\Packetery\Log\LogRepository::class)->hasAnyByOrderId($orderId)) {
             $this->context->smarty->assign('logLink', $this->getAdminLink('PacketeryLogGrid', ['id_order' => $orderId]));
         }
 
@@ -1502,35 +1500,35 @@ class Packetery extends CarrierModule
     private function processPostParcel(array &$messages)
     {
         if (
-            Tools::isSubmit('process_post_parcel') &&
-            Tools::getIsset('order_id')
+            !Tools::isSubmit('process_post_parcel') ||
+            !Tools::getIsset('order_id')
         ) {
-            $orderIds = [Tools::getValue('order_id')];
-            /** @var Packetery\Order\PacketSubmitter $packetSubmitter */
-            $packetSubmitter = $this->diContainer->get(Packetery\Order\PacketSubmitter::class);
-            $exportResult = $packetSubmitter->ordersExport($orderIds);
-            if (is_array($exportResult)) {
-                foreach ($exportResult as $resultRow) {
-                    if (!$resultRow[0]) {
-                        $messages[] = [
-                            'text' => $resultRow[1],
-                            'class' => 'danger',
-                        ];
-                    } elseif ($resultRow[0]) {
-                        /** @var Packetery\Order\Tracking $packeteryTracking */
-                        $packeteryTracking = $this->diContainer->get(Packetery\Order\Tracking::class);
+            return;
+        }
 
-                        $smarty = new \Smarty();
-                        $smarty->assign('trackingNumber', $resultRow[1]);
-                        $smarty->assign('trackingUrl', \Packetery\Module\Helper::getTrackingUrl($resultRow[1]));
-                        $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
+        $orderIds = [Tools::getValue('order_id')];
+        /** @var Packetery\Order\PacketSubmitter $packetSubmitter */
+        $packetSubmitter = $this->diContainer->get(Packetery\Order\PacketSubmitter::class);
 
-                        $messages[] = [
-                            'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryTrackingLink,
-                            'class' => 'success',
-                        ];
-                    }
-                }
+        try {
+            $trackingNumbers = $packetSubmitter->ordersExport($orderIds);
+            foreach ($trackingNumbers as $trackingNumber) {
+                $smarty = new \Smarty();
+                $smarty->assign('trackingNumber', $trackingNumber);
+                $smarty->assign('trackingUrl', \Packetery\Module\Helper::getTrackingUrl($trackingNumber));
+                $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
+
+                $messages[] = [
+                    'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryTrackingLink,
+                    'class' => 'success',
+                ];
+            }
+        } catch (Packetery\Exceptions\AggregatedException $aggregatedException) {
+            foreach ($aggregatedException->getExceptions() as $exception) {
+                $messages[] = [
+                    'text' => $exception->getMessage(),
+                    'class' => 'danger',
+                ];
             }
         }
     }
