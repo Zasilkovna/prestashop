@@ -91,11 +91,32 @@ class PacketStatusTrackingFormService extends AbstractFormService
                 'name' => 'PACKETERY_PACKET_STATUS_TRACKING_PACKET_STATUSES',
                 'multiple' => true,
                 'values' => [
-                    'query' => $this->packetStatusMapper->getPacketStatusChoices(),
+                    'query' => $this->getPacketStatusChoices(),
                     'id' => 'id',
                     'name' => 'name'
                 ]
             ],
         ];
     }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    private function getPacketStatusChoices() {
+        $result = [];
+
+        foreach ($this->packetStatusMapper->getPacketStatuses() as $packetStatusId => $packetStatus) {
+            if ($packetStatus['isFinal'] === true) {
+                continue;
+            }
+
+            $result[] = [
+                'id' => $packetStatusId,
+                'name' => $packetStatus['translated'],
+            ];
+        }
+
+        return $result;
+    }
+
 }
