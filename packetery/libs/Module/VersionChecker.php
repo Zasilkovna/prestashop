@@ -49,6 +49,7 @@ class VersionChecker
             $response = $this->getLatestReleaseResponse();
         } catch (Exception $exception) {
             PrestaShopLogger::addLog('Packetery: ' . $exception->getMessage(), 3, null, null, null, true);
+            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK, time());
 
             return;
         }
