@@ -1242,9 +1242,9 @@ class Packetery extends CarrierModule
         $this->context->controller->addCSS($this->_path . 'views/css/back.css' . $suffix, 'all', null, false);
         $this->context->controller->addJS($this->_path . 'views/js/back.js' . $suffix);
 
-        /** @var \Packetery\Features\FeaturesManager $featuresManager */
-        $featuresManager = $this->diContainer->get(\Packetery\Features\FeaturesManager::class);
-        $featuresManager->checkForUpdate();
+        /** @var \Packetery\Module\VersionChecker $versionChecker */
+        $versionChecker = $this->diContainer->get(\Packetery\Module\VersionChecker::class);
+        $versionChecker->checkForUpdate();
     }
 
     /**
