@@ -7,13 +7,15 @@ use Packetery\Exceptions\ApiClientException;
 use Packetery\Module\ApiClientFacade;
 use Packetery\Module\VersionChecker;
 use Packetery\Response\FeaturesResponse;
+use Packetery\Response\LatestReleaseResponse;
 use Packetery\Tools\ConfigHelper;
+use Packetery\Tools\JsonStructureValidator;
 use PrestaShopLogger;
 
 class FeaturesManager
 {
     const FEATURES_API_URL = 'https://pes-features-prod-pes.prod.packeta-com.codenow.com/v1/ps';
-    const CHECK_INTERVAL = 3600; // 1 hour
+    const CHECK_INTERVAL = 24 * 3600; // 1 day
 
     /** @var ApiClientFacade */
     private $client;
@@ -24,16 +26,25 @@ class FeaturesManager
     /** @var VersionChecker */
     private $versionChecker;
 
+    /** @var JsonStructureValidator */
+    private $jsonStructureValidator;
+
     /**
      * @param ApiClientFacade $client
      * @param ConfigHelper $configHelper
      * @param VersionChecker $versionChecker
      */
-    public function __construct(ApiClientFacade $client, ConfigHelper $configHelper, VersionChecker $versionChecker)
+    public function __construct(
+        ApiClientFacade $client,
+        ConfigHelper $configHelper,
+        VersionChecker $versionChecker,
+        JsonStructureValidator $jsonStructureValidator
+    )
     {
         $this->client = $client;
         $this->configHelper = $configHelper;
         $this->versionChecker = $versionChecker;
+        $this->jsonStructureValidator = $jsonStructureValidator;
     }
 
     /**
@@ -47,8 +58,6 @@ class FeaturesManager
     }
 
     /**
-     * The method is temporarily disabled due to Packeta endpoint instability.
-     *
      * @return void
      */
     public function checkForUpdate()
@@ -58,17 +67,17 @@ class FeaturesManager
         }
 
         try {
-            $response = $this->getResponse();
+            $response = $this->getLatestReleaseResponse();
         } catch (Exception $e) {
             PrestaShopLogger::addLog('Packetery: ' . $e->getMessage(), 3, null, null, null, true);
 
             return;
         }
 
-        $latestVersion = $response->getPluginVersion();
-        $downloadUrl = $response->getPluginDownloadUrl();
-        if ($latestVersion && $downloadUrl && $this->versionChecker->isNewVersionAvailable($latestVersion)) {
-            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $latestVersion);
+        $version = $response->getVersion();
+        $downloadUrl = $response->getDownloadUrl();
+        if ($version && $downloadUrl && $this->versionChecker->isNewVersionAvailable($version)) {
+            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $version);
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, $downloadUrl);
         }
 
@@ -104,4 +113,42 @@ class FeaturesManager
         return FeaturesResponse::createFromJson($json);
     }
 
+    /**
+     * @return LatestReleaseResponse
+     * @throws ApiClientException
+     */
+    public function getLatestReleaseResponse()
+    {
+        $json = $this->client->get('https://api.github.com/repos/Zasilkovna/prestashop/releases/latest');
+        if (!$json) {
+            throw new ApiClientException('Empty response from GitHub latest releases endpoint.');
+        }
+
+        $data = json_decode($json, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            PrestaShopLogger::addLog('Packetery: ' . json_last_error_msg(), 3, null, null, null, true);
+            throw new ApiClientException('Invalid response from GitHub latest releases endpoint.');
+        }
+
+        $isStructureValid = $this->jsonStructureValidator->isStructureValid(
+            $data,
+            [
+                'tag_name' => 'string',
+                'assets' => [
+                    0 => [
+                        'browser_download_url' => 'string',
+                    ],
+                ],
+            ]
+        );
+
+        if (!$isStructureValid) {
+            throw new ApiClientException('Invalid response structure from GitHub latest releases endpoint.');
+        }
+
+        return new LatestReleaseResponse(
+            ltrim($data['tag_name'], 'v'),
+            $data['assets'][0]['browser_download_url']
+        );
+    }
 }
