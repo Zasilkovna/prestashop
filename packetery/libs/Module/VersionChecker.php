@@ -15,7 +15,7 @@ use Tools;
 
 class VersionChecker
 {
-    const CHECK_INTERVAL = 24 * 3600; // 1 day
+    const CHECK_INTERVAL_IN_SECONDS = 24 * 3600; // 1 day
     const LATEST_RELEASES_ENDPOINT_URL = 'https://api.github.com/repos/Zasilkovna/prestashop/releases/latest';
 
     /** @var Packetery */
@@ -50,7 +50,7 @@ class VersionChecker
             $response = $this->getLatestReleaseResponse();
         } catch (Exception $exception) {
             PrestaShopLogger::addLog('Packetery: ' . $exception->getMessage(), 3, null, null, null, true);
-            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK, time());
+            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time());
 
             return;
         }
@@ -62,7 +62,7 @@ class VersionChecker
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, $downloadUrl);
         }
 
-        ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK, time());
+        ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time());
     }
 
     /**
@@ -73,14 +73,14 @@ class VersionChecker
     private function getLatestReleaseResponse()
     {
         $json = $this->apiClientFacade->get(self::LATEST_RELEASES_ENDPOINT_URL);
-        if (!$json) {
-            throw new VersionCheckerException('Empty response from GitHub latest releases endpoint.');
+        if ($json === '' || $json === false) {
+            throw new VersionCheckerException('Failed to retrieve response from GitHub latest releases endpoint.');
         }
 
         $data = json_decode($json, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            PrestaShopLogger::addLog('Packetery: ' . json_last_error_msg(), 3, null, null, null, true);
-            throw new VersionCheckerException('Invalid response from GitHub latest releases endpoint.');
+            PrestaShopLogger::addLog('Packetery: JSON decode error: ' . json_last_error_msg(), 3, null, null, null, true);
+            throw VersionCheckerException::createForInvalidLatestReleaseResponse();
         }
 
         $isStructureValid = $this->jsonStructureValidator->isStructureValid(
@@ -96,7 +96,7 @@ class VersionChecker
         );
 
         if (!$isStructureValid) {
-            throw new VersionCheckerException('Invalid response structure from GitHub latest releases endpoint.');
+            throw VersionCheckerException::createForInvalidLatestReleaseResponse();
         }
 
         return new LatestReleaseResponse(
@@ -110,12 +110,12 @@ class VersionChecker
      */
     private function shouldCheckApi()
     {
-        $lastCheck = ConfigHelper::get(ConfigHelper::KEY_LAST_VERSION_CHECK);
+        $lastCheck = ConfigHelper::get(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP);
         if ($lastCheck === false) {
             return true;
         }
 
-        return (time() - (int)$lastCheck) > self::CHECK_INTERVAL;
+        return (time() - (int)$lastCheck) > self::CHECK_INTERVAL_IN_SECONDS;
     }
 
     /**
