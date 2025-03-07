@@ -293,6 +293,10 @@ PacketaModule.ui = {
                 widgetOptions.country = country;
             }
 
+            if (PacketaModule.config.isAgeVerificationRequired) {
+                widgetOptions.livePickupPoint = true;
+            }
+
             Packeta.Widget.pick(PacketaModule.config.apiKey, function (pickupPoint) {
                 if (pickupPoint == null) {
                     return;

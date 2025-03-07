@@ -779,6 +779,18 @@ class Packetery extends CarrierModule
         $isPS16 = strpos(_PS_VERSION_, '1.6') === 0;
         $isOpcEnabled = (bool) Configuration::get('PS_ORDER_PROCESS_TYPE');
 
+        $products = $cart->getProducts();
+        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+
+        $isAgeVerificationRequired = false;
+        foreach ($products as $product) {
+            $productAttributes = $productAttributeRepository->findByProductId($product['id_product']);
+            if ($productAttributes !== null) {
+                $isAgeVerificationRequired = $productAttributes->isForAdults();
+                break;
+            }
+        }
+
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $this->context->smarty->assign('packetaModuleConfig', [
@@ -807,6 +819,7 @@ class Packetery extends CarrierModule
             'addressValidatedMessage' => $this->l('Address is valid.'),
             'addressNotValidatedMessage' => $this->l('Address is not valid.'),
             'countryDiffersMessage' => $this->l('The selected delivery address is in a country other than the country of delivery of the order.'),
+            'isAgeVerificationRequired' => $isAgeVerificationRequired,
         ]);
 
         $this->context->smarty->assign('mustSelectPointText', $this->l('Please select pickup point'));
@@ -1600,16 +1613,16 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $isAdult = null;
+        $isAgeVerificationRequired = null;
         /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
         $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
-        $packeteryAgeVerification = $productAttributeRepository->getRow($product->id);
-        if (is_array($packeteryAgeVerification)) {
-            $isAdult = $packeteryAgeVerification['is_adult'];
+        $productAttributes = $productAttributeRepository->findByProductId($product->id);
+        if ($productAttributes !== null) {
+            $isAgeVerificationRequired = $productAttributes->isForAdults();
         }
 
         $this->context->smarty->assign([
-            'packeteryAgeVerification' => $isAdult,
+            'packeteryAgeVerification' => $isAgeVerificationRequired,
             'adminProductUrl' => $this->getAdminLink('AdminProducts'),
             'isPrestaShop16' => $isPrestaShop16,
         ]);
