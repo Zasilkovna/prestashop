@@ -16,23 +16,24 @@ use Tools;
 class VersionChecker
 {
     const CHECK_INTERVAL = 24 * 3600; // 1 day
+    const LATEST_RELEASES_ENDPOINT_URL = 'https://api.github.com/repos/Zasilkovna/prestashop/releases/latest';
 
     /** @var Packetery */
     private $module;
 
     /** @var ApiClientFacade */
-    private $client;
+    private $apiClientFacade;
 
     /** @var JsonStructureValidator */
     private $jsonStructureValidator;
 
     public function __construct(
         Packetery $module,
-        ApiClientFacade $client,
+        ApiClientFacade $apiClientFacade,
         JsonStructureValidator $jsonStructureValidator
     ) {
         $this->module = $module;
-        $this->client = $client;
+        $this->apiClientFacade = $apiClientFacade;
         $this->jsonStructureValidator = $jsonStructureValidator;
     }
 
@@ -56,7 +57,7 @@ class VersionChecker
 
         $version = $response->getVersion();
         $downloadUrl = $response->getDownloadUrl();
-        if ($version && $downloadUrl && $this->isNewVersionAvailable($version)) {
+        if ($version !== '' && $downloadUrl !== '' && $this->isNewVersionAvailable($version)) {
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $version);
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, $downloadUrl);
         }
@@ -71,7 +72,7 @@ class VersionChecker
      */
     private function getLatestReleaseResponse()
     {
-        $json = $this->client->get('https://api.github.com/repos/Zasilkovna/prestashop/releases/latest');
+        $json = $this->apiClientFacade->get(self::LATEST_RELEASES_ENDPOINT_URL);
         if (!$json) {
             throw new VersionCheckerException('Empty response from GitHub latest releases endpoint.');
         }
