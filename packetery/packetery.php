@@ -784,9 +784,9 @@ class Packetery extends CarrierModule
 
         $isAgeVerificationRequired = false;
         foreach ($products as $product) {
-            $productAttributes = $productAttributeRepository->getRow($product['id_product']);
-            if (is_array($productAttributes) && $productAttributes['is_adult']) {
-                $isAgeVerificationRequired = true;
+            $productAttributes = $productAttributeRepository->findByProductId($product['id_product']);
+            if ($productAttributes !== null) {
+                $isAgeVerificationRequired = $productAttributes->forAdultsOnly();
                 break;
             }
         }
@@ -1609,16 +1609,16 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $isAdult = null;
+        $isAgeVerificationRequired = null;
         /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
         $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
-        $packeteryAgeVerification = $productAttributeRepository->getRow($product->id);
-        if (is_array($packeteryAgeVerification)) {
-            $isAdult = $packeteryAgeVerification['is_adult'];
+        $productAttributes = $productAttributeRepository->findByProductId($product->id);
+        if ($productAttributes !== null) {
+            $isAgeVerificationRequired = $productAttributes->forAdultsOnly();
         }
 
         $this->context->smarty->assign([
-            'packeteryAgeVerification' => $isAdult,
+            'packeteryAgeVerification' => $isAgeVerificationRequired,
             'adminProductUrl' => $this->getAdminLink('AdminProducts'),
             'isPrestaShop16' => $isPrestaShop16,
         ]);
