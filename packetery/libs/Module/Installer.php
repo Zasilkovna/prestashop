@@ -227,7 +227,7 @@ class Installer
             ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0) &&
             ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_WEIGHT', 0) &&
             ConfigHelper::update('PACKETERY_DEFAULT_PACKAGING_WEIGHT', 0) &&
-            ConfigHelper::update(ConfigHelper::KEY_LAST_FEATURE_CHECK, (string) time()) &&
+            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time()) &&
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $this->module->version) &&
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, '') &&
             ConfigHelper::update(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION, 0)
