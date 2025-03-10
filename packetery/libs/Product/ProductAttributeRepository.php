@@ -23,6 +23,20 @@ class ProductAttributeRepository
     }
 
     /**
+     * @param int $productId
+     * @return ProductAttributes|null
+     */
+    public function findByProductId($productId)
+    {
+        $productAttributesRow = $this->getRow($productId);
+        if ($productAttributesRow === false) {
+            return null;
+        }
+
+        return ProductAttributes::fromDbRow($productAttributesRow);
+    }
+
+    /**
      * @param int $idProduct
      * @return array|false
      * @throws DatabaseException
