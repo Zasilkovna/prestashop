@@ -1,0 +1,15 @@
+parameters:
+	phpVersion:
+		min: 70100
+		max: 80400
+	fileExtensions:
+		- php
+	level: 1
+	paths:
+		- controllers
+		- labels
+		- libs
+		- upgrade
+		- packetery.php
+	scanDirectories:
+		- vendor/stancer/php-stubs-prestashop/stubs/
