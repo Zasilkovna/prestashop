@@ -124,9 +124,7 @@ $_MODULE['<{packetery}prestashop>downloader_a2b5e89ee86d19550fccf24d694324ee'] =
 $_MODULE['<{packetery}prestashop>downloader_8e64f4816d0026c2ac24d8e0f0e62de0'] = 'Dopravci byli aktualizováni.';
 $_MODULE['<{packetery}prestashop>apicarrierrepository_0ace50d3fdc56a8b3ecf3532baa0990c'] = 'Výdejní místa Zásilkovny';
 $_MODULE['<{packetery}prestashop>apicarrierrepository_85ad5aeec9dfb9e0650de5fbfecd88da'] = 'Všechna výdejní místa (Zásilkovna + dopravci)';
-$_MODULE['<{packetery}prestashop>packetsubmitter_8edcab87afe80d94a87d88f19b6e814a'] = 'Vytvoření zásilky';
 $_MODULE['<{packetery}prestashop>packetsubmitter_5552dc553d496d4b06866ca45b890b4a'] = 'Vyberte prosím nejdříve objednávky.';
-$_MODULE['<{packetery}prestashop>labels_9b5a794d0ef94bb3615638beed3eb2a0'] = 'Tisk štítku';
 $_MODULE['<{packetery}prestashop>orderexporter_4988c308d36d231707ae7e2d1e8d06b2'] = 'Nepodařilo se načíst údaje potřebné pro exportování objednávky';
 $_MODULE['<{packetery}prestashop>orderexporter_4187014f98a93a8339a9ea26cf78f132'] = 'Nepodařilo se nalézt měnu výdejního místa, objednávka';
 $_MODULE['<{packetery}prestashop>orderexporter_e633b4eefe327cee3b6ce2a2966fe96a'] = 'Nelze najít směnný kurz v nastavení měn PrestaShopu pro cílovou zemi objednávky';
@@ -141,7 +139,6 @@ $_MODULE['<{packetery}prestashop>orderdetailsupdater_51ff9c28b4174618d5ac7ffbeb1
 $_MODULE['<{packetery}prestashop>soapapi_d71e2835dd2dece42d55e29929bf006c'] = 'Použité API heslo není platné.';
 $_MODULE['<{packetery}prestashop>uninstaller_e21a827831f90240feccbb1f8fd8c7e3'] = 'Při odinstalování modulu Zásilkovny nastala výjimka:';
 $_MODULE['<{packetery}prestashop>options_ac4ea9d06af52e534143ed2979c50841'] = 'API heslo musí mít 32 znaků.';
-$_MODULE['<{packetery}prestashop>options_4b2baa07493024b4198132c260b9bbe9'] = 'Ověření odesílatele';
 $_MODULE['<{packetery}prestashop>options_d2cfd13754957b947b1fb129f7f00c4b'] = 'Zadané označení odesílatele neexistuje.';
 $_MODULE['<{packetery}prestashop>options_1e55c11920d6ebc07255263ae03d4974'] = 'Ověření označení odesílatele selhalo';
 $_MODULE['<{packetery}prestashop>options_13c2b3c8f8fcb16a73d7b6848a42c37b'] = 'Vložte prosím výchozí cenu zásilky';
@@ -187,9 +184,6 @@ $_MODULE['<{packetery}prestashop>packeteryloggridcontroller_902b0d55fddef6f8d651
 $_MODULE['<{packetery}prestashop>packeteryloggridcontroller_d79cf3f429596f77db95c65074663a54'] = 'ID objednávky';
 $_MODULE['<{packetery}prestashop>packeteryloggridcontroller_44749712dbec183e983dcd78a7736c41'] = 'Datum';
 $_MODULE['<{packetery}prestashop>packeteryloggridcontroller_004bf6c9a40003140292e97330236c53'] = 'Akce';
-$_MODULE['<{packetery}prestashop>packeteryloggridcontroller_9b5a794d0ef94bb3615638beed3eb2a0'] = 'Tisk štítku';
-$_MODULE['<{packetery}prestashop>packeteryloggridcontroller_4b2baa07493024b4198132c260b9bbe9'] = 'Ověření odesílatele';
-$_MODULE['<{packetery}prestashop>packeteryloggridcontroller_e768e16ace76f605b3d5659cb8dd9b77'] = 'Vytvoření zásilky';
 $_MODULE['<{packetery}prestashop>packeteryloggridcontroller_3b0649c72650c313a357338dcdfb64ec'] = 'Poznámka';
 $_MODULE['<{packetery}prestashop>packeteryloggridcontroller_b2d37ae1cedf42ff874289b721860af2'] = 'Logy';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_b718adec73e04ce3ec720dd11a06a308'] = 'ID';
