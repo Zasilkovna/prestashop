@@ -40,7 +40,7 @@ class OrderStatusChangeFormService extends AbstractFormService
         $orderStatusesChoices = [
             [
                 'id' => null,
-                'name' => $this->module->l('Order status'),
+                'name' => $this->module->l('Order status', 'orderstatuschangeformservice'),
             ],
         ];
         foreach ($orderStatuses as $orderStatus) {
@@ -69,21 +69,21 @@ class OrderStatusChangeFormService extends AbstractFormService
         $fields['PACKETERY_ORDER_STATUS_CHANGE_ENABLED'] = [
             'type' => 'radio',
             'size' => 2,
-            'label' => $this->module->l('Enabled'),
+            'label' => $this->module->l('Enabled', 'orderstatuschangeformservice'),
             'name' => 'PACKETERY_ORDER_STATUS_CHANGE_ENABLED',
             'values' => [
                 [
                     'id' => 1,
                     'value' => 1,
-                    'label' => $this->module->l('Yes'),
+                    'label' => $this->module->l('Yes', 'orderstatuschangeformservice'),
                 ],
                 [
                     'id' => 0,
                     'value' => 0,
-                    'label' => $this->module->l('No'),
+                    'label' => $this->module->l('No', 'orderstatuschangeformservice'),
                 ],
             ],
-            'title' => $this->module->l('Enabled'),
+            'title' => $this->module->l('Enabled', 'orderstatuschangeformservice'),
             'required' => false,
             'defaultValue' => 0,
         ];
