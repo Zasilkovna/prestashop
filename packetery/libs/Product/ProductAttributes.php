@@ -2,8 +2,6 @@
 
 namespace Packetery\Product;
 
-use InvalidArgumentException;
-
 class ProductAttributes
 {
     /**
@@ -11,15 +9,8 @@ class ProductAttributes
      */
     private $isForAdults;
 
-    /**
-     * @param bool $isForAdults
-     */
-    public function __construct($isForAdults)
+    public function __construct(bool $isForAdults)
     {
-        if (!is_bool($isForAdults)) {
-            throw new InvalidArgumentException("forAdultsOnly accepts boolean");
-        }
-
         $this->isForAdults = $isForAdults;
     }
 
@@ -27,15 +18,12 @@ class ProductAttributes
      * @param array{ is_adult: string } $dbRow
      * @return self
      */
-    public static function fromDbRow(array $dbRow)
+    public static function fromDbRow(array $dbRow): ProductAttributes
     {
         return new self((bool)$dbRow['is_adult']);
     }
 
-    /**
-     * @return bool
-     */
-    public function isForAdults()
+    public function isForAdults(): bool
     {
         return $this->isForAdults;
     }
