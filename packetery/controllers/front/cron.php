@@ -33,34 +33,34 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
         ignore_user_abort(true); // Ignore connection-closing by the client/user
 
         if ($this->validateToken() === false) {
-            $this->renderError($this->module->l('Invalid packetery cron token.', 'cron'));
+            $this->renderError($this->module->getTranslator()->trans('Invalid packetery cron token.', [], 'Modules.Packetery.Packeterycronmodulefront'));
             return;
         }
 
         $task = Tools::getValue('task', null);
         if (!$task) {
-            $this->renderError($this->module->l('Cron task to run was not specified.', 'cron'));
+            $this->renderError($this->module->getTranslator()->trans('Cron task to run was not specified.', [], 'Modules.Packetery.Packeterycronmodulefront'));
             return;
         }
 
         switch ($task) {
             case DeleteLabels::getTaskName():
-                $taskName = $this->module->l('Deleting labels', 'cron');
+                $taskName = $this->module->getTranslator()->trans('Deleting labels', [], 'Modules.Packetery.Packeterycronmodulefront');
                 break;
             case DownloadCarriers::getTaskName():
-                $taskName = $this->module->l('Carrier list update', 'cron');
+                $taskName = $this->module->getTranslator()->trans('Carrier list update', [], 'Modules.Packetery.Packeterycronmodulefront');
                 break;
             case UpdatePacketStatus::getTaskName():
-                $taskName = $this->module->l('Packet tracking status update', 'cron');
+                $taskName = $this->module->getTranslator()->trans('Packet tracking status update', [], 'Modules.Packetery.Packeterycronmodulefront');
                 break;
             default:
                 $taskName = $task;
         }
 
         $this->renderMessage(
-            '[' . $this->module->l('BEGIN', 'cron') . ']: ' .
+            '[' . $this->module->getTranslator()->trans('BEGIN', [], 'Modules.Packetery.Packeterycronmodulefront') . ']: ' .
             sprintf(
-                $this->module->l('Task "%s" is about to be executed.', 'cron'),
+                $this->module->getTranslator()->trans('Task "%s" is about to be executed.', [], 'Modules.Packetery.Packeterycronmodulefront'),
                 $taskName
             )
         );
@@ -87,17 +87,17 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
                 $this->renderErrors($errors);
                 break;
             default:
-                $this->renderError($this->module->l('Task was not found.', 'cron'));
+                $this->renderError($this->module->getTranslator()->trans('Task was not found.', [], 'Modules.Packetery.Packeterycronmodulefront'));
         }
 
         if ($this->hasError) {
-            $this->renderMessage($this->module->l('All displayed errors are stored in the Prestashop database.', 'cron'));
+            $this->renderMessage($this->module->getTranslator()->trans('All displayed errors are stored in the Prestashop database.', [], 'Modules.Packetery.Packeterycronmodulefront'));
         }
 
         $this->renderMessage(
-            '[' . $this->module->l('END', 'cron') . ']: ' .
+            '[' . $this->module->getTranslator()->trans('END', [], 'Modules.Packetery.Packeterycronmodulefront') . ']: ' .
             sprintf(
-                $this->module->l('Task "%s" was finished.', 'cron'),
+                $this->module->getTranslator()->trans('Task "%s" was finished.', [], 'Modules.Packetery.Packeterycronmodulefront'),
                 $taskName
             )
         );
@@ -139,7 +139,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     public function renderError($message)
     {
         $this->hasError = true;
-        $this->renderMessage('[' . $this->module->l('ERROR', 'cron') . ']: ' . $message);
+        $this->renderMessage('[' . $this->module->getTranslator()->trans('ERROR', [], 'Modules.Packetery.Packeterycronmodulefront') . ']: ' . $message);
         PrestaShopLogger::addLog('[packetery:cron]: ' . $message, 3, null, null, null, true);
     }
 

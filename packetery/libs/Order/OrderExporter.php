@@ -44,7 +44,7 @@ class OrderExporter
 
         if (empty($packeteryOrder) || empty($packeteryOrder['id_branch'])) {
             throw new ExportException(
-                $this->module->l('Unable to load information required to export order', 'orderexporter') .
+                $this->module->getTranslator()->trans('Unable to load information required to export order', [], 'Modules.Packetery.Orderexporter') .
                 ' ' . $order->id
             );
         }
@@ -61,9 +61,10 @@ class OrderExporter
         $shippingCountryCurrency = $packeteryOrder['currency_branch'];
         if ($shippingCountryCurrency === null) {
             throw new ExportException(
-                $this->module->l(
+                $this->module->getTranslator()->trans(
                     'Can\'t find currency of pickup point, order',
-                    'orderexporter'
+                    [],
+                    'Modules.Packetery.Orderexporter'
                 ) . ' - ' . $order->id
             );
         }
@@ -76,9 +77,10 @@ class OrderExporter
             $total = $paymentRepository->getRateTotal($orderCurrency->iso_code, $shippingCountryCurrency, $total);
             if ($total === null) {
                 throw new ExportException(
-                    $this->module->l(
+                    $this->module->getTranslator()->trans(
                         'Unable to find the exchange rate in the PrestaShop currency settings for the destination country of the order',
-                        'orderexporter'
+                        [],
+                        'Modules.Packetery.Orderexporter'
                     ) . ': ' . $order->id
                 );
             }

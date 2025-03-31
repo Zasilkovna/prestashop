@@ -1,6 +1,6 @@
 <div class="panel-footer">
     <button type="submit" class="btn btn-default pull-right" name="submitPacketeryOrderGrid" value="submitPacketeryOrderGrid">
-        <i class="process-icon-save"></i> {l s='Save' mod='packetery'}
+        <i class="process-icon-save"></i> {l s='Save' d='Modules.Packetery.Display_order_list_footer'}
     </button>
 </div>
 <script type="text/javascript">

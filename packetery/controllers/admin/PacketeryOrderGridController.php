@@ -109,28 +109,28 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         $this->fields_list = [
             'id_order' => [
-                'title' => $this->l('ID', 'packeteryordergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('ID', [], 'Modules.Packetery.Packeteryordergrid'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
                 'filter_key' => 'a!id_order',
             ],
             'reference' => [
-                'title' => $this->l('Reference', 'packeteryordergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Reference', [], 'Modules.Packetery.Packeteryordergrid'),
                 'callback' => 'getReferenceColumnValue',
             ],
             'customer' => [
-                'title' => $this->l('Customer', 'packeteryordergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Customer', [], 'Modules.Packetery.Packeteryordergrid'),
                 'havingFilter' => false,
                 'callback' => 'getCustomerColumnValue',
             ],
             'total_paid' => [
-                'title' => $this->l('Total Price', 'packeteryordergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Total Price', [], 'Modules.Packetery.Packeteryordergrid'),
                 'align' => 'text-right',
                 'type' => 'price',
                 'filter_key' => 'a!total_paid',
             ],
             'osname' => [
-                'title' => $this->l('Status', 'packeteryordergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Status', [], 'Modules.Packetery.Packeteryordergrid'),
                 'type' => 'select',
                 'color' => 'color',
                 'list' => $this->statuses_array,
@@ -139,36 +139,36 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'order_key' => 'osname',
             ],
             'date_add' => [
-                'title' => $this->l('Date', 'packeteryordergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Date', [], 'Modules.Packetery.Packeteryordergrid'),
                 'type' => 'datetime',
                 'filter_key' => 'a!date_add',
                 'align' => 'text-left',
             ],
             'is_cod' => [
-                'title' => $this->l('Is COD', 'packeteryordergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Is COD', [], 'Modules.Packetery.Packeteryordergrid'),
                 'type' => 'bool',
                 'align' => 'center',
                 'callback' => 'getIconForBoolean',
                 'filter_key' => 'po!is_cod',
             ],
             'name_branch' => [
-                'title' => $this->l('Pickup point / Carrier', 'packeteryordergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Pickup point / Carrier', [], 'Modules.Packetery.Packeteryordergrid'),
                 'filter_key' => 'po!name_branch',
             ],
             'tracking_number' => [
-                'title' => $this->l('Tracking number', 'packeteryordergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Tracking number', [], 'Modules.Packetery.Packeteryordergrid'),
                 'callback' => 'getTrackingLink',
                 'filter_key' => 'po!tracking_number',
                 'search' => true,
                 'orderby' => false,
             ],
             'status_code' => [
-                'title' => $this->l('Packet status', 'packeteryordergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Packet status', [], 'Modules.Packetery.Packeteryordergrid'),
                 'search' => false,
                 'callback' => 'getTranslatedPacketStatus',
             ],
             'weight' => [
-                'title' => $this->l('Weight (kg)', 'packeteryordergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Weight (kg)', [], 'Modules.Packetery.Packeteryordergrid'),
                 'type' => 'editable',
                 'search' => false,
                 'callback' => 'getWeightEditable',
@@ -178,24 +178,24 @@ class PacketeryOrderGridController extends ModuleAdminController
         $this->bulk_actions = [
             // use 'confirm' key to require confirmation
             'CreatePacket' => [
-                'text' => $this->l('Send selected orders and create shipment', 'packeteryordergridcontroller'),
+                'text' => $this->module->getTranslator()->trans('Send selected orders and create shipment', [], 'Modules.Packetery.Packeteryordergrid'),
                 'icon' => 'icon-send',
             ],
             'LabelPdf' => [
-                'text' => $this->l('Download Packeta labels', 'packeteryordergridcontroller'),
+                'text' => $this->module->getTranslator()->trans('Download Packeta labels', [], 'Modules.Packetery.Packeteryordergrid'),
                 'icon' => 'icon-print',
             ],
             'CarrierLabelPdf' => [
-                'text' => $this->l('Download carrier labels', 'packeteryordergridcontroller'),
+                'text' => $this->module->getTranslator()->trans('Download carrier labels', [], 'Modules.Packetery.Packeteryordergrid'),
                 'icon' => 'icon-print',
             ],
             'CsvExport' => [
-                'text' => $this->l('CSV export', 'packeteryordergridcontroller'),
+                'text' => $this->module->getTranslator()->trans('CSV export', [], 'Modules.Packetery.Packeteryordergrid'),
                 'icon' => 'icon-download',
             ],
         ];
 
-        $title = $this->l('Packeta Orders', 'packeteryordergridcontroller');
+        $title = $this->module->getTranslator()->trans('Packeta Orders', [], 'Modules.Packetery.Packeteryordergrid');
         $this->meta_title = $title;
         $this->toolbar_title = $title;
 
@@ -227,14 +227,14 @@ class PacketeryOrderGridController extends ModuleAdminController
         if ($this->errors) {
             return;
         }
-        $this->confirmations[] = $this->l('The shipments were successfully submitted.', 'packeteryordergridcontroller');
+        $this->confirmations[] = $this->module->getTranslator()->trans('The shipments were successfully submitted.', [], 'Modules.Packetery.Packeteryordergrid');
     }
 
     public function processBulkCreatePacket()
     {
         $ids = $this->boxes;
         if (!$ids) {
-            $this->informations = $this->l('No orders were selected.', 'packeteryordergridcontroller');
+            $this->informations = $this->module->getTranslator()->trans('No orders were selected.', [], 'Modules.Packetery.Packeteryordergrid');
             return;
         }
         $this->createPackets($ids);
@@ -258,7 +258,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         $packeteryTracking = $module->diContainer->get(Tracking::class);
         $packetNumbers = $packeteryTracking->getTrackingFromOrders(implode(',', $ids));
         if (!$packetNumbers) {
-            $this->warnings[] = $this->l('Please submit selected orders first.', 'packeteryordergridcontroller');
+            $this->warnings[] = $this->module->getTranslator()->trans('Please submit selected orders first.', [], 'Modules.Packetery.Packeteryordergrid');
         }
 
         return $packetNumbers;
@@ -346,7 +346,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $ids = $this->boxes;
         if (!$ids) {
-            $this->informations = $this->l('Please choose orders first.', 'packeteryordergridcontroller');
+            $this->informations = $this->module->getTranslator()->trans('Please choose orders first.', [], 'Modules.Packetery.Packeteryordergrid');
             return;
         }
         $module = $this->getModule();
@@ -364,7 +364,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             }
             $ids = $this->boxes;
             if (!$ids) {
-                $this->informations = $this->l('Please choose orders first.', 'packeteryordergridcontroller');
+                $this->informations = $this->module->getTranslator()->trans('Please choose orders first.', [], 'Modules.Packetery.Packeteryordergrid');
             } else {
                 $packetNumbers = $this->preparePacketNumbers($ids);
                 if ($packetNumbers) {
@@ -378,7 +378,7 @@ class PacketeryOrderGridController extends ModuleAdminController
                         $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
                         $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
                         if (empty($packetsEnhanced)) {
-                            $this->warnings[] = $this->l('No labels can be printed as carrier labels.', 'packeteryordergridcontroller');
+                            $this->warnings[] = $this->module->getTranslator()->trans('No labels can be printed as carrier labels.', [], 'Modules.Packetery.Packeteryordergrid');
                         }
                     } else {
                         $type = Labels::TYPE_PACKETA;
@@ -440,7 +440,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             }
         }
         if ($change) {
-            $this->informations = $this->l('Order weights were saved.', 'packeteryordergridcontroller');
+            $this->informations = $this->module->getTranslator()->trans('Order weights were saved.', [], 'Modules.Packetery.Packeteryordergrid');
         }
 
         parent::postProcess();
@@ -584,11 +584,11 @@ class PacketeryOrderGridController extends ModuleAdminController
             if ($orderData['tracking_number']) {
                 $action = 'print';
                 $iconClass = 'icon-print';
-                $title = $this->l('Print labels', 'packeteryordergridcontroller');
+                $title = $this->module->getTranslator()->trans('Print labels', [], 'Modules.Packetery.Packeteryordergrid');
             } else {
                 $action = 'submit';
                 $iconClass = 'icon-send';
-                $title = $this->l('Submit packet', 'packeteryordergridcontroller');
+                $title = $this->module->getTranslator()->trans('Submit packet', [], 'Modules.Packetery.Packeteryordergrid');
             }
             $href = $this->getModule()->getAdminLink('PacketeryOrderGrid', ['id_order' => $orderId, 'action' => $action]);
             $smarty = new Smarty();

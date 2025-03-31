@@ -49,7 +49,7 @@ class Downloader
         } catch (\Exception $e) {
             return [
                 'text' => sprintf(
-                    $this->module->l('Carrier download failed: %s Please try again later.', 'downloader'),
+                    $this->module->getTranslator()->trans('Carrier download failed: %s Please try again later.', [], 'Modules.Packetery.Downloader'),
                     $e->getMessage()
                 ),
                 'class' => 'danger',
@@ -58,8 +58,8 @@ class Downloader
         if (!$carriers) {
             return [
                 'text' => sprintf(
-                    $this->module->l('Carrier download failed: %s Please try again later.', 'downloader'),
-                    $this->module->l('Failed to get the list.', 'downloader')
+                    $this->module->getTranslator()->trans('Carrier download failed: %s Please try again later.', [], 'Modules.Packetery.Downloader'),
+                    $this->module->getTranslator()->trans('Failed to get the list.', [], 'Modules.Packetery.Downloader')
                 ),
                 'class' => 'danger',
             ];
@@ -68,8 +68,8 @@ class Downloader
         if (!$validation_result) {
             return [
                 'text' => sprintf(
-                    $this->module->l('Carrier download failed: %s Please try again later.', 'downloader'),
-                    $this->module->l('Invalid API response.', 'downloader')
+                    $this->module->getTranslator()->trans('Carrier download failed: %s Please try again later.', [], 'Modules.Packetery.Downloader'),
+                    $this->module->getTranslator()->trans('Invalid API response.', [], 'Modules.Packetery.Downloader')
                 ),
                 'class' => 'danger',
             ];
@@ -78,7 +78,7 @@ class Downloader
         ConfigHelper::update('PACKETERY_LAST_CARRIERS_UPDATE', time());
 
         return [
-            'text' => $this->module->l('Carriers were updated.', 'downloader'),
+            'text' => $this->module->getTranslator()->trans('Carriers were updated.', [], 'Modules.Packetery.Downloader'),
             'class' => 'success',
         ];
     }

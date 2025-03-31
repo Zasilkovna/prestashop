@@ -56,35 +56,35 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $this->availableCarriers = array_combine(array_column($packeteryCarriers, 'id_branch'), array_column($packeteryCarriers, 'name_branch'));
         foreach ($this->availableCarriers as $carrierId => $carrierName) {
             if ($carrierId === Packetery::ZPOINT && empty($carrierName)) {
-                $this->availableCarriers[Packetery::ZPOINT] = $this->l('Packeta pickup points', 'packeterycarriergridcontroller');
+                $this->availableCarriers[Packetery::ZPOINT] = $this->module->getTranslator()->trans('Packeta pickup points', [], 'Modules.Packetery.Packeterycarriergrid');
             } elseif ($carrierId === Packetery::PP_ALL && empty($carrierName)) {
-                $this->availableCarriers[Packetery::PP_ALL] = $this->l('Packeta pickup points (Packeta + carriers)', 'packeterycarriergridcontroller');
+                $this->availableCarriers[Packetery::PP_ALL] = $this->module->getTranslator()->trans('Packeta pickup points (Packeta + carriers)', [], 'Modules.Packetery.Packeterycarriergrid');
             }
         }
 
         $this->fields_list = [
             'id_carrier' => [
-                'title' => $this->l('ID', 'packeterycarriergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('ID', [], 'Modules.Packetery.Packeterycarriergrid'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
             ],
             'name' => [
-                'title' => $this->l('Carrier', 'packeterycarriergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Carrier', [], 'Modules.Packetery.Packeterycarriergrid'),
             ],
             'zones' => [
-                'title' => $this->l('Zones', 'packeterycarriergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Zones', [], 'Modules.Packetery.Packeterycarriergrid'),
                 'havingFilter' => false,
                 'search' => false,
                 'orderby' => false,
             ],
             'countries' => [
-                'title' => $this->l('Countries', 'packeterycarriergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Countries', [], 'Modules.Packetery.Packeterycarriergrid'),
                 'havingFilter' => false,
                 'search' => false,
                 'orderby' => false,
             ],
             'id_branch' => [
-                'title' => $this->l('Is delivery via Packeta', 'packeterycarriergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Is delivery via Packeta', [], 'Modules.Packetery.Packeterycarriergrid'),
                 'type' => 'select',
                 'list' => $this->availableCarriers,
                 'filter_key' => 'id_branch',
@@ -92,21 +92,21 @@ class PacketeryCarrierGridController extends ModuleAdminController
                 'callback' => 'getCarrierName',
             ],
             'is_active' => [
-                'title' => $this->l('Active', 'packeterycarriergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Active', [], 'Modules.Packetery.Packeterycarriergrid'),
                 'type' => 'bool',
                 'filter_key' => 'active',
                 'align' => 'center',
                 'callback' => 'getIconForBoolean',
             ],
             'is_cod' => [
-                'title' => $this->l('Is COD', 'packeterycarriergridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Is COD', [], 'Modules.Packetery.Packeterycarriergrid'),
                 'type' => 'bool',
                 'align' => 'center',
                 'callback' => 'getIconForBoolean',
             ],
         ];
 
-        $title = $this->l('Packeta carriers list', 'packeterycarriergridcontroller');
+        $title = $this->module->getTranslator()->trans('Packeta carriers list', [], 'Modules.Packetery.Packeterycarriergrid');
         $this->meta_title = $title;
         $this->toolbar_title = $title;
 
@@ -212,7 +212,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
 
         $smarty = new Smarty();
         $smarty->assign('link', CarrierTools::getEditLink($carrierId));
-        $smarty->assign('title', $this->l('Edit', 'packeterycarriergridcontroller'));
+        $smarty->assign('title', $this->module->getTranslator()->trans('Edit', [], 'Modules.Packetery.Packeterycarriergrid'));
         $smarty->assign('class', 'edit btn btn-default');
         $smarty->assign('icon', 'icon-pencil');
 

@@ -83,7 +83,7 @@ class CarrierAdminForm
     {
         $carrierData = $this->repository->getById($this->carrierId);
         if (!$carrierData) {
-            $this->error = $this->module->l('Failed to load carrier.', 'carrieradminform');
+            $this->error = $this->module->getTranslator()->trans('Failed to load carrier.', [], 'Modules.Packetery.Carrieradminform');
             return null;
         }
 
@@ -103,12 +103,12 @@ class CarrierAdminForm
             [
                 'form' => [
                     'legend' => [
-                        'title' => $this->module->l('Edit carrier', 'carrieradminform') . ': ' . $carrierData['name'],
+                        'title' => $this->module->getTranslator()->trans('Edit carrier', [], 'Modules.Packetery.Carrieradminform') . ': ' . $carrierData['name'],
                         'icon' => 'icon-cogs'
                     ],
                     'input' => [
                         [
-                            'label' => $this->module->l('Packeta carrier to pair with this carrier', 'carrieradminform'),
+                            'label' => $this->module->getTranslator()->trans('Packeta carrier to pair with this carrier', [], 'Modules.Packetery.Carrieradminform'),
                             'type' => 'select',
                             'name' => 'id_branch',
                             'required' => true,
@@ -123,7 +123,7 @@ class CarrierAdminForm
                         $this->getBackButton(),
                     ],
                     'submit' => [
-                        'title' => $this->module->l('Save', 'carrieradminform'),
+                        'title' => $this->module->getTranslator()->trans('Save', [], 'Modules.Packetery.Carrieradminform'),
                         'class' => 'btn btn-default pull-right',
                         'name' => 'submitCarrierForm',
                     ],
@@ -144,7 +144,7 @@ class CarrierAdminForm
     {
         $carrierData = $this->repository->getById($this->carrierId);
         if (!$carrierData) {
-            $this->error = $this->module->l('Failed to load carrier.', 'carrieradminform');
+            $this->error = $this->module->getTranslator()->trans('Failed to load carrier.', [], 'Modules.Packetery.Carrieradminform');
             return null;
         }
 
@@ -178,24 +178,24 @@ class CarrierAdminForm
             if ($validationPossible) {
                 $formInputs[] = [
                     'type' => 'radio',
-                    'label' => $this->module->l('Validate address using widget?', 'carrieradminform'),
+                    'label' => $this->module->getTranslator()->trans('Validate address using widget?', [], 'Modules.Packetery.Carrieradminform'),
                     'name' => 'address_validation',
-                    'desc' => $this->module->l('Applicable only in case of CZ and SK home delivery carrier.', 'carrieradminform'),
+                    'desc' => $this->module->getTranslator()->trans('Applicable only in case of CZ and SK home delivery carrier.', [], 'Modules.Packetery.Carrieradminform'),
                     'values' => [
                         [
                             'id' => 'address_validation_0',
                             'value' => 'none',
-                            'label' => $this->module->l('No', 'carrieradminform'),
+                            'label' => $this->module->getTranslator()->trans('No', [], 'Modules.Packetery.Carrieradminform'),
                         ],
                         [
                             'id' => 'address_validation_1',
                             'value' => 'required',
-                            'label' => $this->module->l('Yes', 'carrieradminform'),
+                            'label' => $this->module->getTranslator()->trans('Yes', [], 'Modules.Packetery.Carrieradminform'),
                         ],
                         [
                             'id' => 'address_validation_2',
                             'value' => 'optional',
-                            'label' => $this->module->l('Optionally', 'carrieradminform'),
+                            'label' => $this->module->getTranslator()->trans('Optionally', [], 'Modules.Packetery.Carrieradminform'),
                         ],
                     ]
                 ];
@@ -203,7 +203,7 @@ class CarrierAdminForm
         } else if (!empty($possibleVendors)) {
             $formInputs[] = [
                 'name' => 'allowed_vendors',
-                'label' => $this->module->l('Allowed pickup point types', 'carrieradminform'),
+                'label' => $this->module->getTranslator()->trans('Allowed pickup point types', [], 'Modules.Packetery.Carrieradminform'),
                 'type' => 'html',
                 'html_content' => $this->getVendorsHtml(
                     $possibleVendors,
@@ -215,23 +215,23 @@ class CarrierAdminForm
         if ((bool)$apiCarrier['disallows_cod'] === false && (bool)$carrierData['is_cod'] === true) {
             $formInputs[] = [
                 'type' => 'radio',
-                'label' => $this->module->l('Is COD?', 'carrieradminform'),
+                'label' => $this->module->getTranslator()->trans('Is COD?', [], 'Modules.Packetery.Carrieradminform'),
                 'name' => 'is_cod',
                 'required' => true,
                 'desc' => sprintf('%s %s',
-                    $this->module->l('YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.', 'carrieradminform'),
-                    $this->module->l('The option to set cash on delivery according to the carrier is already obsolete, and we recommend not using it. It will be completely removed soon.', 'carrieradminform')
+                    $this->module->getTranslator()->trans('YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.', [], 'Modules.Packetery.Carrieradminform'),
+                    $this->module->getTranslator()->trans('The option to set cash on delivery according to the carrier is already obsolete, and we recommend not using it. It will be completely removed soon.', [], 'Modules.Packetery.Carrieradminform')
                 ),
                 'values' => [
                     [
                         'id' => 'is_cod_0',
                         'value' => 0,
-                        'label' => $this->module->l('No', 'carrieradminform'),
+                        'label' => $this->module->getTranslator()->trans('No', [], 'Modules.Packetery.Carrieradminform'),
                     ],
                     [
                         'id' => 'is_cod_1',
                         'value' => 1,
-                        'label' => $this->module->l('Yes', 'carrieradminform'),
+                        'label' => $this->module->getTranslator()->trans('Yes', [], 'Modules.Packetery.Carrieradminform'),
                     ],
                 ]
             ];
@@ -245,12 +245,12 @@ class CarrierAdminForm
             [
                 'form' => [
                     'legend' => [
-                        'title' => $this->module->l('Edit carrier settings', 'carrieradminform'),
+                        'title' => $this->module->getTranslator()->trans('Edit carrier settings', [], 'Modules.Packetery.Carrieradminform'),
                         'icon' => 'icon-cogs',
                     ],
                     'input' => $formInputs,
                     'submit' => [
-                        'title' => $this->module->l('Save', 'carrieradminform'),
+                        'title' => $this->module->getTranslator()->trans('Save', [], 'Modules.Packetery.Carrieradminform'),
                         'class' => 'btn btn-default pull-right',
                         'name' => 'submitCarrierOptionsForm',
                     ],
@@ -282,7 +282,7 @@ class CarrierAdminForm
         $apiCarrier = $this->apiRepository->getById($carrierData['id_branch']);
         if (!$apiCarrier) {
             $this->repository->deleteById($this->carrierId);
-            $this->messageManager->setMessage('info', $this->module->l('Carrier has been saved.', 'carrieradminform'));
+            $this->messageManager->setMessage('info', $this->module->getTranslator()->trans('Carrier has been saved.', [], 'Modules.Packetery.Carrieradminform'));
             Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
         }
 
@@ -314,7 +314,7 @@ class CarrierAdminForm
             );
         }
 
-        $this->messageManager->setMessage('info', $this->module->l('Carrier has been saved.', 'carrieradminform'));
+        $this->messageManager->setMessage('info', $this->module->getTranslator()->trans('Carrier has been saved.', [], 'Modules.Packetery.Carrieradminform'));
         Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
     }
 
@@ -350,7 +350,7 @@ class CarrierAdminForm
             ($allowedVendors !== null ? json_encode($allowedVendors) : null)
         );
 
-        $this->messageManager->setMessage('info', $this->module->l('Carrier settings were saved.', 'carrieradminform'));
+        $this->messageManager->setMessage('info', $this->module->getTranslator()->trans('Carrier settings were saved.', [], 'Modules.Packetery.Carrieradminform'));
         Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
     }
 
@@ -457,7 +457,7 @@ class CarrierAdminForm
         }
 
         if ($carrierData['id_branch'] && !in_array($carrierData['id_branch'], array_column($availableCarriers, 'id'))) {
-            $warning = sprintf($this->module->l('The Packeta carrier selected for method "%s" does not deliver to any of its active countries.', 'carrieradminform'), $carrierData['name']);
+            $warning = sprintf($this->module->getTranslator()->trans('The Packeta carrier selected for method "%s" does not deliver to any of its active countries.', [], 'Modules.Packetery.Carrieradminform'), $carrierData['name']);
             $orphanData = $this->apiRepository->getById($carrierData['id_branch']);
             if ($orphanData) {
                 $availableCarriers[] = $orphanData;
@@ -465,7 +465,7 @@ class CarrierAdminForm
         }
 
         if (!$availableCarriers) {
-            $warning = sprintf($this->module->l('There are no available carriers for method "%s".', 'carrieradminform'), $carrierData['name']);
+            $warning = sprintf($this->module->getTranslator()->trans('There are no available carriers for method "%s".', [], 'Modules.Packetery.Carrieradminform'), $carrierData['name']);
         }
 
         array_unshift($availableCarriers, ['id' => null, 'name' => '--']);
@@ -527,12 +527,12 @@ class CarrierAdminForm
         $possibleVendors = $this->getPossibleVendors($carrierData);
 
         if (empty($possibleVendors) || !isset($formData['allowed_vendors'])) {
-            return ['error' => $this->module->l('You must select at least one vendor for each country.', 'carrieradminform')];
+            return ['error' => $this->module->getTranslator()->trans('You must select at least one vendor for each country.', [], 'Modules.Packetery.Carrieradminform')];
         }
 
         foreach ($possibleVendors as $countryCode => $vendorGroups) {
             if (!isset($formData['allowed_vendors'][$countryCode])) {
-                return ['error' => $this->module->l('You must select at least one vendor for each country.', 'carrieradminform')];
+                return ['error' => $this->module->getTranslator()->trans('You must select at least one vendor for each country.', [], 'Modules.Packetery.Carrieradminform')];
             }
         }
 
@@ -542,7 +542,7 @@ class CarrierAdminForm
             // Checkbox value is "on" if checked.
             foreach ($vendorGroups as $vendorGroup => $value) {
                 if (!in_array($vendorGroup, array_column($possibleVendors[$countryCode], 'group'))) {
-                    return ['error' => $this->module->l('One of selected vendor is not available anymore.', 'carrieradminform')];
+                    return ['error' => $this->module->getTranslator()->trans('One of selected vendor is not available anymore.', [], 'Modules.Packetery.Carrieradminform')];
                 }
 
                 $allowedVendors[$countryCode][] = $vendorGroup;
@@ -583,7 +583,7 @@ class CarrierAdminForm
     {
         return [
             'href' => $this->module->getContext()->link->getAdminLink('PacketeryCarrierGrid'),
-            'title' => $this->module->l('Back to list', 'carrieradminform'),
+            'title' => $this->module->getTranslator()->trans('Back to list', [], 'Modules.Packetery.Carrieradminform'),
             'class' => 'btn btn-default pull-left',
         ];
     }

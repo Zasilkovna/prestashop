@@ -160,6 +160,6 @@ class Uninstaller
      */
     private function getExceptionRaisedText()
     {
-        return $this->module->l('Exception raised during Packetery module uninstall:', 'uninstaller');
+        return $this->module->getTranslator()->trans('Exception raised during Packetery module uninstall:', [], 'Modules.Packetery.Uninstaller');
     }
 }

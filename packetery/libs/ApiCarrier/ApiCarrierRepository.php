@@ -112,9 +112,9 @@ class ApiCarrierRepository
     private function addNonApiCarriers(array $mappedData) {
         $defaultPickupPointsValues = array_combine(array_keys(self::$columnDefinitions), array_column(self::$columnDefinitions, 'defaultPPValue'));
         $mappedData[Packetery::ZPOINT] = $defaultPickupPointsValues;
-        $mappedData[Packetery::ZPOINT]['name'] = $this->module->l('Packeta pickup points', 'apicarrierrepository');
+        $mappedData[Packetery::ZPOINT]['name'] = $this->module->getTranslator()->trans('Packeta pickup points', [], 'Modules.Packetery.Apicarrierrepository');
         $mappedData[Packetery::PP_ALL] = $defaultPickupPointsValues;
-        $mappedData[Packetery::PP_ALL]['name'] = $this->module->l('Packeta pickup points (Packeta + carriers)', 'apicarrierrepository');
+        $mappedData[Packetery::PP_ALL]['name'] = $this->module->getTranslator()->trans('Packeta pickup points (Packeta + carriers)', [], 'Modules.Packetery.Apicarrierrepository');
 
         return $mappedData;
     }

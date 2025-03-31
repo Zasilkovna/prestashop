@@ -70,31 +70,31 @@ class Installer
                 'parentClass' => 'SELL',
                 'class' => 'Packetery',
                 'name' => 'Packeta',
-                'translatedName' => $this->module->l('Packeta', 'installer')
+                'translatedName' => $this->module->getTranslator()->trans('Packeta', [], 'Modules.Packetery.Installer')
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryOrderGrid',
                 'name' => 'Packeta Orders',
-                'translatedName' => $this->module->l('Packeta Orders', 'installer')
+                'translatedName' => $this->module->getTranslator()->trans('Packeta Orders', [], 'Modules.Packetery.Installer')
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryCarrierGrid',
                 'name' => 'Carrier settings',
-                'translatedName' => $this->module->l('Carrier settings', 'installer')
+                'translatedName' => $this->module->getTranslator()->trans('Carrier settings', [], 'Modules.Packetery.Installer')
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketerySetting',
                 'name' => 'Configuration',
-                'translatedName' => $this->module->l('Configuration', 'installer')
+                'translatedName' => $this->module->getTranslator()->trans('Configuration', [], 'Modules.Packetery.Installer')
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryLogGrid',
                 'name' => 'Log',
-                'translatedName' => $this->module->l('Log', 'installer')
+                'translatedName' => $this->module->getTranslator()->trans('Log', [], 'Modules.Packetery.Installer')
             ],
         ];
 
@@ -126,7 +126,7 @@ class Installer
         foreach ($languages as $language) {
             // We check if we have translation for that language. l method never returns the original english string.
             $haveTranslation = in_array($language['iso_code'], self::TRANSLATED_LANGUAGES);
-            $multiLangField[$language['id_lang']] = $haveTranslation ? $this->module->l($translationKey, 'installer', $language['language_code']) : $translationKey;
+            $multiLangField[$language['id_lang']] = $haveTranslation ? $this->module->getTranslator()->trans($translationKey, [], 'Modules.Packetery.Installer', $language['language_code']) : $translationKey;
         }
 
         return $multiLangField;
@@ -239,7 +239,7 @@ class Installer
      */
     private function getExceptionRaisedText()
     {
-        return $this->module->l('Exception raised during Packetery module install:', 'installer');
+        return $this->module->getTranslator()->trans('Exception raised during Packetery module install:', [], 'Modules.Packetery.Installer');
     }
 
     /**
