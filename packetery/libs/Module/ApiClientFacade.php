@@ -11,7 +11,7 @@ class ApiClientFacade
 {
     /**
      * @param string $url
-     * @return string
+     * @return string|bool
      * @throws \Packetery\Exceptions\ApiClientException
      */
     public function get($url)

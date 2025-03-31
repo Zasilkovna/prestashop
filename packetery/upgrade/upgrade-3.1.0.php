@@ -1,6 +1,7 @@
 <?php
 
 use Packetery\PacketTracking\PacketTrackingRepository;
+use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\DbTools;
 
 if (!defined('_PS_VERSION_')) {
@@ -25,7 +26,9 @@ function upgrade_module_3_1_0($module) {
         $sql,
         $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.1.0'),
         true
-    );
+    ) &&
+        ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time()) &&
+        Configuration::deleteByName('PACKETERY_LAST_FEATURE_CHECK');
 
     return $executeResult !== false;
 }
