@@ -4,7 +4,7 @@
     {/if}
     <input type="hidden" id="packetery_product_extra_hook" name="packetery_product_extra_hook" value="1">
     <h3>
-        {l s='Packetery product settings' mod='packetery'}
+        {l s='Packetery product settings' d='Modules.Packetery.Display_admin_product_extra'}
     </h3>
     <div class="form-group">
         <div class="col-lg-1">
@@ -19,7 +19,7 @@
                             id="packetery_age_verification"
                             name="packetery_age_verification"
                             value="{$packeteryAgeVerification}" {if $packeteryAgeVerification}checked="checked"{/if}>
-                    {l s='This product is for adults only and needs to be age verified upon delivery.' mod='packetery'}
+                    {l s='This product is for adults only and needs to be age verified upon delivery.' d='Modules.Packetery.Display_admin_product_extra'}
                 </label>
             </div>
         </div>
@@ -27,11 +27,11 @@
     {if $isPrestaShop16}
         <div class="panel-footer">
             <a href="{$adminProductUrl}" class="btn btn-default"><i
-                        class="process-icon-cancel"></i> {l s='Cancel' mod='packetery'}</a>
+                        class="process-icon-cancel"></i> {l s='Cancel' d='Modules.Packetery.Display_admin_product_extra'}</a>
             <button type="submit" name="submitAddproduct" class="btn btn-default pull-right"><i
-                        class="process-icon-save"></i> {l s='Save' mod='packetery'}</button>
+                        class="process-icon-save"></i> {l s='Save' d='Modules.Packetery.Display_admin_product_extra'}</button>
             <button type="submit" name="submitAddproductAndStay" class="btn btn-default pull-right"><i
-                        class="process-icon-save"></i> {l s='Save and Stay' mod='packetery'}</button>
+                        class="process-icon-save"></i> {l s='Save and Stay' d='Modules.Packetery.Display_admin_product_extra'}</button>
         </div>
     {/if}
 </div>

@@ -42,8 +42,8 @@ class CarrierVendors
      */
     public function getVendors()
     {
-        $zpointName = $this->module->l('Packeta Pick-up Points', 'carriervendors');
-        $zboxName = $this->module->l('Packeta', 'carriervendors') . ' Z-BOX';
+        $zpointName = $this->module->getTranslator()->trans('Packeta Pick-up Points', [], 'Modules.Packetery.Carriervendors');
+        $zboxName = $this->module->getTranslator()->trans('Packeta', [], 'Modules.Packetery.Carriervendors') . ' Z-BOX';
 
         return [
             'cz' => [

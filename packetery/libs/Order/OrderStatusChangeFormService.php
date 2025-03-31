@@ -41,7 +41,7 @@ class OrderStatusChangeFormService extends AbstractFormService
         $orderStatusesChoices = [
             [
                 'id' => null,
-                'name' => $this->module->l('Order status', 'orderstatuschangeformservice'),
+                'name' => $this->module->getTranslator()->trans('Order status', [], 'Modules.Packetery.Orderstatuschangeformservice'),
             ],
         ];
         foreach ($orderStatuses as $orderStatus) {
@@ -71,21 +71,21 @@ class OrderStatusChangeFormService extends AbstractFormService
         $fields['PACKETERY_ORDER_STATUS_CHANGE_ENABLED'] = [
             'type' => 'radio',
             'size' => 2,
-            'label' => $this->module->l('Enabled', 'orderstatuschangeformservice'),
+            'label' => $this->module->getTranslator()->trans('Enabled', [], 'Modules.Packetery.Orderstatuschangeformservice'),
             'name' => 'PACKETERY_ORDER_STATUS_CHANGE_ENABLED',
             'values' => [
                 [
                     'id' => 1,
                     'value' => 1,
-                    'label' => $this->module->l('Yes', 'orderstatuschangeformservice'),
+                    'label' => $this->module->getTranslator()->trans('Yes', [], 'Modules.Packetery.Orderstatuschangeformservice'),
                 ],
                 [
                     'id' => 0,
                     'value' => 0,
-                    'label' => $this->module->l('No', 'orderstatuschangeformservice'),
+                    'label' => $this->module->getTranslator()->trans('No', [], 'Modules.Packetery.Orderstatuschangeformservice'),
                 ],
             ],
-            'title' => $this->module->l('Enabled', 'orderstatuschangeformservice'),
+            'title' => $this->module->getTranslator()->trans('Enabled', [], 'Modules.Packetery.Orderstatuschangeformservice'),
             'required' => false,
             'defaultValue' => 0,
         ];

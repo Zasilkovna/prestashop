@@ -154,7 +154,7 @@ class SoapApi
                 $response = $this->packetCarrierNumber($packetId);
                 if ($response->hasFault()) {
                     if ($response->hasWrongPassword()) {
-                        $messageManager->setMessage('warning', $this->module->l('Used API password is not valid.', 'soapapi'));
+                        $messageManager->setMessage('warning', $this->module->getTranslator()->trans('Used API password is not valid.', [], 'Modules.Packetery.Soapapi'));
                         return $result;
                     }
                     $logger->logToFile(sprintf('Error while retrieving carrier number for order %s: %s', $packetId, $response->getFaultString()));

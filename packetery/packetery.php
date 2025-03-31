@@ -78,13 +78,19 @@ class Packetery extends CarrierModule
         parent::__construct();
 
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
-        $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
-        $desc .= $this->l('Export orders to Packeta system.');
+        // todo unused
+        $desc = $this->trans('Get your customers access to pick-up point in Packeta delivery network.', [], 'Modules.Packetery.Packetery');
+        $desc .= $this->trans('Export orders to Packeta system.', [], 'Modules.Packetery.Packetery');
 
-        $this->displayName = $this->l('Packeta');
-        $this->description = $this->l('Packeta pick-up points, orders export, and print shipping labels');
+        $this->displayName = $this->trans('Packeta', [], 'Modules.Packetery.Packetery');
+        $this->description = $this->trans('Packeta pick-up points, orders export, and print shipping labels', [], 'Modules.Packetery.Packetery');
 
         $this->ps_versions_compliancy = array('min' => '1.7.0.0', 'max' => _PS_VERSION_);
+    }
+
+    public function isUsingNewTranslationSystem()
+    {
+        return true;
     }
 
     /**
@@ -96,7 +102,7 @@ class Packetery extends CarrierModule
     public function install()
     {
         if (extension_loaded('curl') === false) {
-            $this->_errors[] = $this->l('You have to enable the cURL extension on your server to install this module');
+            $this->_errors[] = $this->trans('You have to enable the cURL extension on your server to install this module', [], 'Modules.Packetery.Packetery');
             return false;
         }
 
@@ -169,15 +175,19 @@ class Packetery extends CarrierModule
         $fn = _PS_MODULE_DIR_ . "packetery/views/js/write-test.js";
         @touch($fn);
         if (!is_writable($fn)) {
-            $error[] = $this->l(
-                'The Packeta module folder must be writable for the pickup point selection to work properly.'
+            $error[] = $this->trans(
+                'The Packeta module folder must be writable for the pickup point selection to work properly.',
+                [],
+                'Modules.Packetery.Packetery'
             );
             $have_error = true;
         }
 
         if (!self::transportMethod()) {
-            $error[] = $this->l(
+            $error[] = $this->trans(
                 'No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.'
+                [],
+                'Modules.Packetery.Packetery'
             );
             $have_error = true;
         }
@@ -187,7 +197,7 @@ class Packetery extends CarrierModule
         $apiPass = $configHelper->getApiPass();
 
         if (empty($apiPass)) {
-            $error[] = $this->l('Packeta API password is not set.');
+            $error[] = $this->trans('Packeta API password is not set.', [], 'Modules.Packetery.Packetery');
             $have_error = true;
         }
 
@@ -251,7 +261,7 @@ class Packetery extends CarrierModule
         $output = '';
 
         if (!extension_loaded('soap')) {
-            $output .= $this->displayError($this->l('Soap is disabled. You have to enable Soap on your server'));
+            $output .= $this->displayError($this->trans('Soap is disabled. You have to enable Soap on your server', [], 'Modules.Packetery.Packetery'));
         }
 
         $versionChecker = $this->diContainer->get(\Packetery\Module\VersionChecker::class);
@@ -261,7 +271,7 @@ class Packetery extends CarrierModule
 
         if (\Packetery\Weight\Converter::isKgConversionSupported() === false) {
             $output .= $this->displayInformation(sprintf(
-                $this->l('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to one of: %s.'),
+                $this->trans('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to one of: %s.', [], 'Modules.Packetery.Packetery'),
                 Configuration::get('PS_WEIGHT_UNIT'),
                 implode(', ', array_keys(\Packetery\Weight\Converter::$mapping))
             ));
@@ -323,7 +333,7 @@ class Packetery extends CarrierModule
         }
 
         if ($isSubmit && !$error) {
-            $output .= $this->displayConfirmation($this->l('Settings updated'));
+            $output .= $this->displayConfirmation($this->trans('Settings updated', [], 'Modules.Packetery.Packetery'));
         }
 
         $output .= $this->displayForm();
@@ -382,7 +392,7 @@ class Packetery extends CarrierModule
         }
         $formInputs[] = [
             'type' => 'checkbox',
-            'label' => $this->l('Payment methods representing COD'),
+            'label' => $this->trans('Payment methods representing COD', [], 'Modules.Packetery.Packetery'),
             'name' => 'payment_cod',
             'multiple' => true,
             'values' => [
@@ -395,11 +405,11 @@ class Packetery extends CarrierModule
         $form = [
             'form' => [
                 'legend' => [
-                    'title' => $this->l('Packeta settings'),
+                    'title' => $this->trans('Packeta settings', [], 'Modules.Packetery.Packetery'),
                 ],
                 'input' => $formInputs,
                 'submit' => [
-                    'title' => $this->l('Save'),
+                    'title' => $this->trans('Save', [], 'Modules.Packetery.Packetery'),
                     'class' => 'btn btn-default pull-right',
                 ],
             ],
@@ -433,14 +443,14 @@ class Packetery extends CarrierModule
             $packetStatusTrackingFormService->generateForm(
                 $this->name,
                 $this->table,
-                $this->l('Packet status tracking'),
-                $this->l('Save')
+                $this->trans('Packet status tracking', [], 'Modules.Packetery.Packetery'),
+                $this->trans('Save', [], 'Modules.Packetery.Packetery')
             ) .
             $orderStatusChangeFormService->generateForm(
                 $this->name,
                 $this->table,
-                $this->l('Order status change'),
-                $this->l('Save')
+                $this->trans('Order status change', [], 'Modules.Packetery.Packetery'),
+                $this->trans('Save', [], 'Modules.Packetery.Packetery')
             ) .
             $this->generateCronInfoBlock();
     }
@@ -501,19 +511,19 @@ class Packetery extends CarrierModule
     {
         return [
             'PACKETERY_APIPASS' => [
-                'title' => $this->l('API password'),
+                'title' => $this->trans('API password', [], 'Modules.Packetery.Packetery'),
                 'required' => true,
             ],
             'PACKETERY_ESHOP_ID' => [
-                'title' => $this->l('Sender indication'),
+                'title' => $this->trans('Sender indication', [], 'Modules.Packetery.Packetery'),
                 'desc' => sprintf(
-                    $this->l('You can find the sender indication in the client section: %s in the "indication" field.'),
+                    $this->trans('You can find the sender indication in the client section: %s in the "indication" field.', [], 'Modules.Packetery.Packetery'),
                     '<a href="https://client.packeta.com/senders/">https://client.packeta.com/senders/</a>'
                 ),
                 'required' => true,
             ],
             'PACKETERY_LABEL_FORMAT' => [
-                'title' => $this->l('Packeta label format'),
+                'title' => $this->trans('Packeta label format', [], 'Modules.Packetery.Packetery'),
                 'options' => array_combine(
                     array_keys($this->getAvailableLabelFormats()),
                     array_column($this->getAvailableLabelFormats(), 'name')
@@ -521,48 +531,48 @@ class Packetery extends CarrierModule
                 'required' => false,
             ],
             'PACKETERY_CARRIER_LABEL_FORMAT' => [
-                'title' => $this->l('Carrier label format'),
+                'title' => $this->trans('Carrier label format', [], 'Modules.Packetery.Packetery'),
                 'options' => $this->getCarrierLabelFormats('name'),
                 'required' => false,
             ],
             'PACKETERY_ID_PREFERENCE' => [
-                'title' => $this->l('As the order ID, use'),
+                'title' => $this->trans('As the order ID, use', [], 'Modules.Packetery.Packetery'),
                 'options' => [
-                    self::ID_PREF_ID => $this->l('Order ID'),
-                    self::ID_PREF_REF => $this->l('Order Reference'),
+                    self::ID_PREF_ID => $this->trans('Order ID', [], 'Modules.Packetery.Packetery'),
+                    self::ID_PREF_REF => $this->trans('Order Reference', [], 'Modules.Packetery.Packetery'),
                 ],
                 'required' => false,
             ],
             'PACKETERY_WIDGET_AUTOOPEN' => [
-                'title' => $this->l('Automatically open widget in cart'),
+                'title' => $this->trans('Automatically open widget in cart', [], 'Modules.Packetery.Packetery'),
                 'options' => [
-                    1 => $this->l('Yes'),
-                    0 => $this->l('No'),
+                    1 => $this->trans('Yes', [], 'Modules.Packetery.Packetery'),
+                    0 => $this->trans('No', [], 'Modules.Packetery.Packetery'),
                 ],
                 'required' => false,
             ],
             'PACKETERY_DEFAULT_PACKAGE_PRICE' => [
-                'title' => $this->l('Default package price'),
+                'title' => $this->trans('Default package price', [], 'Modules.Packetery.Packetery'),
                 'required' => false,
-                'desc' => $this->l('Enter the default value for the shipment if the order price is zero'),
+                'desc' => $this->trans('Enter the default value for the shipment if the order price is zero', [], 'Modules.Packetery.Packetery'),
             ],
             \Packetery\Tools\ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION => [
-                'title' => $this->l('Currency conversion'),
+                'title' => $this->trans('Currency conversion', [], 'Modules.Packetery.Packetery'),
                 'options' => [
-                    1 => $this->l('Enable currency conversion according to the exchange rate in PrestaShop'),
-                    0 => $this->l('Disable currency conversion, cash on delivery will be sent to Packeta in the currency of the order'),
+                    1 => $this->trans('Enable currency conversion according to the exchange rate in PrestaShop', [], 'Modules.Packetery.Packetery'),
+                    0 => $this->trans('Disable currency conversion, cash on delivery will be sent to Packeta in the currency of the order', [], 'Modules.Packetery.Packetery'),
                 ],
                 'required' => false,
             ],
             'PACKETERY_DEFAULT_PACKAGE_WEIGHT' => [
-                'title' => $this->l('Default package weight in kg'),
+                'title' => $this->trans('Default package weight in kg', [], 'Modules.Packetery.Packetery'),
                 'required' => false,
-                'desc' => $this->l('Enter the default weight for the shipment if the order weight is zero'),
+                'desc' => $this->trans('Enter the default weight for the shipment if the order weight is zero', [], 'Modules.Packetery.Packetery'),
             ],
             'PACKETERY_DEFAULT_PACKAGING_WEIGHT' => [
-                'title' => $this->l('Default packaging weight in kg'),
+                'title' => $this->trans('Default packaging weight in kg', [], 'Modules.Packetery.Packetery'),
                 'required' => false,
-                'desc' => $this->l('Enter the default weight of the packaging in kg if the order weight is non-zero'),
+                'desc' => $this->trans('Enter the default weight of the packaging in kg if the order weight is non-zero', [], 'Modules.Packetery.Packetery'),
             ],
         ];
     }
@@ -574,32 +584,32 @@ class Packetery extends CarrierModule
     {
         return [
             'A7 on A4' => [
-                'name' => $this->l('1/8 of A4, printed on A4, 8 labels per page'),
+                'name' => $this->trans('1/8 of A4, printed on A4, 8 labels per page', [], 'Modules.Packetery.Packetery'),
                 'maxOffset' => 7,
                 'directLabels' => false,
             ],
             '105x35mm on A4' => [
-                'name' => $this->l('105x35mm, printed on A4, 16 labels per page'),
+                'name' => $this->trans('105x35mm, printed on A4, 16 labels per page', [], 'Modules.Packetery.Packetery'),
                 'maxOffset' => 15,
                 'directLabels' => false,
             ],
             'A6 on A4' => [
-                'name' => $this->l('1/4 of A4, printed on A4, 4 labels per page'),
+                'name' => $this->trans('1/4 of A4, printed on A4, 4 labels per page', [], 'Modules.Packetery.Packetery'),
                 'maxOffset' => 3,
                 'directLabels' => true,
             ],
             'A6 on A6' => [
-                'name' => $this->l('1/4 of A4, direct printing, 1 label per page'),
+                'name' => $this->trans('1/4 of A4, direct printing, 1 label per page', [], 'Modules.Packetery.Packetery'),
                 'maxOffset' => 0,
                 'directLabels' => true,
             ],
             'A7 on A7' => [
-                'name' => $this->l('1/8 of A4, direct printing, 1 label per page'),
+                'name' => $this->trans('1/8 of A4, direct printing, 1 label per page', [], 'Modules.Packetery.Packetery'),
                 'maxOffset' => 0,
                 'directLabels' => false,
             ],
             'A8 on A8' => [
-                'name' => $this->l('1/16 of A4, direct printing, 1 label per page'),
+                'name' => $this->trans('1/16 of A4, direct printing, 1 label per page', [], 'Modules.Packetery.Packetery'),
                 'maxOffset' => 0,
                 'directLabels' => false,
             ],
@@ -710,8 +720,8 @@ class Packetery extends CarrierModule
             }
             $this->context->smarty->assign('addressValidationSetting', $packeteryCarrier['address_validation']);
             $this->context->smarty->assign('addressValidated', $addressValidated);
-            $this->context->smarty->assign('addressValidatedMessage', $this->l('Address is valid.'));
-            $this->context->smarty->assign('addressNotValidatedMessage', $this->l('Address is not valid.'));
+            $this->context->smarty->assign('addressValidatedMessage', $this->trans('Address is valid.', [], 'Modules.Packetery.Packetery'));
+            $this->context->smarty->assign('addressNotValidatedMessage', $this->trans('Address is not valid.', [], 'Modules.Packetery.Packetery'));
         } else {
             $template = 'views/templates/front/widget.tpl';
             $name_branch = '';
@@ -823,13 +833,13 @@ class Packetery extends CarrierModule
             'toggleExtraContent' => false, // TODO: make configurable?
 
             'addressValidationLevels' => $carrierRepository->getAddressValidationLevels(),
-            'addressValidatedMessage' => $this->l('Address is valid.'),
-            'addressNotValidatedMessage' => $this->l('Address is not valid.'),
-            'countryDiffersMessage' => $this->l('The selected delivery address is in a country other than the country of delivery of the order.'),
+            'addressValidatedMessage' => $this->trans('Address is valid.', [], 'Modules.Packetery.Packetery'),
+            'addressNotValidatedMessage' => $this->trans('Address is not valid.', [], 'Modules.Packetery.Packetery'),
+            'countryDiffersMessage' => $this->trans('The selected delivery address is in a country other than the country of delivery of the order.', [], 'Modules.Packetery.Packetery'),
             'isAgeVerificationRequired' => $isAgeVerificationRequired,
         ]);
 
-        $this->context->smarty->assign('mustSelectPointText', $this->l('Please select pickup point'));
+        $this->context->smarty->assign('mustSelectPointText', $this->trans('Please select pickup point', [], 'Modules.Packetery.Packetery'));
 
         return $this->context->smarty->fetch($this->local_path . 'views/templates/front/display-before-carrier.tpl');
     }
@@ -984,7 +994,7 @@ class Packetery extends CarrierModule
                     ];
                     if ($packeteryOrder['country'] !== strtolower($packeteryOrder['ps_country'])) {
                         $messages[] = [
-                            'text' => $this->l('The selected delivery address is in a country other than the country of delivery of the order.'),
+                            'text' => $this->trans('The selected delivery address is in a country other than the country of delivery of the order.', [], 'Modules.Packetery.Packetery'),
                             'class' => 'danger',
                         ];
                     }
@@ -1275,7 +1285,7 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $this->context->smarty->assign('pickupPointLabel', $this->l('Selected Packeta pickup point or carrier'));
+        $this->context->smarty->assign('pickupPointLabel', $this->trans('Selected Packeta pickup point or carrier', [], 'Modules.Packetery.Packetery'));
         $this->context->smarty->assign('pickupPointName', $orderData['name_branch']);
 
         return $this->display(__FILE__, 'display_order_confirmation.tpl');
@@ -1300,7 +1310,7 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $this->context->smarty->assign('pickupPointLabel', $this->l('Selected Packeta pickup point'));
+        $this->context->smarty->assign('pickupPointLabel', $this->trans('Selected Packeta pickup point', [], 'Modules.Packetery.Packetery'));
         $this->context->smarty->assign('pickupPointName', $orderData['name_branch']);
 
         return $this->display(__FILE__, 'display_order_detail.tpl');
@@ -1452,7 +1462,7 @@ class Packetery extends CarrierModule
             $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
             !$orderRepository->isPickupPointChosenByCart($cart->id)
         ) {
-            $this->context->controller->errors[] = $this->l('Please select pickup point.');
+            $this->context->controller->errors[] = $this->trans('Please select pickup point.', [], 'Modules.Packetery.Packetery');
         }
     }
 
@@ -1468,7 +1478,7 @@ class Packetery extends CarrierModule
     public function hookActionValidateStepComplete(array &$params)
     {
         if (empty($params['cart'])) {
-            $this->context->controller->errors[] = $this->l('Order validation failed, shop owner can find more information in log.');
+            $this->context->controller->errors[] = $this->trans('Order validation failed, shop owner can find more information in log.', [], 'Modules.Packetery.Packetery');
             PrestaShopLogger::addLog('Cart is not present in hook parameters.', 3, null, null, null, true);
             $params['completed'] = false;
             return;
@@ -1486,7 +1496,7 @@ class Packetery extends CarrierModule
             $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
             empty($orderData['id_branch'])
         ) {
-            $this->context->controller->errors[] = $this->l('Please select pickup point.');
+            $this->context->controller->errors[] = $this->trans('Please select pickup point.', [], 'Modules.Packetery.Packetery');
             $params['completed'] = false;
             return;
         }
@@ -1497,7 +1507,7 @@ class Packetery extends CarrierModule
         }
 
         if (!$orderData || !\Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
-            $this->context->controller->errors[] = $this->l('Please use widget to validate address.');
+            $this->context->controller->errors[] = $this->trans('Please use widget to validate address.', [], 'Modules.Packetery.Packetery');
             $params['completed'] = false;
             return;
         }
@@ -1533,7 +1543,7 @@ class Packetery extends CarrierModule
                 $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
 
                 $messages[] = [
-                    'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryTrackingLink,
+                    'text' => $this->trans('The shipment was successfully submitted under shipment number:', [], 'Modules.Packetery.Packetery') . $packeteryTrackingLink,
                     'class' => 'success',
                 ];
             }

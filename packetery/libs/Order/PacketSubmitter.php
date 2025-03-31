@@ -130,7 +130,7 @@ class PacketSubmitter
         if (!$orderIds) {
             throw new AggregatedException(
                 [
-                    new RuntimeException($this->module->l('Please choose orders first.', 'packetsubmitter')),
+                    new RuntimeException($this->module->getTranslator()->trans('Please choose orders first.', [], 'Modules.Packetery.Packetsubmitter')),
                 ]
             );
         }
@@ -182,7 +182,7 @@ class PacketSubmitter
 
             throw new ApiClientException(
                 sprintf(
-                    $this->module->l('Tracking number not returned for order %s', 'packetsubmitter'),
+                    $this->module->getTranslator()->trans('Tracking number not returned for order %s', [], 'Modules.Packetery.Packetsubmitter'),
                     $packetAttributes['number']
                 )
             );

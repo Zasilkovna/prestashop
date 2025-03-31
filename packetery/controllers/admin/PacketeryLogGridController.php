@@ -42,30 +42,30 @@ class PacketeryLogGridController extends ModuleAdminController
 
         $this->fields_list = [
             'status' => [
-                'title' => $this->l('Status', 'packeteryloggridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Status', [], 'Modules.Packetery.Packeteryloggrid'),
                 'type' => 'select',
                 'list' => [
-                    LogRepository::STATUS_SUCCESS => $this->l('Success', 'packeteryloggridcontroller'),
-                    LogRepository::STATUS_ERROR => $this->l('Error', 'packeteryloggridcontroller'),
+                    LogRepository::STATUS_SUCCESS => $this->module->getTranslator()->trans('Success', [], 'Modules.Packetery.Packeteryloggrid'),
+                    LogRepository::STATUS_ERROR => $this->module->getTranslator()->trans('Error', [], 'Modules.Packetery.Packeteryloggrid'),
                 ],
                 'align' => 'left',
                 'callback' => 'renderStatus',
                 'filter_key' => 'a!status',
             ],
             'order_id' => [
-                'title' => $this->l('Order ID', 'packeteryloggridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Order ID', [], 'Modules.Packetery.Packeteryloggrid'),
                 'align' => 'left',
                 'callback' => 'renderOrderId',
                 'filter_key' => 'a!order_id',
             ],
             'date' => [
-                'title' => $this->l('Date', 'packeteryloggridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Date', [], 'Modules.Packetery.Packeteryloggrid'),
                 'type' => 'datetime',
                 'align' => 'left',
                 'filter_key' => 'a!date',
             ],
             'action' => [
-                'title' => $this->l('Action', 'packeteryloggridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Action', [], 'Modules.Packetery.Packeteryloggrid'),
                 'type' => 'select',
                 'list' => $this->logRepository->getActionTranslations(),
                 'align' => 'left',
@@ -73,7 +73,7 @@ class PacketeryLogGridController extends ModuleAdminController
                 'filter_key' => 'a!action',
             ],
             'note' => [
-                'title' => $this->l('Note', 'packeteryloggridcontroller'),
+                'title' => $this->module->getTranslator()->trans('Note', [], 'Modules.Packetery.Packeteryloggrid'),
                 'callback' => 'renderNoteColumn',
                 'align' => 'left',
                 'orderby' => false,
@@ -83,7 +83,7 @@ class PacketeryLogGridController extends ModuleAdminController
 
         $this->bulk_actions = [];
 
-        $title = $this->l('Logs', 'packeteryloggridcontroller');
+        $title = $this->module->getTranslator()->trans('Logs', [], 'Modules.Packetery.Packeteryloggrid');
         $this->meta_title = $title;
         $this->toolbar_title = $title;
     }
@@ -167,10 +167,10 @@ class PacketeryLogGridController extends ModuleAdminController
     public function renderStatus($value, array $row)
     {
         if ($value === 'success') {
-            return '<span class="packeteryloggrid-success">' . $this->l('Success', 'packeteryloggridcontroller') . '</span>';
+            return '<span class="packeteryloggrid-success">' . $this->module->getTranslator()->trans('Success', [], 'Modules.Packetery.Packeteryloggrid') . '</span>';
         }
 
-        return '<span class="packeteryloggrid-error">' . $this->l('Error', 'packeteryloggridcontroller') . '</span>';
+        return '<span class="packeteryloggrid-error">' . $this->module->getTranslator()->trans('Error', [], 'Modules.Packetery.Packeteryloggrid') . '</span>';
     }
 
     /**

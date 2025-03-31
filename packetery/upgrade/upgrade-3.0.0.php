@@ -96,7 +96,7 @@ function upgrade_module_3_0_0($module)
     $sql[] = $logRepository->getCreateTableSql();
 
     $dbTools = $module->diContainer->get(DbTools::class);
-    if (!$dbTools->executeQueries($sql, $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.0.0'), true)) {
+    if (!$dbTools->executeQueries($sql, $module->getTranslator()->trans('Exception raised during Packetery module upgrade:', [], 'Modules.Packetery.Upgrade-3.0.0'), true)) {
         return false;
     }
 
@@ -115,7 +115,7 @@ function upgrade_module_3_0_0($module)
                 $carrierData['id_carrier']
             );
         }
-        if (!$dbTools->executeQueries($carrierUpdates, $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.0.0'), true)) {
+        if (!$dbTools->executeQueries($carrierUpdates, $module->getTranslator()->trans('Exception raised during Packetery module upgrade:', [], 'Modules.Packetery.Upgrade-3.0.0'), true)) {
             return false;
         }
     }

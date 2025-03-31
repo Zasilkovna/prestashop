@@ -42,7 +42,7 @@ class Options
         switch ($id) {
             case 'PACKETERY_APIPASS':
                 if (\Tools::strlen($value) !== self::API_PASSWORD_LENGTH) {
-                    return $this->module->l('Api password must be 32 characters long.', 'options');
+                    return $this->module->getTranslator()->trans('Api password must be 32 characters long.', [], 'Modules.Packetery.Options');
                 }
 
                 return false;
@@ -65,7 +65,7 @@ class Options
                     return false;
                 } catch (SenderGetReturnRoutingException $e) {
                     if ($e->senderNotExists === true) {
-                        return $this->module->l('Provided sender indication does not exist.', 'options');
+                        return $this->module->getTranslator()->trans('Provided sender indication does not exist.', [], 'Modules.Packetery.Options');
                     }
 
                     $this->logRepository->insertRow(
@@ -79,7 +79,7 @@ class Options
 
                     return sprintf(
                         '%s: %s',
-                        $this->module->l('Sender indication validation failed', 'options'),
+                        $this->module->getTranslator()->trans('Sender indication validation failed', [], 'Modules.Packetery.Options'),
                         $e->getMessage()
                     );
                 }
@@ -87,27 +87,27 @@ class Options
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
-                return $this->module->l('Please insert default package price', 'options');
+                return $this->module->getTranslator()->trans('Please insert default package price', [], 'Modules.Packetery.Options');
             case 'PACKETERY_DEFAULT_PACKAGE_WEIGHT':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
-                return $this->module->l('Please insert default package weight in kg', 'options');
+                return $this->module->getTranslator()->trans('Please insert default package weight in kg', [], 'Modules.Packetery.Options');
             case 'PACKETERY_DEFAULT_PACKAGING_WEIGHT':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
-                return $this->module->l('Please insert default packaging weight in kg', 'options');
+                return $this->module->getTranslator()->trans('Please insert default packaging weight in kg', [], 'Modules.Packetery.Options');
             case 'PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
-                return $this->module->l('Insert maximum number of orders that will be processed', 'options');
+                return $this->module->getTranslator()->trans('Insert maximum number of orders that will be processed', [], 'Modules.Packetery.Options');
             case 'PACKETERY_PACKET_STATUS_TRACKING_MAX_ORDER_AGE_DAYS':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
-                return $this->module->l('Insert maximum order age in days', 'options');
+                return $this->module->getTranslator()->trans('Insert maximum order age in days', [], 'Modules.Packetery.Options');
             default:
                 return false;
         }
