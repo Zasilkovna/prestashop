@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin516a3rrrf" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="e7688b51379d3009efeb9efc9d9bfe2d">
+        <source>CRON jobs</source>
+        <target>CRON úkoly</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="96b5307d5a7608691dc0fc0c9a7a2318">
+        <source>Automatic PDF label deletion via CRON</source>
+        <target>Automatické mazání štítků PDF přes CRON</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e2aa285d311193473a9c91a47defaf18">
+        <source>This URL below provides basic functionality for deleting old PDF labels.</source>
+        <target>Tato URL adresa níže poskytuje základní funkce pro mazání starých štítků PDF.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="7c6f61dbdf09d47fb238511b543e42b8">
+        <source>It deletes all PDF labels older than %s days.</source>
+        <target>Smaže všechny štítky PDF starší než %s dní.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a9f5810ceaa043265511ca0443e94a86">
+        <source>To delete the PDF labels automatically, you need to call this URL via CRON jobs.</source>
+        <target>Chcete-li štítky PDF odstranit automaticky, musíte tuto adresu URL zavolat prostřednictvím úloh CRON.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ebdaedbfda244dc012fb8c8417ae3f1c">
+        <source>Extended options are also available to modify the functionality using parameters.</source>
+        <target>Jsou zde také rozšířené možnosti, jak upravit funkcionalitu za použití parametrů.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="83f499a540b1323009c200d6f8cc9396">
+        <source>Parameter</source>
+        <target>Parametr</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b72ac10807b29c77f5b7e4b80ea40414">
+        <source>Explanation</source>
+        <target>Vysvětlení</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a9eb26c1184f0656e0b4947900e55ff3">
+        <source>The parameter tells how old files need to be to be deleted.</source>
+        <target>Parametr říká, jak staré soubory musí být smazány.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ca401932eeff81cb4afddd57134a44ad">
+        <source>This example will delete all PDF labels that are older than %s days.</source>
+        <target>Tento příklad odstraní všechny štítky PDF, které jsou starší než %s dní.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="680fd94cadf0a9907a1e135fe5e50c81">
+        <source>The parameter tells how many PDF labels can be deleted in one CRON call.</source>
+        <target>Parametr říká, kolik štítků PDF lze odstranit v jednom volání CRON.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f4dfc663f4a1f48f182d87da795f4915">
+        <source>This example will delete max %s PDF labels in one batch.</source>
+        <target>Tento příklad odstraní max. %s štítků PDF v jedné dávce.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d7e8a46b0a8b3d64bda7b833934089fc">
+        <source>Can be used to ease up your server/hosting resources.</source>
+        <target>Může být použit k ochraně zdrojů serveru/hostingu.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="aaa32f0174f94c155fae17b931b607c1">
+        <source>* You can also use these two parameters separately and change their values.</source>
+        <target>Tyto dva parametry můžete také používat samostatně a měnit jejich hodnoty.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="83da76284b32119b3e3833c8d8a74392">
+        <source>Packeta carriers update</source>
+        <target>Aktualizace Zásilkovna dopravců</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1c80df02fb6b1411d45df629245a9cd0">
+        <source>Link to update Packeta carriers using CRON</source>
+        <target>Odkaz pre aktualizáciu Packeta dopravcov pomocou cronu</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ff7008e17044128984c90f92fef65368">
+        <source>It is not possible to use the update of carriers. First, set an API password.</source>
+        <target>Aktualizaci dopravců nelze využít. Nejprve nastavte heslo API.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4a65c9986d5bd7296b865722de481cfd">
+        <source>Packet status tracking</source>
+        <target>Sledování stavu zásilek</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2dd680c046e2fdc36cfd8f2239689be7">
+        <source>To automatically update packet statuses regularly, you need to call this URL via CRON jobs.</source>
+        <target>Chcete-li automaticky pravidelně aktualizovat stavy zásilek, musíte tuto adresu URL zavolat prostřednictvím úloh CRON.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1c8bc5f9be7d2391527caba53f09b032">
+        <source>It is not possible to use the task for updating packet statuses. First, set an API password.</source>
+        <target>Nelze použít úlohu pro aktualizaci stavů zásilek. Nejprve nastavte heslo API.</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

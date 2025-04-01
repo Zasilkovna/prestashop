@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin516a3rrrf" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="fd3510c1f57ee8be21bd3dcffe5041a0">
+        <source>A new version of the Packeta module is available: %newVersion% (current version: %currentVersion%).</source>
+        <target>K dispozici je nová verze modulu Zásilkovna: %newVersion% (aktuální verze: %currentVersion%).</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="14875e5c41ab2e37ac073397510ba1bf">
+        <source>Download it</source>
+        <target>Stáhněte ji</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6c92285fa6d3e827b198d120ea3ac674">
+        <source>here</source>
+        <target>zde</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
