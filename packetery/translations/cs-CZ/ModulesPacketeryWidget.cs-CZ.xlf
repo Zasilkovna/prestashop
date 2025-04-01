@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin516a3rrrf" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="422f03dbebc5e4e66d1d5b7e4564c355">
+        <source>Select pick-up point:</source>
+        <target>Vybrat místo vyzvednutí:</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="81bd9c17af94c31967cdb6870f154d83">
+        <source>Selected pick-up point:</source>
+        <target>Vybrané místo vyzvednutí:</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="397164405b87202533b09fd47a137141">
+        <source>Please select a pick up point before confirming your order</source>
+        <target>Vyberte prosím před potvrzením objednávky výdejní místo</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
