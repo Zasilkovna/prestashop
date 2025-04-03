@@ -860,7 +860,7 @@ class Packetery extends CarrierModule
 
         /** @var \Packetery\Order\OrderDetailsUpdater $orderDetailsUpdater */
         $orderDetailsUpdater = $this->diContainer->get(\Packetery\Order\OrderDetailsUpdater::class);
-        $orderDetailsUpdater->orderUpdate($messages, $packeteryOrder, $orderId);
+        $packeteryOrder = $orderDetailsUpdater->orderUpdate($messages, $packeteryOrder, $orderId);
 
         $isAddressDelivery = (bool)$packeteryOrder['is_ad'];
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
