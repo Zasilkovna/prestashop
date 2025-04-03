@@ -176,7 +176,12 @@ class PacketSubmitter
                 return $trackingNumber->id;
             }
 
-            throw new ApiClientException($this->module->l(sprintf('Tracking number not returned for order %s', $packetAttributes['number']), 'packetsubmitter'));
+            throw new ApiClientException(
+                sprintf(
+                    $this->module->l('Tracking number not returned for order %s', 'packetsubmitter'),
+                    $packetAttributes['number']
+                )
+            );
         } catch (SoapFault $e) {
             throw new ApiClientException($this->getErrorMessage($e));
         }
