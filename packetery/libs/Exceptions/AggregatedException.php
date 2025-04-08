@@ -16,7 +16,7 @@ class AggregatedException extends Exception
      */
     public function __construct(array $exceptions)
     {
-        parent::__construct( 'Multiple exceptions occurred.' );
+        parent::__construct('Multiple exceptions occurred.');
         $this->exceptions = $exceptions;
     }
 

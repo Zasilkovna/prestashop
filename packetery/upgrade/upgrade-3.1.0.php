@@ -12,7 +12,8 @@ if (!defined('_PS_VERSION_')) {
  * @param Packetery $module
  * @return bool
  */
-function upgrade_module_3_1_0($module) {
+function upgrade_module_3_1_0($module)
+{
     $sql = [];
 
     /** @var PacketTrackingRepository $packetTrackingRepository */

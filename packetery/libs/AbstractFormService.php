@@ -18,7 +18,8 @@ abstract class AbstractFormService
     /** @var Options */
     private $options;
 
-    public function __construct(Options $options) {
+    public function __construct(Options $options)
+    {
         $this->options = $options;
     }
 
@@ -111,7 +112,6 @@ abstract class AbstractFormService
         );
 
         foreach ($fieldsConfig as $itemKey => $itemConfiguration) {
-
             if ($itemConfiguration['type'] === 'checkbox') {
                 $persistedValue = $packeterySettings[$itemKey];
                 if ($persistedValue === false) {
@@ -134,7 +134,7 @@ abstract class AbstractFormService
                     $defaultValue = $itemConfiguration['defaultValue'];
                 }
 
-                $packetStatusTrackingHelper->fields_value[$itemKey] = Tools::getValue($itemKey, $defaultValue);;
+                $packetStatusTrackingHelper->fields_value[$itemKey] = Tools::getValue($itemKey, $defaultValue);
             }
         }
     }

@@ -16,7 +16,8 @@ class PacketStatusTrackingFormService extends AbstractFormService
     /** @var PacketStatusFactory */
     private $packetStatusFactory;
 
-    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options) {
+    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
+    {
         parent::__construct($options);
         $this->module = $module;
         $this->packetStatusFactory = $packetStatusFactory;
@@ -33,7 +34,8 @@ class PacketStatusTrackingFormService extends AbstractFormService
     /**
      * @return array<string, array<string, mixed>>
      */
-    public function getConfigurationFormFields() {
+    public function getConfigurationFormFields()
+    {
         return [
             'PACKETERY_PACKET_STATUS_TRACKING_ENABLED' => [
                 'type' => 'radio',
@@ -82,8 +84,8 @@ class PacketStatusTrackingFormService extends AbstractFormService
                 'values' => [
                     'query' => $this->getOrderStates(),
                     'id' => 'id',
-                    'name' => 'name'
-                ]
+                    'name' => 'name',
+                ],
             ],
             'PACKETERY_PACKET_STATUS_TRACKING_PACKET_STATUSES' => [
                 'type' => 'checkbox',
@@ -93,8 +95,8 @@ class PacketStatusTrackingFormService extends AbstractFormService
                 'values' => [
                     'query' => $this->getPacketStatusChoices(),
                     'id' => 'id',
-                    'name' => 'name'
-                ]
+                    'name' => 'name',
+                ],
             ],
         ];
     }
@@ -102,7 +104,8 @@ class PacketStatusTrackingFormService extends AbstractFormService
     /**
      * @return array<int, array<string, string>>
      */
-    private function getPacketStatusChoices() {
+    private function getPacketStatusChoices()
+    {
         $result = [];
 
         foreach ($this->packetStatusFactory->getPacketStatuses() as $packetStatus) {
@@ -118,5 +121,4 @@ class PacketStatusTrackingFormService extends AbstractFormService
 
         return $result;
     }
-
 }

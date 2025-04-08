@@ -6,8 +6,8 @@ use mysqli_result;
 use Packetery\Tools\DbTools;
 use PDOStatement;
 
-class PacketTrackingRepository {
-
+class PacketTrackingRepository
+{
     public static $tableName = 'packetery_packet_status';
 
     /**
@@ -18,14 +18,16 @@ class PacketTrackingRepository {
     /**
      * @param DbTools $dbTools
      */
-    public function __construct(DbTools $dbTools) {
+    public function __construct(DbTools $dbTools)
+    {
         $this->dbTools = $dbTools;
     }
 
     /**
      * @return string
      */
-    private function getPrefixedTableName() {
+    private function getPrefixedTableName()
+    {
         return _DB_PREFIX_ . self::$tableName;
     }
 
@@ -37,7 +39,8 @@ class PacketTrackingRepository {
      * @param string $statusText
      * @return bool
      */
-    public function insert($orderId, $packetId, $eventDatetime, $statusCode, $statusText) {
+    public function insert($orderId, $packetId, $eventDatetime, $statusCode, $statusText)
+    {
         return $this->dbTools->insert(
             self::$tableName,
             [
@@ -55,7 +58,8 @@ class PacketTrackingRepository {
      * @param string $packetId
      * @return int|null
      */
-    public function getLastStatusCodeByOrderAndPacketId($orderId, $packetId) {
+    public function getLastStatusCodeByOrderAndPacketId($orderId, $packetId)
+    {
         $statusCode = $this->dbTools->getValue('SELECT `status_code` FROM `' . $this->getPrefixedTableName() . '`
             WHERE `id_order` = ' . (int)$orderId . ' AND `packet_id` = "' . $this->dbTools->db->escape($packetId) . '"
             ORDER BY `event_datetime` DESC');
@@ -70,14 +74,16 @@ class PacketTrackingRepository {
     /**
      * @return string
      */
-    public function getDropTableSql() {
+    public function getDropTableSql()
+    {
         return 'DROP TABLE IF EXISTS `' . $this->getPrefixedTableName() . '`;';
     }
 
     /**
      * @return string
      */
-    public function getCreateTableSql() {
+    public function getCreateTableSql()
+    {
         return 'CREATE TABLE `' . $this->getPrefixedTableName() . '` (
           `id` int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
           `id_order` int unsigned NOT NULL,
@@ -95,7 +101,8 @@ class PacketTrackingRepository {
      * @param int $orderId
      * @return bool
      */
-    public function delete($orderId) {
+    public function delete($orderId)
+    {
         return $this->dbTools->delete(self::$tableName, '`id_order` = ' . (int)$orderId);
     }
 
@@ -103,11 +110,11 @@ class PacketTrackingRepository {
      * @param int $orderId
      * @return array|bool|mysqli_result|PDOStatement|resource|null
      */
-    public function getPacketStatusesByOrderId($orderId) {
+    public function getPacketStatusesByOrderId($orderId)
+    {
         $sql = 'SELECT `id`, `id_order`, `packet_id`, `event_datetime`, `status_code`, `status_text` 
                 FROM `' . $this->getPrefixedTableName() . '`
                 WHERE `id_order` = ' . (int)$orderId;
         return $this->dbTools->getRows($sql);
     }
-
 }

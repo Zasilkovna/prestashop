@@ -24,6 +24,7 @@ class ConfigHelper
 
     /**
      * We do not try to fix rare errors caused by using pre 3.0 versions with multistore on.
+     *
      * @param string $key
      * @return false|string
      */
@@ -132,5 +133,4 @@ class ConfigHelper
 
         return self::BEHAVIOR_ALL;
     }
-
 }

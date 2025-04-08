@@ -2,7 +2,8 @@
 
 namespace Packetery\PacketTracking;
 
-class PacketStatus {
+class PacketStatus
+{
     const RECEIVED_DATA = 1;
     const ARRIVED = 2;
     const PREPARED_FOR_DEPARTURE = 3;
@@ -43,7 +44,7 @@ class PacketStatus {
     public function __construct(
         $id,
         $code,
-        $translatedCode, 
+        $translatedCode,
         $isFinal
     ) {
 
@@ -72,5 +73,4 @@ class PacketStatus {
     {
         return $this->isFinal;
     }
-
 }

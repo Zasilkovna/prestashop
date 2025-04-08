@@ -27,5 +27,4 @@ class Helper
 
         return is_string($data) ? @unserialize($data) : null;
     }
-
 }

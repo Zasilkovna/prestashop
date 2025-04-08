@@ -4,20 +4,22 @@ namespace Packetery\Response;
 
 class PacketInfo extends BaseResponse
 {
-
     /**
      * Packet carrier number.
+     *
      * @var string
      */
     private $number;
     /**
      * Packet tracking link
+     *
      * @var string
      */
     private $trackingLink;
 
     /**
      * Sets packet carrier number.
+     *
      * @param string $number
      */
     public function setNumber($number)
@@ -27,6 +29,7 @@ class PacketInfo extends BaseResponse
 
     /**
      * Sets packet carrier tracking link.
+     *
      * @param string $trackingLink
      */
     public function setTrackingLink($trackingLink)
@@ -36,6 +39,7 @@ class PacketInfo extends BaseResponse
 
     /**
      * Gets packet carrier number
+     *
      * @return string
      */
     public function getNumber()
@@ -45,6 +49,7 @@ class PacketInfo extends BaseResponse
 
     /**
      * Gets packet carrier tracking link
+     *
      * @return string
      */
     public function getTrackingLink()

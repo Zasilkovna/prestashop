@@ -2,7 +2,6 @@
 
 namespace Packetery\Order;
 
-use Context;
 use Packetery;
 use Packetery\Log\LogRepository;
 use Packetery\Module\SoapApi;
@@ -30,8 +29,7 @@ class Labels
         ConfigHelper $configHelper,
         LogRepository $logRepository,
         Packetery $module
-    )
-    {
+    ) {
         $this->logRepository = $logRepository;
         $this->configHelper = $configHelper;
         $this->module = $module;
@@ -44,7 +42,7 @@ class Labels
      * @param array|null $packetsEnhanced Used for carrier labels.
      * @return string|void
      */
-    public function packetsLabelsPdf(array $packets, $type, $packetsEnhanced = null , $offset = 0)
+    public function packetsLabelsPdf(array $packets, $type, $packetsEnhanced = null, $offset = 0)
     {
         $client = new SoapClient(SoapApi::WSDL_URL);
         try {
@@ -53,7 +51,7 @@ class Labels
                 $pdf = $client->packetsCourierLabelsPdf($this->configHelper->getApiPass(), $packetsEnhanced, $offset, $format);
             } else {
                 $format = ConfigHelper::get('PACKETERY_LABEL_FORMAT');
-                $pdf = $client->packetsLabelsPdf($this->configHelper->getApiPass(), array_values( $packets ), $format, $offset);
+                $pdf = $client->packetsLabelsPdf($this->configHelper->getApiPass(), array_values($packets), $format, $offset);
             }
             if ($pdf) {
                 foreach ($packets as $orderId => $packetNumber) {

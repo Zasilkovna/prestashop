@@ -2,8 +2,8 @@
 
 use Packetery\Cron\Tasks\DeleteLabels;
 use Packetery\Cron\Tasks\DownloadCarriers;
-use Packetery\Cron\Tasks\UpdatePacketStatus;
 use Packetery\Cron\Tasks\PurgeLogs;
+use Packetery\Cron\Tasks\UpdatePacketStatus;
 use Packetery\Tools\ConfigHelper;
 
 class PacketeryCronModuleFrontController extends ModuleFrontController
@@ -124,7 +124,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     {
         $templateFilePath = __DIR__ . '/../../views/templates/front/cron-message-row.tpl';
         $template = $this->context->smarty->createTemplate($templateFilePath, [
-            'message' => $message
+            'message' => $message,
         ]);
 
         // gzip compression forces browser to wait for all messages, no point in calling flush()

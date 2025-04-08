@@ -12,42 +12,42 @@ class ApiCarrierRepository
         'is_pickup_points' => [
             'apiName' => 'pickupPoints',
             'type' => 'bool',
-            'defaultPPValue' => true
+            'defaultPPValue' => true,
         ],
         'has_carrier_direct_label' => [
             'apiName' => 'apiAllowed',
             'type' => 'bool',
-            'defaultPPValue' => false
+            'defaultPPValue' => false,
         ],
         'separate_house_number' => [
             'apiName' => 'separateHouseNumber',
             'type' => 'bool',
-            'defaultPPValue' => false
+            'defaultPPValue' => false,
         ],
         'customs_declarations' => [
             'apiName' => 'customsDeclarations',
             'type' => 'bool',
-            'defaultPPValue' => false
+            'defaultPPValue' => false,
         ],
         'requires_email' => [
             'apiName' => 'requiresEmail',
             'type' => 'bool',
-            'defaultPPValue' => false
+            'defaultPPValue' => false,
         ],
         'requires_phone' => [
             'apiName' => 'requiresPhone',
             'type' => 'bool',
-            'defaultPPValue' => false
+            'defaultPPValue' => false,
         ],
         'requires_size' => [
             'apiName' => 'requiresSize',
             'type' => 'bool',
-            'defaultPPValue' => false
+            'defaultPPValue' => false,
         ],
         'disallows_cod' => [
             'apiName' => 'disallowsCod',
             'type' => 'bool',
-            'defaultPPValue' => false
+            'defaultPPValue' => false,
         ],
         'country' => ['defaultPPValue' => ''],
         'currency' => ['defaultPPValue' => ''],
@@ -65,6 +65,7 @@ class ApiCarrierRepository
 
     /**
      * CarrierRepository constructor.
+     *
      * @param DbTools $dbTools
      */
     public function __construct(DbTools $dbTools)
@@ -79,6 +80,7 @@ class ApiCarrierRepository
 
     /**
      * Maps input data to storage structure.
+     *
      * @param array $carriers Validated data retrieved from API.
      * @return array data to store in db
      */
@@ -109,7 +111,8 @@ class ApiCarrierRepository
      * @param array $mappedData data to store in db
      * @return array
      */
-    private function addNonApiCarriers(array $mappedData) {
+    private function addNonApiCarriers(array $mappedData)
+    {
         $defaultPickupPointsValues = array_combine(array_keys(self::$columnDefinitions), array_column(self::$columnDefinitions, 'defaultPPValue'));
         $mappedData[Packetery::ZPOINT] = $defaultPickupPointsValues;
         $mappedData[Packetery::ZPOINT]['name'] = $this->module->l('Packeta pickup points', 'apicarrierrepository');
@@ -121,6 +124,7 @@ class ApiCarrierRepository
 
     /**
      * Saves carriers.
+     *
      * @param array $carriers Validated data retrieved from API.
      * @throws DatabaseException
      */
@@ -202,6 +206,7 @@ class ApiCarrierRepository
 
     /**
      * Set those not in feed as deleted.
+     *
      * @param array $carriersInFeed
      * @throws DatabaseException
      */

@@ -22,6 +22,7 @@ class PaymentRepository
 
     /**
      * PaymentRepository constructor.
+     *
      * @param Db $db
      * @param DbTools $dbTools
      * @param OrderRepository $orderRepository
@@ -118,13 +119,15 @@ class PaymentRepository
 
     /**
      * Converts price from order currency to branch currency
+     *
      * @param string $orderCurrencyIso
      * @param string $branchCurrencyIso
      * @param float|int $total
      * @return float|int|null Returns null if rate was not found.
      * @throws DatabaseException
      */
-    public function getRateTotal($orderCurrencyIso, $branchCurrencyIso, $total) {
+    public function getRateTotal($orderCurrencyIso, $branchCurrencyIso, $total)
+    {
         $conversionRateOrder = $this->orderRepository->getConversionRate($orderCurrencyIso);
         $conversionRateBranch = $this->orderRepository->getConversionRate($branchCurrencyIso);
 
@@ -138,6 +141,7 @@ class PaymentRepository
 
     /**
      * Get list of payments for configuration
+     *
      * @return array
      * @throws DatabaseException
      */
@@ -164,10 +168,9 @@ class PaymentRepository
             $payments[] = [
                 'name' => $instance->displayName,
                 'is_cod' => $is_cod,
-                'module_name' => $installedPaymentModule['name']
+                'module_name' => $installedPaymentModule['name'],
             ];
         }
         return $payments;
     }
-
 }

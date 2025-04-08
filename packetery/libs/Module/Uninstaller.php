@@ -2,13 +2,13 @@
 
 namespace Packetery\Module;
 
+use Configuration;
 use Packetery;
 use Packetery\Log\LogRepository;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\DbTools;
 use PrestaShopException;
 use PrestaShopLogger;
-use Configuration;
 use Tab;
 
 class Uninstaller

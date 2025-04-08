@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2017 Zlab Solutions
  *
@@ -37,7 +38,6 @@ use Packetery\Tools\ConfigHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
 {
-
     const ACTION_BULK_CARRIER_LABEL_PDF = 'bulkCarrierLabelPdf';
 
     protected $statuses_array = array();
@@ -290,6 +290,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     /**
      * Used after offset setting form is processed.
+     *
      * @throws ReflectionException
      * @throws DatabaseException
      */
@@ -305,6 +306,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     /**
      * Used after offset setting form is processed.
+     *
      * @return void
      * @throws DatabaseException
      * @throws ReflectionException
@@ -324,6 +326,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     /**
      * Used after single order print is triggered.
+     *
      * @throws ReflectionException
      * @throws DatabaseException
      */
@@ -619,7 +622,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      * @param int $orderId
      * @return string
      */
-    public function displayActionLink($token = null, $orderId)
+    public function displayActionLink($token, $orderId)
     {
         $actionLinkHtml = '';
         foreach ($this->getActionLinks($orderId) as $link) {

@@ -2,10 +2,10 @@
 
 namespace Packetery\Module;
 
-use Packetery\Exceptions\ApiClientException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Message\Response;
+use Packetery\Exceptions\ApiClientException;
 
 class ApiClientFacade
 {
@@ -35,5 +35,4 @@ class ApiClientFacade
 
         return \Tools::file_get_contents($url, false, null, 30, true);
     }
-
 }

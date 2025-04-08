@@ -114,6 +114,7 @@ class SoapApi
 
     /**
      * Requests carrier number for a packet.
+     *
      * @param string $packetId
      * @return PacketCarrierNumber
      */
@@ -174,6 +175,7 @@ class SoapApi
 
     /**
      * Gets fault identifier from SoapFault exception.
+     *
      * @param SoapFault $exception
      * @return int|string
      */

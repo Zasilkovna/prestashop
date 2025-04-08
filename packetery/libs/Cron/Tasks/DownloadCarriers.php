@@ -3,8 +3,8 @@
 namespace Packetery\Cron\Tasks;
 
 use Packetery;
-use Packetery\Exceptions\DatabaseException;
 use Packetery\ApiCarrier\Downloader;
+use Packetery\Exceptions\DatabaseException;
 
 class DownloadCarriers extends Base
 {

@@ -103,6 +103,7 @@ class DbTools
 
     /**
      * Simplified fork of Db::getValue
+     *
      * @param string $sql SQL query
      * @return false|string|null
      * @throws DatabaseException
@@ -209,5 +210,4 @@ class DbTools
     {
         return array_combine(array_column($result, $indexKey), array_column($result, $valueKey));
     }
-
 }

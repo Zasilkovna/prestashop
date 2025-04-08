@@ -126,7 +126,7 @@ class PacketSubmitter
         if (!$orderIds) {
             throw new AggregatedException(
                 [
-                    new RuntimeException($this->module->l('Please choose orders first.', 'packetsubmitter'))
+                    new RuntimeException($this->module->l('Please choose orders first.', 'packetsubmitter')),
                 ]
             );
         }
@@ -198,8 +198,10 @@ class PacketSubmitter
             $errorMessage = $e->faultstring;
         }
         if (isset($e->detail->PacketAttributesFault->attributes->fault)) {
-            if (is_array($e->detail->PacketAttributesFault->attributes->fault) &&
-                count($e->detail->PacketAttributesFault->attributes->fault) > 1) {
+            if (
+                is_array($e->detail->PacketAttributesFault->attributes->fault) &&
+                count($e->detail->PacketAttributesFault->attributes->fault) > 1
+            ) {
                 foreach ($e->detail->PacketAttributesFault->attributes->fault as $fault) {
                     $errorMessage .= "\n" . $fault->name . ': ' . $fault->fault;
                 }
@@ -210,5 +212,4 @@ class PacketSubmitter
         }
         return $errorMessage;
     }
-
 }
