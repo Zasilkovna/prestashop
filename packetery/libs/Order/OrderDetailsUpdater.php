@@ -29,17 +29,17 @@ class OrderDetailsUpdater
      * @param array $messages
      * @param array|bool|null|object $packeteryOrder
      * @param int $orderId
-     * @return void
+     * @return array|bool|null|object
      * @throws Packetery\Exceptions\DatabaseException
      */
     public function orderUpdate(&$messages, $packeteryOrder, $orderId)
     {
         if (!Tools::isSubmit('order_update')) {
-            return;
+            return $packeteryOrder;
         }
 
         if ($packeteryOrder['exported']) {
-            return;
+            return $packeteryOrder;
         }
 
         $fieldsToUpdate = [];
@@ -68,6 +68,10 @@ class OrderDetailsUpdater
                     'text' => $this->module->l('Data has been successfully saved', 'orderdetailsupdater'),
                     'class' => 'success',
                 ];
+
+                foreach ($fieldsToUpdate as $key => $value) {
+                    $packeteryOrder[$key] = $value;
+                }
             } else {
                 $messages[] = [
                     'text' => $this->module->l('Address could not be changed.', 'orderdetailsupdater'),
@@ -84,6 +88,8 @@ class OrderDetailsUpdater
                 'class' => 'danger',
             ];
         }
+
+        return $packeteryOrder;
     }
 
     /**

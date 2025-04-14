@@ -56,7 +56,7 @@ class Packetery extends CarrierModule
     {
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '3.0.0';
+        $this->version = '3.0.1';
         $this->author = 'Packeta s.r.o.';
         $this->need_instance = 0;
         $this->is_configurable = 1;
@@ -860,7 +860,7 @@ class Packetery extends CarrierModule
 
         /** @var \Packetery\Order\OrderDetailsUpdater $orderDetailsUpdater */
         $orderDetailsUpdater = $this->diContainer->get(\Packetery\Order\OrderDetailsUpdater::class);
-        $orderDetailsUpdater->orderUpdate($messages, $packeteryOrder, $orderId);
+        $packeteryOrder = $orderDetailsUpdater->orderUpdate($messages, $packeteryOrder, $orderId);
 
         $isAddressDelivery = (bool)$packeteryOrder['is_ad'];
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
@@ -1089,34 +1089,6 @@ class Packetery extends CarrierModule
         ];
         /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        return $orderRepository->updateByOrder($packeteryOrderFields, $orderId);
-    }
-
-    /**
-     * @return bool
-     * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
-     */
-    private function savePickupPointChange()
-    {
-        $orderId = (int)Tools::getValue('order_id');
-        $pickupPoint = json_decode(Packetery\Tools\Tools::getValue('pickup_point'));
-        if (!$pickupPoint) {
-            return false;
-        }
-
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $packeteryOrderFields = [
-            'id_branch' => (int)$pickupPoint->id,
-            'name_branch' => $orderRepository->db->escape($pickupPoint->name),
-            'currency_branch' => $orderRepository->db->escape($pickupPoint->currency),
-        ];
-        if ($pickupPoint->pickupPointType === 'external') {
-            $packeteryOrderFields['is_carrier'] = 1;
-            $packeteryOrderFields['id_branch'] = (int)$pickupPoint->carrierId;
-            $packeteryOrderFields['carrier_pickup_point'] = $orderRepository->db->escape($pickupPoint->carrierPickupPointId);
-        }
-
         return $orderRepository->updateByOrder($packeteryOrderFields, $orderId);
     }
 
