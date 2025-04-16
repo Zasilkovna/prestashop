@@ -13,13 +13,13 @@ class PacketStatusTrackingFormService extends AbstractFormService
     /** @var Packetery */
     private $module;
 
-    /** @var PacketStatusMapper */
-    private $packetStatusMapper;
+    /** @var PacketStatusFactory */
+    private $packetStatusFactory;
 
-    public function __construct(Packetery $module, PacketStatusMapper $packetStatusMapper, Options $options) {
+    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options) {
         parent::__construct($options);
         $this->module = $module;
-        $this->packetStatusMapper = $packetStatusMapper;
+        $this->packetStatusFactory = $packetStatusFactory;
     }
 
     /**
@@ -105,14 +105,14 @@ class PacketStatusTrackingFormService extends AbstractFormService
     private function getPacketStatusChoices() {
         $result = [];
 
-        foreach ($this->packetStatusMapper->getPacketStatuses() as $packetStatusId => $packetStatus) {
-            if ($packetStatus['isFinal'] === true) {
+        foreach ($this->packetStatusFactory->getPacketStatuses() as $packetStatus) {
+            if ($packetStatus->isFinal() === true) {
                 continue;
             }
 
             $result[] = [
-                'id' => $packetStatusId,
-                'name' => $packetStatus['translated'],
+                'id' => $packetStatus->getId(),
+                'name' => $packetStatus->getTranslatedCode(),
             ];
         }
 

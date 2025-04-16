@@ -5,7 +5,7 @@ namespace Packetery\Order;
 use Packetery;
 use Packetery\AbstractFormService;
 use Packetery\Module\Options;
-use Packetery\PacketTracking\PacketStatusMapper;
+use Packetery\PacketTracking\PacketStatusFactory;
 
 class OrderStatusChangeFormService extends AbstractFormService
 {
@@ -14,13 +14,13 @@ class OrderStatusChangeFormService extends AbstractFormService
     /** @var Packetery */
     private $module;
 
-    /** @var PacketStatusMapper */
-    private $packetStatusMapper;
+    /** @var PacketStatusFactory */
+    private $packetStatusFactory;
 
-    public function __construct(Packetery $module, PacketStatusMapper $packetStatusMapper, Options $options) {
+    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options) {
         parent::__construct($options);
         $this->module = $module;
-        $this->packetStatusMapper = $packetStatusMapper;
+        $this->packetStatusFactory = $packetStatusFactory;
     }
 
     /**
@@ -51,11 +51,12 @@ class OrderStatusChangeFormService extends AbstractFormService
         }
 
         $packetStatusFields = [];
-        $packetStatuses = $this->packetStatusMapper->getPacketStatuses();
-        foreach ($packetStatuses as $packetStatusId => $packetStatus) {
+        $packetStatuses = $this->packetStatusFactory->getPacketStatuses();
+        foreach ($packetStatuses as  $packetStatus) {
+            $packetStatusId = $packetStatus->getId();
             $packetStatusFields['PACKETERY_ORDER_STATUS_CHANGE_' . $packetStatusId] = [
                 'type' => 'select',
-                'label' => $packetStatus['translated'],
+                'label' => $packetStatus->getTranslatedCode(),
                 'name' => 'PACKETERY_ORDER_STATUS_CHANGE_' . $packetStatusId,
                 'options' => [
                     'query' => $orderStatusesChoices,
