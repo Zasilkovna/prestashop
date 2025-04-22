@@ -2,3 +2,4 @@
 .DS_Store
 .phpcs-cache
 packetery/vendor
+packetery/views/js/write-test.js
