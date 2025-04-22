@@ -12,8 +12,5 @@ jobs:
             -   name: Running sniffer
                 shell: bash
                 run: |
-                    # make file runnable, might not be necessary
-                    chmod +x "${GITHUB_WORKSPACE}/.github/run-sniffer.sh"
-                    
                     # run script
                     "${GITHUB_WORKSPACE}/.github/run-sniffer.sh"
