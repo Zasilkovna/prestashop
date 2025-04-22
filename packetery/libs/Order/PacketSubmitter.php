@@ -21,6 +21,9 @@ use Tools;
 
 class PacketSubmitter
 {
+    /** @var string */
+    const AFFILIATE_ID = '26d07661f147af2f';
+
     /** @var OrderRepository */
     private $orderRepository;
     /** @var LogRepository */
@@ -70,6 +73,7 @@ class PacketSubmitter
             'eshop' => $exportData['senderLabel'],
             'weight' => $exportData['weight'],
             'adultContent' => $exportData['adultContent'],
+            'affiliateId' => self::AFFILIATE_ID,
         ];
 
         if (count($exportData['size']) > 0) {
