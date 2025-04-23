@@ -20,40 +20,57 @@ class PacketStatus {
     const REJECTED_BY_RECIPIENT = 17;
     const UNKNOWN = 999;
 
+    /**
+     * @var int
+     */
     private $id;
+
+    /**
+     * @var string
+     */
     private $code;
+
+    /**
+     * @var string
+     */
     private $translatedCode;
+
+    /**
+     * @var bool
+     */
+    private $isFinal;
 
     public function __construct(
         $id,
         $code,
-        $translatedCode
+        $translatedCode, 
+        $isFinal
     ) {
 
         $this->id = $id;
         $this->code = $code;
         $this->translatedCode = $translatedCode;
+        $this->isFinal = $isFinal;
     }
 
-    /**
-     * @return int
-     */
-    public function getId() {
+    public function getId(): int
+    {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode() {
+    public function getCode(): string
+    {
         return $this->code;
     }
 
-    /**
-     * @return string
-     */
-    public function getTranslatedCode() {
+    public function getTranslatedCode(): string
+    {
         return $this->translatedCode;
+    }
+
+    public function isFinal(): bool
+    {
+        return $this->isFinal;
     }
 
 }
