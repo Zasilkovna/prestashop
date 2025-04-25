@@ -7,8 +7,8 @@ use Order;
 use OrderState;
 use Packetery;
 use Packetery\Log\LogRepository;
-use Packetery\Module\SoapApi;
 use Packetery\Module\Helper;
+use Packetery\Module\SoapApi;
 use Packetery\Order\OrderRepository;
 use Packetery\Tools\ConfigHelper;
 use PrestaShop\PrestaShop\Adapter\Validate;
@@ -191,14 +191,15 @@ class PacketTrackingCron
      * @param int $orderId
      * @return void
      */
-    private function updateOrderStatus($lastRecord, $orderId) {
+    private function updateOrderStatus($lastRecord, $orderId)
+    {
         $lastStatusCode = $lastRecord->statusCode;
         $newOrderStatus = ConfigHelper::get('PACKETERY_ORDER_STATUS_CHANGE_' . $lastStatusCode);
 
         $order = new Order($orderId);
         $isOrderExists = Validate::isLoadedObject($order);
         if ($isOrderExists === false) {
-           return;
+            return;
         }
 
         $orderState = new OrderState($newOrderStatus);
@@ -211,6 +212,6 @@ class PacketTrackingCron
             return;
         }
 
-        $order->setCurrentState((int)$newOrderStatus);;
+        $order->setCurrentState((int)$newOrderStatus);
     }
 }

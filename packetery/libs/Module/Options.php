@@ -2,12 +2,10 @@
 
 namespace Packetery\Module;
 
-use Context;
 use Packetery;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Log\LogRepository;
 use Validate;
-use Packetery\Tools\ConfigHelper;
 
 class Options
 {
@@ -26,8 +24,7 @@ class Options
         Packetery $module,
         SoapApi $soapApi,
         LogRepository $logRepository
-    )
-    {
+    ) {
         $this->module = $module;
         $this->soapApi = $soapApi;
         $this->logRepository = $logRepository;
@@ -141,5 +138,4 @@ class Options
     {
         return (Validate::isUnsignedInt($value) || (Validate::isFloat($value) && $value >= 0));
     }
-
 }

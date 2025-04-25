@@ -20,6 +20,7 @@ class CarrierRepository
 
     /**
      * CarrierRepository constructor.
+     *
      * @param Db $db
      * @param DbTools $dbTools
      */
@@ -46,6 +47,7 @@ class CarrierRepository
 
     /**
      * Get all active packetery carriers
+     *
      * @return array|false|\mysqli_result|null|\PDOStatement|resource
      * @throws DatabaseException
      */
@@ -200,6 +202,7 @@ class CarrierRepository
 
     /**
      * Add address delivery to carrier in DB
+     *
      * @param int $carrierId
      * @param string $branchId
      * @param string $branchName
@@ -219,8 +222,7 @@ class CarrierRepository
         $isCod,
         $addressValidation,
         $allowedVendors
-    )
-    {
+    ) {
         $carrierId = (int)$carrierId;
         $branchId = (string)$branchId;
         $branchName = (string)$branchName;
@@ -268,5 +270,4 @@ class CarrierRepository
 
         return $result;
     }
-
 }

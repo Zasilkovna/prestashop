@@ -1,13 +1,73 @@
 <?xml version="1.0"?>
 <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="PHP_CodeSniffer" xsi:noNamespaceSchemaLocation="phpcs.xsd">
     <description>Prestashop coding standards.</description>
-
+    <arg name="basepath" value="."/>
+    <arg name="cache" value=".phpcs-cache"/>
     <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="20"/>
+    <arg name="tab-width" value="4"/>
+    <arg name="encoding" value="utf-8"/>
 
-    <rule ref="PSR2">
-        <exclude-pattern>translations/*.php</exclude-pattern>
+    <ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED"/>
+
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>translations/*.php</exclude-pattern>
+    <exclude-pattern>index.php</exclude-pattern>
+
+    <rule ref="PSR12">
         <exclude name="PSR1.Files.SideEffects.FoundWithSymbols"/>
         <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+        <exclude name="PSR12.Classes.ClassConstantVisibility.NotFound"/>
+        <exclude name="PSR12.Properties.ConstantVisibility.NotFound"/>
     </rule>
 
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace">
+        <properties>
+            <property name="ignoreBlankLines" value="false"/>
+        </properties>
+    </rule>
+
+    <rule ref="Generic.Files.EndFileNewline"/>
+    <rule ref="SlevomatCodingStandard.PHP.UselessSemicolon"/>
+    <rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash"/>
+    <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses"/>
+
+    <rule ref="SlevomatCodingStandard.Classes.ClassMemberSpacing">
+        <properties>
+            <property name="linesCountBetweenMembers" value="1"/>
+        </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
+        <properties>
+            <property name="searchAnnotations" value="true"/>
+        </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Commenting.DocCommentSpacing">
+        <properties>
+            <property name="linesCountBetweenDescriptionAndAnnotations" value="1"/>
+            <property name="linesCountBeforeFirstContent" value="0"/>
+            <property name="linesCountAfterLastContent" value="0"/>
+        </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma">
+        <properties>
+            <property name="enableAfterHeredoc" value="true"/>
+        </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses">
+        <properties>
+            <property name="caseSensitive" value="false"/>
+        </properties>
+    </rule>
+
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="300"/>
+        </properties>
+    </rule>
 </ruleset>

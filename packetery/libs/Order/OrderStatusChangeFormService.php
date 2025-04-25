@@ -17,7 +17,8 @@ class OrderStatusChangeFormService extends AbstractFormService
     /** @var PacketStatusFactory */
     private $packetStatusFactory;
 
-    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options) {
+    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
+    {
         parent::__construct($options);
         $this->module = $module;
         $this->packetStatusFactory = $packetStatusFactory;
@@ -52,7 +53,7 @@ class OrderStatusChangeFormService extends AbstractFormService
 
         $packetStatusFields = [];
         $packetStatuses = $this->packetStatusFactory->getPacketStatuses();
-        foreach ($packetStatuses as  $packetStatus) {
+        foreach ($packetStatuses as $packetStatus) {
             $packetStatusId = $packetStatus->getId();
             $packetStatusFields['PACKETERY_ORDER_STATUS_CHANGE_' . $packetStatusId] = [
                 'type' => 'select',

@@ -146,5 +146,4 @@ class VersionChecker
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/newVersionMessage.tpl');
     }
-
 }

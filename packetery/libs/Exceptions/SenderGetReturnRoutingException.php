@@ -8,6 +8,7 @@ class SenderGetReturnRoutingException extends \Exception
 
     /**
      * SenderGetReturnRoutingException constructor.
+     *
      * @param string $message
      * @param bool $senderNotExists
      */

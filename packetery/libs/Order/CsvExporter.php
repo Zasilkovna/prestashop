@@ -22,6 +22,7 @@ class CsvExporter
 
     /**
      * Get data for CSV Export
+     *
      * @param array $order_ids - IDs of orders to be exported
      * @return array - Order data
      * @throws DatabaseException
@@ -104,5 +105,4 @@ class CsvExporter
         }
         fclose($fp);
     }
-
 }

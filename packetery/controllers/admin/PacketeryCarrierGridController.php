@@ -3,9 +3,9 @@
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Carrier\CarrierAdminForm;
 use Packetery\Carrier\CarrierRepository;
+use Packetery\Carrier\CarrierTools;
 use Packetery\Module\VersionChecker;
 use Packetery\Tools\MessageManager;
-use Packetery\Carrier\CarrierTools;
 
 class PacketeryCarrierGridController extends ModuleAdminController
 {
@@ -204,7 +204,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
         return $this->packetery;
     }
 
-    public function displayEditLink($token = null, $carrierId, $name = null)
+    public function displayEditLink($token, $carrierId, $name = null)
     {
         if ($this->totalCarriers === 0) {
             return '';

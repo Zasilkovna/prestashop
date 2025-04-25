@@ -1,0 +1,16 @@
+name: Code checking by sniffer
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+jobs:
+    sniff:
+        name: Run sniffer
+        runs-on: ubuntu-24.04
+        steps:
+            -   uses: actions/checkout@v4
+            -   name: Running sniffer
+                shell: bash
+                run: |
+                    # run script
+                    "${GITHUB_WORKSPACE}/.github/run-sniffer.sh"

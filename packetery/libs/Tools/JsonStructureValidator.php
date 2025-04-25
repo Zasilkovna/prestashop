@@ -74,5 +74,4 @@ class JsonStructureValidator
                 return false;
         }
     }
-
 }

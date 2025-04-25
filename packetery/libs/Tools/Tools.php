@@ -3,8 +3,8 @@
 namespace Packetery\Tools;
 
 use Symfony\Component\HttpFoundation\Request;
-use ToolsCore;
 use Tools as PrestaShopTools;
+use ToolsCore;
 
 class Tools extends ToolsCore
 {
@@ -14,7 +14,6 @@ class Tools extends ToolsCore
      *
      * @param string $key Value key
      * @param mixed $default_value (optional)
-     *
      * @return mixed Value
      */
     public static function getValue($key, $default_value = false)

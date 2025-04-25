@@ -1,4 +1,11 @@
 .gitattributes export-ignore
 .gitignore export-ignore
+.github export-ignore
 doc/ export-ignore
 releases/ export-ignore
+packetery/bin export-ignore
+packetery/vendor/ export-ignore
+packetery/phpcs.xml export-ignore
+packetery/phpcs.xsd export-ignore
+packetery/composer.json export-ignore
+packetery/composer.lock export-ignore

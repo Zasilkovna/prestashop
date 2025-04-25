@@ -26,6 +26,7 @@ class Downloader
 
     /**
      * Downloader constructor.
+     *
      * @param Packetery $module
      * @param ApiCarrierRepository $apiCarrierRepository
      * @param SoapApi $configHelper
@@ -39,6 +40,7 @@ class Downloader
 
     /**
      * Runs update and returns result.
+     *
      * @return array
      * @throws DatabaseException
      */
@@ -130,7 +132,6 @@ class Downloader
      * Converts JSON to array.
      *
      * @param string $json JSON.
-     *
      * @return array|null
      */
     private function getFromJson($json)
@@ -142,27 +143,30 @@ class Downloader
 
     /**
      * Validates data from API.
+     *
      * @param array $carriers Data retrieved from API.
      * @return bool
      */
     public function validateCarrierData(array $carriers)
     {
         foreach ($carriers as $carrier) {
-            if (!isset(
-                $carrier['id'],
-                $carrier['name'],
-                $carrier['country'],
-                $carrier['currency'],
-                $carrier['pickupPoints'],
-                $carrier['apiAllowed'],
-                $carrier['separateHouseNumber'],
-                $carrier['customsDeclarations'],
-                $carrier['requiresEmail'],
-                $carrier['requiresPhone'],
-                $carrier['requiresSize'],
-                $carrier['disallowsCod'],
-                $carrier['maxWeight']
-            )) {
+            if (
+                !isset(
+                    $carrier['id'],
+                    $carrier['name'],
+                    $carrier['country'],
+                    $carrier['currency'],
+                    $carrier['pickupPoints'],
+                    $carrier['apiAllowed'],
+                    $carrier['separateHouseNumber'],
+                    $carrier['customsDeclarations'],
+                    $carrier['requiresEmail'],
+                    $carrier['requiresPhone'],
+                    $carrier['requiresSize'],
+                    $carrier['disallowsCod'],
+                    $carrier['maxWeight']
+                )
+            ) {
                 return false;
             }
         }

@@ -4,15 +4,16 @@ namespace Packetery\PacketTracking;
 
 use Packetery;
 
-class PacketStatusFactory {
-
+class PacketStatusFactory
+{
     /** @var Packetery */
     private $module;
 
     /**
      * @param Packetery $module
      */
-    public function __construct(Packetery $module) {
+    public function __construct(Packetery $module)
+    {
         $this->module = $module;
     }
 
@@ -21,7 +22,8 @@ class PacketStatusFactory {
      *
      * @return PacketStatus[]
      */
-    public function getPacketStatuses() {
+    public function getPacketStatuses()
+    {
         return [
             PacketStatus::RECEIVED_DATA => new PacketStatus(
                 PacketStatus::RECEIVED_DATA,
@@ -99,7 +101,7 @@ class PacketStatusFactory {
                 PacketStatus::REVERSE_PACKET_ARRIVED,
                 'reverse packet arrived',
                 $this->module->l('Reverse parcel has been accepted at our pick up point', 'packetstatusfactory'),
-                 false
+                false
             ),
             PacketStatus::DELIVERY_ATTEMPT => new PacketStatus(
                 PacketStatus::DELIVERY_ATTEMPT,
@@ -121,5 +123,4 @@ class PacketStatusFactory {
             ),
         ];
     }
-
 }

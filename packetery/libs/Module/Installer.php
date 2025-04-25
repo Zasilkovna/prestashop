@@ -2,15 +2,15 @@
 
 namespace Packetery\Module;
 
+use Language;
 use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Log\LogRepository;
 use Packetery\PacketTracking\PacketTrackingRepository;
 use Packetery\Product\ProductAttributeRepository;
-use Packetery\Tools\DbTools;
-use Language;
 use Packetery\Tools\ConfigHelper;
+use Packetery\Tools\DbTools;
 use PrestaShopDatabaseException;
 use PrestaShopException;
 use PrestaShopLogger;
@@ -59,6 +59,7 @@ class Installer
 
     /**
      * Creates packetery menu items
+     *
      * @return bool
      */
     public function insertMenuItems()
@@ -70,31 +71,31 @@ class Installer
                 'parentClass' => 'SELL',
                 'class' => 'Packetery',
                 'name' => 'Packeta',
-                'translatedName' => $this->module->l('Packeta', 'installer')
+                'translatedName' => $this->module->l('Packeta', 'installer'),
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryOrderGrid',
                 'name' => 'Packeta Orders',
-                'translatedName' => $this->module->l('Packeta Orders', 'installer')
+                'translatedName' => $this->module->l('Packeta Orders', 'installer'),
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryCarrierGrid',
                 'name' => 'Carrier settings',
-                'translatedName' => $this->module->l('Carrier settings', 'installer')
+                'translatedName' => $this->module->l('Carrier settings', 'installer'),
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketerySetting',
                 'name' => 'Configuration',
-                'translatedName' => $this->module->l('Configuration', 'installer')
+                'translatedName' => $this->module->l('Configuration', 'installer'),
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryLogGrid',
                 'name' => 'Log',
-                'translatedName' => $this->module->l('Log', 'installer')
+                'translatedName' => $this->module->l('Log', 'installer'),
             ],
         ];
 
@@ -253,7 +254,7 @@ class Installer
      */
     private function addTab($parentClassName, $className, $name)
     {
-        $tab = new Tab;
+        $tab = new Tab();
         $parentId = Tab::getIdFromClassName($parentClassName);
         // PrestaShop 1.6 without the SELL tab group.
         if ($parentId === false) {

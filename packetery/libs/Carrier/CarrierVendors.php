@@ -4,7 +4,6 @@ namespace Packetery\Carrier;
 
 class CarrierVendors
 {
-
     /** @var \Packetery */
     private $module;
 
@@ -94,7 +93,7 @@ class CarrierVendors
                     'country' => 'ro',
                     'name' => $zboxName,
                 ],
-            ]
+            ],
         ];
     }
 
@@ -121,7 +120,7 @@ class CarrierVendors
                         ];
                     }
                 }
-            } else if (is_numeric($packeteryCarrier['id_branch'])) {
+            } elseif (is_numeric($packeteryCarrier['id_branch'])) {
                 $widgetVendors[] = [
                     'carrierId' => $packeteryCarrier['id_branch'],
                     'selected' => true,
@@ -131,5 +130,4 @@ class CarrierVendors
 
         return $widgetVendors;
     }
-
 }

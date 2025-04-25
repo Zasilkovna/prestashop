@@ -20,6 +20,7 @@ class OrderRepository
 
     /**
      * OrderRepository constructor.
+     *
      * @param Db $db
      * @param DbTools $dbTools
      */
@@ -453,5 +454,4 @@ class OrderRepository
         $orderId = (int)$orderId;
         return $this->dbTools->update('packetery_order', ['last_update_tracking_status' => $lastUpdateTrackingStatus->format('Y-m-d H:i:s')], '`id_order` = ' . $orderId);
     }
-
 }

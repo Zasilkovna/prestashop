@@ -6,8 +6,8 @@ use Packetery\PacketTracking\PacketStatusFactory;
 use Packetery\PacketTracking\PacketTrackingRepository;
 use Smarty;
 
-class OrderDetailView {
-
+class OrderDetailView
+{
     /**
      * @var PacketTrackingRepository
      */
@@ -31,7 +31,8 @@ class OrderDetailView {
      * @param array $packeteryOrder
      * @return void
      */
-    public function addPacketStatus(Smarty $smarty, array $packeteryOrder) {
+    public function addPacketStatus(Smarty $smarty, array $packeteryOrder)
+    {
         if (!$packeteryOrder['tracking_number']) {
             return;
         }
@@ -51,5 +52,4 @@ class OrderDetailView {
             // else TODO: after adding a new column code_text to the db, return the value from the db
         }
     }
-
 }

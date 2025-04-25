@@ -10,6 +10,7 @@ class MessageManager
 
     /**
      * We are working with one message, Cookie does not allow arrays.
+     *
      * @param string $errorLevel
      * @param string $message
      * @return void
@@ -42,5 +43,4 @@ class MessageManager
         $key = self::PREFIX . $errorLevel;
         return [$context, $key];
     }
-
 }

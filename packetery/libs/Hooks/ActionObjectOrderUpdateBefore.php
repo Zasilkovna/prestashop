@@ -6,8 +6,8 @@ use AddressCore as Address;
 use OrderCore as Order;
 use Packetery\Carrier\CarrierRepository;
 use Packetery\Carrier\CarrierTools;
-use Packetery\Order\OrderSaver;
 use Packetery\Order\OrderRepository;
+use Packetery\Order\OrderSaver;
 
 class ActionObjectOrderUpdateBefore
 {
@@ -25,6 +25,7 @@ class ActionObjectOrderUpdateBefore
 
     /**
      * ActionObjectOrderUpdateBefore constructor.
+     *
      * @param OrderRepository $orderRepository
      * @param OrderSaver $orderSaver
      * @param CarrierTools $carrierTools
@@ -35,8 +36,7 @@ class ActionObjectOrderUpdateBefore
         OrderSaver $orderSaver,
         CarrierTools $carrierTools,
         CarrierRepository $carrierRepository
-    )
-    {
+    ) {
         $this->orderRepository = $orderRepository;
         $this->orderSaver = $orderSaver;
         $this->carrierTools = $carrierTools;

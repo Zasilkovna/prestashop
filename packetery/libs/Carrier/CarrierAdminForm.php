@@ -104,7 +104,7 @@ class CarrierAdminForm
                 'form' => [
                     'legend' => [
                         'title' => $this->module->l('Edit carrier', 'carrieradminform') . ': ' . $carrierData['name'],
-                        'icon' => 'icon-cogs'
+                        'icon' => 'icon-cogs',
                     ],
                     'input' => [
                         [
@@ -197,10 +197,10 @@ class CarrierAdminForm
                             'value' => 'optional',
                             'label' => $this->module->l('Optionally', 'carrieradminform'),
                         ],
-                    ]
+                    ],
                 ];
             }
-        } else if (!empty($possibleVendors)) {
+        } elseif (!empty($possibleVendors)) {
             $formInputs[] = [
                 'name' => 'allowed_vendors',
                 'label' => $this->module->l('Allowed pickup point types', 'carrieradminform'),
@@ -218,7 +218,8 @@ class CarrierAdminForm
                 'label' => $this->module->l('Is COD?', 'carrieradminform'),
                 'name' => 'is_cod',
                 'required' => true,
-                'desc' => sprintf('%s %s',
+                'desc' => sprintf(
+                    '%s %s',
                     $this->module->l('YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.', 'carrieradminform'),
                     $this->module->l('The option to set cash on delivery according to the carrier is already obsolete, and we recommend not using it. It will be completely removed soon.', 'carrieradminform')
                 ),
@@ -233,7 +234,7 @@ class CarrierAdminForm
                         'value' => 1,
                         'label' => $this->module->l('Yes', 'carrieradminform'),
                     ],
-                ]
+                ],
             ];
         }
 
@@ -608,5 +609,4 @@ class CarrierAdminForm
         }
         return $allowedVendorsJson;
     }
-
 }

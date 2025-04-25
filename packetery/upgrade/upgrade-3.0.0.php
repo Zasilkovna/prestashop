@@ -108,9 +108,12 @@ function upgrade_module_3_0_0($module)
             $carrierAdminForm = new CarrierAdminForm((int)$carrierData['id_carrier'], $module);
             // Second parameter ensures that internal pickup points are not needed to exist in carriers table.
             $allowedVendorsJson = $carrierAdminForm->getDefaultAllowedVendors($carrierData, ['id' => $carrierData['id_branch']]);
-            $carrierUpdates[] = sprintf('UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery`
+            $carrierUpdates[] = sprintf(
+                'UPDATE `' . _DB_PREFIX_ . 'packetery_address_delivery`
                 SET `allowed_vendors` = "%s" WHERE `id_carrier` = "%s";',
-                $dbTools->db->escape($allowedVendorsJson), $carrierData['id_carrier']);
+                $dbTools->db->escape($allowedVendorsJson),
+                $carrierData['id_carrier']
+            );
         }
         if (!$dbTools->executeQueries($carrierUpdates, $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.0.0'), true)) {
             return false;
