@@ -67,7 +67,7 @@ class DeleteLabels extends Base
             if ($fileTime === false) {
                 $errors['filemtime'] = $this->module->l(
                     'Failed to retrieve file time for some labels. Check file permissions.',
-                    'DeleteLabels'
+                    'deletelabels'
                 );
                 continue;
             }
@@ -75,7 +75,7 @@ class DeleteLabels extends Base
             if (unlink($label) === false) {
                 $errors['unlink'] = $this->module->l(
                     'Failed to remove some labels. Check file permissions.',
-                    'DeleteLabels'
+                    'deletelabels'
                 );
                 continue;
             }

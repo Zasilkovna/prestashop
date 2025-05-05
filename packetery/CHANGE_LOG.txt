@@ -1,37 +1,32 @@
-3.0.0  - Added: ability to open widget right after choosing delivery method without the need to click on button
-       - Updated: packetery orders table is backed up and deleted upon uninstall
-       - Updated: refactored saving pickup point information in cart
-       - Updated: hook for new orders changed from actionOrderHistoryAddAfter to actionValidateOrder
-       - Updated: treated the situation when the country of the pickup point does not correspond to the customer's address
-       - Updated: order administration realised using PrestaShop's native grid
-       - Added: Product weight in pounds and ounces is now supported.
-       - Updated: module settings page realised using standard PrestaShop's Helper
-       - Added: possibility to set print offset when preparing packet labels
-       - Updated: carrier list in module administration realised using standard PrestaShop's controller.
-       - Added: in the case of a multistore, the list of orders and export in the administration
-         takes into account the selected shop or shop group
-       - Updated: unification of data generation logic for shipment export (API + CSV)
-       - Added: possibility of using either ID or Reference as order ID in export
-       - Updated: internal refactoring - removal of static classes Packeteryclass and PacketeryApi
-       - Added: Packeta submenu added to main menu
-       - Added: possibility to prepare carrier labels
-       - Added: There is new possibility to post parcel via button in our packetery box in BO order detail
-       - Added: possibility to delete PDF labels via CRON and customize deletion results with GET params (file age/number of deleted files at once)
-       - Added: ID verification request for adult products upon delivery
-       - Added: Packetery/Core API layer
-       - Added: settings for "Default package weight" and "Default packaging weight"
-       - Updated: label print action no longer creates temporary file for received PDF
-       - Updated: The option of cash on delivery with the carrier has been made obsolete.
-       - Added: The option to set whether the value of the order will be converted according to the PrestaShop conversion rate or just sent to Packeta.
+3.0.1  - Fixed: Correct display of the selected pickup point and the message after setting the pickup point for a new order.
+3.0.0  - Updated: Order administration and carrier list were realized using PrestaShop's native grids (controllers).
+       - Updated: The module settings page was realized using PrestaShop's native form.
+       - Added: Multistore support. In the case of a multistore, the list of orders and the export in the administration
+         takes into account the selected shop or shop group.
+       - Added: The Packeta submenu was added to the main menu.
        - Updated: The module was tested against PrestaShop 8 and PHP 8.1 and now supports these versions.
+       - Added: Possibility to prepare carrier labels.
+       - Added: Possibility to set print offset when preparing packet labels.
+       - Added: Possibility to post parcel via the button in our Packeta box on the order detail page in administration.
+       - Added: On the order detail page it is now possible to set the dimensions of the shipment.
+       - Added: Possibility to open the widget right after choosing the delivery method without the need to click on the button.
+       - Updated: Treated the situation when the country of the pickup point does not correspond to the customer's address.
+       - Added: Product weight in pounds and ounces is now supported.
+       - Added: Possibility of using either ID or Reference as order ID in export.
+       - Added: Possibility to delete PDF labels via CRON and customize deletion results with GET parameters (file age/number of deleted files at once).
+       - Added: Age verification for shipments containing adult products.
+       - Added: Settings for "Default package weight" and "Default packaging weight".
+       - Updated: Label print action no longer creates a temporary file for generated PDF.
+       - Added: The option to set whether the value of the order will be converted according to the PrestaShop conversion rate or just sent to Packeta.
        - Updated: API communication has been updated to be better compatible with 32-bit PHP in the future.
-       - Fixed: correct order saving for templates that in some cases do not save the carrier id in the cart before confirming the order
-       - Removed: validation of API password using API
-       - Updated: during uninstallation, the module version 2.x tables and links to the PS carriers are also correctly removed
-       - Added: In the order detail it is now possible to set the dimensions of the shipment
-       - Updated: New tracking URL address
-       - Added: API logging
-       - Updated: packet is no longer validated separately
+       - Fixed: Corrected order saving for templates that in some cases do not save the carrier id in the cart before confirming the order.
+       - Updated: The table for Packeta orders is backed up and deleted upon uninstall.
+       - Updated: During uninstallation, the tables of module version 2.x and the links to the PS carriers are also correctly removed.
+       - Updated: Tracking URL address.
+       - Added: Logging API calls.
+       - Removed: Possibility to specify carriers to create orders that will always be considered as cash on delivery orders.
+       - Removed: Validation of API password using API.
+       - Updated: Hook for new orders changed from actionOrderHistoryAddAfter to actionValidateOrder.
 2.1.20 - Fixed: front.js - compatibility with other plugins
        - Removed: validation of API password using API
 2.1.19 - Fixed: displaying the widget button and cart validation
