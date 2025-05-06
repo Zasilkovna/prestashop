@@ -328,11 +328,16 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function processBulkCsvExport()
     {
+        if ((int)Tools::getValue('submitFilterorders') === 1) {
+            return;
+        }
+
         $ids = $this->boxes;
         if (!$ids) {
             $this->informations = $this->l('Please choose orders first.', 'packeteryordergridcontroller');
             return;
         }
+
         $module = $this->getModule();
         /** @var CsvExporter $csvExporter */
         $csvExporter = $module->diContainer->get(CsvExporter::class);
