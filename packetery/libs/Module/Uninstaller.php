@@ -5,6 +5,7 @@ namespace Packetery\Module;
 use Configuration;
 use Packetery;
 use Packetery\Log\LogRepository;
+use Packetery\PacketTracking\PacketTrackingRepository;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\DbTools;
 use PrestaShopException;
@@ -109,6 +110,9 @@ class Uninstaller
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_product`';
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_branch`';
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_order_old`';
+
+        $packetTrackingRepository = $this->module->diContainer->get(PacketTrackingRepository::class);
+        $sql[] = $packetTrackingRepository->getDropTableSql();
 
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText())) {
             return false;

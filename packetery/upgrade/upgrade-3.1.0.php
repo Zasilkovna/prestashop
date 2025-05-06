@@ -18,6 +18,7 @@ function upgrade_module_3_1_0($module)
 
     /** @var PacketTrackingRepository $packetTrackingRepository */
     $packetTrackingRepository = $module->diContainer->get(PacketTrackingRepository::class);
+    $sql[] = $packetTrackingRepository->getDropTableSql();
     $sql[] = $packetTrackingRepository->getCreateTableSql();
     $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
         ADD `last_update_tracking_status` datetime NULL;';
