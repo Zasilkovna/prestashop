@@ -3,6 +3,7 @@
 namespace Packetery\Module;
 
 use Configuration;
+use Exception;
 use Packetery;
 use Packetery\Log\LogRepository;
 use Packetery\PacketTracking\PacketTrackingRepository;
@@ -126,10 +127,19 @@ class Uninstaller
      */
     private function unregisterHooks()
     {
+        $failedHooks = [];
         foreach ($this->module->getModuleHooksList() as $hookName) {
-            if (!$this->module->unregisterHook($hookName)) {
-                return false;
+            try {
+                if ($this->module->unregisterHook($hookName) === false) {
+                    $failedHooks[] = $hookName;
+                }
+            } catch (Exception $exception) {
+                $failedHooks[] = $hookName . ' - ' . $exception->getMessage();
             }
+        }
+
+        if (count($failedHooks) > 0) {
+            PrestaShopLogger::addLog('Packetery: Failed to unregister hooks: ' . implode(', ', $failedHooks), 3, null, null, null, true);
         }
 
         return true;
