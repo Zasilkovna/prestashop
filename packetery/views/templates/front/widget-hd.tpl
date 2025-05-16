@@ -9,11 +9,11 @@
             <div class="col-md-12">
                 <div class="zas-box">
                     <button class="btn btn-sm btn-success pull-left open-packeta-widget-hd"
-                            id="open-packeta-widget-hd">{l s='Validate delivery address' mod='packetery'}
+                            id="open-packeta-widget-hd">{l s='Validate delivery address' mod='packetery' d='Modules.Packetery.Widget-hd'}
                     </button>
                     <br>
                     <ul>
-                        <li>{l s='Selected delivery address' mod='packetery'}:
+                        <li>{l s='Selected delivery address' mod='packetery' d='Modules.Packetery.Widget-hd'}:
                             <span class="picked-delivery-place">
                                 {assign var=addressInfo value=[]}
                                 {if $customerStreet}{$addressInfo[]=$customerStreet}{/if}
