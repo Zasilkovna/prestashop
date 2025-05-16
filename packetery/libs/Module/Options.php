@@ -20,14 +20,19 @@ class Options
     /** @var LogRepository */
     private $logRepository;
 
+    /** @var TranslationProvider */
+    private $translationProvider;
+
     public function __construct(
         Packetery $module,
         SoapApi $soapApi,
-        LogRepository $logRepository
+        LogRepository $logRepository,
+        TranslationProvider $translationProvider
     ) {
         $this->module = $module;
         $this->soapApi = $soapApi;
         $this->logRepository = $logRepository;
+        $this->translationProvider = $translationProvider;
     }
 
     /**
@@ -42,7 +47,7 @@ class Options
         switch ($id) {
             case 'PACKETERY_APIPASS':
                 if (\Tools::strlen($value) !== self::API_PASSWORD_LENGTH) {
-                    return $this->module->l('Api password must be 32 characters long.', 'options');
+                    return $this->translationProvider->getTranslation('Api password must be 32 characters long.');
                 }
 
                 return false;
@@ -102,7 +107,7 @@ class Options
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
-                return $this->module->l('Insert maximum number of orders that will be processed', 'options');
+                return $this->translationProvider->getTranslation(TranslationProvider::MAX_NUMBER_OF_ORDERS_TO_PROCESS);
             case 'PACKETERY_PACKET_STATUS_TRACKING_MAX_ORDER_AGE_DAYS':
                 if ($this->isNonNegative($value)) {
                     return false;
