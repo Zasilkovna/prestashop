@@ -140,9 +140,13 @@ class Installer
     private function installDatabase()
     {
         $sql = [];
+        // DB migrations do not work with PACKETERY_REMOVE_ALL_DATA set to false
+        $dropTables = !defined('PACKETERY_REMOVE_ALL_DATA') || PACKETERY_REMOVE_ALL_DATA;
 
-        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_order`';
-        $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_order` (
+        if ($dropTables) {
+            $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_order`';
+        }
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_order` (
             `id_order` int,
             `id_cart` int,
             `id_branch` int NULL,
@@ -173,14 +177,18 @@ class Installer
             UNIQUE(`id_cart`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
-        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';
-        $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_payment` (
+        if ($dropTables) {
+            $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';
+        }
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_payment` (
             `module_name` varchar(255) NOT NULL PRIMARY KEY,
             `is_cod` tinyint(1) NOT NULL DEFAULT 0
         ) ENGINE=InnoDB DEFAULT charset=utf8;';
 
-        $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
-        $sql[] = 'CREATE TABLE `' . _DB_PREFIX_ . 'packetery_address_delivery` (
+        if ($dropTables) {
+            $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery`';
+        }
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'packetery_address_delivery` (
             `id_carrier` int NOT NULL PRIMARY KEY,
             `id_branch` varchar(255) NOT NULL,
             `name_branch` varchar(255) NULL,
@@ -192,19 +200,27 @@ class Installer
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
         $productAttributeRepository = $this->module->diContainer->get(ProductAttributeRepository::class);
-        $sql[] = $productAttributeRepository->getDropTableSql();
+        if ($dropTables) {
+            $sql[] = $productAttributeRepository->getDropTableSql();
+        }
         $sql[] = $productAttributeRepository->getCreateTableSql();
 
         $apiCarrierRepository = $this->module->diContainer->get(ApiCarrierRepository::class);
-        $sql[] = $apiCarrierRepository->getDropTableSql();
+        if ($dropTables) {
+            $sql[] = $apiCarrierRepository->getDropTableSql();
+        }
         $sql[] = $apiCarrierRepository->getCreateTableSql();
 
         $logRepository = $this->module->diContainer->get(LogRepository::class);
-        $sql[] = $logRepository->getDropTableSql();
+        if ($dropTables) {
+            $sql[] = $logRepository->getDropTableSql();
+        }
         $sql[] = $logRepository->getCreateTableSql();
 
         $packetTrackingRepository = $this->module->diContainer->get(PacketTrackingRepository::class);
-        $sql[] = $packetTrackingRepository->getDropTableSql();
+        if ($dropTables) {
+            $sql[] = $packetTrackingRepository->getDropTableSql();
+        }
         $sql[] = $packetTrackingRepository->getCreateTableSql();
 
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText(), true)) {

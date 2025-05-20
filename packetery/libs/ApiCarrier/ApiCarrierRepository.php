@@ -152,7 +152,7 @@ class ApiCarrierRepository
 
     public function getCreateTableSql()
     {
-        return 'CREATE TABLE `' . $this->getPrefixedTableName() . '` (
+        return 'CREATE TABLE IF NOT EXISTS `' . $this->getPrefixedTableName() . '` (
             `id` varchar(255) NOT NULL,
             `name` varchar(255) NOT NULL,
             `is_pickup_points` boolean NOT NULL,
