@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin516a3rrrf" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="412d643c177ac66b1f8d2dc84ac74779">
+        <source>Validate delivery address</source>
+        <target>Ověřit adresu doručení</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d57ac83f33b2ef09dc08ec77e7e4f421">
+        <source>Selected delivery address</source>
+        <target>Vybraná doručovací adresa</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

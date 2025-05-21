@@ -63,7 +63,7 @@ class PacketTrackingCron
         $isPacketStatusTrackingEnabled = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_ENABLED');
         if (!$isPacketStatusTrackingEnabled) {
             return [
-                'text' => $this->module->l('Packet status tracking is not active', 'packetrackingcron'),
+                'text' => $this->module->getTranslator()->trans('Packet status tracking is not active', [], 'Modules.Packetery.Packettrackingcron'),
                 'class' => 'danger',
             ];
         }
@@ -73,7 +73,7 @@ class PacketTrackingCron
 
         if (!is_array($orderStatuses)) {
             return [
-                'text' => $this->module->l('No order statuses configured for packet tracking', 'packetrackingcron'),
+                'text' => $this->module->getTranslator()->trans('No order statuses configured for packet tracking', [], 'Modules.Packetery.Packettrackingcron'),
                 'class' => 'danger',
             ];
         }
@@ -181,7 +181,7 @@ class PacketTrackingCron
         }
 
         return [
-            'text' => $this->module->l('Order statuses have been updated.', 'packetrackingcron'),
+            'text' => $this->module->getTranslator()->trans('Order statuses have been updated.', [], 'Modules.Packetery.Packettrackingcron'),
             'class' => 'success',
         ];
     }

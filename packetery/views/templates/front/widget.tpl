@@ -29,10 +29,10 @@
             <div class="col-md-12">
                 <div class="zas-box">
                     <div class="clearfix">
-                        <button class="btn btn-sm btn-success pull-left open-packeta-widget" id="open-packeta-widget">{l s='Select pick-up point:' mod='packetery'}</button>
+                        <button class="btn btn-sm btn-success pull-left open-packeta-widget" id="open-packeta-widget">{l s='Select pick-up point:' d='Modules.Packetery.Widget'}</button>
                     </div>
                     <ul id="selected-branch">
-                        <li>{l s='Selected pick-up point:' mod='packetery'}
+                        <li>{l s='Selected pick-up point:' d='Modules.Packetery.Widget'}
                             <span id="picked-delivery-place" class="picked-delivery-place">{$name_branch}</span>
                         </li>
                     </ul>
@@ -53,5 +53,5 @@
         </div>
     </div>
 
-    <div class="packetery-message-pickup-point-not-selected-error" data-content="{l s='Please select a pick up point before confirming your order' mod='packetery'}"></div>
+    <div class="packetery-message-pickup-point-not-selected-error" data-content="{l s='Please select a pick up point before confirming your order' d='Modules.Packetery.Widget'}"></div>
 </div>

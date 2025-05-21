@@ -65,17 +65,19 @@ class DeleteLabels extends Base
         foreach ($files as $label) {
             $fileTime = filemtime($label);
             if ($fileTime === false) {
-                $errors['filemtime'] = $this->module->l(
+                $errors['filemtime'] = $this->module->getTranslator()->trans(
                     'Failed to retrieve file time for some labels. Check file permissions.',
-                    'deletelabels'
+                    [],
+                    'Modules.Packetery.Deletelabels'
                 );
                 continue;
             }
 
             if (unlink($label) === false) {
-                $errors['unlink'] = $this->module->l(
+                $errors['unlink'] = $this->module->getTranslator()->trans(
                     'Failed to remove some labels. Check file permissions.',
-                    'deletelabels'
+                    [],
+                    'Modules.Packetery.Deletelabels'
                 );
                 continue;
             }

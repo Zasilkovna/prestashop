@@ -57,10 +57,10 @@ class LogRepository
     public function getActionTranslations()
     {
         return [
-            self::ACTION_LABEL_PRINT => $this->module->l('Label print', 'logrepository'),
-            self::ACTION_SENDER_VALIDATION => $this->module->l('Sender validation', 'logrepository'),
-            self::ACTION_PACKET_SENDING => $this->module->l('Packet sending', 'logrepository'),
-            self::ACTION_PACKET_TRACKING => $this->module->l('Packet tracking', 'logrepository'),
+            self::ACTION_LABEL_PRINT => $this->module->getTranslator()->trans('Label print', [], 'Modules.Packetery.Logrepository'),
+            self::ACTION_SENDER_VALIDATION => $this->module->getTranslator()->trans('Sender validation', [], 'Modules.Packetery.Logrepository'),
+            self::ACTION_PACKET_SENDING => $this->module->getTranslator()->trans('Packet sending', [], 'Modules.Packetery.Logrepository'),
+            self::ACTION_PACKET_TRACKING => $this->module->getTranslator()->trans('Packet tracking', [], 'Modules.Packetery.Logrepository'),
         ];
     }
 
