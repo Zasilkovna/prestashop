@@ -84,7 +84,7 @@ class PacketTrackingRepository
      */
     public function getCreateTableSql()
     {
-        return 'CREATE TABLE `' . $this->getPrefixedTableName() . '` (
+        return 'CREATE TABLE IF NOT EXISTS `' . $this->getPrefixedTableName() . '` (
           `id` int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
           `id_order` int unsigned NOT NULL,
           `packet_id` varchar(15) NOT NULL,
