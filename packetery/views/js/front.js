@@ -465,7 +465,7 @@ PacketaModule.ajax = {
     post: function (action, data, onSuccess) {
         var url =
             PacketaModule.config.baseUri +
-            '/modules/packetery/ajax_front.php?action=' + action +
+            '/module/packetery/checkout?action=' + action +
             '&token=' + PacketaModule.config.frontAjaxToken;
 
         return $.ajax({
