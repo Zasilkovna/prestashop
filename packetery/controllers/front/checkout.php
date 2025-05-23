@@ -6,6 +6,12 @@ use Packetery\Order\OrderSaver;
 
 class PacketeryCheckoutModuleFrontController extends ModuleFrontController
 {
+    /** @var bool */
+    public $auth = false;
+
+    /** @var bool */
+    public $ajax = true;
+
     /** @var Packetery */
     public $module;
 
