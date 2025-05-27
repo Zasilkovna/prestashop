@@ -70,12 +70,13 @@ class PacketTrackingCron
 
         $configOrderStatuses = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATES');
         $orderStatuses = Helper::unserialize($configOrderStatuses);
-
         if (!is_array($orderStatuses)) {
-            return [
-                'text' => $this->module->l('No order statuses configured for packet tracking', 'packetrackingcron'),
-                'class' => 'danger',
-            ];
+            return $this->getNoOrderStatusesMessage();
+        }
+
+        $enabledOrderStatuses = array_keys($orderStatuses, 'on', true);
+        if ($enabledOrderStatuses === []) {
+            return $this->getNoOrderStatusesMessage();
         }
 
         $configPacketStatuses = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_PACKET_STATUSES');
@@ -89,7 +90,7 @@ class PacketTrackingCron
         $oldestOrderDate = new DateTimeImmutable("-{$maxOrderAgeDays} days");
 
         $maxProcessedOrders = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS');
-        $orders = $this->orderRepository->getOrdersByStateAndLastUpdate($orderStatuses, $maxProcessedOrders, $oldestOrderDate);
+        $orders = $this->orderRepository->getOrdersByStateAndLastUpdate($enabledOrderStatuses, $maxProcessedOrders, $oldestOrderDate);
 
         $isStatusChangeEnabled = ConfigHelper::get('PACKETERY_ORDER_STATUS_CHANGE_ENABLED');
         foreach ($orders as $order) {
@@ -213,5 +214,16 @@ class PacketTrackingCron
         }
 
         $order->setCurrentState((int)$newOrderStatus);
+    }
+
+    /**
+     * @return array{text: string, class: string}
+     */
+    public function getNoOrderStatusesMessage(): array
+    {
+        return [
+            'text' => $this->module->l('No order statuses configured for packet tracking', 'packetrackingcron'),
+            'class' => 'danger',
+        ];
     }
 }
