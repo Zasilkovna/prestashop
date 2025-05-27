@@ -3,6 +3,7 @@
 namespace Packetery\Order;
 
 use Order;
+use OrderCarrier;
 use Packetery;
 use Packetery\Exceptions\AggregatedException;
 use Packetery\Exceptions\ApiClientException;
@@ -151,6 +152,12 @@ class PacketSubmitter
                 $trackingUpdate = $packeteryTracking->updateOrderTrackingNumber($orderId, $trackingNumber);
                 if ($trackingUpdate) {
                     $trackingNumbers[] = $trackingNumber;
+                    $orderCarrier = $order->getIdOrderCarrier();
+                    if ($orderCarrier !== 0) {
+                        $carrier = new OrderCarrier($orderCarrier);
+                        $carrier->tracking_number = $trackingNumber;
+                        $carrier->update();
+                    }
                 }
             } catch (ExportException $exportException) {
                 $errors[] = $exportException;
