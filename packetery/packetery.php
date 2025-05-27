@@ -816,6 +816,7 @@ class Packetery extends CarrierModule
             'frontAjaxToken' => Tools::getToken('ajax_front'),
             'appIdentity' => $this->getAppIdentity(),
             'prestashopVersion' => _PS_VERSION_,
+            'prestashopMajorVersion' => substr(_PS_VERSION_, 0, strpos(_PS_VERSION_, '.', 0)),
             'shopLanguage' => $shopLanguage,
             'customerCountry' => $customerCountry,
             'deliveryPointCarrierIds' => $deliveryPointCarrierIds,
