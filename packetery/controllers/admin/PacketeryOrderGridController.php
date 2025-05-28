@@ -234,7 +234,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $ids = $this->boxes;
         if (!$ids) {
-            $this->informations = $this->module->getTranslator()->trans('No orders were selected.', [], 'Modules.Packetery.Packeteryordergrid');
+            $this->informations[] = $this->module->getTranslator()->trans('No orders were selected.', [], 'Modules.Packetery.Packeteryordergrid');
             return;
         }
         $this->createPackets($ids);
@@ -349,7 +349,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $ids = $this->boxes;
         if (!$ids) {
-            $this->informations = $this->module->getTranslator()->trans('Please choose orders first.', [], 'Modules.Packetery.Packeteryordergrid');
+            $this->informations[] = $this->module->getTranslator()->trans('Please choose orders first.', [], 'Modules.Packetery.Packeteryordergrid');
             return;
         }
         $module = $this->getModule();
@@ -367,7 +367,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             }
             $ids = $this->boxes;
             if (!$ids) {
-                $this->informations = $this->module->getTranslator()->trans('Please choose orders first.', [], 'Modules.Packetery.Packeteryordergrid');
+                $this->informations[] = $this->module->getTranslator()->trans('Please choose orders first.', [], 'Modules.Packetery.Packeteryordergrid');
             } else {
                 $packetNumbers = $this->preparePacketNumbers($ids);
                 if ($packetNumbers) {
@@ -443,7 +443,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             }
         }
         if ($change) {
-            $this->informations = $this->module->getTranslator()->trans('Order weights were saved.', [], 'Modules.Packetery.Packeteryordergrid');
+            $this->informations[] = $this->module->getTranslator()->trans('Order weights were saved.', [], 'Modules.Packetery.Packeteryordergrid');
         }
 
         parent::postProcess();
