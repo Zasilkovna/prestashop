@@ -4,6 +4,12 @@ PacketaModule.tools = {
     isPS16: function () {
         return PacketaModule.config.prestashopVersion.indexOf('1.6') === 0;
     },
+    isPS8: function () {
+        return PacketaModule.config.prestashopMajorVersion === '8';
+    },
+    isPS9: function () {
+        return PacketaModule.config.prestashopMajorVersion === '9';
+    }
 };
 
 PacketaModule.runner = {
@@ -529,7 +535,7 @@ function PacketeryCheckoutModulesManager()
 {
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
     // order is important because of false positives (Unknown has to be last)
-    this.supportedModules = ['Ps16', 'Ps17', 'Supercheckout', 'OpcZelarg', 'Unknown'];
+    this.supportedModules = ['Ps16', 'Ps17', 'Supercheckout', 'OpcZelarg', 'Hummingbird', 'Unknown'];
     this.loadedModules = [];
     this.detectedModule = null;
 
