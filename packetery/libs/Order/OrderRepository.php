@@ -412,17 +412,20 @@ class OrderRepository
     }
 
     /**
-     * @param array<int, 'on'|'false'> $orderStatuses
+     * @param array<int, int> $enabledOrderStatuses
      * @param int $maxProcessedOrdersLimit
      * @param DateTimeImmutable $oldestOrderDate
      * @return array|bool|mysqli_result|PDOStatement|resource|null
      */
     public function getOrdersByStateAndLastUpdate(
-        array $orderStatuses,
+        array $enabledOrderStatuses,
         $maxProcessedOrdersLimit,
         DateTimeImmutable $oldestOrderDate
     ) {
-        $implodedOrderStatuses = implode(',', array_keys($orderStatuses, 'on', true));
+        if ($enabledOrderStatuses === []) {
+            return [];
+        }
+        $implodedOrderStatuses = implode(',', $enabledOrderStatuses);
 
         $sql = 'SELECT DISTINCT
             `po`.`id_order`,
