@@ -14,6 +14,7 @@ use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
 use PrestaShopDatabaseException;
 use PrestaShopException;
+use PrestaShopLogger;
 use ReflectionException;
 use RuntimeException;
 use SoapClient;
@@ -154,9 +155,20 @@ class PacketSubmitter
                     $trackingNumbers[] = $trackingNumber;
                     $orderCarrier = $order->getIdOrderCarrier();
                     if ($orderCarrier !== 0) {
-                        $carrier = new OrderCarrier($orderCarrier);
-                        $carrier->tracking_number = $trackingNumber;
-                        $carrier->update();
+                        try {
+                            $carrier = new OrderCarrier($orderCarrier);
+                            $carrier->tracking_number = $trackingNumber;
+                            $carrier->update();
+                        } catch (\Exception $exception) {
+                            PrestaShopLogger::addLog(
+                                'Packetery: Failed to update tracking number for order ID ' . $orderId . '. Error: ' . $exception->getMessage(),
+                                3,
+                                null,
+                                null,
+                                null,
+                                true
+                            );
+                        }
                     }
                 }
             } catch (ExportException $exportException) {
