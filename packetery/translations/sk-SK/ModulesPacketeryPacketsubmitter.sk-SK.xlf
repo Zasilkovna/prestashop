@@ -2,14 +2,14 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
     <body>
-      <trans-unit id="412d643c177ac66b1f8d2dc84ac74779">
-        <source>Validate delivery address</source>
-        <target>Ověřit adresu doručení</target>
+      <trans-unit id="5552dc553d496d4b06866ca45b890b4a">
+        <source>Please choose orders first.</source>
+        <target>Najprv vyberte objednávky.</target>
         <note>Line: </note>
       </trans-unit>
-      <trans-unit id="d57ac83f33b2ef09dc08ec77e7e4f421">
-        <source>Selected delivery address</source>
-        <target>Vybraná doručovací adresa</target>
+      <trans-unit id="0dba7c324908f7f67e9f72e3393a4beb">
+        <source>Tracking number not returned for order %s</source>
+        <target>Tracking number not returned for order %s</target>
         <note>Line: </note>
       </trans-unit>
     </body>

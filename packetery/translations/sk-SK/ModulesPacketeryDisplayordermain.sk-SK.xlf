@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file original="admin516a3rrrf" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
     <body>
       <trans-unit id="4a93d9164aad959a6abc2de389170ac9">
         <source>Packeta</source>
@@ -19,7 +19,7 @@
       </trans-unit>
       <trans-unit id="108b7b058f862ee055e273cd8ee3bfaa">
         <source>Please select shipment method again</source>
-        <target>Vyberte prosím znovu způsob přepravy</target>
+        <target>Vyberte prosím znovu způsob přeprav</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="a6e579a3b53827e8be9ec089d7199594">
@@ -79,7 +79,7 @@
       </trans-unit>
       <trans-unit id="b467fdcd05373dcb789d8e055e2f8160">
         <source>Size (L x W x H):</source>
-        <target>Rozmery (D x Š x V)</target>
+        <target>Rozmery (D x Š x V):</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="ba2a9c6c8c77e03f83ef8bf543612275">
