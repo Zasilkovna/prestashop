@@ -1031,7 +1031,7 @@ class Packetery extends CarrierModule
         $orderDetailView = $this->diContainer->get(\Packetery\Order\OrderDetailView::class);
         $orderDetailView->addPacketStatus($this->context->smarty, $packeteryOrder);
 
-        return $this->display(__FILE__, 'display_order_main.tpl');
+        return $this->display(__FILE__, 'displayOrderMain.tpl');
     }
 
     /**
