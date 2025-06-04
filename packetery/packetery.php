@@ -1637,7 +1637,7 @@ class Packetery extends CarrierModule
             'isPrestaShop16' => $isPrestaShop16,
         ]);
 
-        return $this->display(__FILE__, 'display_admin_product_extra.tpl');
+        return $this->display(__FILE__, 'displayAdminProductExtra.tpl');
     }
 
     /**
