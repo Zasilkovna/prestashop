@@ -244,7 +244,7 @@ class Packetery extends CarrierModule
             $this->context->smarty->assign('updateCarriersLink', $updateCarriersLink);
         }
 
-        return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriers_info.tpl');
+        return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriersInfo.tpl');
     }
 
     /**
