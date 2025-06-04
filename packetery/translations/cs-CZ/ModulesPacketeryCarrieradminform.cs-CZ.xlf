@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="14276119325be6fede456ec6b0a3c179">
+        <source>Failed to load carrier.</source>
+        <target>Dopravce se nepodařilo načíst.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6c7a9c587489a3e130e06323ec2fc878">
+        <source>Edit carrier</source>
+        <target>Upravit dopravce</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="afdfd88e1e5862e09c288d90623f12f6">
+        <source>Packeta carrier to pair with this carrier</source>
+        <target>Dopravce Zásilkovny pro spárování s tímto dopravcem</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c9cc8cce247e49bae79f15173ce97354">
+        <source>Save</source>
+        <target>Uložit</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="97f876fc0a30ae71855e27f22f0b573c">
+        <source>Validate address using widget?</source>
+        <target>Ověřovat adresu pomocí widgetu?</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b7e7ae1c0dde0a767ce2910ee16f6811">
+        <source>Applicable only in case of CZ and SK home delivery carrier.</source>
+        <target>Platí pouze v případě CZ a SK doručení na adresu.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="bafd7322c6e97d25b6299b5d6fe8920b">
+        <source>No</source>
+        <target>Ne</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="93cba07454f06a4a960172bbd6e2a435">
+        <source>Yes</source>
+        <target>Ano</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1399f8fce27c5636684948807c9a28c5">
+        <source>Optionally</source>
+        <target>Volitelně</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9af787002da743589075aa873a322d4d">
+        <source>Allowed pickup point types</source>
+        <target>Povolené typy výdejních míst</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="307747191798efa983ed0748f83d0652">
+        <source>Is COD?</source>
+        <target>Jde o dobírku?</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="37fc20ebfb7194883268f64cc5bcdbc8">
+        <source>YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.</source>
+        <target>ANO - všechny objednávky na tohoto dopravce budou do Zásilkovny exportovány jako dobírka, NE - nastavení dobírky se bude řídit podle nastavení dobírky u platební metody.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2e553a6da95861acbe3a954d03df8ef7">
+        <source>The option to set cash on delivery according to the carrier is already obsolete, and we recommend not using it. It will be completely removed soon.</source>
+        <target>Možnost nastavení dobírky podle dopravce je již zastaralá a doporučujeme ji nepoužívat. Brzy bude zcela odstraněna.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="38983834d12186bbca2fc20a8c4c24bb">
+        <source>Edit carrier settings</source>
+        <target>Upravit nastavení dopravce</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a9a6f3084bcd2e462f03d0cf0c1afd84">
+        <source>Carrier has been saved.</source>
+        <target>Dopravce byl uložen.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a2a74e2c942959d67b22af9d3a0b54db">
+        <source>Carrier settings were saved.</source>
+        <target>Nastavení dopravce byla uložena.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d96936da5cb766a1d3f03ee71b57d02a">
+        <source>The Packeta carrier selected for method "%s" does not deliver to any of its active countries.</source>
+        <target>Dopravce Zásilkovny vybraný u metody \"%s\" nedoručuje ani do jedné z jejích povolených zemí.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6b2b1a2e9fc50ec3db40399344356351">
+        <source>There are no available carriers for method "%s".</source>
+        <target>Pro metodu \"%s\" nejsou dostupní žádní dopravci.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1274d72368e1329ec66cf6d83d8cc23d">
+        <source>You must select at least one vendor for each country.</source>
+        <target>Pro každou zemi musíte vybrat alespoň jeden typ výdejních míst.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="064e8b8c3e28ba5dd0349a0e0fb698ad">
+        <source>One of selected vendor is not available anymore.</source>
+        <target>Jeden z vybraných typů výdejních míst již není dostupný.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="630f6dc397fe74e52d5189e2c80f282b">
+        <source>Back to list</source>
+        <target>Zpět na seznam</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

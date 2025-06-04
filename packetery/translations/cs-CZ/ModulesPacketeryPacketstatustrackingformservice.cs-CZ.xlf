@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="00d23a76e43b46dae9ec7aa9dcbebb32">
+        <source>Enabled</source>
+        <target>Aktivováno</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="93cba07454f06a4a960172bbd6e2a435">
+        <source>Yes</source>
+        <target>Ano</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="bafd7322c6e97d25b6299b5d6fe8920b">
+        <source>No</source>
+        <target>Ne</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6b17a131b80b20457412678d158f0a68">
+        <source>Max processed orders</source>
+        <target>Maximální počet zpracovávaných objednávek</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b51795a24e5c65a16613d55607ec55ff">
+        <source>Max order age in days</source>
+        <target>Maximální stáří objednávky ve dnech</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="33af8066d3c83110d4bd897f687cedd2">
+        <source>Order statuses</source>
+        <target>Stavy objednávek</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d704d40d0a7f722008b45ccdc05f2b22">
+        <source>Packet statuses</source>
+        <target>Stavy zásilek</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
