@@ -1398,7 +1398,7 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayPacketeryOrderGridListAfter()
     {
-        return $this->display(__FILE__, 'display_order_list_footer.tpl');
+        return $this->display(__FILE__, 'DisplayOrderListFooter.tpl');
     }
 
     /**
