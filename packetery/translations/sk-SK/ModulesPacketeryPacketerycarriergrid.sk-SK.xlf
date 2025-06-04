@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="0ace50d3fdc56a8b3ecf3532baa0990c">
+        <source>Packeta pickup points</source>
+        <target>Výdejní místa Zásilkovny</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="85ad5aeec9dfb9e0650de5fbfecd88da">
+        <source>Packeta pickup points (Packeta + carriers)</source>
+        <target>Všechna výdejní místa (Zásilkovna + dopravci)</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b718adec73e04ce3ec720dd11a06a308">
+        <source>ID</source>
+        <target>ID</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="914419aa32f04011357d3b604a86d7eb">
+        <source>Carrier</source>
+        <target>Prepravca</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="dad1f8d794ee0dd7753fe75e73b78f31">
+        <source>Zones</source>
+        <target>Zóny</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="790d59ef178acbc75d233bf4211763c6">
+        <source>Countries</source>
+        <target>Země</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6f43f840bec2edbac78a25ae4bfde3a9">
+        <source>Is delivery via Packeta</source>
+        <target>Dopravce Zásilkovny</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4d3d769b812b6faa6b76e1a8abaece2d">
+        <source>Active</source>
+        <target>Aktivní</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="7798b7c45fa643a0169a3a9e8ba8a6f9">
+        <source>Is COD</source>
+        <target>Dobírka</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="37bd94f2e132fdf97716b180ddde437d">
+        <source>Packeta carriers list</source>
+        <target>Seznam dopravců Zásilkovny</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="7dce122004969d56ae2e0245cb754d35">
+        <source>Edit</source>
+        <target>Upravit</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

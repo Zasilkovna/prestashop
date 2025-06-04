@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="44e05cef9b23421538483520e6cc0934">
+        <source>The selected delivery address is in a country other than the country of delivery of the order.</source>
+        <target>Zvolená dodací adresa je v jiné zemi, než je země doručení objednávky.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3fb2c4a1bb0ea1f05da513ae133a21ee">
+        <source>Data has been successfully saved</source>
+        <target>Data byla úspěšně uložena</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9adba94d0538aa24decee46ce7511368">
+        <source>Address could not be changed.</source>
+        <target>Nepodařilo se změnit adresu.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="47838d234bae5339a17c704bb605d01a">
+        <source>No pickup point selected for the order. It will not be possible to export the order to Packeta.</source>
+        <target>Pro objednávku není vybráno žádné výdejní místo. Export objednávky do Zásilkovny nebude možný.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2fa47f7c65fec19cc163b195725e3844">
+        <source>length</source>
+        <target>délka</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b435e227d5dd201e1768b2bcb2e0aa81">
+        <source>height</source>
+        <target>výška</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="eaae26a6fb20ed3ef54fb23bfa0b1fcc">
+        <source>width</source>
+        <target>šířka</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="51ff9c28b4174618d5ac7ffbeb137445">
+        <source>%s must be a number, greater than 0.</source>
+        <target>%s musí být číslo, větší než 0.</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
