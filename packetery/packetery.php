@@ -704,7 +704,7 @@ class Packetery extends CarrierModule
                 return;
             }
 
-            $template = 'views/templates/front/widget-hd.tpl';
+            $template = 'views/templates/front/widgetHd.tpl';
             $addressValidated = false;
             if ($orderData && \Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
                 $addressValidated = true;
