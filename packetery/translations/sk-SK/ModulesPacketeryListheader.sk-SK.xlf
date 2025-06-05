@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="36e5769d3d33717f601e1f1dc3409d11">
+        <source>Label printing</source>
+        <target>Tisk štítků</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="910b7b9a83a45de4d15f9c5b141a087b">
+        <source>Do not skip any fields</source>
+        <target>Nevynechávat žádné pole</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="bee548697b56304883fdbd8436000eb3">
+        <source>Skip 1 field</source>
+        <target>Vynechat 1 pole</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5182dfef2124178acde4250919ba2c4f">
+        <source>Skip %s fields</source>
+        <target>Vynechat %s polí</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ea4788705e6873b424c65e91c2846b19">
+        <source>Cancel</source>
+        <target>Zrušit</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="40cd014b7b6251e3a22e6a45a73a64e1">
+        <source>Execute</source>
+        <target>Provést</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="79500929219856f7162cea4f4d85d9b7">
+        <source>Failed to retrieve file time for some labels. Check file permissions.</source>
+        <target>Nepodařilo se získat čas vytvoření některých štítků. Zkontrolujte souborová oprávnění.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="60abf2c345b55a7ed556d3293ea5c70c">
+        <source>Failed to remove some labels. Check file permissions.</source>
+        <target>Nepodařilo se odstranit některé štítky. Zkontrolujte souborová oprávnění.</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="895723a1dfa2218be3a7089c3d0df4b2">
+        <source>Packetery product settings</source>
+        <target>Zásilkovna nastavení produktu</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="dda6a3364aa6d25a5ce04ea1f3b136ee">
+        <source>This product is for adults only and needs to be age verified upon delivery.</source>
+        <target>Tento produkt je určen pouze pro dospělé a při dodání je třeba ověřit věk.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ea4788705e6873b424c65e91c2846b19">
+        <source>Cancel</source>
+        <target>Zrušit</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c9cc8cce247e49bae79f15173ce97354">
+        <source>Save</source>
+        <target>Uložit</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f7de1b71605a10ef04416effa4c6e09e">
+        <source>Save and Stay</source>
+        <target>Uložit a zůstat</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
