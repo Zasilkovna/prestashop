@@ -57,9 +57,12 @@ class VersionChecker
 
         $version = $response->getVersion();
         $downloadUrl = $response->getDownloadUrl();
-        if ($version !== '' && $downloadUrl !== '' && $this->isNewVersionAvailable($version)) {
+        $releaseNotes = $response->getReleaseNotes();
+
+        if ($version !== '' && $downloadUrl !== '' && $releaseNotes !== '' && $this->isNewVersionAvailable($version)) {
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $version);
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, $downloadUrl);
+            ConfigHelper::update(ConfigHelper::KEY_LAST_RELEASE_NOTES, $releaseNotes);
         }
 
         ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time());
@@ -101,7 +104,8 @@ class VersionChecker
 
         return new LatestReleaseResponse(
             ltrim($data['tag_name'], 'v'),
-            $data['assets'][0]['browser_download_url']
+            $data['assets'][0]['browser_download_url'],
+            $data['body']
         );
     }
 
@@ -143,6 +147,7 @@ class VersionChecker
         $smarty->assign('downloadUrl', ConfigHelper::get(ConfigHelper::KEY_LAST_VERSION_URL));
         $smarty->assign('newVersion', ConfigHelper::get(ConfigHelper::KEY_LAST_VERSION));
         $smarty->assign('currentVersion', $this->module->version);
+        $smarty->assign('releaseNotes', ConfigHelper::get(ConfigHelper::KEY_LAST_RELEASE_NOTES));
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/newVersionMessage.tpl');
     }
