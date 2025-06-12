@@ -2,6 +2,8 @@
 
 namespace Packetery\Module;
 
+use Tools;
+
 class Helper
 {
     const TRACKING_URL = 'https://tracking.packeta.com/Z%s';
