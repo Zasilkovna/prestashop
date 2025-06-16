@@ -26,7 +26,7 @@ function upgrade_module_3_1_0($module)
     $dbTools = $module->diContainer->get(DbTools::class);
     $executeResult = $dbTools->executeQueries(
         $sql,
-        $module->getTranslator()->trans('Exception raised during Packetery module upgrade:', [], 'Modules.Packetery.Upgrade-3.1.0'),
+        $module->getTranslator()->trans('Exception raised during Packetery module upgrade:', [], 'Modules.Packetery.Upgrade'),
         true
     ) &&
         ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time()) &&
