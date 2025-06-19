@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="4988c308d36d231707ae7e2d1e8d06b2">
+        <source>Unable to load information required to export order</source>
+        <target>Nepodařilo se načíst údaje potřebné pro exportování objednávky</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1a0b6dfe7253ca6b0d6689da91cd0402">
+        <source>Can't find currency of pickup point, order</source>
+        <target>Nepodařilo se nalézt měnu výdejního místa, objednávka</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e633b4eefe327cee3b6ce2a2966fe96a">
+        <source>Unable to find the exchange rate in the PrestaShop currency settings for the destination country of the order</source>
+        <target>Nelze najít směnný kurz v nastavení měn PrestaShopu pro cílovou zemi objednávky</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

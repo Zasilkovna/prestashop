@@ -1,687 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file original="admin516a3rrrf" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
     <body>
-      <trans-unit id="bb1ca97ec761fc37101737ba0aa2e7c5">
-        <source>ERROR</source>
-        <target>ERROR</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="5dc2860ca37a426fc8a2cf6213b72b96">
-        <source>Task "%s" was finished.</source>
-        <target>Task "%s" was finished.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="b1a326c06d88bf042f73d70f50197905">
-        <source>END</source>
-        <target>END</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="b3158ee97bbf8d04ea6dd98b3327a51d">
-        <source>All displayed errors are stored in the Prestashop database.</source>
-        <target>All displayed errors are stored in the Prestashop database.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="f7aa8bd8b7067c9f4eaea7193a1f394b">
-        <source>Task was not found.</source>
-        <target>Task was not found.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="a5e0021bf76278d7abffb156003aa46d">
-        <source>Task "%s" is about to be executed.</source>
-        <target>Task "%s" is about to be executed.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="19aad9f2fe3ce0023298ab83f7e75775">
-        <source>BEGIN</source>
-        <target>BEGIN</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="57278b44f1b40495b05ba12fe8c6db4f">
-        <source>Packet tracking status update</source>
-        <target>Packet tracking status update</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="e689c7a0e375fc4c26686a7544df5829">
-        <source>Carrier list update</source>
-        <target>Carrier list update</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="3ecbf4fb95842e8c64dcf3d802474618">
-        <source>Deleting labels</source>
-        <target>Deleting labels</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="36114979c9d11968c61fc8c8cf447349">
-        <source>Cron task to run was not specified.</source>
-        <target>Cron task to run was not specified.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="aee4c3ffdf25619455f67b0ca1d1e946">
-        <source>Invalid packetery cron token.</source>
-        <target>Invalid packetery cron token.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="7dce122004969d56ae2e0245cb754d35">
-        <source>Edit</source>
-        <target>Edit</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="37bd94f2e132fdf97716b180ddde437d">
-        <source>Packeta carriers list</source>
-        <target>Packeta carriers list</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="4d3d769b812b6faa6b76e1a8abaece2d">
-        <source>Active</source>
-        <target>Active</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="6f43f840bec2edbac78a25ae4bfde3a9">
-        <source>Is delivery via Packeta</source>
-        <target>Is delivery via Packeta</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="790d59ef178acbc75d233bf4211763c6">
-        <source>Countries</source>
-        <target>Countries</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="dad1f8d794ee0dd7753fe75e73b78f31">
-        <source>Zones</source>
-        <target>Zones</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="914419aa32f04011357d3b604a86d7eb">
-        <source>Carrier</source>
-        <target>Carrier</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="cb3f88d940058bd1bf8ad3e55d19f7f9">
-        <source>Submit packet</source>
-        <target>Submit packet</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="c879cb3351593188d1178647eb2032fe">
-        <source>Print labels</source>
-        <target>Print labels</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d5bced36fd88402506bdf9d99064697e">
-        <source>Order weights were saved.</source>
-        <target>Order weights were saved.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="b0e18fd5958d01d019dac2d4eb98a23e">
-        <source>No labels can be printed as carrier labels.</source>
-        <target>No labels can be printed as carrier labels.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="e24ad57fb2f078979a7f5c9979e88d5f">
-        <source>Please submit selected orders first.</source>
-        <target>Please submit selected orders first.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="a649d29479834d551b83b533b7042ad3">
-        <source>No orders were selected.</source>
-        <target>No orders were selected.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="9ead4c33fc986533310eae97801b8cee">
-        <source>The shipments were successfully submitted.</source>
-        <target>The shipments were successfully submitted.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d6bd7c88c16b841e2fbb2d56ba501eac">
-        <source>CSV export</source>
-        <target>CSV export</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="042c2c2c147f96372f9439533d8be875">
-        <source>Download carrier labels</source>
-        <target>Download carrier labels</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="4247d79e91abf88acd273a097e974fd5">
-        <source>Download Packeta labels</source>
-        <target>Download Packeta labels</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="44940301ddbd65606983e583e0a5760e">
-        <source>Send selected orders and create shipment</source>
-        <target>Send selected orders and create shipment</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="91721604210524b7051d99c4c8478715">
-        <source>Weight (kg)</source>
-        <target>Weight (kg)</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d3b52ebb29d8fa2f5d92a39c00163df2">
-        <source>Packet status</source>
-        <target>Packet status</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="5068c162a60b5859f973f701333f45c5">
-        <source>Tracking number</source>
-        <target>Tracking number</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="e4e27891f1c682f4877b696243b0e218">
-        <source>Pickup point / Carrier</source>
-        <target>Pickup point / Carrier</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="7798b7c45fa643a0169a3a9e8ba8a6f9">
-        <source>Is COD</source>
-        <target>Is COD</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="f3547ae5e06426d87312eff7dda775aa">
-        <source>Total Price</source>
-        <target>Total Price</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="ce26601dac0dea138b7295f02b7620a7">
-        <source>Customer</source>
-        <target>Customer</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="63d5049791d9d79d86e9a108b0a999ca">
-        <source>Reference</source>
-        <target>Reference</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="b718adec73e04ce3ec720dd11a06a308">
-        <source>ID</source>
-        <target>ID</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="b2d37ae1cedf42ff874289b721860af2">
-        <source>Logs</source>
-        <target>Logs</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="3b0649c72650c313a357338dcdfb64ec">
-        <source>Note</source>
-        <target>Note</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="004bf6c9a40003140292e97330236c53">
-        <source>Action</source>
-        <target>Action</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="44749712dbec183e983dcd78a7736c41">
-        <source>Date</source>
-        <target>Date</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="902b0d55fddef6f8d651fe1035b7d4bd">
-        <source>Error</source>
-        <target>Error</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="505a83f220c02df2f85c3810cd9ceb38">
-        <source>Success</source>
-        <target>Success</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="ec53a8c4f07baed5d8825072c89799be">
-        <source>Status</source>
-        <target>Status</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="dccfc27ffe830d44560890217a879cf6">
-        <source>Exception raised during Packetery module upgrade:</source>
-        <target>Exception raised during Packetery module upgrade:</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="82dac591dcd0307fb98e07dd6b14b5d4">
-        <source>Order status change</source>
-        <target>Order status change</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="4a65c9986d5bd7296b865722de481cfd">
-        <source>Packet status tracking</source>
-        <target>Packet status tracking</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="8e64f4816d0026c2ac24d8e0f0e62de0">
-        <source>Carriers were updated.</source>
-        <target>Carriers were updated.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="a2b5e89ee86d19550fccf24d694324ee">
-        <source>Invalid API response.</source>
-        <target>Invalid API response.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="962437147c581d5b304392ee8f920ce5">
-        <source>Failed to get the list.</source>
-        <target>Failed to get the list.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="ae4593859212da2371dd8db75461239d">
-        <source>Carrier download failed: %s Please try again later.</source>
-        <target>Carrier download failed: %s Please try again later.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="85ad5aeec9dfb9e0650de5fbfecd88da">
-        <source>Packeta pickup points (Packeta + carriers)</source>
-        <target>Packeta pickup points (Packeta + carriers)</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="0ace50d3fdc56a8b3ecf3532baa0990c">
-        <source>Packeta pickup points</source>
-        <target>Packeta pickup points</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="60abf2c345b55a7ed556d3293ea5c70c">
-        <source>Failed to remove some labels. Check file permissions.</source>
-        <target>Failed to remove some labels. Check file permissions.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="79500929219856f7162cea4f4d85d9b7">
-        <source>Failed to retrieve file time for some labels. Check file permissions.</source>
-        <target>Failed to retrieve file time for some labels. Check file permissions.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="e470e2b6f2d3d89adf07fb160f256fa8">
-        <source>Packet tracking</source>
-        <target>Packet tracking</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="e768e16ace76f605b3d5659cb8dd9b77">
-        <source>Packet sending</source>
-        <target>Packet sending</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="4b2baa07493024b4198132c260b9bbe9">
-        <source>Sender validation</source>
-        <target>Sender validation</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="9b5a794d0ef94bb3615638beed3eb2a0">
-        <source>Label print</source>
-        <target>Label print</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="e633b4eefe327cee3b6ce2a2966fe96a">
-        <source>Unable to find the exchange rate in the PrestaShop currency settings for the destination country of the order</source>
-        <target>Unable to find the exchange rate in the PrestaShop currency settings for the destination country of the order</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="1a0b6dfe7253ca6b0d6689da91cd0402">
-        <source>Can't find currency of pickup point, order</source>
-        <target>Can't find currency of pickup point, order</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="4988c308d36d231707ae7e2d1e8d06b2">
-        <source>Unable to load information required to export order</source>
-        <target>Unable to load information required to export order</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="5552dc553d496d4b06866ca45b890b4a">
-        <source>Please choose orders first.</source>
-        <target>Please choose orders first.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="57297718fdb439175177cf6b196172d1">
-        <source>Order status</source>
-        <target>Order status</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="51ff9c28b4174618d5ac7ffbeb137445">
-        <source>%s must be a number, greater than 0.</source>
-        <target>%s must be a number, greater than 0.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="eaae26a6fb20ed3ef54fb23bfa0b1fcc">
-        <source>width</source>
-        <target>width</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="b435e227d5dd201e1768b2bcb2e0aa81">
-        <source>height</source>
-        <target>height</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="2fa47f7c65fec19cc163b195725e3844">
-        <source>length</source>
-        <target>length</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="47838d234bae5339a17c704bb605d01a">
-        <source>No pickup point selected for the order. It will not be possible to export the order to Packeta.</source>
-        <target>No pickup point selected for the order. It will not be possible to export the order to Packeta.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="9adba94d0538aa24decee46ce7511368">
-        <source>Address could not be changed.</source>
-        <target>Address could not be changed.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="3fb2c4a1bb0ea1f05da513ae133a21ee">
-        <source>Data has been successfully saved</source>
-        <target>Data has been successfully saved</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="694634a346412a3843bb432d70ac220b">
-        <source>Order statuses have been updated.</source>
-        <target>Order statuses have been updated.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="bba897ab8bf5da4eab16852021ec3fca">
-        <source>No order statuses configured for packet tracking</source>
-        <target>No order statuses configured for packet tracking</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d356a19c67e3509908065e241b0df4d7">
-        <source>Packet status tracking is not active</source>
-        <target>Packet status tracking is not active</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d704d40d0a7f722008b45ccdc05f2b22">
-        <source>Packet statuses</source>
-        <target>Packet statuses</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="33af8066d3c83110d4bd897f687cedd2">
-        <source>Order statuses</source>
-        <target>Order statuses</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="b51795a24e5c65a16613d55607ec55ff">
-        <source>Max order age in days</source>
-        <target>Max order age in days</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="6b17a131b80b20457412678d158f0a68">
-        <source>Max processed orders</source>
-        <target>Max processed orders</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="00d23a76e43b46dae9ec7aa9dcbebb32">
-        <source>Enabled</source>
-        <target>Enabled</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="0b1ee8113a131a340c086e907cbad951">
-        <source>Unknown parcel status</source>
-        <target>Unknown parcel status</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="0c2b856e1c30ab57f4e8134f65940cc6">
-        <source>Rejected by recipient response</source>
-        <target>Rejected by recipient response</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="698bec647110c4b82dd50b21c43c2a5d">
-        <source>Unsuccessful delivery attempt of parcel</source>
-        <target>Unsuccessful delivery attempt of parcel</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d3dd234890c253195390a0b779b14023">
-        <source>Reverse parcel has been accepted at our pick up point</source>
-        <target>Reverse parcel has been accepted at our pick up point</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d260371f86b91a61f44137ab9ede6698">
-        <source>Customs declaration process</source>
-        <target>Customs declaration process</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d7be43ee6cef0bd34e2b211322615834">
-        <source>Parcel has been collected</source>
-        <target>Parcel has been collected</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="a149e85a44aeec9140e92733d9ed694e">
-        <source>Cancelled</source>
-        <target>Cancelled</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="dab103434acd20a0542679b4fe31cf6d">
-        <source>Returned to sender</source>
-        <target>Returned to sender</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="8fa7e41cb7d17fafc28d5b0c2da0c23b">
-        <source>Returning (on the way back)</source>
-        <target>Returning (on the way back)</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="67edd3b99247c9eb5884a02802a20fa7">
-        <source>Delivered</source>
-        <target>Delivered</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="1a34b515b06c745fdc8db940ef7e0513">
-        <source>Handed over to carrier company</source>
-        <target>Handed over to carrier company</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="6353f017840d931dfc62862e5c2f9864">
-        <source>Ready for pick-up</source>
-        <target>Ready for pick-up</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="f845db4a6afc1d13fb110620feff779a">
-        <source>Departed from depot</source>
-        <target>Departed from depot</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="b294f7507c86ee75e4b6107b816d2d14">
-        <source>On the way</source>
-        <target>On the way</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="5cc947b5efb336bdc891168bbe250e13">
-        <source>Accepted at depot</source>
-        <target>Accepted at depot</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="5a0bfb21da806f4aa47aa852628af10b">
-        <source>Awaiting consignment</source>
-        <target>Awaiting consignment</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="53eaba02fc3eb9c2a21635d0a7fb15ff">
-        <source>Packeta Pick-up Points</source>
-        <target>Packeta Pick-up Points</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="630f6dc397fe74e52d5189e2c80f282b">
-        <source>Back to list</source>
-        <target>Back to list</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="064e8b8c3e28ba5dd0349a0e0fb698ad">
-        <source>One of selected vendor is not available anymore.</source>
-        <target>One of selected vendor is not available anymore.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="1274d72368e1329ec66cf6d83d8cc23d">
-        <source>You must select at least one vendor for each country.</source>
-        <target>You must select at least one vendor for each country.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="6b2b1a2e9fc50ec3db40399344356351">
-        <source>There are no available carriers for method "%s".</source>
-        <target>There are no available carriers for method "%s".</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d96936da5cb766a1d3f03ee71b57d02a">
-        <source>The Packeta carrier selected for method "%s" does not deliver to any of its active countries.</source>
-        <target>The Packeta carrier selected for method "%s" does not deliver to any of its active countries.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="a2a74e2c942959d67b22af9d3a0b54db">
-        <source>Carrier settings were saved.</source>
-        <target>Carrier settings were saved.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="a9a6f3084bcd2e462f03d0cf0c1afd84">
-        <source>Carrier has been saved.</source>
-        <target>Carrier has been saved.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="38983834d12186bbca2fc20a8c4c24bb">
-        <source>Edit carrier settings</source>
-        <target>Edit carrier settings</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="2e553a6da95861acbe3a954d03df8ef7">
-        <source>The option to set cash on delivery according to the carrier is already obsolete, and we recommend not using it. It will be completely removed soon.</source>
-        <target>The option to set cash on delivery according to the carrier is already obsolete, and we recommend not using it. It will be completely removed soon.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="37fc20ebfb7194883268f64cc5bcdbc8">
-        <source>YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.</source>
-        <target>YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="307747191798efa983ed0748f83d0652">
-        <source>Is COD?</source>
-        <target>Is COD?</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="9af787002da743589075aa873a322d4d">
-        <source>Allowed pickup point types</source>
-        <target>Allowed pickup point types</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="1399f8fce27c5636684948807c9a28c5">
-        <source>Optionally</source>
-        <target>Optionally</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="b7e7ae1c0dde0a767ce2910ee16f6811">
-        <source>Applicable only in case of CZ and SK home delivery carrier.</source>
-        <target>Applicable only in case of CZ and SK home delivery carrier.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="97f876fc0a30ae71855e27f22f0b573c">
-        <source>Validate address using widget?</source>
-        <target>Validate address using widget?</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="afdfd88e1e5862e09c288d90623f12f6">
-        <source>Packeta carrier to pair with this carrier</source>
-        <target>Packeta carrier to pair with this carrier</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="6c7a9c587489a3e130e06323ec2fc878">
-        <source>Edit carrier</source>
-        <target>Edit carrier</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="14276119325be6fede456ec6b0a3c179">
-        <source>Failed to load carrier.</source>
-        <target>Failed to load carrier.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d71e2835dd2dece42d55e29929bf006c">
-        <source>Used API password is not valid.</source>
-        <target>Used API password is not valid.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="114c1ca2964f3ed2bf798f80f824fa8b">
-        <source>Insert maximum order age in days</source>
-        <target>Insert maximum order age in days</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="8e9a43661a754c4ca0f6377a91f2c06c">
-        <source>Insert maximum number of orders that will be processed</source>
-        <target>Insert maximum number of orders that will be processed</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="1a30fcd66a1163cd876d8ab94d910e8d">
-        <source>Please insert default packaging weight in kg</source>
-        <target>Please insert default packaging weight in kg</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="c4254df469dac2cdae48925b9a671923">
-        <source>Please insert default package weight in kg</source>
-        <target>Please insert default package weight in kg</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="13c2b3c8f8fcb16a73d7b6848a42c37b">
-        <source>Please insert default package price</source>
-        <target>Please insert default package price</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="1e55c11920d6ebc07255263ae03d4974">
-        <source>Sender indication validation failed</source>
-        <target>Sender indication validation failed</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d2cfd13754957b947b1fb129f7f00c4b">
-        <source>Provided sender indication does not exist.</source>
-        <target>Provided sender indication does not exist.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="ac4ea9d06af52e534143ed2979c50841">
-        <source>Api password must be 32 characters long.</source>
-        <target>Api password must be 32 characters long.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="eabcd81deb732e90093180b9eba3320a">
-        <source>Exception raised during Packetery module install:</source>
-        <target>Exception raised during Packetery module install:</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="ce0be71e33226e4c1db2bcea5959f16b">
-        <source>Log</source>
-        <target>Log</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="254f642527b45bc260048e30704edb39">
-        <source>Configuration</source>
-        <target>Configuration</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="1f42d6d2b28ad239bda96a9771dfd977">
-        <source>Carrier settings</source>
-        <target>Carrier settings</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="ddd6dc80580e42e39480b99a2fd30e1e">
-        <source>Packeta Orders</source>
-        <target>Packeta Orders</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="e21a827831f90240feccbb1f8fd8c7e3">
-        <source>Exception raised during Packetery module uninstall:</source>
-        <target>Exception raised during Packetery module uninstall:</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="4a93d9164aad959a6abc2de389170ac9">
-        <source>Packeta</source>
-        <target>Zásilkovna</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="c9cc8cce247e49bae79f15173ce97354">
-        <source>Save</source>
-        <target>Uložit</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="bafd7322c6e97d25b6299b5d6fe8920b">
-        <source>No</source>
-        <target>Ne</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="93cba07454f06a4a960172bbd6e2a435">
-        <source>Yes</source>
-        <target>Ano</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="44e05cef9b23421538483520e6cc0934">
-        <source>The selected delivery address is in a country other than the country of delivery of the order.</source>
-        <target>Vybraná adresa pro doručení je v jiné zemi, než je země doručení objednávky.</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="7e436ecba5095ef42cfeb5b696fbbdfd">
         <source>Get your customers access to pick-up point in Packeta delivery network.</source>
         <target>Získejte zákazníkům přístup k vyzvedávacím bodům v síti Zásilkovny.</target>
@@ -690,6 +10,11 @@
       <trans-unit id="e35932e04a726a6aeaf748a6bb5d4267">
         <source>Export orders to Packeta system.</source>
         <target>Export objednávek do systému Zásilkovny.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4a93d9164aad959a6abc2de389170ac9">
+        <source>Packeta</source>
+        <target>Zásilkovna</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="34d961ea46be6bd89ea050f383853695">
@@ -705,11 +30,6 @@
       <trans-unit id="c721b4e2739ac6e4dd5b507696c0a24d">
         <source>The Packeta module folder must be writable for the pickup point selection to work properly.</source>
         <target>Aby výběr výdejního místa správně fungoval, musí být složka modulu Packeta zapisovatelná.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="5488268ddc84626385570bad05d6eed6">
-        <source>No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.</source>
-        <target>Na webovém serveru není k dispozici žádný způsob přístupu k Packeta API: povolte prosím modul CURL nebo nastavení allow_url_fopen.</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="35c4f71040b3390abc9a98803735e993">
@@ -740,6 +60,21 @@
       <trans-unit id="155bf3eafccd1f4eb6ddf803c886541b">
         <source>Packeta settings</source>
         <target>Zásilkovna - nastavení</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c9cc8cce247e49bae79f15173ce97354">
+        <source>Save</source>
+        <target>Uložit</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4a65c9986d5bd7296b865722de481cfd">
+        <source>Packet status tracking</source>
+        <target>Sledování stavu zásilek</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="82dac591dcd0307fb98e07dd6b14b5d4">
+        <source>Order status change</source>
+        <target>Order status change</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="37e31370e4ab230ff6fba12cc6390aff">
@@ -785,6 +120,16 @@
       <trans-unit id="bce7c96973feb8b2e9c4a771f4c81f2a">
         <source>Automatically open widget in cart</source>
         <target>Automatické otevření widgetu v košíku</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="93cba07454f06a4a960172bbd6e2a435">
+        <source>Yes</source>
+        <target>Ano</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="bafd7322c6e97d25b6299b5d6fe8920b">
+        <source>No</source>
+        <target>Ne</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="00d71b1bbc3658188c7d35ba1636db50">
@@ -870,6 +215,11 @@
       <trans-unit id="a29aff418504e8f98f1df376c2197791">
         <source>Address is not valid.</source>
         <target>Adresa není ověřená.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="44e05cef9b23421538483520e6cc0934">
+        <source>The selected delivery address is in a country other than the country of delivery of the order.</source>
+        <target>Vybraná adresa pro doručení je v jiné zemi, než je země doručení objednávky.</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="9aa49c5a01dab7e49c73343b47e995a2">

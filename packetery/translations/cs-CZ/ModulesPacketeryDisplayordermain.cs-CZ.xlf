@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="4a93d9164aad959a6abc2de389170ac9">
+        <source>Packeta</source>
+        <target>Zásilkovna</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="bb7e30225abff439d6d47bb559af39fb">
+        <source>Show log</source>
+        <target>Zobrazit logy</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="914419aa32f04011357d3b604a86d7eb">
+        <source>Carrier</source>
+        <target>Dopravce</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="108b7b058f862ee055e273cd8ee3bfaa">
+        <source>Please select shipment method again</source>
+        <target>Vyberte prosím znovu způsob přepravy</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a6e579a3b53827e8be9ec089d7199594">
+        <source>Delivery address verified for order</source>
+        <target>U objednávky byla ověřena adresa doručení</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d61ebdd8a0c0cd57c22455e9f0918c65">
+        <source>Street</source>
+        <target>Ulice</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="57d056ed0984166336b7879c2af3657f">
+        <source>City</source>
+        <target>Město</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="963ab0bbea32f1f9d19afb00d08be14d">
+        <source>Zip</source>
+        <target>PSČ</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e25b163360646e8f71af8a8ee0fad1a3">
+        <source>County</source>
+        <target>Kraj</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8c578de37278ada488d763ea86c5cf20">
+        <source>GPS</source>
+        <target>GPS</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="880aa0400f544314b130331043ae7494">
+        <source>Change validated delivery address</source>
+        <target>Změnit ověřenou doručovací adresu</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="413f30130d000fc25023de3c318ecce3">
+        <source>Set validated delivery address</source>
+        <target>Nastavit ověřenou doručovací adresu</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ee5c5839980b47f1893220655a3de0fb">
+        <source>Pickup point</source>
+        <target>Výdejní místo</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9aa49c5a01dab7e49c73343b47e995a2">
+        <source>Please select pickup point</source>
+        <target>Vyberte prosím výdejní místo</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="128ca07a3ac6521356117915e983660d">
+        <source>Change pickup point</source>
+        <target>Změnit výdejní místo</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b467fdcd05373dcb789d8e055e2f8160">
+        <source>Size (L x W x H):</source>
+        <target>Rozměry (D x Š x V):</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ba2a9c6c8c77e03f83ef8bf543612275">
+        <source>Length</source>
+        <target>Délka</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="32954654ac8fe66a1d09be19001de2d4">
+        <source>Width</source>
+        <target>Šířka</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="eec6c4bdbd339edf8cbea68becb85244">
+        <source>Height</source>
+        <target>Výška</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c9cc8cce247e49bae79f15173ce97354">
+        <source>Save</source>
+        <target>Uložit</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="786313e610ded09bcd936c2b4ebde6ad">
+        <source>Post parcel</source>
+        <target>Podat zásilku</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5606d6f39713e37807ff75042e1ae324">
+        <source>Do you really wish to post the parcel?</source>
+        <target>Opravdu si přejete podat zásilku?</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

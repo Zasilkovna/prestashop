@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="83da76284b32119b3e3833c8d8a74392">
+        <source>Packeta carriers update</source>
+        <target>Aktualizace dopravců Zásilkovny</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="57d41df11d9a0c7512e13b58daea48f7">
+        <source>Total carriers</source>
+        <target>Celkem dopravců</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ad26b2c4320499b7daf5b347dec3ef27">
+        <source>Last carriers update</source>
+        <target>Poslední aktualizace dopravců</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="563aa2b422ea845f64587b776b722275">
+        <source>The list of carriers is currently empty.</source>
+        <target>Seznam dopravců je momentálně prázdný.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8e3d020b07f69c7a130016693ea5e4b8">
+        <source>Manually update the list of carriers</source>
+        <target>Ruční aktualizace dopravců</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ff7008e17044128984c90f92fef65368">
+        <source>It is not possible to use the update of carriers. First, set an API password.</source>
+        <target>Aktualizaci dopravců nelze využít. Nejprve nastavte API heslo.</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
