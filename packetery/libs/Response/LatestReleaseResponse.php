@@ -22,6 +22,7 @@ class LatestReleaseResponse
     /**
      * @param string $version
      * @param string $downloadUrl
+     * @param string $releaseNotes
      */
     public function __construct($version, $downloadUrl, $releaseNotes)
     {
