@@ -20,7 +20,7 @@ class ApiClientFacade
             $token = defined('_GITHUB_ACCESS_TOKEN_') ? constant('_GITHUB_ACCESS_TOKEN_') : null;
 
             if ($token !== null) {
-                $headers['Authorization'] = 'token ' . $token;
+                $headers['Authorization'] = "token {$token}";
                 $client = new Client([
                     'headers' => $headers,
                 ]);

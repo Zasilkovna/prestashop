@@ -16,7 +16,7 @@ use Tools;
 class VersionChecker
 {
     const CHECK_INTERVAL_IN_SECONDS = 24 * 3600; // 1 day
-    const RELEASES_ENDPOINT_URL = 'https://api.github.com/repos/Zasilkovna/prestashop/releases';
+    const GITHUB_RELEASES_ENDPOINT_URL = 'https://api.github.com/repos/Zasilkovna/prestashop/releases';
 
     /** @var Packetery */
     private $module;
@@ -53,7 +53,7 @@ class VersionChecker
                 (defined('_PS_MODE_DEV_') && constant('_PS_MODE_DEV_') === false) &&
                 (defined('_PACKETERY_DEBUG_LOG_') && constant('_PACKETERY_DEBUG_LOG_') === true)
             ) {
-                PrestaShopLogger::addLog('Packetery: ' . $exception->getMessage(), 3, null, null, null, true);
+                PrestaShopLogger::addLog("Packetery: {$exception->getMessage()}", 3, null, null, null, true);
             } elseif ((defined('_PS_MODE_DEV_') && constant('_PS_MODE_DEV_') === true)) {
                 throw $exception;
             }
@@ -66,7 +66,7 @@ class VersionChecker
         $downloadUrl = $response->getDownloadUrl();
         $releaseNotes = $response->getReleaseNotes();
 
-        if ($version !== '' && $downloadUrl !== '' && $releaseNotes !== '' && $this->isNewVersionAvailable($version)) {
+        if ($this->shouldUpdateStoredVersionData($version, $downloadUrl, $releaseNotes)) {
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $version);
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, $downloadUrl);
             ConfigHelper::update(ConfigHelper::KEY_LAST_RELEASE_NOTES, $releaseNotes);
@@ -82,24 +82,23 @@ class VersionChecker
      */
     private function getLatestReleaseResponse(): LatestReleaseResponse
     {
-        $json = $this->apiClientFacade->getWithGithubAuthorizationToken(self::RELEASES_ENDPOINT_URL);
+        $allowedReleaseTypes = defined('_PACKETERY_ALLOWED_RELEASE_TYPES_') && is_array(_PACKETERY_ALLOWED_RELEASE_TYPES_)
+            ? _PACKETERY_ALLOWED_RELEASE_TYPES_
+            : ['stable'];
+
+        $json = $this->apiClientFacade->getWithGithubAuthorizationToken(self::GITHUB_RELEASES_ENDPOINT_URL);
         if ($json === '' || $json === false) {
             throw new VersionCheckerException('Failed to retrieve response from GitHub releases endpoint.');
         }
 
-        $releases = json_decode($json, true);
+        $releaseList = json_decode($json, true);
 
-        if (!is_array($releases) || json_last_error() !== JSON_ERROR_NONE) {
+        if (!is_array($releaseList) || json_last_error() !== JSON_ERROR_NONE) {
             PrestaShopLogger::addLog('Packetery: JSON decode error: ' . json_last_error_msg(), 3, null, null, null, true);
             throw VersionCheckerException::createForInvalidLatestReleaseResponse();
         }
 
-
-        $allowedTypes = defined('_PACKETERY_ALLOWED_RELEASE_TYPES_') && is_array(_PACKETERY_ALLOWED_RELEASE_TYPES_)
-            ? _PACKETERY_ALLOWED_RELEASE_TYPES_
-            : ['stable'];
-
-        foreach ($releases as $release) {
+        foreach ($releaseList as $release) {
             $isStructureValid = $this->jsonStructureValidator->isStructureValid(
                 $release,
                 [
@@ -111,6 +110,7 @@ class VersionChecker
                             'browser_download_url' => 'string',
                         ],
                     ],
+                    'body' => 'string',
                 ]
             );
 
@@ -129,7 +129,7 @@ class VersionChecker
                 $releaseType = 'stable';
             }
 
-            if (in_array($releaseType, $allowedTypes, true)) {
+            if (in_array($releaseType, $allowedReleaseTypes, true)) {
                 return new LatestReleaseResponse(
                     ltrim($release['tag_name'], 'v'),
                     $release['assets'][0]['browser_download_url'],
@@ -182,5 +182,13 @@ class VersionChecker
         $smarty->assign('releaseNotes', ConfigHelper::get(ConfigHelper::KEY_LAST_RELEASE_NOTES));
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/newVersionMessage.tpl');
+    }
+
+    private function shouldUpdateStoredVersionData(string $version, string $downloadUrl, string $releaseNotes): bool
+    {
+        return $version !== ''
+            && $downloadUrl !== ''
+            && $releaseNotes !== ''
+            && $this->isNewVersionAvailable($version);
     }
 }
