@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="0dba7c324908f7f67e9f72e3393a4beb">
         <source>Tracking number not returned for order %s</source>
-        <target>Tracking number not returned for order %s</target>
+        <target>Pro objednávku %s nebylo vráceno trasovací číslo</target>
         <note>Line: </note>
       </trans-unit>
     </body>
