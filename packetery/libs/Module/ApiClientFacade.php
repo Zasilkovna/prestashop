@@ -17,7 +17,7 @@ class ApiClientFacade
     public function getWithGithubAuthorizationToken($url)
     {
         if (class_exists('GuzzleHttp\Client')) {
-            $token = defined('_GITHUB_ACCESS_TOKEN_') ? constant('_GITHUB_ACCESS_TOKEN_') : null;
+            $token = defined('_GITHUB_ACCESS_TOKEN_') ? _GITHUB_ACCESS_TOKEN_ : null;
 
             if ($token !== null) {
                 $headers['Authorization'] = "token {$token}";

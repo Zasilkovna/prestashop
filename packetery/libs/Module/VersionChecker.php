@@ -50,11 +50,11 @@ class VersionChecker
             $response = $this->getLatestReleaseResponse();
         } catch (Exception $exception) {
             if (
-                (defined('_PS_MODE_DEV_') && constant('_PS_MODE_DEV_') === false) &&
-                (defined('_PACKETERY_DEBUG_LOG_') && constant('_PACKETERY_DEBUG_LOG_') === true)
+                (defined('_PS_MODE_DEV_') && _PS_MODE_DEV_ === false) &&
+                (defined('_PACKETERY_DEBUG_LOG_') && _PACKETERY_DEBUG_LOG_ === true)
             ) {
                 PrestaShopLogger::addLog("Packetery: {$exception->getMessage()}", 3, null, null, null, true);
-            } elseif ((defined('_PS_MODE_DEV_') && constant('_PS_MODE_DEV_') === true)) {
+            } elseif ((defined('_PS_MODE_DEV_') && _PS_MODE_DEV_ === true)) {
                 throw $exception;
             }
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time());
