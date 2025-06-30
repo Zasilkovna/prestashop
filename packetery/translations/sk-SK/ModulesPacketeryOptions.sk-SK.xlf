@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="ac4ea9d06af52e534143ed2979c50841">
+        <source>Api password must be 32 characters long.</source>
+        <target>Heslo API musí mať 32 znakov.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d2cfd13754957b947b1fb129f7f00c4b">
+        <source>Provided sender indication does not exist.</source>
+        <target>Zadané označení odesílatele neexistuje.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1e55c11920d6ebc07255263ae03d4974">
+        <source>Sender indication validation failed</source>
+        <target>Ověření označení odesílatele selhalo</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="13c2b3c8f8fcb16a73d7b6848a42c37b">
+        <source>Please insert default package price</source>
+        <target>Vložte prosím výchozí cenu zásilky</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c4254df469dac2cdae48925b9a671923">
+        <source>Please insert default package weight in kg</source>
+        <target>Vložte prosím výchozí hmotnost zásilky v kg</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1a30fcd66a1163cd876d8ab94d910e8d">
+        <source>Please insert default packaging weight in kg</source>
+        <target>Vložte prosím výchozí hmotnost obalového materiálu v kg</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8e9a43661a754c4ca0f6377a91f2c06c">
+        <source>Insert maximum number of orders that will be processed</source>
+        <target>Maximální počet zpracovávaných objednávek</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="114c1ca2964f3ed2bf798f80f824fa8b">
+        <source>Insert maximum order age in days</source>
+        <target>Maximální stáří objednávky ve dnech</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

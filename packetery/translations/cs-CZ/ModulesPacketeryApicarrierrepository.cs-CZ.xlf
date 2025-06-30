@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="0ace50d3fdc56a8b3ecf3532baa0990c">
+        <source>Packeta pickup points</source>
+        <target>Všechna výdejní místa (Zásilkovna + dopravci)</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="85ad5aeec9dfb9e0650de5fbfecd88da">
+        <source>Packeta pickup points (Packeta + carriers)</source>
+        <target>Výdejní místa Zásilkovny</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

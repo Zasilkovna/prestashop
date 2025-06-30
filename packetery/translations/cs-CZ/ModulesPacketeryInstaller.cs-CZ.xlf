@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="4a93d9164aad959a6abc2de389170ac9">
+        <source>Packeta</source>
+        <target>Zásilkovna</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ddd6dc80580e42e39480b99a2fd30e1e">
+        <source>Packeta Orders</source>
+        <target>Objednávky Zásilkovna</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1f42d6d2b28ad239bda96a9771dfd977">
+        <source>Carrier settings</source>
+        <target>Nastavení dopravců</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="254f642527b45bc260048e30704edb39">
+        <source>Configuration</source>
+        <target>Konfigurace</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ce0be71e33226e4c1db2bcea5959f16b">
+        <source>Log</source>
+        <target>Log</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="eabcd81deb732e90093180b9eba3320a">
+        <source>Exception raised during Packetery module install:</source>
+        <target>Při instalování modulu Zásilkovny nastala výjimka:</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

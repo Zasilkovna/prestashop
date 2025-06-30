@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="ae4593859212da2371dd8db75461239d">
+        <source>Carrier download failed: %s Please try again later.</source>
+        <target>Stažení dopravců selhalo: %s Zkuste to prosím později.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="962437147c581d5b304392ee8f920ce5">
+        <source>Failed to get the list.</source>
+        <target>Nepodařilo se získat seznam.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a2b5e89ee86d19550fccf24d694324ee">
+        <source>Invalid API response.</source>
+        <target>Neplatná odpověď API.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8e64f4816d0026c2ac24d8e0f0e62de0">
+        <source>Carriers were updated.</source>
+        <target>Dopravci byli aktualizováni.</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
