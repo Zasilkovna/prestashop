@@ -39,6 +39,30 @@ class BaseResponse
     }
 
     /**
+     * @return bool
+     */
+    public function hasPacketIdsFault()
+    {
+        return $this->fault === 'PacketIdsFault';
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPacketIdFault()
+    {
+        return $this->fault === 'PacketIdFault';
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasInvalidCourierNumberFault()
+    {
+        return $this->fault === 'InvalidCourierNumber';
+    }
+
+    /**
      * Sets fault identifier.
      *
      * @param string $fault Fault identifier.
