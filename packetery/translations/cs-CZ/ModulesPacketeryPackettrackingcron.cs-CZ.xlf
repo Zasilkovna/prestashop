@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="d356a19c67e3509908065e241b0df4d7">
+        <source>Packet status tracking is not active</source>
+        <target>Sledování stavu zásilky není aktivní</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="bba897ab8bf5da4eab16852021ec3fca">
+        <source>No order statuses configured for packet tracking</source>
+        <target>Pro sledování zásilky nejsou nastaveny žádné stavy objednávky</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="694634a346412a3843bb432d70ac220b">
+        <source>Order statuses have been updated.</source>
+        <target>Stavy objednávek byly upraveny.</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

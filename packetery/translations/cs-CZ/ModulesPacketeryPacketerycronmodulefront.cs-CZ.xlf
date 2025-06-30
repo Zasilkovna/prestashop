@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="57278b44f1b40495b05ba12fe8c6db4f">
+        <source>Packet tracking status update</source>
+        <target>Aktualizace sledování stavu zásilky</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="aee4c3ffdf25619455f67b0ca1d1e946">
+        <source>Invalid packetery cron token.</source>
+        <target>Nesprávný token.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="36114979c9d11968c61fc8c8cf447349">
+        <source>Cron task to run was not specified.</source>
+        <target>Úloha nebyla specifikována.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3ecbf4fb95842e8c64dcf3d802474618">
+        <source>Deleting labels</source>
+        <target>Mazání štítků</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e689c7a0e375fc4c26686a7544df5829">
+        <source>Carrier list update</source>
+        <target>Aktualizace seznamu dopravců</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="19aad9f2fe3ce0023298ab83f7e75775">
+        <source>BEGIN</source>
+        <target>ZAČÁTEK</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a5e0021bf76278d7abffb156003aa46d">
+        <source>Task "%s" is about to be executed.</source>
+        <target>Úloha \"%s\" se začíná zpracovávat.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f7aa8bd8b7067c9f4eaea7193a1f394b">
+        <source>Task was not found.</source>
+        <target>Úloha nenalezena.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b3158ee97bbf8d04ea6dd98b3327a51d">
+        <source>All displayed errors are stored in the Prestashop database.</source>
+        <target>Všechny zobrazené chyby jsou uložené v databázi Prestashopu.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b1a326c06d88bf042f73d70f50197905">
+        <source>END</source>
+        <target>KONEC</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5dc2860ca37a426fc8a2cf6213b72b96">
+        <source>Task "%s" was finished.</source>
+        <target>Úloha \"%s\" byla dokončena.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="bb1ca97ec761fc37101737ba0aa2e7c5">
+        <source>ERROR</source>
+        <target>CHYBA</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

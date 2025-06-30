@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="e470e2b6f2d3d89adf07fb160f256fa8">
+        <source>Packet tracking</source>
+        <target>Sledování zásilky</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9b5a794d0ef94bb3615638beed3eb2a0">
+        <source>Label print</source>
+        <target>Tisk štítku</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4b2baa07493024b4198132c260b9bbe9">
+        <source>Sender validation</source>
+        <target>Ověření odesílatele</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e768e16ace76f605b3d5659cb8dd9b77">
+        <source>Packet sending</source>
+        <target>Vytvoření zásilky</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

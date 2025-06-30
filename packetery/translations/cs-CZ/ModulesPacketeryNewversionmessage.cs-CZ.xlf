@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file original="admin516a3rrrf" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
     <body>
       <trans-unit id="fd3510c1f57ee8be21bd3dcffe5041a0">
         <source>A new version of the Packeta module is available: %newVersion% (current version: %currentVersion%).</source>
