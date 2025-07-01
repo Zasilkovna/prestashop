@@ -738,9 +738,7 @@ class Packetery extends CarrierModule
             $this->context->smarty->assign('pickup_point_type', $pickupPointType);
             $this->context->smarty->assign('packeta_carrier_id', $carrierId);
             $this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
-
-            $base_uri = __PS_BASE_URI__ === '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-            $this->context->smarty->assign('baseuri', $base_uri);
+            $this->context->smarty->assign('baseuri', \Packetery\Module\Helper::getBaseUri());
             /** @var \Packetery\Tools\ConfigHelper $configHelper */
             $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
             $this->context->smarty->assign('packeta_api_key', $configHelper->getApiKey());
@@ -781,8 +779,6 @@ class Packetery extends CarrierModule
         $shopLanguage = $language->iso_code ?: 'en';
         $shopLanguage = strtolower($shopLanguage);
 
-        $baseUri = __PS_BASE_URI__ === '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
-
         $isPS16 = strpos(_PS_VERSION_, '1.6') === 0;
         $isOpcEnabled = (bool) Configuration::get('PS_ORDER_PROCESS_TYPE');
 
@@ -801,7 +797,7 @@ class Packetery extends CarrierModule
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $this->context->smarty->assign('packetaModuleConfig', [
-            'baseUri' => $baseUri,
+            'baseUri' => \Packetery\Module\Helper::getBaseUri(),
             'apiKey' => $configHelper->getApiKey(),
             'frontAjaxToken' => Tools::getToken('ajax_front'),
             'appIdentity' => $this->getAppIdentity(),
@@ -916,22 +912,10 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
         $this->processPostParcel($messages);
 
-        /** @var \Packetery\Tools\ConfigHelper $configHelper */
-        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
-        $apiKey = $configHelper->getApiKey();
-
         /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
-        if (!$apiKey || !$packeteryOrder) {
-            return;
-        }
-
-        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
-        $showActionButtonsDivider = false;
-        if (!$packeteryCarrier) {
+        if ((bool)$packeteryOrder === false) {
             return;
         }
 
@@ -944,9 +928,7 @@ class Packetery extends CarrierModule
         $isAddressDelivery = (bool)$packeteryOrder['is_ad'];
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
         $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $packeteryOrder['name_branch']);
-        $pickupPointChangeAllowed = false;
-        $postParcelButtonAllowed = false;
-        $isExported = (bool) $packeteryOrder['exported'];
+        $isExported = (bool)$packeteryOrder['exported'];
 
         if ($isExported === false) {
             $orderDetails = [
@@ -959,51 +941,69 @@ class Packetery extends CarrierModule
 
         $this->context->smarty->assign('isExported', $isExported);
 
-        if ($isAddressDelivery) {
-            $isAddressValidated = false;
-            if (in_array($packeteryCarrier['address_validation'], ['required', 'optional'])) {
-                $validatedAddress = [
-                    'street' => '',
-                    'houseNumber' => '',
-                    'city' => '',
-                    'zip' => '',
-                    'county' => '',
-                    'latitude' => '',
-                    'longitude' => '',
-                ];
-                if (\Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
+        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
+        if ((bool)$packeteryCarrier === false) {
+            $oldCarrier = new Carrier($packeteryOrder['id_carrier']);
+            $newCarrier = Carrier::getCarrierByReference($oldCarrier->id_reference);
+            $packeteryCarrier = $carrierRepository->getPacketeryCarrierById($newCarrier->id);
+        }
+
+        /** @var \Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+        $apiKey = $configHelper->getApiKey();
+
+        $pickupPointChangeAllowed = false;
+        if ($apiKey !== false && (bool)$packeteryCarrier === true) {
+            if ($isAddressDelivery === true) {
+                $isAddressValidated = false;
+                if (in_array($packeteryCarrier['address_validation'], ['required', 'optional'])) {
                     $validatedAddress = [
-                        'street' => $packeteryOrder['street'],
-                        'houseNumber' => $packeteryOrder['house_number'],
-                        'city' => $packeteryOrder['city'],
-                        'zip' => $packeteryOrder['zip'],
-                        'county' => $packeteryOrder['county'],
-                        'latitude' => $packeteryOrder['latitude'],
-                        'longitude' => $packeteryOrder['longitude'],
-                        // we do not display country
+                        'street' => '',
+                        'houseNumber' => '',
+                        'city' => '',
+                        'zip' => '',
+                        'county' => '',
+                        'latitude' => '',
+                        'longitude' => '',
                     ];
-                    if ($packeteryOrder['country'] !== strtolower($packeteryOrder['ps_country'])) {
-                        $messages[] = [
-                            'text' => $this->l('The selected delivery address is in a country other than the country of delivery of the order.'),
-                            'class' => 'danger',
+                    if (\Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
+                        $validatedAddress = [
+                            'street' => $packeteryOrder['street'],
+                            'houseNumber' => $packeteryOrder['house_number'],
+                            'city' => $packeteryOrder['city'],
+                            'zip' => $packeteryOrder['zip'],
+                            'county' => $packeteryOrder['county'],
+                            'latitude' => $packeteryOrder['latitude'],
+                            'longitude' => $packeteryOrder['longitude'],
+                            // we do not display country
                         ];
+                        if (strtolower($packeteryOrder['country']) !== strtolower($packeteryOrder['ps_country'])) {
+                            $messages[] = [
+                                'text' => $this->l('The selected delivery address is in a country other than the country of delivery of the order.'),
+                                'class' => 'danger',
+                            ];
+                        }
+                        $isAddressValidated = true;
                     }
-                    $isAddressValidated = true;
+                    $this->context->smarty->assign('validatedAddress', $validatedAddress);
+                    $this->prepareAddressChange($apiKey, $packeteryOrder);
                 }
-                $this->context->smarty->assign('validatedAddress', $validatedAddress);
-                $this->prepareAddressChange($apiKey, $packeteryOrder);
+                $this->context->smarty->assign('isAddressValidated', $isAddressValidated);
+            } elseif ((int)$packeteryOrder['id_carrier'] !== 0) {
+                $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
+                $pickupPointChangeAllowed = true;
             }
-            $this->context->smarty->assign('isAddressValidated', $isAddressValidated);
-        } elseif ((int)$packeteryOrder['id_carrier'] !== 0) {
-            $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
-            $pickupPointChangeAllowed = true;
         }
 
         /** @var \Packetery\Weight\Calculator $weightCalculator */
         $weightCalculator = $this->diContainer->get(\Packetery\Weight\Calculator::class);
         $orderWeight = $weightCalculator->getFinalWeight($packeteryOrder);
 
-        if ($isExported === false && $orderWeight !== null && $orderWeight > 0) {
+        $postParcelButtonAllowed = false;
+        $showActionButtonsDivider = false;
+        if ($apiKey !== false && $isExported === false && $orderWeight !== null && $orderWeight > 0) {
             $postParcelButtonAllowed = true;
             $showActionButtonsDivider = true;
         }
