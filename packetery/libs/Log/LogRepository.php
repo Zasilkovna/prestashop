@@ -81,7 +81,7 @@ class LogRepository
                 'params' => json_encode($params, JSON_UNESCAPED_UNICODE),
                 'status' => $status,
                 'action' => $action,
-                'date' => (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
+                'date' => (new DateTimeImmutable('now'))->setTimezone(new DateTimeZone(date_default_timezone_get()))->format('Y-m-d H:i:s'),
             ]
         );
     }
