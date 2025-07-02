@@ -88,6 +88,10 @@ class Uninstaller
      */
     private function uninstallDatabase()
     {
+        if (defined('PACKETERY_REMOVE_ALL_DATA') && !PACKETERY_REMOVE_ALL_DATA) {
+            return true;
+        }
+
         $sql = [];
         // remove tables with payment and carrier settings, and with carriers
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';
@@ -150,6 +154,10 @@ class Uninstaller
      */
     private function deleteConfiguration()
     {
+        if (defined('PACKETERY_REMOVE_ALL_DATA') && !PACKETERY_REMOVE_ALL_DATA) {
+            return true;
+        }
+
         return (
             Configuration::deleteByName('PACKETERY_APIPASS') &&
             Configuration::deleteByName('PACKETERY_ESHOP_ID') &&

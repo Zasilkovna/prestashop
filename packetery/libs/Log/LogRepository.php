@@ -120,7 +120,7 @@ class LogRepository
      */
     public function getCreateTableSql()
     {
-        return 'CREATE TABLE ' . $this->getPrefixedTableName() . ' (
+        return 'CREATE TABLE IF NOT EXISTS ' . $this->getPrefixedTableName() . ' (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `order_id` int(10) NULL,
             `params` text NOT NULL,
