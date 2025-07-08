@@ -118,7 +118,7 @@ class ProductAttributeRepository
      */
     public function getCreateTableSql()
     {
-        return 'CREATE TABLE `' . $this->getPrefixedTableName() . '` (
+        return 'CREATE TABLE IF NOT EXISTS `' . $this->getPrefixedTableName() . '` (
             `id_product` int(11) NOT NULL PRIMARY KEY,
             `is_adult` tinyint(1) NOT NULL DEFAULT 0
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
