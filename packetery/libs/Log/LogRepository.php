@@ -80,7 +80,7 @@ class LogRepository
         return $this->insert(
             [
                 'order_id' => $orderId === 0 || $orderId === "0" ? null : $orderId,
-                'params' => json_encode($params, JSON_UNESCAPED_UNICODE),
+                'params' => $this->dbTools->db->escape(json_encode($params, JSON_UNESCAPED_UNICODE)),
                 'status' => $status,
                 'action' => $action,
                 'date' => (new DateTimeImmutable('now'))->setTimezone(new DateTimeZone(date_default_timezone_get()))->format('Y-m-d H:i:s'),
