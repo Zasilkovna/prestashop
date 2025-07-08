@@ -16,7 +16,6 @@ use Tools;
 
 class OrderExporter
 {
-
     /** @var Packetery */
     private $module;
 
@@ -159,6 +158,7 @@ class OrderExporter
 
     /**
      * Gets a value divisible by $x.
+     *
      * @param float|int $n
      * @param int $x
      * @return float|int
@@ -167,5 +167,4 @@ class OrderExporter
     {
         return (ceil($n) % $x === 0) ? ceil($n) : round(($n + $x / 2) / $x) * $x;
     }
-
 }

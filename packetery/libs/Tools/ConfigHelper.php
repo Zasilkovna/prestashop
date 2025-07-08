@@ -9,9 +9,10 @@ use Shop;
 
 class ConfigHelper
 {
-    const KEY_LAST_FEATURE_CHECK = 'PACKETERY_LAST_FEATURE_CHECK';
+    const KEY_LAST_VERSION_CHECK_TIMESTAMP = 'PACKETERY_LAST_VERSION_CHECK_TIMESTAMP';
     const KEY_LAST_VERSION_URL = 'PACKETERY_LAST_VERSION_URL';
     const KEY_LAST_VERSION = 'PACKETERY_LAST_VERSION';
+    const KEY_LAST_RELEASE_NOTES = 'PACKETERY_LAST_RELEASE_NOTES';
     const KEY_USE_PS_CURRENCY_CONVERSION = 'PACKETERY_USE_PS_CURRENCY_CONVERSION';
 
     const BEHAVIOR_ALL = 'all'; // default
@@ -24,6 +25,7 @@ class ConfigHelper
 
     /**
      * We do not try to fix rare errors caused by using pre 3.0 versions with multistore on.
+     *
      * @param string $key
      * @return false|string
      */
@@ -132,5 +134,4 @@ class ConfigHelper
 
         return self::BEHAVIOR_ALL;
     }
-
 }

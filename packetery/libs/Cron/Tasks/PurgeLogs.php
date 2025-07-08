@@ -18,14 +18,13 @@ class PurgeLogs extends Base
     private $logRepository;
 
     /**
-     * DownloadCarriers constructor.
      * @param Packetery $module
-     * @throws \ReflectionException
+     * @param LogRepository $logRepository
      */
-    public function __construct(Packetery $module)
+    public function __construct(Packetery $module, LogRepository $logRepository)
     {
         $this->module = $module;
-        $this->logRepository = $this->module->diContainer->get(LogRepository::class);
+        $this->logRepository = $logRepository;
     }
 
     /**

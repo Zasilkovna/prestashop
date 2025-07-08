@@ -4,11 +4,11 @@ namespace Packetery\Module;
 
 use Packetery;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
+use Packetery\Log\LogRepository;
 use Packetery\Order\OrderRepository;
 use Packetery\Response\PacketCarrierNumber;
 use Packetery\Response\PacketInfo;
 use Packetery\Tools\ConfigHelper;
-use Packetery\Tools\Logger;
 use Packetery\Tools\MessageManager;
 use ReflectionException;
 use SoapClient;
@@ -114,6 +114,7 @@ class SoapApi
 
     /**
      * Requests carrier number for a packet.
+     *
      * @param string $packetId
      * @return PacketCarrierNumber
      */
@@ -143,8 +144,8 @@ class SoapApi
         $result = [];
         /** @var OrderRepository $orderRepository */
         $orderRepository = $this->module->diContainer->get(OrderRepository::class);
-        /** @var Logger $logger */
-        $logger = $this->module->diContainer->get(Logger::class);
+        /** @var LogRepository $logRepository */
+        $logRepository = $this->module->diContainer->get(LogRepository::class);
         /** @var MessageManager $messageManager */
         $messageManager = $this->module->diContainer->get(MessageManager::class);
         foreach ($packets as $orderId => $packetId) {
@@ -156,7 +157,16 @@ class SoapApi
                         $messageManager->setMessage('warning', $this->module->l('Used API password is not valid.', 'soapapi'));
                         return $result;
                     }
-                    $logger->logToFile(sprintf('Error while retrieving carrier number for order %s: %s', $packetId, $response->getFaultString()));
+                    $logRepository->insertRow(
+                        LogRepository::ACTION_CARRIER_TRACKING_NUMBER,
+                        [
+                            'packetId' => $packetId,
+                            'error' => $response->getFaultString(),
+                        ],
+                        LogRepository::STATUS_ERROR,
+                        $orderId
+                    );
+
                     continue;
                 }
                 $orderRepository->setCarrierNumber($orderId, $response->getNumber());
@@ -174,6 +184,7 @@ class SoapApi
 
     /**
      * Gets fault identifier from SoapFault exception.
+     *
      * @param SoapFault $exception
      * @return int|string
      */
@@ -186,4 +197,71 @@ class SoapApi
         return $exception->faultstring;
     }
 
+    /**
+     * @param string $packetId
+     * @return array|string
+     */
+    public function getPacketTracking($packetId)
+    {
+        $client = new SoapClient(self::WSDL_URL);
+        try {
+            $response = $client->packetTracking($this->configHelper->getApiPass(), $packetId);
+        } catch (SoapFault $exception) {
+            return $exception->faultstring;
+        }
+        return $response;
+    }
+
+    /**
+     * @param array $packets
+     * @param string $format
+     * @param string $offset
+     * @return Packetery\Response\PacketsLabelsPdfResponse
+     */
+    public function getPacketsLabelsPdf(array $packets, $format, $offset)
+    {
+        $response = new Packetery\Response\PacketsLabelsPdfResponse();
+        try {
+            $soapClient = new SoapClient(self::WSDL_URL);
+            $pdfContents = $soapClient->packetsLabelsPdf($this->configHelper->getApiPass(), $packets, $format, $offset);
+            $response->setPdfContents($pdfContents);
+        } catch (SoapFault $exception) {
+            $response->setFault($this->getFaultIdentifier($exception));
+            $response->setFaultString($exception->faultstring);
+
+            if ($response->hasPacketIdsFault()) {
+                $response->setInvalidPacketIds((array) $exception->detail->PacketIdsFault->ids->packetId);
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * @param array $packetsEnhanced
+     * @param string $format
+     * @param string $offset
+     * @return Packetery\Response\PacketsCourierLabelsPdfResponse
+     */
+    public function getPacketsCourierLabelsPdf(array $packetsEnhanced, $format, $offset)
+    {
+        $response = new Packetery\Response\PacketsCourierLabelsPdfResponse();
+        try {
+            $soapClient = new SoapClient(self::WSDL_URL);
+            $pdfContents = $soapClient->packetsCourierLabelsPdf($this->configHelper->getApiPass(), $packetsEnhanced, $offset, $format);
+            $response->setPdfContents($pdfContents);
+        } catch (SoapFault $exception) {
+            $response->setFault($this->getFaultIdentifier($exception));
+            $response->setFaultString($exception->faultstring);
+        }
+
+        if ($response->hasInvalidCourierNumberFault() && count($packetsEnhanced) === 1) {
+            $response->setInvalidCourierNumbers(array_column($packetsEnhanced, 'courierNumber'));
+        }
+        if ($response->hasPacketIdFault() && count($packetsEnhanced) === 1) {
+            $response->setInvalidPacketIds(array_column($packetsEnhanced, 'packetId'));
+        }
+
+        return $response;
+    }
 }

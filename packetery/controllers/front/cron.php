@@ -3,6 +3,7 @@
 use Packetery\Cron\Tasks\DeleteLabels;
 use Packetery\Cron\Tasks\DownloadCarriers;
 use Packetery\Cron\Tasks\PurgeLogs;
+use Packetery\Cron\Tasks\UpdatePacketStatus;
 use Packetery\Tools\ConfigHelper;
 
 class PacketeryCronModuleFrontController extends ModuleFrontController
@@ -49,6 +50,9 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
             case DownloadCarriers::getTaskName():
                 $taskName = $this->module->l('Carrier list update', 'cron');
                 break;
+            case UpdatePacketStatus::getTaskName():
+                $taskName = $this->module->l('Packet tracking status update', 'cron');
+                break;
             default:
                 $taskName = $task;
         }
@@ -63,15 +67,23 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
         switch ($task) {
             case DeleteLabels::getTaskName():
-                $errors = (new DeleteLabels($this->module))->execute();
+                $deleteLabels = $this->module->diContainer->get(DeleteLabels::class);
+                $errors = $deleteLabels->execute();
                 $this->renderErrors($errors);
                 break;
             case DownloadCarriers::getTaskName():
-                $errors = (new DownloadCarriers($this->module))->execute();
+                $downloadCarriers = $this->module->diContainer->get(DownloadCarriers::class);
+                $errors = $downloadCarriers->execute();
                 $this->renderErrors($errors);
                 break;
             case PurgeLogs::getTaskName():
-                $errors = (new PurgeLogs($this->module))->execute();
+                $purgeLogs = $this->module->diContainer->get(PurgeLogs::class);
+                $errors = $purgeLogs->execute();
+                $this->renderErrors($errors);
+                break;
+            case UpdatePacketStatus::getTaskName():
+                $updatePacketStatus = $this->module->diContainer->get(UpdatePacketStatus::class);
+                $errors = $updatePacketStatus->execute();
                 $this->renderErrors($errors);
                 break;
             default:
@@ -112,7 +124,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     {
         $templateFilePath = __DIR__ . '/../../views/templates/front/cron-message-row.tpl';
         $template = $this->context->smarty->createTemplate($templateFilePath, [
-            'message' => $message
+            'message' => $message,
         ]);
 
         // gzip compression forces browser to wait for all messages, no point in calling flush()

@@ -9,7 +9,7 @@ var PacketeryCheckoutModuleOpcZelarg = {
         return isCorrectVersion && this.findDeliveryOptions().length > 0;
     },
 
-    getSubmitButton: function() {
+    getSubmitButton: function () {
         return $('.button-continue .confirm_button');
     },
 

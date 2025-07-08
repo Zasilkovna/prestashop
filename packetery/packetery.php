@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2017 Zlab Solutions
  *
@@ -54,7 +55,7 @@ class Packetery extends CarrierModule
     {
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '3.0.4';
+        $this->version = '3.1.0';
         $this->author = 'Packeta s.r.o.';
         $this->need_instance = 0;
         $this->is_configurable = 1;
@@ -89,6 +90,7 @@ class Packetery extends CarrierModule
     /**
      * Don't forget to create upgrade methods if needed:
      * https://devdocs.prestashop.com/1.7/modules/creation/enabling-auto-update/
+     *
      * @return bool
      */
     public function install()
@@ -164,7 +166,7 @@ class Packetery extends CarrierModule
         $error = array();
         $have_error = false;
 
-        $fn = _PS_MODULE_DIR_."packetery/views/js/write-test.js";
+        $fn = _PS_MODULE_DIR_ . "packetery/views/js/write-test.js";
         @touch($fn);
         if (!is_writable($fn)) {
             $error[] = $this->l(
@@ -237,6 +239,7 @@ class Packetery extends CarrierModule
 
     /**
      * Load the configuration form
+     *
      * @return string
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
@@ -264,9 +267,35 @@ class Packetery extends CarrierModule
             ));
         }
 
+        $error = false;
+        $isSubmit = false;
+        /** @var \Packetery\Order\OrderStatusChangeFormService $orderStatusChangeFormService */
+        $orderStatusChangeFormService = $this->diContainer->get(\Packetery\Order\OrderStatusChangeFormService::class);
+        try {
+            if (Tools::isSubmit($orderStatusChangeFormService->getSubmitActionKey())) {
+                $isSubmit = true;
+                $orderStatusChangeFormService->handleSubmit();
+            }
+        } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
+            $output .= $this->displayError($formDataPersistException->getMessage());
+            $error = true;
+        }
+
+        /** @var \Packetery\PacketTracking\PacketStatusTrackingFormService $packetStatusTrackingFormService */
+        $packetStatusTrackingFormService = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
+        try {
+            if (Tools::isSubmit($packetStatusTrackingFormService->getSubmitActionKey())) {
+                $isSubmit = true;
+                $packetStatusTrackingFormService->handleSubmit();
+            }
+        } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
+            $output .= $this->displayError($formDataPersistException->getMessage());
+            $error = true;
+        }
+
         if (Tools::isSubmit('submit' . $this->name)) {
+            $isSubmit = true;
             $confOptions = $this->getConfigurationOptions();
-            $error = false;
             /** @var \Packetery\Module\Options $packeteryOptions */
             $packeteryOptions = $this->diContainer->get(\Packetery\Module\Options::class);
             foreach ($confOptions as $option => $optionConf) {
@@ -291,10 +320,12 @@ class Packetery extends CarrierModule
                     }
                 }
             }
-            if (!$error) {
-                $output .= $this->displayConfirmation($this->l('Settings updated'));
-            }
         }
+
+        if ($isSubmit && !$error) {
+            $output .= $this->displayConfirmation($this->l('Settings updated'));
+        }
+
         $output .= $this->displayForm();
 
         return $output;
@@ -302,6 +333,7 @@ class Packetery extends CarrierModule
 
     /**
      * Builds the configuration form
+     *
      * @return string HTML code
      * @throws PrestaShopException
      * @throws ReflectionException
@@ -356,8 +388,8 @@ class Packetery extends CarrierModule
             'values' => [
                 'query' => $codOptions,
                 'id' => 'id',
-                'name' => 'name'
-            ]
+                'name' => 'name',
+            ],
         ];
 
         $form = [
@@ -394,14 +426,31 @@ class Packetery extends CarrierModule
             }
         }
 
-        return $helper->generateForm([$form]) . $this->generateCronInfoBlock();
+        $packetStatusTrackingFormService = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
+        $orderStatusChangeFormService = $this->diContainer->get(\Packetery\Order\OrderStatusChangeFormService::class);
+
+        return $helper->generateForm([$form]) .
+            $packetStatusTrackingFormService->generateForm(
+                $this->name,
+                $this->table,
+                $this->l('Packet status tracking'),
+                $this->l('Save')
+            ) .
+            $orderStatusChangeFormService->generateForm(
+                $this->name,
+                $this->table,
+                $this->l('Order status change'),
+                $this->l('Save')
+            ) .
+            $this->generateCronInfoBlock();
     }
 
     /**
      * @return false|string
      * @throws SmartyException
      */
-    private function generateCronInfoBlock() {
+    private function generateCronInfoBlock()
+    {
         $token = \Packetery\Tools\ConfigHelper::get('PACKETERY_CRON_TOKEN');
         $link = new Link();
 
@@ -426,10 +475,20 @@ class Packetery extends CarrierModule
                 'cron',
                 [
                     'token' => $token,
-                    'task' => 'DownloadCarriers'
+                    'task' => 'DownloadCarriers',
                 ]
             );
             $this->context->smarty->assign('updateCarriersUrl', $updateCarriersUrl);
+
+            $updatePacketStatusesUrl = $link->getModuleLink(
+                $this->name,
+                'cron',
+                [
+                    'token' => $token,
+                    'task' => 'UpdatePacketStatus',
+                ]
+            );
+            $this->context->smarty->assign('updatePacketStatusesUrl', $updatePacketStatusesUrl);
         }
         $this->context->smarty->assign('deleteLabelsUrl', $deleteLabelsUrl);
         $this->context->smarty->assign('numberOfDays', $numberOfDays);
@@ -438,7 +497,8 @@ class Packetery extends CarrierModule
         return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/generateCronInfoBlock.tpl');
     }
 
-    private function getConfigurationOptions() {
+    private function getConfigurationOptions()
+    {
         return [
             'PACKETERY_APIPASS' => [
                 'title' => $this->l('API password'),
@@ -579,6 +639,7 @@ class Packetery extends CarrierModule
 
     /**
      * Display widget selection button and chosen branch info for every carrier
+     *
      * @param array $params
      * @return string|void
      * @throws ReflectionException
@@ -721,6 +782,18 @@ class Packetery extends CarrierModule
         $isPS16 = strpos(_PS_VERSION_, '1.6') === 0;
         $isOpcEnabled = (bool) Configuration::get('PS_ORDER_PROCESS_TYPE');
 
+        $products = $cart->getProducts();
+        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+
+        $isAgeVerificationRequired = false;
+        foreach ($products as $product) {
+            $productAttributes = $productAttributeRepository->findByProductId($product['id_product']);
+            if ($productAttributes !== null) {
+                $isAgeVerificationRequired = $productAttributes->isForAdults();
+                break;
+            }
+        }
+
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $this->context->smarty->assign('packetaModuleConfig', [
@@ -749,6 +822,7 @@ class Packetery extends CarrierModule
             'addressValidatedMessage' => $this->l('Address is valid.'),
             'addressNotValidatedMessage' => $this->l('Address is not valid.'),
             'countryDiffersMessage' => $this->l('The selected delivery address is in a country other than the country of delivery of the order.'),
+            'isAgeVerificationRequired' => $isAgeVerificationRequired,
         ]);
 
         $this->context->smarty->assign('mustSelectPointText', $this->l('Please select pickup point'));
@@ -799,14 +873,21 @@ class Packetery extends CarrierModule
     /*ORDERS*/
     /**
      * Save packetery order after order is created. Called both in FE and admin, once. Not called during order update.
+     *
      * @param array $params contains objects: order, cookie, cart, customer, currency, orderStatus
      */
     public function hookActionValidateOrder($params)
     {
         if (!($params['cart'] instanceof Cart) || !($params['order'] instanceof Order)) {
-            PrestaShopLogger::addLog('Packetery: Unable to save new order with parameters cart (' .
+            PrestaShopLogger::addLog(
+                'Packetery: Unable to save new order with parameters cart (' .
                 gettype($params['cart']) . ') and order (' . gettype($params['order']) . ').',
-                3, null, null, null, true);
+                3,
+                null,
+                null,
+                null,
+                true
+            );
             return;
         }
 
@@ -935,6 +1016,10 @@ class Packetery extends CarrierModule
             $this->context->smarty->assign('logLink', $this->getAdminLink('PacketeryLogGrid', ['id_order' => $orderId]));
         }
 
+        /** @var \Packetery\Order\OrderDetailView $orderDetailView */
+        $orderDetailView = $this->diContainer->get(\Packetery\Order\OrderDetailView::class);
+        $orderDetailView->addPacketStatus($this->context->smarty, $packeteryOrder);
+
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
@@ -1040,6 +1125,7 @@ class Packetery extends CarrierModule
 
     /**
      * see https://devdocs.prestashop.com/1.7/modules/core-updates/1.7.5/
+     *
      * @param string $controller
      * @param array|null $params
      * @param string|null $anchor
@@ -1092,6 +1178,7 @@ class Packetery extends CarrierModule
 
     /**
      * removed in 1.7.7 in favor of displayAdminOrderMain
+     *
      * @param array $params parameters provided by PrestaShop
      */
     public function hookDisplayAdminOrderLeft($params)
@@ -1101,6 +1188,7 @@ class Packetery extends CarrierModule
 
     /**
      * since 1.7.7
+     *
      * @param array $params parameters provided by PrestaShop
      */
     public function hookDisplayAdminOrderMain($params)
@@ -1155,10 +1243,15 @@ class Packetery extends CarrierModule
 
         $this->context->controller->addCSS($this->_path . 'views/css/back.css' . $suffix, 'all', null, false);
         $this->context->controller->addJS($this->_path . 'views/js/back.js' . $suffix);
+
+        /** @var \Packetery\Module\VersionChecker $versionChecker */
+        $versionChecker = $this->diContainer->get(\Packetery\Module\VersionChecker::class);
+        $versionChecker->checkForUpdate();
     }
 
     /**
      * Shows information about selected pickup point, right after information about sent mail
+     *
      * @param array $params
      * @return string|void
      * @throws ReflectionException
@@ -1190,6 +1283,7 @@ class Packetery extends CarrierModule
 
     /**
      * Show information about selected pickup point in frontend order detail, between address and products
+     *
      * @param array $params
      * @return string|void
      * @throws ReflectionException
@@ -1215,17 +1309,19 @@ class Packetery extends CarrierModule
     /**
      * Alters variables of order e-mails
      * inspiration: https://github.com/PrestaShop/ps_legalcompliance/blob/dev/ps_legalcompliance.php
+     *
      * @param array $params
      * @throws ReflectionException
      * @throws \Packetery\Exceptions\DatabaseException
      */
     public function hookSendMailAlterTemplateVars(&$params)
     {
-        if (!isset(
-            $params['template'],
-            $params['template_vars']['{id_order}'],
-            $params['template_vars']['{carrier}']
-        ) ||
+        if (
+            !isset(
+                $params['template'],
+                $params['template_vars']['{id_order}'],
+                $params['template_vars']['{carrier}']
+            ) ||
             strpos((string)$params['template'], 'order') === false
         ) {
             return;
@@ -1286,6 +1382,7 @@ class Packetery extends CarrierModule
 
     /**
      * Displays save button after Packeta orders list
+     *
      * @return false|string
      */
     public function hookDisplayPacketeryOrderGridListAfter()
@@ -1295,6 +1392,7 @@ class Packetery extends CarrierModule
 
     /**
      * Adds computed weight to orders without saved weight
+     *
      * @param array $params Hook parameters
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
@@ -1336,6 +1434,7 @@ class Packetery extends CarrierModule
 
     /**
      * Called in PS 1.6 after choosing the carrier
+     *
      * @param array $params
      * @return void
      * @throws ReflectionException
@@ -1361,6 +1460,7 @@ class Packetery extends CarrierModule
      * Is not called in SuperCheckout. Process all validations in addSupercheckoutOrderValidator.
      * Is not called in PS 1.6.
      * TODO: use suitable validations in hookActionCarrierProcess, solve like packeteryHookDisplayAdminOrder.
+     *
      * @param array $params
      * @throws ReflectionException
      * @throws \Packetery\Exceptions\DatabaseException
@@ -1414,41 +1514,42 @@ class Packetery extends CarrierModule
     private function processPostParcel(array &$messages)
     {
         if (
-            Tools::isSubmit('process_post_parcel') &&
-            Tools::getIsset('order_id')
+            !Tools::isSubmit('process_post_parcel') ||
+            !Tools::getIsset('order_id')
         ) {
-            $orderIds = [Tools::getValue('order_id')];
-            /** @var Packetery\Order\PacketSubmitter $packetSubmitter */
-            $packetSubmitter = $this->diContainer->get(Packetery\Order\PacketSubmitter::class);
-            $exportResult = $packetSubmitter->ordersExport($orderIds);
-            if (is_array($exportResult)) {
-                foreach ($exportResult as $resultRow) {
-                    if (!$resultRow[0]) {
-                        $messages[] = [
-                            'text' => $resultRow[1],
-                            'class' => 'danger',
-                        ];
-                    } elseif ($resultRow[0]) {
-                        /** @var Packetery\Order\Tracking $packeteryTracking */
-                        $packeteryTracking = $this->diContainer->get(Packetery\Order\Tracking::class);
+            return;
+        }
 
-                        $smarty = new \Smarty();
-                        $smarty->assign('trackingNumber', $resultRow[1]);
-                        $smarty->assign('trackingUrl', \Packetery\Module\Helper::getTrackingUrl($resultRow[1]));
-                        $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
+        $orderIds = [Tools::getValue('order_id')];
+        /** @var Packetery\Order\PacketSubmitter $packetSubmitter */
+        $packetSubmitter = $this->diContainer->get(Packetery\Order\PacketSubmitter::class);
 
-                        $messages[] = [
-                            'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryTrackingLink,
-                            'class' => 'success',
-                        ];
-                    }
-                }
+        try {
+            $trackingNumbers = $packetSubmitter->ordersExport($orderIds);
+            foreach ($trackingNumbers as $trackingNumber) {
+                $smarty = new \Smarty();
+                $smarty->assign('trackingNumber', $trackingNumber);
+                $smarty->assign('trackingUrl', \Packetery\Module\Helper::getTrackingUrl($trackingNumber));
+                $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
+
+                $messages[] = [
+                    'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryTrackingLink,
+                    'class' => 'success',
+                ];
+            }
+        } catch (Packetery\Exceptions\AggregatedException $aggregatedException) {
+            foreach ($aggregatedException->getExceptions() as $exception) {
+                $messages[] = [
+                    'text' => $exception->getMessage(),
+                    'class' => 'danger',
+                ];
             }
         }
     }
 
     /**
      * Loads zones and countries to carriers
+     *
      * @param array $params Hook parameters
      * @throws ReflectionException
      */
@@ -1487,6 +1588,7 @@ class Packetery extends CarrierModule
 
     /**
      * Shows Packetery form in BO product detail
+     *
      * @param array $params Hook parameter
      * @return false|string|void
      * @throws Packetery\Exceptions\DatabaseException
@@ -1510,26 +1612,26 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $isAdult = null;
+        $isAgeVerificationRequired = null;
         /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
         $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
-        $packeteryAgeVerification = $productAttributeRepository->getRow($product->id);
-        if (is_array($packeteryAgeVerification)) {
-            $isAdult = $packeteryAgeVerification['is_adult'];
+        $productAttributes = $productAttributeRepository->findByProductId($product->id);
+        if ($productAttributes !== null) {
+            $isAgeVerificationRequired = $productAttributes->isForAdults();
         }
 
         $this->context->smarty->assign([
-            'packeteryAgeVerification' => $isAdult,
+            'packeteryAgeVerification' => $isAgeVerificationRequired,
             'adminProductUrl' => $this->getAdminLink('AdminProducts'),
             'isPrestaShop16' => $isPrestaShop16,
         ]);
 
         return $this->display(__FILE__, 'display_admin_product_extra.tpl');
-
     }
 
     /**
      * Shows Packetery form in BO product detail
+     *
      * @param array $params product information
      * @return void
      * @throws \Packetery\Exceptions\DatabaseException|ReflectionException
@@ -1549,25 +1651,22 @@ class Packetery extends CarrierModule
         $productAttributeInfo = $productAttribute->getRow($product->id);
 
         if ($productAttributeInfo) {
-
             $data = [
                 'is_adult' => $isAdult,
             ];
             $productAttribute->update($product->id, $data);
-
         } else {
-
             $data = [
                 'id_product' => $product->id,
                 'is_adult' => $isAdult,
             ];
             $productAttribute->insert($data);
-
         }
     }
 
     /**
      * Shows Packetery form in BO product detail
+     *
      * @param array $params product information
      * @return bool
      * @throws \Packetery\Exceptions\DatabaseException|ReflectionException

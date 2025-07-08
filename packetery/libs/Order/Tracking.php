@@ -16,6 +16,7 @@ class Tracking
 
     /**
      * Returns packetery order tracking number
+     *
      * @param string $id_orders Comma separated integers
      * @return array
      * @throws DatabaseException
@@ -34,6 +35,7 @@ class Tracking
 
     /**
      * Updates eshop and packetery order tracking number
+     *
      * @param int $id_order
      * @param string $tracking_number numeric
      * @return bool

@@ -293,6 +293,10 @@ PacketaModule.ui = {
                 widgetOptions.country = country;
             }
 
+            if (PacketaModule.config.isAgeVerificationRequired) {
+                widgetOptions.livePickupPoint = true;
+            }
+
             Packeta.Widget.pick(PacketaModule.config.apiKey, function (pickupPoint) {
                 if (pickupPoint == null) {
                     return;
@@ -521,7 +525,8 @@ PacketaModule.storage = {
     addresses: {}
 };
 
-function PacketeryCheckoutModulesManager() {
+function PacketeryCheckoutModulesManager()
+{
     // ids correspond to parts of class names in checkout-module/*.js - first letter in upper case
     // order is important because of false positives (Unknown has to be last)
     this.supportedModules = ['Ps16', 'Ps17', 'Supercheckout', 'OpcZelarg', 'Unknown'];
@@ -578,7 +583,8 @@ var packeteryModulesManager = new PacketeryCheckoutModulesManager();
 /**
  *  This function is called by third party checkout modules (e.g. Supercheckout) after shipping methods are fetched via AJAX
  */
-function onShippingLoadedCallback() {
+function onShippingLoadedCallback()
+{
     PacketaModule.runner.onShippingLoad();
 }
 

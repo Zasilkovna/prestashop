@@ -2,8 +2,8 @@
 
 namespace Packetery\Order;
 
-use Packetery\Tools\Tools;
 use Packetery;
+use Packetery\Tools\Tools;
 
 class OrderDetailsUpdater
 {
@@ -47,7 +47,7 @@ class OrderDetailsUpdater
             $this->processPickupPointChange($fieldsToUpdate);
         } else {
             $countryDiffersMessage = $this->module->l('The selected delivery address is in a country other than the country of delivery of the order.', 'orderdetailsupdater');
-            $this->processAddressChange($messages, $fieldsToUpdate,  $packeteryOrder, $countryDiffersMessage);
+            $this->processAddressChange($messages, $fieldsToUpdate, $packeteryOrder, $countryDiffersMessage);
             // We need to fetch the Order with a country, so we can compare the change of address and see if it matches the original country selected for delivery.
             $packeteryOrder = $this->orderRepository->getOrderWithCountry($orderId);
         }
@@ -83,7 +83,8 @@ class OrderDetailsUpdater
         if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
             $messages[] = [
                 'text' => $this->module->l(
-                    'No pickup point selected for the order. It will not be possible to export the order to Packeta.', 'orderdetailsupdater'
+                    'No pickup point selected for the order. It will not be possible to export the order to Packeta.',
+                    'orderdetailsupdater'
                 ),
                 'class' => 'danger',
             ];
@@ -115,10 +116,8 @@ class OrderDetailsUpdater
             if ((string)(int)$rawValue === $rawValue) {
                 $value = (int)$rawValue;
                 $isValid = $value > 0;
-
             } elseif ($rawValue === '') {
                 $isValid = true;
-
             } else {
                 $isValid = false;
             }

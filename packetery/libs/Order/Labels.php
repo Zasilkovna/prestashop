@@ -2,111 +2,135 @@
 
 namespace Packetery\Order;
 
-use Context;
 use Packetery;
+use Packetery\Exceptions\LabelPrintException;
 use Packetery\Log\LogRepository;
 use Packetery\Module\SoapApi;
+use Packetery\Response\PacketsCourierLabelsPdfResponse;
+use Packetery\Response\PacketsLabelsPdfResponse;
 use Packetery\Tools\ConfigHelper;
-use SoapClient;
-use SoapFault;
 
 class Labels
 {
     const TYPE_PACKETA = 'packeta';
     const TYPE_CARRIER = 'carrier';
 
-    /**
-     * @var ConfigHelper
-     */
-    private $configHelper;
-
-    /** @var LogRepository  */
+    /** @var LogRepository */
     private $logRepository;
 
     /** @var Packetery */
     private $module;
 
     public function __construct(
-        ConfigHelper $configHelper,
         LogRepository $logRepository,
         Packetery $module
-    )
-    {
+    ) {
         $this->logRepository = $logRepository;
-        $this->configHelper = $configHelper;
         $this->module = $module;
     }
 
     /**
      * @param array $packets Used for packeta labels.
      * @param string $type
-     * @param int $offset
      * @param array|null $packetsEnhanced Used for carrier labels.
-     * @return string|void
+     * @param int $offset
+     * @param bool $fallbackToPacketaLabel
+     * @return string
+     * @throws LabelPrintException
      */
-    public function packetsLabelsPdf(array $packets, $type, $packetsEnhanced = null , $offset = 0)
+    public function packetsLabelsPdf(array $packets, $type, $packetsEnhanced = null, $offset = 0, $fallbackToPacketaLabel = false)
     {
-        $client = new SoapClient(SoapApi::WSDL_URL);
-        try {
-            if ($type === self::TYPE_CARRIER) {
-                $format = ConfigHelper::get('PACKETERY_CARRIER_LABEL_FORMAT');
-                $pdf = $client->packetsCourierLabelsPdf($this->configHelper->getApiPass(), $packetsEnhanced, $offset, $format);
-            } else {
-                $format = ConfigHelper::get('PACKETERY_LABEL_FORMAT');
-                $pdf = $client->packetsLabelsPdf($this->configHelper->getApiPass(), array_values( $packets ), $format, $offset);
-            }
-            if ($pdf) {
-                foreach ($packets as $orderId => $packetNumber) {
-                    $this->logRepository->insertRow(
-                        LogRepository::ACTION_LABEL_PRINT,
-                        [
-                            'packetNumber' => $packetNumber,
-                            'format' => $format,
-                            'type' => $type,
-                        ],
-                        LogRepository::STATUS_SUCCESS,
-                        $orderId
-                    );
-                }
-
-                return $pdf;
-            }
-
-            foreach ($packets as $orderId => $packetNumber) {
-                $this->logRepository->insertRow(
-                    LogRepository::ACTION_LABEL_PRINT,
-                    [
-                        'packetNumber' => $packetNumber,
-                        'format' => $format,
-                        'type' => $type,
-                    ],
-                    LogRepository::STATUS_ERROR,
-                    $orderId
-                );
-            }
-
-            echo "\n error \n";
-            exit;
-        } catch (SoapFault $e) {
-            if (isset($e->faultstring)) {
-                $error_msg = $e->faultstring;
-                echo "\n$error_msg\n";
-            }
-
-            foreach ($packets as $orderId => $packetNumber) {
-                $this->logRepository->insertRow(
-                    LogRepository::ACTION_LABEL_PRINT,
-                    [
-                        'packetNumber' => $packetNumber,
-                        'type' => $type,
-                        'exception' => $e->getMessage(),
-                    ],
-                    LogRepository::STATUS_ERROR,
-                    $orderId
-                );
-            }
-
-            exit;
+        /** @var SoapApi $soapApi */
+        $soapApi = $this->module->diContainer->get(SoapApi::class);
+        $carrierNumbers = [];
+        if (is_array($packetsEnhanced)) {
+            $carrierNumbers = array_column($packetsEnhanced, 'courierNumber', 'packetId');
         }
+
+        if ($type === self::TYPE_CARRIER) {
+            $format = ConfigHelper::get('PACKETERY_CARRIER_LABEL_FORMAT');
+            $response = $soapApi->getPacketsCourierLabelsPdf($packetsEnhanced, $format, $offset);
+            if ($fallbackToPacketaLabel === true && $response->hasFault()) {
+                $response = $soapApi->getPacketsLabelsPdf(array_values($packets), $format, $offset);
+            }
+        } else {
+            $format = ConfigHelper::get('PACKETERY_LABEL_FORMAT');
+            $response = $soapApi->getPacketsLabelsPdf(array_values($packets), $format, $offset);
+        }
+
+        if ($response->hasFault()) {
+            foreach ($packets as $orderId => $packetNumber) {
+                $logProperties = $this->buildLogProperties($packetNumber, $format, $type, $carrierNumbers, $response);
+                $logProperties['exception'] = $response->getFaultString();
+                $this->logRepository->insertRow(
+                    LogRepository::ACTION_LABEL_PRINT,
+                    $logProperties,
+                    LogRepository::STATUS_ERROR,
+                    $orderId
+                );
+            }
+
+            if ($fallbackToPacketaLabel === true && count($packets) === 1) {
+                $message = sprintf(
+                    $this->module->l('Label printing for packet %s failed, you can find more information in the Packeta log.', 'labels'),
+                    array_shift($packets)
+                );
+            } elseif ($type === self::TYPE_CARRIER) {
+                $message = sprintf(
+                    $this->module->l('Carrier label printing failed, you can find more information in the Packeta log. Error: %s', 'labels'),
+                    $response->getFaultString()
+                );
+            } else {
+                $message = sprintf(
+                    $this->module->l('Label printing failed, you can find more information in the Packeta log. Error: %s', 'labels'),
+                    $response->getFaultString()
+                );
+            }
+
+            throw new LabelPrintException($message);
+        }
+
+        foreach ($packets as $orderId => $packetNumber) {
+            $logProperties = $this->buildLogProperties($packetNumber, $format, $type, $carrierNumbers, $response);
+            $this->logRepository->insertRow(
+                LogRepository::ACTION_LABEL_PRINT,
+                $logProperties,
+                LogRepository::STATUS_SUCCESS,
+                $orderId
+            );
+        }
+
+        return $response->getPdfContents();
+    }
+
+    /**
+     * @param string $packetNumber
+     * @param string $format
+     * @param string $type
+     * @param array $carrierNumbers
+     * @param PacketsLabelsPdfResponse|PacketsCourierLabelsPdfResponse $response
+     * @return array
+     */
+    public function buildLogProperties($packetNumber, $format, $type, array $carrierNumbers, $response)
+    {
+        $logProperties = [
+            'packetNumber' => $packetNumber,
+            'format' => $format,
+            'type' => $type,
+        ];
+        if ($response->hasInvalidPacketId($packetNumber) === true) {
+            $logProperties['isPacketIdInvalid'] = true;
+        }
+        if (isset($carrierNumbers[$packetNumber])) {
+            $logProperties['packetCourierNumber'] = $carrierNumbers[$packetNumber];
+            if (
+                $response instanceof PacketsCourierLabelsPdfResponse &&
+                $response->hasInvalidCourierNumber($carrierNumbers[$packetNumber]) === true
+            ) {
+                $logProperties['isCourierNumberInvalid'] = true;
+            }
+        }
+
+        return $logProperties;
     }
 }

@@ -27,8 +27,6 @@ class DeleteLabels extends Base
     private $limit = 86400;
 
     /**
-     * DeleteLabels constructor.
-     *
      * @param Packetery $module
      */
     public function __construct(Packetery $module)

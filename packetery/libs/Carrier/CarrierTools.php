@@ -1,12 +1,11 @@
 <?php
 
-
 namespace Packetery\Carrier;
 
 use Carrier;
 use ConfigurationCore as Configuration;
-use CountryCore as Country;
 use Context;
+use CountryCore as Country;
 
 class CarrierTools
 {

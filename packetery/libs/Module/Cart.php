@@ -11,6 +11,7 @@ use Tools;
 class Cart
 {
     /** Endpoint is called in PS 1.6 only. PS 1.6 does not have hook for carrier extra content.
+     *
      * @return string
      * @throws Packetery\Exceptions\DatabaseException
      * @throws ReflectionException
@@ -24,12 +25,12 @@ class Cart
         $params = [
             'packetery' => [
                 // TODO: fix address validation in PS 1.6
-                'template' => 'views/templates/front/carrier-extra-content.tpl'
+                'template' => 'views/templates/front/carrier-extra-content.tpl',
             ],
             'carrier' => [
-                'id' => $carrierId
+                'id' => $carrierId,
             ],
-            'cart' => Context::getContext()->cart
+            'cart' => Context::getContext()->cart,
         ];
 
         return $packetery->hookDisplayCarrierExtraContent($params);

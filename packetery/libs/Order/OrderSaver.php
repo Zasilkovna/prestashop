@@ -31,6 +31,7 @@ class OrderSaver
 
     /**
      * TODO: later inherit from some Base class
+     *
      * @param OrderRepository $orderRepository
      * @param PaymentRepository $paymentRepository
      * @param Logger $logger
@@ -43,8 +44,7 @@ class OrderSaver
         Logger $logger,
         CarrierRepository $carrierRepository,
         Calculator $weightCalculator
-    )
-    {
+    ) {
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
         $this->logger = $logger;
@@ -54,6 +54,7 @@ class OrderSaver
 
     /**
      * Save packetery order after order is created
+     *
      * @param Cart $cart
      * @param PrestaShopOrder $order
      */
@@ -117,10 +118,12 @@ class OrderSaver
      * @return array with result and message
      * @throws DatabaseException
      */
-    private function savePickupPointInCart() {
+    private function savePickupPointInCart()
+    {
         $cartId = Context::getContext()->cart->id;
 
-        if (!isset($cartId) ||
+        if (
+            !isset($cartId) ||
             !Tools::getIsset('id_branch') ||
             !Tools::getIsset('name_branch') ||
             !Tools::getIsset('currency_branch') ||
@@ -194,7 +197,8 @@ class OrderSaver
     /**
      * @return false|string JSON
      */
-    public function savePickupPointInCartGetJson() {
+    public function savePickupPointInCartGetJson()
+    {
         try {
             $result = $this->savePickupPointInCart();
         } catch (DatabaseException $exception) {
@@ -211,5 +215,4 @@ class OrderSaver
 
         return json_encode($result);
     }
-
 }

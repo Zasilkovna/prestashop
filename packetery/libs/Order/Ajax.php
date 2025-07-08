@@ -15,6 +15,7 @@ class Ajax
 
     /**
      * Ajax constructor.
+     *
      * @param OrderRepository $orderRepository
      * @param CarrierRepository $carrierRepository
      */

@@ -2,12 +2,10 @@
 
 namespace Packetery\Module;
 
-use Context;
 use Packetery;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Log\LogRepository;
 use Validate;
-use Packetery\Tools\ConfigHelper;
 
 class Options
 {
@@ -26,8 +24,7 @@ class Options
         Packetery $module,
         SoapApi $soapApi,
         LogRepository $logRepository
-    )
-    {
+    ) {
         $this->module = $module;
         $this->soapApi = $soapApi;
         $this->logRepository = $logRepository;
@@ -101,6 +98,16 @@ class Options
                     return false;
                 }
                 return $this->module->l('Please insert default packaging weight in kg', 'options');
+            case 'PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS':
+                if ($this->isNonNegative($value)) {
+                    return false;
+                }
+                return $this->module->l('Insert maximum number of orders that will be processed', 'options');
+            case 'PACKETERY_PACKET_STATUS_TRACKING_MAX_ORDER_AGE_DAYS':
+                if ($this->isNonNegative($value)) {
+                    return false;
+                }
+                return $this->module->l('Insert maximum order age in days', 'options');
             default:
                 return false;
         }
@@ -131,5 +138,4 @@ class Options
     {
         return (Validate::isUnsignedInt($value) || (Validate::isFloat($value) && $value >= 0));
     }
-
 }

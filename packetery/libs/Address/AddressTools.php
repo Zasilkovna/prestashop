@@ -30,5 +30,4 @@ class AddressTools
         }
         return '';
     }
-
 }

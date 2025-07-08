@@ -4,21 +4,23 @@ namespace Packetery\Response;
 
 class BaseResponse
 {
-
     /**
      * Fault identifier.
+     *
      * @var ?string
      */
     protected $fault;
 
     /**
      * Fault string.
+     *
      * @var ?string
      */
     private $faultString;
 
     /**
      * Checks if is faulty.
+     *
      * @return bool
      */
     public function hasFault()
@@ -28,6 +30,7 @@ class BaseResponse
 
     /**
      * Checks if password is faulty.
+     *
      * @return bool
      */
     public function hasWrongPassword()
@@ -36,7 +39,32 @@ class BaseResponse
     }
 
     /**
+     * @return bool
+     */
+    public function hasPacketIdsFault()
+    {
+        return $this->fault === 'PacketIdsFault';
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPacketIdFault()
+    {
+        return $this->fault === 'PacketIdFault';
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasInvalidCourierNumberFault()
+    {
+        return $this->fault === 'InvalidCourierNumber';
+    }
+
+    /**
      * Sets fault identifier.
+     *
      * @param string $fault Fault identifier.
      */
     public function setFault($fault)
@@ -46,6 +74,7 @@ class BaseResponse
 
     /**
      * Sets fault string.
+     *
      * @param string $faultString Fault string.
      */
     public function setFaultString($faultString)
@@ -55,11 +84,11 @@ class BaseResponse
 
     /**
      * Gets fault string.
+     *
      * @return string|null
      */
     public function getFaultString()
     {
         return $this->faultString;
     }
-
 }

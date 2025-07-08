@@ -3,8 +3,8 @@
 namespace Packetery\Cron\Tasks;
 
 use Packetery;
-use Packetery\Exceptions\DatabaseException;
 use Packetery\ApiCarrier\Downloader;
+use Packetery\Exceptions\DatabaseException;
 
 class DownloadCarriers extends Base
 {
@@ -15,14 +15,13 @@ class DownloadCarriers extends Base
     private $downloader;
 
     /**
-     * DownloadCarriers constructor.
      * @param Packetery $module
-     * @throws \ReflectionException
+     * @param Downloader $downloader
      */
-    public function __construct(Packetery $module)
+    public function __construct(Packetery $module, Downloader $downloader)
     {
         $this->module = $module;
-        $this->downloader = $this->module->diContainer->get(Downloader::class);
+        $this->downloader = $downloader;
     }
 
     /**

@@ -2,12 +2,11 @@
 
 namespace Packetery\Product;
 
-use Packetery\Tools\DbTools;
 use Packetery\Exceptions\DatabaseException;
+use Packetery\Tools\DbTools;
 
 class ProductAttributeRepository
 {
-
     /** @var DbTools */
     private $dbTools;
 
@@ -15,11 +14,26 @@ class ProductAttributeRepository
 
     /**
      * ProductRepository constructor.
+     *
      * @param DbTools $dbTools
      */
     public function __construct(DbTools $dbTools)
     {
         $this->dbTools = $dbTools;
+    }
+
+    /**
+     * @param int $productId
+     * @return ProductAttributes|null
+     */
+    public function findByProductId($productId)
+    {
+        $productAttributesRow = $this->getRow($productId);
+        if ($productAttributesRow === false) {
+            return null;
+        }
+
+        return ProductAttributes::fromDbRow($productAttributesRow);
     }
 
     /**
@@ -66,7 +80,7 @@ class ProductAttributeRepository
         return $this->dbTools->update(
             self::$tableName,
             $data,
-            '`id_product` = '. $idProduct
+            '`id_product` = ' . $idProduct
         );
     }
 
@@ -109,5 +123,4 @@ class ProductAttributeRepository
             `is_adult` tinyint(1) NOT NULL DEFAULT 0
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
     }
-
 }

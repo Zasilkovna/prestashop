@@ -2,9 +2,12 @@
 
 namespace Packetery\Order;
 
+use DateTimeImmutable;
 use Db;
+use mysqli_result;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
+use PDOStatement;
 use PrestaShopLoggerCore as PrestaShopLogger;
 
 class OrderRepository
@@ -17,6 +20,7 @@ class OrderRepository
 
     /**
      * OrderRepository constructor.
+     *
      * @param Db $db
      * @param DbTools $dbTools
      */
@@ -219,6 +223,7 @@ class OrderRepository
                    `po`.`height`,
                    `po`.`width`,
                    `po`.`exported`,
+                   `po`.`tracking_number`,
                    `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
@@ -406,4 +411,50 @@ class OrderRepository
         return (bool) $this->dbTools->getValue($sql);
     }
 
+    /**
+     * @param array<int, int> $enabledOrderStatuses
+     * @param int $maxProcessedOrdersLimit
+     * @param DateTimeImmutable $oldestOrderDate
+     * @return array|bool|mysqli_result|PDOStatement|resource|null
+     */
+    public function getOrdersByStateAndLastUpdate(
+        array $enabledOrderStatuses,
+        $maxProcessedOrdersLimit,
+        DateTimeImmutable $oldestOrderDate
+    ) {
+        if ($enabledOrderStatuses === []) {
+            return [];
+        }
+        $implodedOrderStatuses = implode(',', $enabledOrderStatuses);
+
+        $sql = 'SELECT DISTINCT
+            `po`.`id_order`,
+            `po`.`last_update_tracking_status`,
+            `po`.`tracking_number`,
+            `pps`.`status_code`,
+            `o`.`current_state` 
+        FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
+        LEFT JOIN `' . _DB_PREFIX_ . 'orders` `o`
+            ON `o`.`id_order` = `po`.`id_order`
+        LEFT JOIN `' . _DB_PREFIX_ . 'packetery_packet_status` `pps`
+            ON `o`.`id_order` = `pps`.`id_order`
+        WHERE `o`.`current_state` IN (' . $this->db->escape($implodedOrderStatuses) . ')
+            AND `o`.`date_add` > "' . $oldestOrderDate->format('Y-m-d H:i:s') . '"
+            AND `po`.`exported` = 1
+        ORDER BY `po`.`last_update_tracking_status` ASC
+        LIMIT ' . (int) $maxProcessedOrdersLimit;
+
+        return $this->dbTools->getRows($sql);
+    }
+
+    /**
+     * @param DateTimeImmutable $lastUpdateTrackingStatus
+     * @param int $orderId
+     * @return bool
+     */
+    public function setLastUpdateTrackingStatus($lastUpdateTrackingStatus, $orderId)
+    {
+        $orderId = (int)$orderId;
+        return $this->dbTools->update('packetery_order', ['last_update_tracking_status' => $lastUpdateTrackingStatus->format('Y-m-d H:i:s')], '`id_order` = ' . $orderId);
+    }
 }

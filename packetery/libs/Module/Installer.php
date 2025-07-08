@@ -2,14 +2,15 @@
 
 namespace Packetery\Module;
 
+use Language;
 use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Log\LogRepository;
+use Packetery\PacketTracking\PacketTrackingRepository;
 use Packetery\Product\ProductAttributeRepository;
-use Packetery\Tools\DbTools;
-use Language;
 use Packetery\Tools\ConfigHelper;
+use Packetery\Tools\DbTools;
 use PrestaShopDatabaseException;
 use PrestaShopException;
 use PrestaShopLogger;
@@ -58,6 +59,7 @@ class Installer
 
     /**
      * Creates packetery menu items
+     *
      * @return bool
      */
     public function insertMenuItems()
@@ -69,31 +71,31 @@ class Installer
                 'parentClass' => 'SELL',
                 'class' => 'Packetery',
                 'name' => 'Packeta',
-                'translatedName' => $this->module->l('Packeta', 'installer')
+                'translatedName' => $this->module->l('Packeta', 'installer'),
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryOrderGrid',
                 'name' => 'Packeta Orders',
-                'translatedName' => $this->module->l('Packeta Orders', 'installer')
+                'translatedName' => $this->module->l('Packeta Orders', 'installer'),
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryCarrierGrid',
                 'name' => 'Carrier settings',
-                'translatedName' => $this->module->l('Carrier settings', 'installer')
+                'translatedName' => $this->module->l('Carrier settings', 'installer'),
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketerySetting',
                 'name' => 'Configuration',
-                'translatedName' => $this->module->l('Configuration', 'installer')
+                'translatedName' => $this->module->l('Configuration', 'installer'),
             ],
             [
                 'parentClass' => 'Packetery',
                 'class' => 'PacketeryLogGrid',
                 'name' => 'Log',
-                'translatedName' => $this->module->l('Log', 'installer')
+                'translatedName' => $this->module->l('Log', 'installer'),
             ],
         ];
 
@@ -166,6 +168,7 @@ class Installer
             `latitude` varchar(255) NULL,
             `longitude` varchar(255) NULL,
             `carrier_number` varchar(255) NULL,
+            `last_update_tracking_status` datetime NULL,
             UNIQUE(`id_order`),
             UNIQUE(`id_cart`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
@@ -200,6 +203,10 @@ class Installer
         $sql[] = $logRepository->getDropTableSql();
         $sql[] = $logRepository->getCreateTableSql();
 
+        $packetTrackingRepository = $this->module->diContainer->get(PacketTrackingRepository::class);
+        $sql[] = $packetTrackingRepository->getDropTableSql();
+        $sql[] = $packetTrackingRepository->getCreateTableSql();
+
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText(), true)) {
             return false;
         }
@@ -221,7 +228,7 @@ class Installer
             ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0) &&
             ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_WEIGHT', 0) &&
             ConfigHelper::update('PACKETERY_DEFAULT_PACKAGING_WEIGHT', 0) &&
-            ConfigHelper::update(ConfigHelper::KEY_LAST_FEATURE_CHECK, (string) time()) &&
+            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time()) &&
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $this->module->version) &&
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, '') &&
             ConfigHelper::update(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION, 0)
@@ -247,7 +254,7 @@ class Installer
      */
     private function addTab($parentClassName, $className, $name)
     {
-        $tab = new Tab;
+        $tab = new Tab();
         $parentId = Tab::getIdFromClassName($parentClassName);
         // PrestaShop 1.6 without the SELL tab group.
         if ($parentId === false) {
