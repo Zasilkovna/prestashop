@@ -169,6 +169,9 @@ class Installer
             `longitude` varchar(255) NULL,
             `carrier_number` varchar(255) NULL,
             `last_update_tracking_status` datetime NULL,
+            `price_total` decimal(20,6) NULL,
+            `price_cod` decimal(20,6) NULL,
+            `age_verification_required` tinyint(1) unsigned NULL,
             UNIQUE(`id_order`),
             UNIQUE(`id_cart`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';

@@ -5,6 +5,7 @@ namespace Packetery\Module;
 use Packetery;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Log\LogRepository;
+use Packetery\Tools\Tools;
 use Validate;
 
 class Options
@@ -124,7 +125,7 @@ class Options
             case 'PACKETERY_DEFAULT_PACKAGE_PRICE':
             case 'PACKETERY_DEFAULT_PACKAGE_WEIGHT':
             case 'PACKETERY_DEFAULT_PACKAGING_WEIGHT':
-                return str_replace([',', ' '], ['.', ''], $value);
+                return Tools::sanitizeFloatValue($value);
             default:
                 return $value;
         }
