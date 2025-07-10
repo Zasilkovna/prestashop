@@ -7,6 +7,7 @@ use Currency;
 use Order;
 use Packetery;
 use Packetery\Address\AddressTools;
+use Packetery\Carrier\CarrierTools;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
 use Packetery\Payment\PaymentRepository;
@@ -48,49 +49,22 @@ class OrderExporter
             );
         }
 
-        $total = $order->total_paid;
-
-        $defaultPackagePrice = ConfigHelper::get('PACKETERY_DEFAULT_PACKAGE_PRICE');
-        if ($defaultPackagePrice > 0 && $total <= 0) {
-            $total = $defaultPackagePrice;
-        }
-
-        $orderCurrency = new Currency($order->id_currency);
-        $exportCurrency = $orderCurrency->iso_code;
-        $shippingCountryCurrency = $packeteryOrder['currency_branch'];
-        if ($shippingCountryCurrency === null) {
-            throw new ExportException(
-                $this->module->l(
-                    'Can\'t find currency of pickup point, order',
-                    'orderexporter'
-                ) . ' - ' . $order->id
-            );
-        }
-        if (
-            $orderCurrency->iso_code !== $shippingCountryCurrency &&
-            (bool)ConfigHelper::get(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION) === true
-        ) {
-            $exportCurrency = $shippingCountryCurrency;
-            $paymentRepository = $this->module->diContainer->get(PaymentRepository::class);
-            $total = $paymentRepository->getRateTotal($orderCurrency->iso_code, $shippingCountryCurrency, $total);
-            if ($total === null) {
-                throw new ExportException(
-                    $this->module->l(
-                        'Unable to find the exchange rate in the PrestaShop currency settings for the destination country of the order',
-                        'orderexporter'
-                    ) . ': ' . $order->id
-                );
-            }
-        }
+        list($exportCurrency, $total) = $this->getCurrencyAndTotalValue($order, $packeteryOrder);
 
         $isCod = $packeteryOrder['is_cod'];
         if ($isCod) {
-            if ($exportCurrency === 'CZK') {
-                $codValue = ceil($total);
-            } elseif ($exportCurrency === 'HUF') {
-                $codValue = $this->roundUpMultiples($total);
+            if ($packeteryOrder['price_cod'] === null) {
+                $codValue = $total;
             } else {
-                $codValue = round($total, 2);
+                $codValue = $packeteryOrder['price_cod'];
+            }
+
+            if ($exportCurrency === 'CZK') {
+                $codValue = ceil($codValue);
+            } elseif ($exportCurrency === 'HUF') {
+                $codValue = $this->roundUpMultiples($codValue);
+            } else {
+                $codValue = round($codValue, 2);
             }
         } else {
             $codValue = 0;
@@ -120,6 +94,17 @@ class OrderExporter
             }
         }
 
+        if ($packeteryOrder['age_verification_required'] === null) {
+            $adultContent = $orderRepository->isOrderAdult($order->id);
+        } else {
+            $adultContent = (bool)$packeteryOrder['age_verification_required'];
+        }
+        if ($adultContent === true && CarrierTools::orderSupportsAgeVerification($packeteryOrder) === false) {
+            throw new ExportException(
+                sprintf($this->module->l('Order %s contains product only for adults, but the carrier does not support age verification.', 'orderexporter'), $order->id)
+            );
+        }
+
         $data = [
             'number' => $number,
             'currency' => $exportCurrency,
@@ -137,7 +122,7 @@ class OrderExporter
             'company' => $customer->company,
             'phone' => $phone,
             'email' => $customer->email,
-            'adultContent' => $orderRepository->isOrderAdult($order->id),
+            'adultContent' => $adultContent,
         ];
 
         if ($packeteryOrder['is_ad']) {
@@ -166,5 +151,58 @@ class OrderExporter
     public function roundUpMultiples($n, $x = 5)
     {
         return (ceil($n) % $x === 0) ? ceil($n) : round(($n + $x / 2) / $x) * $x;
+    }
+
+    /**
+     * @param Order $order
+     * @param array $packeteryOrder
+     * @return array
+     * @throws ExportException
+     */
+    public function getCurrencyAndTotalValue(Order $order, array $packeteryOrder)
+    {
+        $shippingCountryCurrency = $packeteryOrder['currency_branch'];
+
+        if ($packeteryOrder['price_total'] === null) {
+            $total = $order->total_paid;
+            $defaultPackagePrice = ConfigHelper::get('PACKETERY_DEFAULT_PACKAGE_PRICE');
+            if ($defaultPackagePrice > 0 && $total <= 0) {
+                $total = $defaultPackagePrice;
+            }
+        } else {
+            $total = $packeteryOrder['price_total'];
+        }
+
+        $orderCurrency = new Currency($order->id_currency);
+        $exportCurrency = $orderCurrency->iso_code;
+        if ($shippingCountryCurrency === null) {
+            throw new ExportException(
+                $this->module->l(
+                    'Can\'t find currency of pickup point, order',
+                    'orderexporter'
+                ) . ' - ' . $order->id
+            );
+        }
+        if (
+            $orderCurrency->iso_code !== $shippingCountryCurrency &&
+            (bool)ConfigHelper::get(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION) === true
+        ) {
+            $exportCurrency = $shippingCountryCurrency;
+
+            if ($packeteryOrder['price_total'] === null) {
+                $paymentRepository = $this->module->diContainer->get(PaymentRepository::class);
+                $total = $paymentRepository->getRateTotal($orderCurrency->iso_code, $shippingCountryCurrency, $total);
+                if ($total === null) {
+                    throw new ExportException(
+                        $this->module->l(
+                            'Unable to find the exchange rate in the PrestaShop currency settings for the destination country of the order',
+                            'orderexporter'
+                        ) . ': ' . $order->id
+                    );
+                }
+            }
+        }
+
+        return [$exportCurrency, $total];
     }
 }
