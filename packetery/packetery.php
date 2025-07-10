@@ -1020,6 +1020,24 @@ class Packetery extends CarrierModule
         $orderDetailView = $this->diContainer->get(\Packetery\Order\OrderDetailView::class);
         $orderDetailView->addPacketStatus($this->context->smarty, $packeteryOrder);
 
+        $order = new Order($orderId);
+        /** @var \Packetery\Order\OrderExporter $orderExporter */
+        $orderExporter = $this->diContainer->get(\Packetery\Order\OrderExporter::class);
+        list($exportCurrency, $total) = $orderExporter->getCurrencyAndTotalValue($order, $packeteryOrder);
+        $this->context->smarty->assign('exportCurrency', $exportCurrency);
+        $this->context->smarty->assign('total', Tools::getValue('price_total') ?: $total);
+
+        $finalCod = $total;
+        if ($packeteryOrder['price_cod'] !== null) {
+            $finalCod = $packeteryOrder['price_cod'];
+        }
+        $this->context->smarty->assign('cod', Tools::getValue('price_cod') ?: $finalCod);
+        $this->context->smarty->assign('isCod', $packeteryOrder['is_cod']);
+        $this->context->smarty->assign('carrierSupportsAgeVerification', \Packetery\Carrier\CarrierTools::orderSupportsAgeVerification($packeteryOrder));
+        $this->context->smarty->assign('isAdult', $orderRepository->isOrderAdult($orderId));
+        $this->context->smarty->assign('ageVerificationRequired', (bool)$packeteryOrder['age_verification_required']);
+        $this->context->smarty->assign('orderWeight', Tools::getValue('weight') ?: $orderWeight);
+
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
@@ -1646,21 +1664,21 @@ class Packetery extends CarrierModule
         $isAdult = (int)Tools::getIsset('packetery_age_verification');
 
         /** @var Packetery\Product\ProductAttributeRepository $dbTools */
-        $productAttribute = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
 
-        $productAttributeInfo = $productAttribute->getRow($product->id);
+        $productAttributeInfo = $productAttributeRepository->getRow($product->id);
 
         if ($productAttributeInfo) {
             $data = [
                 'is_adult' => $isAdult,
             ];
-            $productAttribute->update($product->id, $data);
+            $productAttributeRepository->update($product->id, $data);
         } else {
             $data = [
                 'id_product' => $product->id,
                 'is_adult' => $isAdult,
             ];
-            $productAttribute->insert($data);
+            $productAttributeRepository->insert($data);
         }
     }
 

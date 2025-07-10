@@ -224,6 +224,11 @@ class OrderRepository
                    `po`.`width`,
                    `po`.`exported`,
                    `po`.`tracking_number`,
+                   `po`.`currency_branch`,
+                   `po`.`is_cod`,
+                   `po`.`price_total`,
+                   `po`.`price_cod`,
+                   `po`.`age_verification_required`,
                    `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
@@ -294,8 +299,11 @@ class OrderRepository
                    `po`.`city`,
                    `po`.`street`,
                    `po`.`house_number`,
-                   `o`.`id_shop_group`, 
-                   `o`.`id_shop` 
+                   `po`.`price_total`,
+                   `po`.`price_cod`,
+                   `po`.`age_verification_required`,
+                   `o`.`id_shop_group`,
+                   `o`.`id_shop`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po` 
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
             WHERE `po`.`id_order` = ' . $orderId);

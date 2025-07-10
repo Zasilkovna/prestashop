@@ -99,10 +99,69 @@
                     </div>
                 </div>
 
+                <div class="mt-1">
+                    <div class="form-row align-items-center">
+                        <div class="col-sm-2 col-12 my-1">
+                            <label for="price_total">{l s='Packet value' mod='packetery'}:</label>
+                        </div>
+                        <div class="col-sm-2 my-1">
+                            <input class="form-control" name="price_total" id="price_total" value="{$total}">
+                        </div>
+                        <div class="col-auto my-1">
+                            {$exportCurrency}
+                        </div>
+                    </div>
+                </div>
+
+                {if $isCod}
+                    <div class="mt-1">
+                        <div class="form-row align-items-center">
+                            <div class="col-sm-2 col-12 my-1">
+                                <label for="price_cod">{l s='COD value' mod='packetery'}:</label>
+                            </div>
+                            <div class="col-sm-2 my-1">
+                                <input class="form-control" name="price_cod" id="price_cod" value="{$cod}">
+                            </div>
+                            <div class="col-auto my-1">
+                                {$exportCurrency}
+                            </div>
+                        </div>
+                    </div>
+                {/if}
+
+                {* It is not possible to turn it off for other carriers in case that product for adults is present in the order. *}
+                {if $carrierSupportsAgeVerification}
+                    <div class="mt-1">
+                        <div class="form-row align-items-center">
+                            <div class="col-sm-2 col-12 my-1">
+                                <label for="age_verification_required">{l s='Require age verification' mod='packetery'}:</label>
+                            </div>
+                            <div class="col-sm-2 my-1">
+                                <input class="form-control" type="checkbox" name="age_verification_required" id="age_verification_required"
+                                       value="1"{if ($ageVerificationRequired === null && $isAdult) || $ageVerificationRequired === true} checked="checked"{/if}>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
+
+                <div class="mt-1">
+                    <div class="form-row align-items-center">
+                        <div class="col-sm-2 col-12 my-1">
+                            <label for="weight">{l s='Weight' mod='packetery'}:</label>
+                        </div>
+                        <div class="col-sm-2 my-1">
+                            <input class="form-control" name="weight" id="weight" value="{$orderWeight}">
+                        </div>
+                        <div class="col-auto my-1">
+                            kg
+                        </div>
+                    </div>
+                </div>
+
                 <div class="text-right">
                     <button class="btn btn-primary" name="{$submitButton}">{l s='Save' mod='packetery'}</button>
                 </div>
-            {/if }
+            {/if}
         </form>
 
         {* There will be more buttons aka more actions in future. If there is no button hide the divider *}
