@@ -93,12 +93,7 @@ class OrderDetailsUpdater
         return $packeteryOrder;
     }
 
-    /**
-     * @param array $messages
-     * @param array $fieldsToUpdate
-     * @return void
-     */
-    public function processDimensionsAndPricesChange(&$messages, array &$fieldsToUpdate)
+    public function processDimensionsAndPricesChange(array &$messages, array &$fieldsToUpdate): void
     {
         $newFieldsToUpdate = $invalidInts = $invalidFloats = [];
 
