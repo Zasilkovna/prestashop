@@ -6,11 +6,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-/**
- * @param Packetery $module
- * @return bool
- */
-function upgrade_module_3_2_0($module)
+function upgrade_module_3_2_0(Packetery $module): bool
 {
     $sql = [];
 

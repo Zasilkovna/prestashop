@@ -154,12 +154,9 @@ class OrderExporter
     }
 
     /**
-     * @param Order $order
-     * @param array $packeteryOrder
-     * @return array
      * @throws ExportException
      */
-    public function getCurrencyAndTotalValue(Order $order, array $packeteryOrder)
+    public function getCurrencyAndTotalValue(Order $order, array $packeteryOrder): array
     {
         $shippingCountryCurrency = $packeteryOrder['currency_branch'];
 
