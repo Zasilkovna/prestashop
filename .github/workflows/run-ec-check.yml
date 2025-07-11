@@ -28,8 +28,8 @@ jobs:
           run: php -v
 
       -   name: Install Composer dependencies
-          run: composer install --working-dir=packetery
+          run: composer install
 
       -   name: Run editorconfig check
           run: |
-            packetery/vendor/bin/ec .
+            vendor/bin/ec .

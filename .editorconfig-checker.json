@@ -5,8 +5,9 @@
     "SpacesAfterTabs": false,
     "NoColor": false,
     "Exclude": [
+        ".idea/*",
         "vendor/*",
-        "translations/*"
+        "packetery/translations/*"
     ],
     "AllowedContentTypes": [],
     "PassedFiles": [],

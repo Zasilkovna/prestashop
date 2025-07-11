@@ -11,8 +11,8 @@
 
     <ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED"/>
 
-    <exclude-pattern>vendor/*</exclude-pattern>
-    <exclude-pattern>translations/*.php</exclude-pattern>
+    <file>packetery</file>
+    <exclude-pattern>packetery/translations/*.php</exclude-pattern>
     <exclude-pattern>index.php</exclude-pattern>
 
     <rule ref="PSR12">
