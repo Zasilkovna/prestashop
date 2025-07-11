@@ -9,8 +9,6 @@ php --version | head -1
 echo "ℹ︎ Composer version:"
 composer --version
 
-cd packetery
-
 echo "➤ Installing dependencies..."
 composer --no-interaction --quiet install
 
