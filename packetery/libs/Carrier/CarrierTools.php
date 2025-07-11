@@ -14,7 +14,7 @@ class CarrierTools
      *
      * @var int[]
      */
-    const CARRIERS_SUPPORTING_AGE_VERIFICATION = [
+    private const CARRIERS_SUPPORTING_AGE_VERIFICATION = [
         106,
         131,
     ];
@@ -85,11 +85,7 @@ class CarrierTools
         return sprintf('%s&%s', $gridBaseUrl, $getParameters);
     }
 
-    /**
-     * @param array $packeteryOrder
-     * @return bool
-     */
-    public static function orderSupportsAgeVerification(array $packeteryOrder)
+    public static function orderSupportsAgeVerification(array $packeteryOrder): bool
     {
         if ((bool)$packeteryOrder['is_ad'] === false && (bool)$packeteryOrder['is_carrier'] === false) {
             return true;
