@@ -13,7 +13,7 @@ echo "➤ Installing dependencies..."
 composer --no-interaction --quiet install
 
 echo "➤ Running sniffer:"
-./vendor/bin/phpcs -s ./ 2>&1 | tee /tmp/sniffer.log
+./vendor/bin/phpcs -s 2>&1 | tee /tmp/sniffer.log
 
 if grep -q 'ERROR' /tmp/sniffer.log; then
 	echo "🛑 Sniffer found errors, fix them."
