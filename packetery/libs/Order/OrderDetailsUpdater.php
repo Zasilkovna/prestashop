@@ -3,6 +3,7 @@
 namespace Packetery\Order;
 
 use Packetery;
+use Packetery\Carrier\CarrierTools;
 use Packetery\Tools\Tools;
 
 class OrderDetailsUpdater
@@ -52,10 +53,17 @@ class OrderDetailsUpdater
             $packeteryOrder = $this->orderRepository->getOrderWithCountry($orderId);
         }
 
-        $this->processDimensionsChange($messages, $fieldsToUpdate);
+        $this->processDimensionsAndPricesChange($messages, $fieldsToUpdate);
         if ($fieldsToUpdate) {
+            if (
+                !isset($fieldsToUpdate['age_verification_required']) &&
+                CarrierTools::orderSupportsAgeVerification($packeteryOrder)
+            ) {
+                $fieldsToUpdate['age_verification_required'] = 0;
+            }
+
             foreach ($fieldsToUpdate as &$value) {
-                if ((is_int($value) === false) || ($value !== null)) {
+                if (is_numeric($value) === false && $value !== null) {
                     $value = $this->orderRepository->db->escape($value);
                 }
             }
@@ -74,7 +82,7 @@ class OrderDetailsUpdater
                 }
             } else {
                 $messages[] = [
-                    'text' => $this->module->l('Address could not be changed.', 'orderdetailsupdater'),
+                    'text' => $this->module->l('Order update failed.', 'orderdetailsupdater'),
                     'class' => 'danger',
                 ];
             }
@@ -93,44 +101,89 @@ class OrderDetailsUpdater
         return $packeteryOrder;
     }
 
-    /**
-     * @param array $messages
-     * @param array $fieldsToUpdate
-     * @return void
-     */
-    public function processDimensionsChange(&$messages, array &$fieldsToUpdate)
+    public function processDimensionsAndPricesChange(array &$messages, array &$fieldsToUpdate): void
     {
-        $packageDimensions = [];
-        $invalidFields = [];
+        $newFieldsToUpdate = $invalidInts = $invalidFloats = [];
 
-        $translatedDimensions = [
-            'length' => $this->module->l('length', 'orderdetailsupdater'),
-            'height' => $this->module->l('height', 'orderdetailsupdater'),
-            'width' => $this->module->l('width', 'orderdetailsupdater'),
+        $inputConfigs = [
+            'length' => [
+                'translation' => $this->module->l('length', 'orderdetailsupdater'),
+                'validation' => 'int',
+            ],
+            'height' => [
+                'translation' => $this->module->l('height', 'orderdetailsupdater'),
+                'validation' => 'int',
+            ],
+            'width' => [
+                'translation' => $this->module->l('width', 'orderdetailsupdater'),
+                'validation' => 'int',
+            ],
+            'age_verification_required' => [
+                'translation' => $this->module->l('age verification', 'orderdetailsupdater'),
+                'validation' => 'int',
+            ],
+            'price_total' => [
+                'translation' => $this->module->l('packet value', 'orderdetailsupdater'),
+                'validation' => 'float',
+            ],
+            'price_cod' => [
+                'translation' => $this->module->l('COD value', 'orderdetailsupdater'),
+                'validation' => 'float',
+            ],
+            'weight' => [
+                'translation' => $this->module->l('weight', 'orderdetailsupdater'),
+                'validation' => 'float',
+            ],
         ];
 
-        foreach ($translatedDimensions as $dimension => $translation) {
-            $rawValue = Tools::getValue($dimension);
-
-            $value = null;
-            if ((string)(int)$rawValue === $rawValue) {
-                $value = (int)$rawValue;
-                $isValid = $value > 0;
-            } elseif ($rawValue === '') {
-                $isValid = true;
-            } else {
-                $isValid = false;
+        foreach ($inputConfigs as $inputName => $config) {
+            $rawValue = Tools::getValue($inputName);
+            if ($rawValue === '' || $rawValue === false) {
+                continue;
             }
 
-            if ($isValid) {
-                $packageDimensions[$dimension] = $value;
-            } else {
-                $invalidFields[] = $translation;
+            $value = null;
+            $isValid = false;
+            if ($config['validation'] === 'int') {
+                if (is_numeric($rawValue) && (string)(int)$rawValue === (string)$rawValue) {
+                    $value = (int)$rawValue;
+                    $isValid = $value > 0;
+                }
+
+                if ($isValid === false) {
+                    $invalidInts[] = $config['translation'];
+                }
+            } elseif ($config['validation'] === 'float') {
+                $rawValue = Tools::sanitizeFloatValue($rawValue);
+                if (is_numeric($rawValue)) {
+                    // Compatibility with decimal(20,6).
+                    $value = round((float)$rawValue, 6);
+
+                    $isValid = $value > 0;
+                }
+
+                if ($isValid === false) {
+                    $invalidFloats[] = $config['translation'];
+                }
+            }
+
+            if ($isValid === true) {
+                $newFieldsToUpdate[$inputName] = $value;
             }
         }
 
-        if ($invalidFields !== []) {
-            $fieldNamesList = implode(', ', $invalidFields);
+        if ($invalidInts !== []) {
+            $fieldNamesList = implode(', ', $invalidInts);
+            $messages[] = [
+                'text' => sprintf(
+                    $this->module->l('%s must be a whole number, greater than 0.', 'orderdetailsupdater'),
+                    ucfirst($fieldNamesList)
+                ),
+                'class' => 'danger',
+            ];
+        }
+        if ($invalidFloats !== []) {
+            $fieldNamesList = implode(', ', $invalidFloats);
             $messages[] = [
                 'text' => sprintf(
                     $this->module->l('%s must be a number, greater than 0.', 'orderdetailsupdater'),
@@ -138,15 +191,13 @@ class OrderDetailsUpdater
                 ),
                 'class' => 'danger',
             ];
+        }
 
+        if ($invalidInts !== [] || $invalidFloats !== []) {
             return;
         }
 
-        $fieldsToUpdate = array_merge($fieldsToUpdate, [
-            'length' => $packageDimensions['length'],
-            'height' => $packageDimensions['height'],
-            'width' => $packageDimensions['width'],
-        ]);
+        $fieldsToUpdate = array_merge($fieldsToUpdate, $newFieldsToUpdate);
     }
 
 
