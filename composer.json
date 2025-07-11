@@ -9,8 +9,8 @@
     },
     "scripts": {
         "check:ec": "vendor/bin/ec .",
-        "check:phpcs": "vendor/bin/phpcs --standard=./phpcs.xml .",
-        "fix:phpcbf": "vendor/bin/phpcbf --standard=./phpcs.xml .",
+        "check:phpcs": "vendor/bin/phpcs --standard=./phpcs.xml",
+        "fix:phpcbf": "vendor/bin/phpcbf --standard=./phpcs.xml",
         "check:all": [
             "@check:ec",
             "@check:phpcs"
