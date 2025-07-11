@@ -3,6 +3,7 @@
 namespace Packetery\Order;
 
 use Packetery;
+use Packetery\Carrier\CarrierTools;
 use Packetery\Tools\Tools;
 
 class OrderDetailsUpdater
@@ -54,6 +55,13 @@ class OrderDetailsUpdater
 
         $this->processDimensionsAndPricesChange($messages, $fieldsToUpdate);
         if ($fieldsToUpdate) {
+            if (
+                !isset($fieldsToUpdate['age_verification_required']) &&
+                CarrierTools::orderSupportsAgeVerification($packeteryOrder)
+            ) {
+                $fieldsToUpdate['age_verification_required'] = 0;
+            }
+
             foreach ($fieldsToUpdate as &$value) {
                 if (is_numeric($value) === false && $value !== null) {
                     $value = $this->orderRepository->db->escape($value);
