@@ -1,3 +1,8 @@
+3.1.0  - Added: Tracking shipment status.
+       - Added: Changing order status if shipment status changes.
+       - Updated: Widget at checkout does not offer z-box if there is a product with required age-verification in the cart.
+       - Added: Notification of new updates.
+       - Updated: The packetAttributesValid endpoint is no longer called before submitting a shipment.
 3.0.4  - Fixed: Correct messages used in the module log.
        - Fixed: Show Packeta card panel at order detail even after PS carrier update.
 3.0.3  - Fixed: "Class not found" error when going to checkout.
