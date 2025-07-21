@@ -8,11 +8,13 @@
     <arg name="parallel" value="20"/>
     <arg name="tab-width" value="4"/>
     <arg name="encoding" value="utf-8"/>
+    <arg value="p"/>
+    <arg value="s"/>
 
     <ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED"/>
 
-    <exclude-pattern>vendor/*</exclude-pattern>
-    <exclude-pattern>translations/*.php</exclude-pattern>
+    <file>packetery</file>
+    <exclude-pattern>packetery/translations/*.php</exclude-pattern>
     <exclude-pattern>index.php</exclude-pattern>
 
     <rule ref="PSR12">

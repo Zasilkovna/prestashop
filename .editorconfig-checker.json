@@ -5,8 +5,10 @@
     "SpacesAfterTabs": false,
     "NoColor": false,
     "Exclude": [
+        ".idea/*",
+        ".DS_Store",
         "vendor/*",
-        "translations/*"
+        "packetery/translations/*"
     ],
     "AllowedContentTypes": [],
     "PassedFiles": [],
