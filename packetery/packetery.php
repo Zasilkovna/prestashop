@@ -1038,6 +1038,16 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('ageVerificationRequired', $packeteryOrder['age_verification_required'] === null ? null : (bool)$packeteryOrder['age_verification_required']);
         $this->context->smarty->assign('orderWeight', Tools::getValue('weight') ?: $orderWeight);
 
+        $carrierRequiresSize = null;
+        $externalCarrierId = \Packetery\Carrier\CarrierTools::findExternalCarrierId($packeteryOrder);
+        if ($externalCarrierId !== null) {
+            /** @var \Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
+            $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
+            $apiCarrier = $apiCarrierRepository->getById($externalCarrierId);
+            $carrierRequiresSize = (bool)$apiCarrier['requires_size'];
+        }
+        $this->context->smarty->assign('carrierRequiresSize', $carrierRequiresSize);
+
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
