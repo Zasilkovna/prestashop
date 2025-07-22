@@ -281,7 +281,7 @@ class ApiCarrierRepository
      */
     public function getById($id)
     {
-        return $this->dbTools->getRow('SELECT `id`, `name`, `currency`, `is_pickup_points`, `country`, `disallows_cod`
+        return $this->dbTools->getRow('SELECT `id`, `name`, `currency`, `is_pickup_points`, `country`, `disallows_cod`, `requires_size`
             FROM `' . $this->getPrefixedTableName() . '`
             WHERE `id` = "' . $this->dbTools->db->escape($id) . '"');
     }

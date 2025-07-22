@@ -96,4 +96,16 @@ class CarrierTools
 
         return false;
     }
+
+    public static function findExternalCarrierId(array $packeteryOrder): ?int
+    {
+        if (
+            ((bool)$packeteryOrder['is_ad'] === true || (bool)$packeteryOrder['is_carrier'] === true) &&
+            is_numeric($packeteryOrder['id_branch'])
+        ) {
+            return (int)$packeteryOrder['id_branch'];
+        }
+
+        return null;
+    }
 }

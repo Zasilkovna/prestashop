@@ -76,28 +76,52 @@
                 <div class="mt-4">
                     <div class="form-row align-items-center">
                         <div class="col-sm-2 col-12 my-1">
-                            <label>{l s='Size (L x W x H):' mod='packetery'}</label>
+                            <label for="weight">{l s='Weight' mod='packetery'}:</label>
                         </div>
                         <div class="col-sm-2 my-1">
-                            <input class="form-control" name="length" value="{$orderDetails['length']}" placeholder="{l s='Length' mod='packetery'}">
-                        </div>
-                        <div class="col-auto my-1">
-                            x
-                        </div>
-                        <div class="col-sm-2 my-1">
-                            <input class="form-control" name="width" value="{$orderDetails['width']}" placeholder="{l s='Width' mod='packetery'}">
-                        </div>
-                        <div class="col-auto my-1">
-                            x
-                        </div>
-                        <div class="col-sm-2 my-1">
-                            <input class="form-control" name="height" value="{$orderDetails['height']}" placeholder="{l s='Height' mod='packetery'}">
-                        </div>
-                        <div class="col-auto my-1">
-                            (mm)
+                            <div class="input-group">
+                                <input
+                                        type="text"
+                                        name="weight"
+                                        id="weight"
+                                        class="form-control"
+                                        value="{$orderWeight}"
+                                >
+                                <div class="input-group-append">
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                {if $carrierRequiresSize === true}
+                    <div class="mt-1">
+                        <div class="form-row align-items-center">
+                            <div class="col-sm-2 col-12 my-1">
+                                <label>{l s='Size (L x W x H):' mod='packetery'}</label>
+                            </div>
+                            <div class="col-sm-2 my-1">
+                                <input class="form-control" name="length" value="{$orderDetails['length']}" placeholder="{l s='Length' mod='packetery'}">
+                            </div>
+                            <div class="col-auto my-1">
+                                x
+                            </div>
+                            <div class="col-sm-2 my-1">
+                                <input class="form-control" name="width" value="{$orderDetails['width']}" placeholder="{l s='Width' mod='packetery'}">
+                            </div>
+                            <div class="col-auto my-1">
+                                x
+                            </div>
+                            <div class="col-sm-2 my-1">
+                                <input class="form-control" name="height" value="{$orderDetails['height']}" placeholder="{l s='Height' mod='packetery'}">
+                            </div>
+                            <div class="col-auto my-1">
+                                (mm)
+                            </div>
+                        </div>
+                    </div>
+                {/if}
 
                 <div class="mt-1">
                     <div class="form-row align-items-center">
@@ -105,10 +129,18 @@
                             <label for="price_total">{l s='Packet value' mod='packetery'}:</label>
                         </div>
                         <div class="col-sm-2 my-1">
-                            <input class="form-control" name="price_total" id="price_total" value="{$total}">
-                        </div>
-                        <div class="col-auto my-1">
-                            {$exportCurrency}
+                            <div class="input-group">
+                                <input
+                                        type="text"
+                                        name="price_total"
+                                        id="price_total"
+                                        class="form-control"
+                                        value="{$total}"
+                                >
+                                <div class="input-group-append">
+                                    <span class="input-group-text">{$exportCurrency}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -120,10 +152,18 @@
                                 <label for="price_cod">{l s='COD value' mod='packetery'}:</label>
                             </div>
                             <div class="col-sm-2 my-1">
-                                <input class="form-control" name="price_cod" id="price_cod" value="{$cod}">
-                            </div>
-                            <div class="col-auto my-1">
-                                {$exportCurrency}
+                                <div class="input-group">
+                                    <input
+                                            type="text"
+                                            name="price_cod"
+                                            id="price_cod"
+                                            class="form-control"
+                                            value="{$cod}"
+                                    >
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">{$exportCurrency}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -134,29 +174,26 @@
                     <div class="mt-1">
                         <div class="form-row align-items-center">
                             <div class="col-sm-2 col-12 my-1">
-                                <label for="age_verification_required">{l s='Require age verification' mod='packetery'}:</label>
                             </div>
-                            <div class="col-sm-2 my-1">
-                                <input class="form-control" type="checkbox" name="age_verification_required" id="age_verification_required"
-                                       value="1"{if ($ageVerificationRequired === null && $isAdult) || $ageVerificationRequired === true} checked="checked"{/if}>
+                            <div class="col-auto my-1">
+                                <div class="checkbox">
+                                    <div class="md-checkbox md-checkbox-inline">
+                                        <label>
+                                            <input
+                                                    type="checkbox"
+                                                    id="age_verification_required"
+                                                    name="age_verification_required"
+                                                    value="1"
+                                                    {if ($ageVerificationRequired === null && $isAdult) || $ageVerificationRequired === true}checked="checked"{/if}
+                                            >
+                                            <i class="md-checkbox-control"></i>{l s='Require age verification' mod='packetery'}
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 {/if}
-
-                <div class="mt-1">
-                    <div class="form-row align-items-center">
-                        <div class="col-sm-2 col-12 my-1">
-                            <label for="weight">{l s='Weight' mod='packetery'}:</label>
-                        </div>
-                        <div class="col-sm-2 my-1">
-                            <input class="form-control" name="weight" id="weight" value="{$orderWeight}">
-                        </div>
-                        <div class="col-auto my-1">
-                            kg
-                        </div>
-                    </div>
-                </div>
 
                 <div class="text-right">
                     <button class="btn btn-primary" name="{$submitButton}">{l s='Save' mod='packetery'}</button>
