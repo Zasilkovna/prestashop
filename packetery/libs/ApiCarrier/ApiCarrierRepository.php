@@ -299,4 +299,16 @@ class ApiCarrierRepository
         );
         return array_column($result, 'country');
     }
+
+    /**
+     * @throws DatabaseException
+     */
+    public function isPickupPointCarrier(int $carrierId): bool
+    {
+        $result = $this->dbTools->getValue(
+            'SELECT 1 FROM `' . $this->getPrefixedTableName() . '` WHERE `is_pickup_points` = 1 AND `id` = "' . $this->dbTools->db->escape($carrierId) . '"'
+        );
+
+        return ((int)$result === 1);
+    }
 }

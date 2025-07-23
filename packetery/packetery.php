@@ -1472,12 +1472,17 @@ class Packetery extends CarrierModule
     {
         /** @var CartCore $cart */
         $cart = $params['cart'];
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $carrierRepository */
+        $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
+
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
         if (
             $packeteryCarrier &&
-            $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
+            $apiCarrierRepository->isPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
             !$orderRepository->isPickupPointChosenByCart($cart->id)
         ) {
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
@@ -1504,14 +1509,18 @@ class Packetery extends CarrierModule
 
         /** @var CartCore $cart */
         $cart = $params['cart'];
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
 
+        /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         $orderData = $orderRepository->getByCart((int)$cart->id);
 
+        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $carrierRepository */
+        $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
         if (
-            $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
+            $apiCarrierRepository->isPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
             empty($orderData['id_branch'])
         ) {
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
