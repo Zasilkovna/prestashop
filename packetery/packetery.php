@@ -1034,7 +1034,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('cod', Tools::getValue('price_cod') === false ? $finalCod : Tools::getValue('price_cod'));
         $this->context->smarty->assign('isCod', $packeteryOrder['is_cod']);
         $this->context->smarty->assign('carrierSupportsAgeVerification', \Packetery\Carrier\CarrierTools::orderSupportsAgeVerification($packeteryOrder));
-        $this->context->smarty->assign('isAdult', $orderRepository->isOrderAdult($orderId));
+        $this->context->smarty->assign('isOrderForAdults', $orderRepository->isOrderForAdults($orderId));
         $this->context->smarty->assign('ageVerificationRequired', $packeteryOrder['age_verification_required'] === null ? null : (bool)$packeteryOrder['age_verification_required']);
         $this->context->smarty->assign('orderWeight', Tools::getValue('weight') === false ? $orderWeight : Tools::getValue('weight'));
 
