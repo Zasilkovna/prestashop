@@ -410,7 +410,7 @@ class OrderRepository
      * @return bool
      * @throws DatabaseException
      */
-    public function isOrderAdult($orderId)
+    public function isOrderForAdults($orderId)
     {
         $sql = 'SELECT ppp.`is_adult` FROM `' . _DB_PREFIX_ . 'order_detail` pod 
                 LEFT JOIN `' . _DB_PREFIX_ . 'packetery_product_attribute` ppp ON (pod.`product_id` = ppp.`id_product`)

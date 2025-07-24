@@ -184,7 +184,7 @@
                                                     id="age_verification_required"
                                                     name="age_verification_required"
                                                     value="1"
-                                                    {if ($ageVerificationRequired === null && $isAdult) || $ageVerificationRequired === true}checked="checked"{/if}
+                                                    {if ($ageVerificationRequired === null && $isOrderForAdults) || $ageVerificationRequired === true}checked="checked"{/if}
                                             >
                                             <i class="md-checkbox-control"></i>{l s='Require age verification' mod='packetery'}
                                         </label>

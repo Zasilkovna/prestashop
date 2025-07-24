@@ -95,7 +95,7 @@ class OrderExporter
         }
 
         if ($packeteryOrder['age_verification_required'] === null) {
-            $adultContent = $orderRepository->isOrderAdult($order->id);
+            $adultContent = $orderRepository->isOrderForAdults($order->id);
         } else {
             $adultContent = (bool)$packeteryOrder['age_verification_required'];
         }
