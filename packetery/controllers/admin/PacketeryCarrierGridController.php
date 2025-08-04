@@ -6,6 +6,7 @@ use Packetery\Carrier\CarrierRepository;
 use Packetery\Carrier\CarrierTools;
 use Packetery\Module\VersionChecker;
 use Packetery\Tools\MessageManager;
+use Packetery\Tools\PermissionHelper;
 
 class PacketeryCarrierGridController extends ModuleAdminController
 {
@@ -43,6 +44,11 @@ class PacketeryCarrierGridController extends ModuleAdminController
 
         // for $this->translator not being null, in PS 1.6
         parent::__construct();
+
+        if (!PermissionHelper::canViewCarriers()) {
+            $this->errors[] = 'You do not have permission to access Packeta carriers. Access denied.';
+            return;
+        }
 
         $module = $this->getModule();
 
@@ -173,6 +179,11 @@ class PacketeryCarrierGridController extends ModuleAdminController
     {
         parent::initToolbar();
         unset($this->toolbar_btn['new']);
+
+        // Hide action buttons if user doesn't have edit permissions
+        if (!PermissionHelper::canEditCarriers()) {
+            unset($this->toolbar_btn['bulk_action']);
+        }
     }
 
     /**

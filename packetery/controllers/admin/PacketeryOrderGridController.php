@@ -36,6 +36,7 @@ use Packetery\Order\PacketSubmitter;
 use Packetery\Order\Tracking;
 use Packetery\PacketTracking\PacketStatusFactory;
 use Packetery\Tools\ConfigHelper;
+use Packetery\Tools\PermissionHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
 {
@@ -108,6 +109,11 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         // for $this->translator not being null, in PS 1.6
         parent::__construct();
+
+        if (!PermissionHelper::canViewOrders()) {
+            $this->errors[] = 'You do not have permission to access Packeta orders. Access denied.';
+            return;
+        }
 
         $this->fields_list = [
             'id_order' => [
@@ -234,6 +240,11 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function processBulkCreatePacket()
     {
+        if (!PermissionHelper::canEditOrders()) {
+            $this->errors[] = 'You do not have permission to submit shipment.';
+            return;
+        }
+
         $ids = $this->boxes;
         if (!$ids) {
             $this->informations = $this->l('No orders were selected.', 'packeteryordergridcontroller');
@@ -244,6 +255,11 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function processSubmit()
     {
+        if (!PermissionHelper::canEditOrders()) {
+            $this->errors[] = 'You do not have permission to submit shipment.';
+            return;
+        }
+
         $this->createPackets([Tools::getValue('id_order')]);
     }
 
@@ -339,6 +355,11 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function processBulkLabelPdf()
     {
+        if (!PermissionHelper::canEditOrders()) {
+            $this->errors[] = 'You do not have permission to print labels.';
+            return;
+        }
+
         if (Tools::isSubmit('submitPrepareLabels')) {
             $packetNumbers = $this->prepareOnlyInternalPacketNumbers($this->boxes);
             if ($packetNumbers) {
@@ -358,6 +379,11 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function processBulkCarrierLabelPdf()
     {
+        if (!PermissionHelper::canEditOrders()) {
+            $this->errors[] = 'You do not have permission to print carrier labels.';
+            return;
+        }
+
         if (Tools::isSubmit('submitPrepareLabels')) {
             $packetNumbers = $this->prepareOnlyCarrierPacketNumbers($this->boxes);
             if ($packetNumbers) {
@@ -384,6 +410,11 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function processPrint()
     {
+        if (!PermissionHelper::canEditOrders()) {
+            $this->errors[] = 'You do not have permission to print label.';
+            return;
+        }
+
         /** @var OrderRepository $orderRepo */
         $orderRepository = $this->getModule()->diContainer->get(OrderRepository::class);
         $orderData = $orderRepository->getById((int)Tools::getValue('id_order'));
@@ -410,6 +441,11 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function processBulkCsvExport()
     {
+        if (!PermissionHelper::canViewOrders()) {
+            $this->errors[] = 'You do not have permission to access Packeta orders. Access denied.';
+            return;
+        }
+
         if ((int)Tools::getValue('submitFilterorders') === 1) {
             return;
         }
@@ -511,6 +547,11 @@ class PacketeryOrderGridController extends ModuleAdminController
             $orderRepo = $this->getModule()->diContainer->get(OrderRepository::class);
             foreach ($_POST as $key => $value) {
                 if (preg_match('/^weight_(\d+)$/', $key, $matches)) {
+                    if (!PermissionHelper::canEditOrders()) {
+                        $this->errors[] = 'You do not have permission to modify weight.';
+                        continue;
+                    }
+
                     $orderId = (int)$matches[1];
                     if ($value === '') {
                         $value = null;
@@ -623,7 +664,10 @@ class PacketeryOrderGridController extends ModuleAdminController
         $smarty = new Smarty();
         $smarty->assign('weight', $weight);
         $smarty->assign('orderId', $row['id_order']);
-        $smarty->assign('disabled', $row['tracking_number']);
+
+        // Disable weight editing if user doesn't have edit permissions or if order has tracking number
+        $disabled = !PermissionHelper::canEditOrders() || $row['tracking_number'];
+        $smarty->assign('disabled', $disabled);
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/weightEditable.tpl');
     }

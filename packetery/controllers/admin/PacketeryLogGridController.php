@@ -1,6 +1,7 @@
 <?php
 
 use Packetery\Log\LogRepository;
+use Packetery\Tools\PermissionHelper;
 
 class PacketeryLogGridController extends ModuleAdminController
 {
@@ -37,6 +38,11 @@ class PacketeryLogGridController extends ModuleAdminController
         $this->_pagination = [20, 50, 100, 300];
 
         parent::__construct();
+
+        if (!PermissionHelper::canViewLogs()) {
+            $this->errors[] = 'You do not have permission to access Packeta logs. Access denied.';
+            return;
+        }
 
         $this->logRepository = $this->getModule()->diContainer->get(LogRepository::class);
 
