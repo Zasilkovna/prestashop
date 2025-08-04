@@ -70,6 +70,10 @@ class CsvExporter
                 'height' => isset($exportData['size']['length']) ? $exportData['size']['length'] : '',
                 'depth' => isset($exportData['size']['height']) ? $exportData['size']['height'] : '',
                 'note' => '',
+                'allowPublicTracking' => '',
+                'allowTrackingForUsers' => '',
+                'romaniaCIFNumber' => '',
+                'affiliateId' => PacketSubmitter::AFFILIATE_ID,
             ];
             foreach (['carrierPickupPoint', 'street', 'houseNumber', 'city', 'zip'] as $key) {
                 if (!empty($exportData[$key])) {
@@ -98,7 +102,7 @@ class CsvExporter
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="export_' . $date . '.csv"');
         $fp = fopen('php://output', 'wb');
-        fputcsv($fp, ['version 6']);
+        fputcsv($fp, ['version 8']);
         fputcsv($fp, []);
         foreach ($orderData as $line) {
             fputcsv($fp, $line);
