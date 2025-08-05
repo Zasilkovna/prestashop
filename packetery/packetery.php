@@ -55,7 +55,7 @@ class Packetery extends CarrierModule
     {
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '3.1.1';
+        $this->version = '3.2.0';
         $this->author = 'Packeta s.r.o.';
         $this->need_instance = 0;
         $this->is_configurable = 1;
@@ -1020,6 +1020,34 @@ class Packetery extends CarrierModule
         $orderDetailView = $this->diContainer->get(\Packetery\Order\OrderDetailView::class);
         $orderDetailView->addPacketStatus($this->context->smarty, $packeteryOrder);
 
+        $order = new Order($orderId);
+        /** @var \Packetery\Order\OrderExporter $orderExporter */
+        $orderExporter = $this->diContainer->get(\Packetery\Order\OrderExporter::class);
+        list($exportCurrency, $total) = $orderExporter->getCurrencyAndTotalValue($order, $packeteryOrder);
+        $this->context->smarty->assign('exportCurrency', $exportCurrency);
+        $this->context->smarty->assign('total', Tools::getValue('price_total') === false ? $total : Tools::getValue('price_total'));
+
+        $finalCod = $total;
+        if ($packeteryOrder['price_cod'] !== null) {
+            $finalCod = $packeteryOrder['price_cod'];
+        }
+        $this->context->smarty->assign('cod', Tools::getValue('price_cod') === false ? $finalCod : Tools::getValue('price_cod'));
+        $this->context->smarty->assign('isCod', $packeteryOrder['is_cod']);
+        $this->context->smarty->assign('carrierSupportsAgeVerification', \Packetery\Carrier\CarrierTools::orderSupportsAgeVerification($packeteryOrder));
+        $this->context->smarty->assign('isOrderForAdults', $orderRepository->isOrderForAdults($orderId));
+        $this->context->smarty->assign('ageVerificationRequired', $packeteryOrder['age_verification_required'] === null ? null : (bool)$packeteryOrder['age_verification_required']);
+        $this->context->smarty->assign('orderWeight', Tools::getValue('weight') === false ? $orderWeight : Tools::getValue('weight'));
+
+        $carrierRequiresSize = null;
+        $externalCarrierId = \Packetery\Carrier\CarrierTools::findExternalCarrierId($packeteryOrder);
+        if ($externalCarrierId !== null) {
+            /** @var \Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
+            $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
+            $apiCarrier = $apiCarrierRepository->getById($externalCarrierId);
+            $carrierRequiresSize = (bool)$apiCarrier['requires_size'];
+        }
+        $this->context->smarty->assign('carrierRequiresSize', $carrierRequiresSize);
+
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
 
@@ -1444,12 +1472,17 @@ class Packetery extends CarrierModule
     {
         /** @var CartCore $cart */
         $cart = $params['cart'];
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $carrierRepository */
+        $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
+
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
         if (
             $packeteryCarrier &&
-            $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
+            $apiCarrierRepository->isPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
             !$orderRepository->isPickupPointChosenByCart($cart->id)
         ) {
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
@@ -1476,14 +1509,18 @@ class Packetery extends CarrierModule
 
         /** @var CartCore $cart */
         $cart = $params['cart'];
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
 
+        /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         $orderData = $orderRepository->getByCart((int)$cart->id);
 
+        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $carrierRepository */
+        $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
         if (
-            $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
+            $apiCarrierRepository->isPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
             empty($orderData['id_branch'])
         ) {
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
@@ -1646,21 +1683,21 @@ class Packetery extends CarrierModule
         $isAdult = (int)Tools::getIsset('packetery_age_verification');
 
         /** @var Packetery\Product\ProductAttributeRepository $dbTools */
-        $productAttribute = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
 
-        $productAttributeInfo = $productAttribute->getRow($product->id);
+        $productAttributeInfo = $productAttributeRepository->getRow($product->id);
 
         if ($productAttributeInfo) {
             $data = [
                 'is_adult' => $isAdult,
             ];
-            $productAttribute->update($product->id, $data);
+            $productAttributeRepository->update($product->id, $data);
         } else {
             $data = [
                 'id_product' => $product->id,
                 'is_adult' => $isAdult,
             ];
-            $productAttribute->insert($data);
+            $productAttributeRepository->insert($data);
         }
     }
 
