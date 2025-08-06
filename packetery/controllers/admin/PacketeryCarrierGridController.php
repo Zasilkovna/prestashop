@@ -168,9 +168,8 @@ class PacketeryCarrierGridController extends ModuleAdminController
             $carrierHelper->build();
             if ($carrierHelper->getError()) {
                 $this->errors[] = $carrierHelper->getError();
-            } else {
-                $this->tpl_view_vars['carrierHelper'] = $carrierHelper->getHtml();
             }
+            $this->tpl_view_vars['carrierHelper'] = $carrierHelper->getHtml();
         }
         return parent::renderView();
     }
