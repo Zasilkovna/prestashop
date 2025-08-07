@@ -11,8 +11,8 @@ use Packetery;
 use Packetery\Exceptions\FormDataPersistException;
 use Packetery\Module\Options;
 use Packetery\Tools\ConfigHelper;
-use Packetery\Tools\PermissionHelper;
 use Packetery\Tools\Tools;
+use Packetery\Tools\UserPermissionHelper;
 
 abstract class AbstractFormService
 {
@@ -29,7 +29,7 @@ abstract class AbstractFormService
      */
     public function handleSubmit()
     {
-        if (!PermissionHelper::canEditConfig()) {
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CONFIG, UserPermissionHelper::PERMISSION_EDIT)) {
             throw new FormDataPersistException('You do not have permission to save configuration.');
         }
 

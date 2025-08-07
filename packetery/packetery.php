@@ -34,9 +34,6 @@ if (!defined('_PS_VERSION_')) {
 
 require_once dirname(__FILE__) . '/autoload.php';
 
-use Packetery\Tools\ConfigHelper;
-use Packetery\Tools\PermissionHelper;
-
 defined('PACKETERY_PLUGIN_DIR') || define('PACKETERY_PLUGIN_DIR', dirname(__FILE__));
 
 class Packetery extends CarrierModule
@@ -185,8 +182,8 @@ class Packetery extends CarrierModule
             $have_error = true;
         }
 
-        /** @var ConfigHelper $configHelper */
-        $configHelper = $this->diContainer->get(ConfigHelper::class);
+        /** @var \Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         $apiPass = $configHelper->getApiPass();
 
         if (empty($apiPass)) {
@@ -251,7 +248,7 @@ class Packetery extends CarrierModule
      */
     public function getContent()
     {
-        if (!PermissionHelper::canViewConfig()) {
+        if (!\Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_CONFIG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW)) {
             return $this->displayError('You do not have permission to configure the Packeta module. Access denied.');
         }
 
@@ -301,7 +298,7 @@ class Packetery extends CarrierModule
         }
 
         if (Tools::isSubmit('submit' . $this->name)) {
-            if (!PermissionHelper::canEditConfig()) {
+            if (!\Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_CONFIG, \Packetery\Tools\UserPermissionHelper::PERMISSION_EDIT)) {
                 $output .= $this->displayError('You do not have permission to save configuration.');
                 $error = true;
             } else {
@@ -919,7 +916,7 @@ class Packetery extends CarrierModule
     public function packeteryHookDisplayAdminOrder($params)
     {
         // Check if user can view order detail box
-        if (!PermissionHelper::canViewOrderDetailBox()) {
+        if (!\Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW)) {
             return;
         }
 
@@ -928,7 +925,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('orderId', $orderId);
         $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
 
-        if (PermissionHelper::canEditOrderDetailBox()) {
+        if (\Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_EDIT)) {
             $this->processPostParcel($messages);
         }
 
@@ -1028,15 +1025,14 @@ class Packetery extends CarrierModule
             $showActionButtonsDivider = true;
         }
 
-        // Apply permission restrictions
-        $canEdit = PermissionHelper::canEditOrderDetailBox();
-        $this->context->smarty->assign('canEdit', $canEdit);
+        $canEditOrders = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_EDIT);
+        $this->context->smarty->assign('canEditOrders', $canEditOrders);
         $this->context->smarty->assign('messages', $messages);
-        $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed && $canEdit);
-        $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed && $canEdit);
-        $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider && $canEdit);
+        $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed && $canEditOrders);
+        $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed && $canEditOrders);
+        $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider && $canEditOrders);
 
-        if ($this->diContainer->get(\Packetery\Log\LogRepository::class)->hasAnyByOrderId($orderId) && PermissionHelper::canViewLogs()) {
+        if ($this->diContainer->get(\Packetery\Log\LogRepository::class)->hasAnyByOrderId($orderId) && \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_LOG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW)) {
             $this->context->smarty->assign('logLink', $this->getAdminLink('PacketeryLogGrid', ['id_order' => $orderId]));
         }
 
@@ -1760,15 +1756,15 @@ class Packetery extends CarrierModule
         }
 
         $controller = $params['controller'] ?? null;
-        if (!$controller) {
+        if (!is_object($controller)) {
             return;
         }
 
         $packeteryControllers = [
-            'PacketeryOrderGrid',
-            'PacketeryCarrierGrid',
-            'PacketerySetting',
-            'PacketeryLogGrid',
+            \Packetery\Tools\UserPermissionHelper::SECTION_ORDERS,
+            \Packetery\Tools\UserPermissionHelper::SECTION_CARRIERS,
+            \Packetery\Tools\UserPermissionHelper::SECTION_CONFIG,
+            \Packetery\Tools\UserPermissionHelper::SECTION_LOG,
         ];
 
         $controllerName = get_class($controller);
@@ -1784,28 +1780,24 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $hasPermission = false;
+        $hasUserPermission = false;
         switch (true) {
-            case strpos($controllerName, 'PacketeryOrderGrid') !== false:
-                $hasPermission = PermissionHelper::canViewOrders();
+            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_ORDERS) !== false:
+                $hasUserPermission = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
                 break;
-            case strpos($controllerName, 'PacketeryCarrierGrid') !== false:
-                $hasPermission = PermissionHelper::canViewCarriers();
+            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_CARRIERS) !== false:
+                $hasUserPermission = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_CARRIERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
                 break;
-            case strpos($controllerName, 'PacketerySetting') !== false:
-                $hasPermission = PermissionHelper::canViewConfig();
+            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_CONFIG) !== false:
+                $hasUserPermission = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_CONFIG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
                 break;
-            case strpos($controllerName, 'PacketeryLogGrid') !== false:
-                $hasPermission = PermissionHelper::canViewLogs();
+            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_LOG) !== false:
+                $hasUserPermission = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_LOG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
                 break;
         }
 
-        if (!$hasPermission) {
-            // For PrestaShop 8.2 compatibility, we'll set an error and let the controller handle it
-            if (method_exists($controller, 'errors')) {
-                $controller->errors[] = 'You do not have permission to configure the Packeta module. Access denied.';
-            }
-            // Don't redirect here as it might cause issues, let the controller handle access control
+        if (!$hasUserPermission && property_exists($controller, 'errors')) {
+            $controller->errors[] = $this->l('You do not have permission to configure the Packeta module. Access denied.');
         }
     }
 }

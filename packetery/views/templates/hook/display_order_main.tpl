@@ -37,7 +37,7 @@
                         {l s='GPS' mod='packetery'}: <strong class="packetery-gps">{$validatedAddress['latitude']}, {$validatedAddress['longitude']}</strong><br>
                     </p>
                 {/if}
-                {if isset($widgetOptions) && !$isExported && $canEdit}
+                {if isset($widgetOptions) && !$isExported && $canEditOrders}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-hd-widget"
                            data-widget-options="{$widgetOptions|@json_encode|escape}">
@@ -62,7 +62,7 @@
                         {/if}
                     </strong>
                 </p>
-                {if $pickupPointChangeAllowed && !$isExported && $canEdit}
+                {if $pickupPointChangeAllowed && !$isExported && $canEditOrders}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-widget"
                            data-widget-options="{$widgetOptions|@json_encode|escape}">{l s='Change pickup point' mod='packetery'}</a>
@@ -205,7 +205,7 @@
         {if $showActionButtonsDivider}
             <hr />
         {/if}
-        {if $postParcelButtonAllowed && $canEdit}
+        {if $postParcelButtonAllowed && $canEditOrders}
             <form action="{$returnUrl}" method="post">
                 <p>
                     <button class="btn btn-outline-secondary btn-default"

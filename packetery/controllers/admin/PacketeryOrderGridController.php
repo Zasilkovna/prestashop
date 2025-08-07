@@ -36,7 +36,7 @@ use Packetery\Order\PacketSubmitter;
 use Packetery\Order\Tracking;
 use Packetery\PacketTracking\PacketStatusFactory;
 use Packetery\Tools\ConfigHelper;
-use Packetery\Tools\PermissionHelper;
+use Packetery\Tools\UserPermissionHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
 {
@@ -110,8 +110,8 @@ class PacketeryOrderGridController extends ModuleAdminController
         // for $this->translator not being null, in PS 1.6
         parent::__construct();
 
-        if (!PermissionHelper::canViewOrders()) {
-            $this->errors[] = 'You do not have permission to access Packeta orders. Access denied.';
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_VIEW)) {
+            $this->errors[] = $this->l('You do not have permission to access Packeta orders. Access denied.', 'packeteryordergridcontroller');
             return;
         }
 
@@ -240,8 +240,8 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function processBulkCreatePacket()
     {
-        if (!PermissionHelper::canEditOrders()) {
-            $this->errors[] = 'You do not have permission to submit shipment.';
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+            $this->errors[] = $this->l('You do not have permission to submit shipment.', 'packeteryordergridcontroller');
             return;
         }
 
@@ -255,8 +255,8 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function processSubmit()
     {
-        if (!PermissionHelper::canEditOrders()) {
-            $this->errors[] = 'You do not have permission to submit shipment.';
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+            $this->errors[] = $this->l('You do not have permission to submit shipment.', 'packeteryordergridcontroller');
             return;
         }
 
@@ -355,8 +355,8 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function processBulkLabelPdf()
     {
-        if (!PermissionHelper::canEditOrders()) {
-            $this->errors[] = 'You do not have permission to print labels.';
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+            $this->errors[] = $this->l('You do not have permission to print labels.', 'packeteryordergridcontroller');
             return;
         }
 
@@ -379,8 +379,8 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function processBulkCarrierLabelPdf()
     {
-        if (!PermissionHelper::canEditOrders()) {
-            $this->errors[] = 'You do not have permission to print carrier labels.';
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+            $this->errors[] = $this->l('You do not have permission to print carrier labels.', 'packeteryordergridcontroller');
             return;
         }
 
@@ -410,8 +410,8 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function processPrint()
     {
-        if (!PermissionHelper::canEditOrders()) {
-            $this->errors[] = 'You do not have permission to print label.';
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+            $this->errors[] = $this->l('You do not have permission to print label.', 'packeteryordergridcontroller');
             return;
         }
 
@@ -441,8 +441,8 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function processBulkCsvExport()
     {
-        if (!PermissionHelper::canViewOrders()) {
-            $this->errors[] = 'You do not have permission to access Packeta orders. Access denied.';
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_VIEW)) {
+            $this->errors[] = $this->l('You do not have permission to access Packeta orders. Access denied.', 'packeteryordergridcontroller');
             return;
         }
 
@@ -538,6 +538,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function postProcess()
     {
+
         // values are saved even before bulk actions
         if (
             $this->action !== self::ACTION_BULK_LABEL_PDF && $this->action !== self::ACTION_BULK_CARRIER_LABEL_PDF
@@ -547,8 +548,8 @@ class PacketeryOrderGridController extends ModuleAdminController
             $orderRepo = $this->getModule()->diContainer->get(OrderRepository::class);
             foreach ($_POST as $key => $value) {
                 if (preg_match('/^weight_(\d+)$/', $key, $matches)) {
-                    if (!PermissionHelper::canEditOrders()) {
-                        $this->errors[] = 'You do not have permission to modify weight.';
+                    if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+                        $this->errors[] = $this->l('You do not have permission to modify order weights.', 'packeteryordergridcontroller');
                         continue;
                     }
 
@@ -665,9 +666,8 @@ class PacketeryOrderGridController extends ModuleAdminController
         $smarty->assign('weight', $weight);
         $smarty->assign('orderId', $row['id_order']);
 
-        // Disable weight editing if user doesn't have edit permissions or if order has tracking number
-        $disabled = !PermissionHelper::canEditOrders() || $row['tracking_number'];
-        $smarty->assign('disabled', $disabled);
+        $isDisabled = !UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT) || !empty($row['tracking_number']);
+        $smarty->assign('disabled', $isDisabled);
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/weightEditable.tpl');
     }

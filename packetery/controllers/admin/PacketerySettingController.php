@@ -1,6 +1,6 @@
 <?php
 
-use Packetery\Tools\PermissionHelper;
+use Packetery\Tools\UserPermissionHelper;
 
 class PacketerySettingController extends ModuleAdminController
 {
@@ -14,8 +14,8 @@ class PacketerySettingController extends ModuleAdminController
 
     public function initContent()
     {
-        if (!PermissionHelper::canViewConfig()) {
-            $this->errors[] = 'You do not have permission to configure the Packeta module. Access denied.';
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CONFIG, UserPermissionHelper::PERMISSION_VIEW)) {
+            $this->errors[] = $this->l('You do not have permission to configure the Packeta module. Access denied.', 'packeterysettingcontroller');
             return;
         }
 

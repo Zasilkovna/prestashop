@@ -8,7 +8,7 @@ use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\MessageManager;
-use Packetery\Tools\PermissionHelper;
+use Packetery\Tools\UserPermissionHelper;
 use Tools;
 
 class CarrierAdminForm
@@ -89,7 +89,7 @@ class CarrierAdminForm
         }
 
         if (Tools::isSubmit('submitCarrierForm')) {
-            if (!PermissionHelper::canEditCarriers()) {
+            if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
                 $this->error = $this->module->l('You do not have permission to edit carrier settings.', 'carrieradminform');
             } else {
                 $carrierData['id_branch'] = Tools::getValue('id_branch');
@@ -163,7 +163,7 @@ class CarrierAdminForm
         }
 
         if (Tools::isSubmit('submitCarrierOptionsForm')) {
-            if (!PermissionHelper::canEditCarriers()) {
+            if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
                 $this->error = $this->module->l('You do not have permission to edit carrier options.', 'carrieradminform');
             } else {
                 $this->saveCarrierOptions($carrierData, $apiCarrier);
@@ -289,7 +289,7 @@ class CarrierAdminForm
      */
     public function saveCarrier(array $carrierData)
     {
-        if (!PermissionHelper::canEditCarriers()) {
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
             $this->error = $this->module->l('You do not have permission to save carrier settings.', 'carrieradminform');
             return;
         }
@@ -341,7 +341,7 @@ class CarrierAdminForm
      */
     public function saveCarrierOptions(array $carrierData, array $apiCarrier)
     {
-        if (!PermissionHelper::canEditCarriers()) {
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
             $this->error = $this->module->l('You do not have permission to save carrier options.', 'carrieradminform');
             return;
         }
