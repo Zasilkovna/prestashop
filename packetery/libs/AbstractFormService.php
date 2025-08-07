@@ -12,6 +12,7 @@ use Packetery\Exceptions\FormDataPersistException;
 use Packetery\Module\Options;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\Tools;
+use Packetery\Tools\UserPermissionHelper;
 
 abstract class AbstractFormService
 {
@@ -28,6 +29,10 @@ abstract class AbstractFormService
      */
     public function handleSubmit()
     {
+        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CONFIG, UserPermissionHelper::PERMISSION_EDIT)) {
+            throw new FormDataPersistException('You do not have permission to save configuration.');
+        }
+
         $formFields = $this->getConfigurationFormFields();
         foreach ($formFields as $fieldName => $fieldConfig) {
             $this->handleConfigOption($fieldName, $fieldConfig);

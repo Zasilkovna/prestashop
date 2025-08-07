@@ -248,6 +248,10 @@ class Packetery extends CarrierModule
      */
     public function getContent()
     {
+        if (!\Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_CONFIG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW)) {
+            return $this->displayError('You do not have permission to configure the Packeta module. Access denied.');
+        }
+
         $output = '';
 
         if (!extension_loaded('soap')) {
@@ -294,29 +298,34 @@ class Packetery extends CarrierModule
         }
 
         if (Tools::isSubmit('submit' . $this->name)) {
-            $isSubmit = true;
-            $confOptions = $this->getConfigurationOptions();
-            /** @var \Packetery\Module\Options $packeteryOptions */
-            $packeteryOptions = $this->diContainer->get(\Packetery\Module\Options::class);
-            foreach ($confOptions as $option => $optionConf) {
-                $value = (string)Tools::getValue($option);
-                $configValue = $packeteryOptions->formatOption($option, $value);
-                $errorMessage = $packeteryOptions->validate($option, $configValue);
-                if ($errorMessage !== false) {
-                    $output .= $this->displayError($errorMessage);
-                    $error = true;
-                } else {
-                    \Packetery\Tools\ConfigHelper::update($option, $configValue);
-                }
-            }
-            $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
-            $paymentList = $paymentRepository->getListPayments();
-            if ($paymentList) {
-                foreach ($paymentList as $payment) {
-                    if (Tools::getIsset('payment_cod_' . $payment['module_name'])) {
-                        $paymentRepository->setOrInsert(1, $payment['module_name']);
+            if (!\Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_CONFIG, \Packetery\Tools\UserPermissionHelper::PERMISSION_EDIT)) {
+                $output .= $this->displayError('You do not have permission to save configuration.');
+                $error = true;
+            } else {
+                $isSubmit = true;
+                $confOptions = $this->getConfigurationOptions();
+                /** @var \Packetery\Module\Options $packeteryOptions */
+                $packeteryOptions = $this->diContainer->get(\Packetery\Module\Options::class);
+                foreach ($confOptions as $option => $optionConf) {
+                    $value = (string)Tools::getValue($option);
+                    $configValue = $packeteryOptions->formatOption($option, $value);
+                    $errorMessage = $packeteryOptions->validate($option, $configValue);
+                    if ($errorMessage !== false) {
+                        $output .= $this->displayError($errorMessage);
+                        $error = true;
                     } else {
-                        $paymentRepository->setOrInsert(0, $payment['module_name']);
+                        \Packetery\Tools\ConfigHelper::update($option, $configValue);
+                    }
+                }
+                $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
+                $paymentList = $paymentRepository->getListPayments();
+                if ($paymentList) {
+                    foreach ($paymentList as $payment) {
+                        if (Tools::getIsset('payment_cod_' . $payment['module_name'])) {
+                            $paymentRepository->setOrInsert(1, $payment['module_name']);
+                        } else {
+                            $paymentRepository->setOrInsert(0, $payment['module_name']);
+                        }
                     }
                 }
             }
@@ -906,11 +915,19 @@ class Packetery extends CarrierModule
      */
     public function packeteryHookDisplayAdminOrder($params)
     {
+        // Check if user can view order detail box
+        if (!\Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW)) {
+            return;
+        }
+
         $messages = [];
         $orderId = (int)$params['id_order'];
         $this->context->smarty->assign('orderId', $orderId);
         $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
-        $this->processPostParcel($messages);
+
+        if (\Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_EDIT)) {
+            $this->processPostParcel($messages);
+        }
 
         /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
@@ -1007,12 +1024,15 @@ class Packetery extends CarrierModule
             $postParcelButtonAllowed = true;
             $showActionButtonsDivider = true;
         }
-        $this->context->smarty->assign('messages', $messages);
-        $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
-        $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
-        $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider);
 
-        if ($this->diContainer->get(\Packetery\Log\LogRepository::class)->hasAnyByOrderId($orderId)) {
+        $canEditOrders = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_EDIT);
+        $this->context->smarty->assign('canEditOrders', $canEditOrders);
+        $this->context->smarty->assign('messages', $messages);
+        $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed && $canEditOrders);
+        $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed && $canEditOrders);
+        $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider && $canEditOrders);
+
+        if ($this->diContainer->get(\Packetery\Log\LogRepository::class)->hasAnyByOrderId($orderId) && \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_LOG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW)) {
             $this->context->smarty->assign('logLink', $this->getAdminLink('PacketeryLogGrid', ['id_order' => $orderId]));
         }
 
@@ -1249,6 +1269,7 @@ class Packetery extends CarrierModule
             'displayAdminProductsExtra',
             'actionProductDelete',
             'actionCarrierProcess',
+            'actionAdminControllerInitBefore',
         ];
         if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
             $hooks[] = 'displayAdminOrderLeft';
@@ -1718,6 +1739,65 @@ class Packetery extends CarrierModule
         $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
         if ($productAttributeRepository->delete($params['product']->id)) {
             return;
+        }
+    }
+
+    /**
+     * Hook to handle menu visibility based on permissions
+     * This hook is called before admin controller initialization
+     *
+     * @param array $params
+     * @return void
+     */
+    public function hookActionAdminControllerInitBefore(array $params)
+    {
+        if (!isset($params['controller_type']) || $params['controller_type'] !== 'admin') {
+            return;
+        }
+
+        $controller = $params['controller'] ?? null;
+        if (!is_object($controller)) {
+            return;
+        }
+
+        $packeteryControllers = [
+            \Packetery\Tools\UserPermissionHelper::SECTION_ORDERS,
+            \Packetery\Tools\UserPermissionHelper::SECTION_CARRIERS,
+            \Packetery\Tools\UserPermissionHelper::SECTION_CONFIG,
+            \Packetery\Tools\UserPermissionHelper::SECTION_LOG,
+        ];
+
+        $controllerName = get_class($controller);
+        $isPacketeryController = false;
+        foreach ($packeteryControllers as $packeteryController) {
+            if (strpos($controllerName, $packeteryController) !== false) {
+                $isPacketeryController = true;
+                break;
+            }
+        }
+
+        if (!$isPacketeryController) {
+            return;
+        }
+
+        $hasUserPermission = false;
+        switch (true) {
+            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_ORDERS) !== false:
+                $hasUserPermission = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
+                break;
+            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_CARRIERS) !== false:
+                $hasUserPermission = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_CARRIERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
+                break;
+            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_CONFIG) !== false:
+                $hasUserPermission = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_CONFIG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
+                break;
+            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_LOG) !== false:
+                $hasUserPermission = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_LOG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
+                break;
+        }
+
+        if (!$hasUserPermission && property_exists($controller, 'errors')) {
+            $controller->errors[] = $this->l('You do not have permission to configure the Packeta module. Access denied.');
         }
     }
 }

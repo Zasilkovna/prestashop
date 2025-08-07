@@ -1,0 +1,98 @@
+<?php
+
+namespace Packetery\Tools;
+
+use Context;
+use Exception;
+use Module;
+
+class UserPermissionHelper
+{
+    const MODULE_NAME = 'packetery';
+
+    const PERMISSION_VIEW = 'view';
+    const PERMISSION_EDIT = 'edit';
+
+    const ACCESS_TYPE_MODULE = 'module';
+    const ACCESS_TYPE_TAB = 'tab';
+
+    const SECTION_ORDERS = 'PacketeryOrderGrid';
+    const SECTION_CONFIG = 'PacketerySetting';
+    const SECTION_CARRIERS = 'PacketeryCarrierGrid';
+    const SECTION_LOG = 'PacketeryLogGrid';
+
+    /**
+     * @param string $section Section name
+     * @param string $permission Permission type (view/edit)
+     * @return bool
+     */
+    public static function hasPermission($section, $permission)
+    {
+        $context = Context::getContext();
+
+        if (!isset($context->employee)) {
+            return false;
+        }
+
+        $module = Module::getInstanceByName(self::MODULE_NAME);
+        if (!$module) {
+            return false;
+        }
+
+        if (!$module->id) {
+            return false;
+        }
+
+        $modulePermissionRole = 'ROLE_MOD_MODULE_PACKETERY_' . strtoupper($permission === 'view' ? 'READ' : 'UPDATE');
+        $moduleRoleId = self::findAuthorizationRoleId($modulePermissionRole);
+        if ($moduleRoleId !== null) {
+            $hasModulePermission = self::hasAccessPermission($context->employee->id_profile, $moduleRoleId, self::ACCESS_TYPE_MODULE);
+            if (!$hasModulePermission) {
+                return false;
+            }
+        }
+
+        $tabPermissionRole = 'ROLE_MOD_TAB_' . strtoupper($section) . '_' . strtoupper($permission === 'view' ? 'READ' : 'UPDATE');
+        $tabRoleId = self::findAuthorizationRoleId($tabPermissionRole);
+        if ($tabRoleId !== null) {
+            return self::hasAccessPermission($context->employee->id_profile, $tabRoleId, self::ACCESS_TYPE_TAB);
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $slug
+     * @return int|null
+     */
+    private static function findAuthorizationRoleId($slug)
+    {
+        try {
+            $result = \Db::getInstance()->getValue(
+                'SELECT id_authorization_role FROM ' . _DB_PREFIX_ . 'authorization_role WHERE slug = "' . pSQL($slug) . '"'
+            );
+            return $result ? (int)$result : null;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param int $profileId
+     * @param int $roleId
+     * @param string $type Use ACCESS_TYPE_MODULE or ACCESS_TYPE_TAB constants
+     * @return bool
+     */
+    private static function hasAccessPermission($profileId, $roleId, $type)
+    {
+        try {
+            $table = $type === self::ACCESS_TYPE_MODULE ? 'module_access' : 'access';
+            $result = \Db::getInstance()->getValue(
+                'SELECT COUNT(*) FROM ' . _DB_PREFIX_ . $table . ' WHERE id_profile = ' . (int)$profileId . ' AND id_authorization_role = ' . (int)$roleId
+            );
+            return $result > 0;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+}
