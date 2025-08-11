@@ -915,7 +915,6 @@ class Packetery extends CarrierModule
      */
     public function packeteryHookDisplayAdminOrder($params)
     {
-        // Check if user can view order detail box
         if (!\Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW)) {
             return;
         }
@@ -1025,12 +1024,12 @@ class Packetery extends CarrierModule
             $showActionButtonsDivider = true;
         }
 
-        $canEditOrders = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_EDIT);
-        $this->context->smarty->assign('canEditOrders', $canEditOrders);
+        $canUserEditOrders = \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_EDIT);
+        $this->context->smarty->assign('canUserEditOrders', $canUserEditOrders);
         $this->context->smarty->assign('messages', $messages);
-        $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed && $canEditOrders);
-        $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed && $canEditOrders);
-        $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider && $canEditOrders);
+        $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed && $canUserEditOrders);
+        $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed && $canUserEditOrders);
+        $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider && $canUserEditOrders);
 
         if ($this->diContainer->get(\Packetery\Log\LogRepository::class)->hasAnyByOrderId($orderId) && \Packetery\Tools\UserPermissionHelper::hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_LOG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW)) {
             $this->context->smarty->assign('logLink', $this->getAdminLink('PacketeryLogGrid', ['id_order' => $orderId]));

@@ -666,7 +666,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         $smarty->assign('weight', $weight);
         $smarty->assign('orderId', $row['id_order']);
 
-        $isDisabled = !UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT) || !empty($row['tracking_number']);
+        $isDisabled = !UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT) || (isset($row['tracking_number']) && $row['tracking_number'] !== '');
         $smarty->assign('disabled', $isDisabled);
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/weightEditable.tpl');
