@@ -4,6 +4,9 @@ use Packetery\Tools\UserPermissionHelper;
 
 class PacketerySettingController extends ModuleAdminController
 {
+    /** @var Packetery */
+    private $packetery;
+
     public function __construct()
     {
         $this->bootstrap = true;
@@ -14,7 +17,8 @@ class PacketerySettingController extends ModuleAdminController
 
     public function initContent()
     {
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CONFIG, UserPermissionHelper::PERMISSION_VIEW)) {
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CONFIG, UserPermissionHelper::PERMISSION_VIEW)) {
             $this->errors[] = $this->l('You do not have permission to configure the Packeta module. Access denied.', 'packeterysettingcontroller');
             return;
         }
@@ -22,5 +26,17 @@ class PacketerySettingController extends ModuleAdminController
         Tools::redirectAdmin(
             $this->module->getAdminLink('AdminModules', ['configure' => $this->module->name, 'tab_module' => $this->module->tab, 'module_name' => $this->module->name])
         );
+    }
+
+    /**
+     * @return Packetery
+     */
+    private function getModule()
+    {
+        if ($this->packetery === null) {
+            $this->packetery = new Packetery();
+        }
+
+        return $this->packetery;
     }
 }

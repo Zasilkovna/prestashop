@@ -110,7 +110,8 @@ class PacketeryOrderGridController extends ModuleAdminController
         // for $this->translator not being null, in PS 1.6
         parent::__construct();
 
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_VIEW)) {
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_VIEW)) {
             $this->errors[] = $this->l('You do not have permission to access Packeta orders. Access denied.', 'packeteryordergridcontroller');
             return;
         }
@@ -240,7 +241,8 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function processBulkCreatePacket()
     {
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
             $this->errors[] = $this->l('You do not have permission to submit shipment.', 'packeteryordergridcontroller');
             return;
         }
@@ -255,7 +257,8 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function processSubmit()
     {
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
             $this->errors[] = $this->l('You do not have permission to submit shipment.', 'packeteryordergridcontroller');
             return;
         }
@@ -355,7 +358,8 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function processBulkLabelPdf()
     {
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
             $this->errors[] = $this->l('You do not have permission to print labels.', 'packeteryordergridcontroller');
             return;
         }
@@ -379,7 +383,8 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function processBulkCarrierLabelPdf()
     {
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
             $this->errors[] = $this->l('You do not have permission to print carrier labels.', 'packeteryordergridcontroller');
             return;
         }
@@ -410,7 +415,8 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function processPrint()
     {
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
             $this->errors[] = $this->l('You do not have permission to print label.', 'packeteryordergridcontroller');
             return;
         }
@@ -441,7 +447,8 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function processBulkCsvExport()
     {
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_VIEW)) {
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_VIEW)) {
             $this->errors[] = $this->l('You do not have permission to access Packeta orders. Access denied.', 'packeteryordergridcontroller');
             return;
         }
@@ -548,7 +555,8 @@ class PacketeryOrderGridController extends ModuleAdminController
             $orderRepo = $this->getModule()->diContainer->get(OrderRepository::class);
             foreach ($_POST as $key => $value) {
                 if (preg_match('/^weight_(\d+)$/', $key, $matches)) {
-                    if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+                    $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+                    if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
                         $this->errors[] = $this->l('You do not have permission to modify order weights.', 'packeteryordergridcontroller');
                         continue;
                     }
@@ -666,7 +674,8 @@ class PacketeryOrderGridController extends ModuleAdminController
         $smarty->assign('weight', $weight);
         $smarty->assign('orderId', $row['id_order']);
 
-        $isDisabled = !UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT) || (isset($row['tracking_number']) && $row['tracking_number'] !== '');
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        $isDisabled = !$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT) || (isset($row['tracking_number']) && $row['tracking_number'] !== '');
         $smarty->assign('disabled', $isDisabled);
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/weightEditable.tpl');

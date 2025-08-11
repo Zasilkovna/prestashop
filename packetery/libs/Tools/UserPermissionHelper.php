@@ -26,7 +26,7 @@ class UserPermissionHelper
      * @param string $permission Permission type (view/edit)
      * @return bool
      */
-    public static function hasPermission($section, $permission)
+    public function hasPermission($section, $permission)
     {
         $context = Context::getContext();
 
@@ -44,18 +44,18 @@ class UserPermissionHelper
         }
 
         $modulePermissionRole = 'ROLE_MOD_MODULE_PACKETERY_' . strtoupper($permission === 'view' ? 'READ' : 'UPDATE');
-        $moduleRoleId = self::findAuthorizationRoleId($modulePermissionRole);
+        $moduleRoleId = $this->findAuthorizationRoleId($modulePermissionRole);
         if ($moduleRoleId !== null) {
-            $hasModulePermission = self::hasAccessPermission($context->employee->id_profile, $moduleRoleId, self::ACCESS_TYPE_MODULE);
+            $hasModulePermission = $this->hasAccessPermission($context->employee->id_profile, $moduleRoleId, self::ACCESS_TYPE_MODULE);
             if (!$hasModulePermission) {
                 return false;
             }
         }
 
         $tabPermissionRole = 'ROLE_MOD_TAB_' . strtoupper($section) . '_' . strtoupper($permission === 'view' ? 'READ' : 'UPDATE');
-        $tabRoleId = self::findAuthorizationRoleId($tabPermissionRole);
+        $tabRoleId = $this->findAuthorizationRoleId($tabPermissionRole);
         if ($tabRoleId !== null) {
-            return self::hasAccessPermission($context->employee->id_profile, $tabRoleId, self::ACCESS_TYPE_TAB);
+            return $this->hasAccessPermission($context->employee->id_profile, $tabRoleId, self::ACCESS_TYPE_TAB);
         }
 
         return false;
@@ -65,7 +65,7 @@ class UserPermissionHelper
      * @param string $slug
      * @return int|null
      */
-    private static function findAuthorizationRoleId($slug)
+    private function findAuthorizationRoleId($slug)
     {
         try {
             $result = \Db::getInstance()->getValue(
@@ -83,7 +83,7 @@ class UserPermissionHelper
      * @param string $type Use ACCESS_TYPE_MODULE or ACCESS_TYPE_TAB constants
      * @return bool
      */
-    private static function hasAccessPermission($profileId, $roleId, $type)
+    private function hasAccessPermission($profileId, $roleId, $type)
     {
         try {
             $table = $type === self::ACCESS_TYPE_MODULE ? 'module_access' : 'access';

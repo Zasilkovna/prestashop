@@ -45,7 +45,8 @@ class PacketeryCarrierGridController extends ModuleAdminController
         // for $this->translator not being null, in PS 1.6
         parent::__construct();
 
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_VIEW)) {
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_VIEW)) {
             $this->errors[] = $this->l('You do not have permission to access Packeta carriers. Access denied.', 'packeterycarriergridcontroller');
             return;
         }
@@ -180,7 +181,8 @@ class PacketeryCarrierGridController extends ModuleAdminController
         unset($this->toolbar_btn['new']);
 
         // Hide action buttons if user doesn't have edit permissions
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
             unset($this->toolbar_btn['bulk_action']);
         }
     }

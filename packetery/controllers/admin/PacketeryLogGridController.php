@@ -39,7 +39,8 @@ class PacketeryLogGridController extends ModuleAdminController
 
         parent::__construct();
 
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_LOG, UserPermissionHelper::PERMISSION_VIEW)) {
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_LOG, UserPermissionHelper::PERMISSION_VIEW)) {
             $this->errors[] = $this->l('You do not have permission to access Packeta logs. Access denied.', 'packeteryloggridcontroller');
             return;
         }

@@ -40,7 +40,8 @@ class OrderDetailsUpdater
             return $packeteryOrder;
         }
 
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+        $userPermissionHelper = $this->module->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
             $messages[] = [
                 'text' => $this->module->l('You do not have permission to update order details.', 'orderdetailsupdater'),
                 'class' => 'danger',

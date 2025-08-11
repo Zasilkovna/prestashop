@@ -89,7 +89,8 @@ class CarrierAdminForm
         }
 
         if (Tools::isSubmit('submitCarrierForm')) {
-            if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
+            $userPermissionHelper = $this->module->diContainer->get(UserPermissionHelper::class);
+            if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
                 $this->error = $this->module->l('You do not have permission to edit carrier settings.', 'carrieradminform');
             } else {
                 $carrierData['id_branch'] = Tools::getValue('id_branch');
@@ -163,7 +164,8 @@ class CarrierAdminForm
         }
 
         if (Tools::isSubmit('submitCarrierOptionsForm')) {
-            if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
+            $userPermissionHelper = $this->module->diContainer->get(UserPermissionHelper::class);
+            if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
                 $this->error = $this->module->l('You do not have permission to edit carrier options.', 'carrieradminform');
             } else {
                 $this->saveCarrierOptions($carrierData, $apiCarrier);
@@ -289,7 +291,8 @@ class CarrierAdminForm
      */
     public function saveCarrier(array $carrierData)
     {
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
+        $userPermissionHelper = $this->module->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
             $this->error = $this->module->l('You do not have permission to save carrier settings.', 'carrieradminform');
             return;
         }
@@ -341,7 +344,8 @@ class CarrierAdminForm
      */
     public function saveCarrierOptions(array $carrierData, array $apiCarrier)
     {
-        if (!UserPermissionHelper::hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
+        $userPermissionHelper = $this->module->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
             $this->error = $this->module->l('You do not have permission to save carrier options.', 'carrieradminform');
             return;
         }
