@@ -26,7 +26,8 @@ class UserPermissionHelper
      */
     private $dbTools;
 
-    public function __construct(DbTools $dbTools) {
+    public function __construct(DbTools $dbTools)
+    {
         $this->dbTools = $dbTools;
     }
 
