@@ -5,6 +5,7 @@ namespace Packetery\Tools;
 use Context;
 use Exception;
 use Module;
+use Packetery;
 
 class UserPermissionHelper
 {
@@ -26,10 +27,15 @@ class UserPermissionHelper
      */
     private $dbTools;
 
-    public function __construct(DbTools $dbTools)
+    /** @var Packetery */
+    private $module;
+
+    public function __construct(DbTools $dbTools, Packetery $module)
     {
         $this->dbTools = $dbTools;
+        $this->module = $module;
     }
+
 
     /**
      * @param string $section Section name
@@ -43,13 +49,7 @@ class UserPermissionHelper
         if (!isset($context->employee)) {
             return false;
         }
-
-        $module = Module::getInstanceByName(self::MODULE_NAME);
-        if ($module === false) {
-            return false;
-        }
-
-        if ($module->id === null || is_int($module->id) === false) {
+        if ($this->module->id === null) {
             return false;
         }
 
