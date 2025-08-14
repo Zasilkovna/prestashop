@@ -545,7 +545,6 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function postProcess()
     {
-
         // values are saved even before bulk actions
         if (
             $this->action !== self::ACTION_BULK_LABEL_PDF && $this->action !== self::ACTION_BULK_CARRIER_LABEL_PDF
