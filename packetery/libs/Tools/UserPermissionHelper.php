@@ -22,6 +22,15 @@ class UserPermissionHelper
     const SECTION_LOG = 'PacketeryLogGrid';
 
     /**
+     * @var DbTools
+     */
+    private $dbTools;
+
+    public function __construct(DbTools $dbTools) {
+        $this->dbTools = $dbTools;
+    }
+
+    /**
      * @param string $section Section name
      * @param string $permission Permission type (view/edit)
      * @return bool
@@ -65,8 +74,8 @@ class UserPermissionHelper
     private function findAuthorizationRoleId($slug)
     {
         try {
-            $result = \Db::getInstance()->getValue(
-                'SELECT id_authorization_role FROM ' . _DB_PREFIX_ . 'authorization_role WHERE slug = "' . pSQL($slug) . '"'
+            $result = $this->dbTools->getValue(
+                'SELECT id_authorization_role FROM ' . _DB_PREFIX_ . 'authorization_role WHERE slug = "' . $this->dbTools->db->escape($slug) . '"'
             );
             return $result ? (int)$result : null;
         } catch (Exception $e) {
@@ -84,7 +93,7 @@ class UserPermissionHelper
     {
         try {
             $table = $type === self::ACCESS_TYPE_MODULE ? 'module_access' : 'access';
-            $result = \Db::getInstance()->getValue(
+            $result = $this->dbTools->getValue(
                 'SELECT COUNT(*) FROM ' . _DB_PREFIX_ . $table . ' WHERE id_profile = ' . (int)$profileId . ' AND id_authorization_role = ' . (int)$roleId
             );
             return $result > 0;
