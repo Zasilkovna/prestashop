@@ -1801,7 +1801,7 @@ class Packetery extends CarrierModule
                 break;
         }
 
-        if (!$hasUserPermission && property_exists($controller, 'errors')) {
+        if ($hasUserPermission === false && property_exists($controller, 'errors')) {
             $controller->errors[] = $this->l('You do not have permission to configure the Packeta module. Access denied.');
         }
     }
