@@ -245,6 +245,7 @@ class Packetery extends CarrierModule
      * @throws PrestaShopException
      * @throws ReflectionException
      * @throws \Packetery\Exceptions\DatabaseException
+     * @throws \Packetery\Exceptions\ApiClientException
      */
     public function getContent()
     {
@@ -299,36 +300,13 @@ class Packetery extends CarrierModule
         }
 
         if (Tools::isSubmit('submit' . $this->name)) {
-            if (!$userPermissionHelper->hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_CONFIG, \Packetery\Tools\UserPermissionHelper::PERMISSION_EDIT)) {
-                $output .= $this->displayError('You do not have permission to save configuration.');
+            $isSubmit = true;
+            /** @var \Packetery\Module\ConfigurationFormService $configurationFormService */
+            $configurationFormService = $this->diContainer->get(\Packetery\Module\ConfigurationFormService::class);
+            $result = $configurationFormService->handleConfigurationSubmit($userPermissionHelper);
+            $output .= $result['output'];
+            if ($result['error']) {
                 $error = true;
-            } else {
-                $isSubmit = true;
-                $confOptions = $this->getConfigurationOptions();
-                /** @var \Packetery\Module\Options $packeteryOptions */
-                $packeteryOptions = $this->diContainer->get(\Packetery\Module\Options::class);
-                foreach ($confOptions as $option => $optionConf) {
-                    $value = (string)Tools::getValue($option);
-                    $configValue = $packeteryOptions->formatOption($option, $value);
-                    $errorMessage = $packeteryOptions->validate($option, $configValue);
-                    if ($errorMessage !== false) {
-                        $output .= $this->displayError($errorMessage);
-                        $error = true;
-                    } else {
-                        \Packetery\Tools\ConfigHelper::update($option, $configValue);
-                    }
-                }
-                $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
-                $paymentList = $paymentRepository->getListPayments();
-                if ($paymentList) {
-                    foreach ($paymentList as $payment) {
-                        if (Tools::getIsset('payment_cod_' . $payment['module_name'])) {
-                            $paymentRepository->setOrInsert(1, $payment['module_name']);
-                        } else {
-                            $paymentRepository->setOrInsert(0, $payment['module_name']);
-                        }
-                    }
-                }
             }
         }
 
@@ -507,7 +485,7 @@ class Packetery extends CarrierModule
         return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/generateCronInfoBlock.tpl');
     }
 
-    private function getConfigurationOptions()
+    public function getConfigurationOptions()
     {
         return [
             'PACKETERY_APIPASS' => [
