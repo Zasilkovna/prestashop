@@ -8,18 +8,18 @@ use Module;
 
 class UserPermissionHelper
 {
-    const MODULE_NAME = 'packetery';
+    private const MODULE_NAME = 'packetery';
 
-    const PERMISSION_VIEW = 'view';
-    const PERMISSION_EDIT = 'edit';
+    public const PERMISSION_VIEW = 'view';
+    public const PERMISSION_EDIT = 'edit';
 
-    const ACCESS_TYPE_MODULE = 'module';
-    const ACCESS_TYPE_TAB = 'tab';
+    private const ACCESS_TYPE_MODULE = 'module';
+    private const ACCESS_TYPE_TAB = 'tab';
 
-    const SECTION_ORDERS = 'PacketeryOrderGrid';
-    const SECTION_CONFIG = 'PacketerySetting';
-    const SECTION_CARRIERS = 'PacketeryCarrierGrid';
-    const SECTION_LOG = 'PacketeryLogGrid';
+    public const SECTION_ORDERS = 'PacketeryOrderGrid';
+    public const SECTION_CONFIG = 'PacketerySetting';
+    public const SECTION_CARRIERS = 'PacketeryCarrierGrid';
+    public const SECTION_LOG = 'PacketeryLogGrid';
 
     /**
      * @var DbTools
