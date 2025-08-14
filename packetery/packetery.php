@@ -1771,36 +1771,15 @@ class Packetery extends CarrierModule
             \Packetery\Tools\UserPermissionHelper::SECTION_LOG,
         ];
 
+        $userPermissionHelper = $this->diContainer->get(\Packetery\Tools\UserPermissionHelper::class);
         $controllerName = get_class($controller);
-        $isPacketeryController = false;
+        $hasUserPermission = false;
         foreach ($packeteryControllers as $packeteryController) {
             if (strpos($controllerName, $packeteryController) !== false) {
-                $isPacketeryController = true;
+                $hasUserPermission = $userPermissionHelper->hasPermission($packeteryController, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
                 break;
             }
         }
-
-        if (!$isPacketeryController) {
-            return;
-        }
-
-        $userPermissionHelper = $this->diContainer->get(\Packetery\Tools\UserPermissionHelper::class);
-        $hasUserPermission = false;
-        switch (true) {
-            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_ORDERS) !== false:
-                $hasUserPermission = $userPermissionHelper->hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_ORDERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
-                break;
-            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_CARRIERS) !== false:
-                $hasUserPermission = $userPermissionHelper->hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_CARRIERS, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
-                break;
-            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_CONFIG) !== false:
-                $hasUserPermission = $userPermissionHelper->hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_CONFIG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
-                break;
-            case strpos($controllerName, \Packetery\Tools\UserPermissionHelper::SECTION_LOG) !== false:
-                $hasUserPermission = $userPermissionHelper->hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_LOG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW);
-                break;
-        }
-
         if ($hasUserPermission === false && property_exists($controller, 'errors')) {
             $controller->errors[] = $this->l('You do not have permission to configure the Packeta module. Access denied.');
         }
