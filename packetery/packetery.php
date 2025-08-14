@@ -1033,7 +1033,10 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed && $canUserEditOrders);
         $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider && $canUserEditOrders);
 
-        if ($this->diContainer->get(\Packetery\Log\LogRepository::class)->hasAnyByOrderId($orderId) && $userPermissionHelper->hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_LOG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW)) {
+        if (
+            $this->diContainer->get(\Packetery\Log\LogRepository::class)->hasAnyByOrderId($orderId)
+            && $userPermissionHelper->hasPermission(\Packetery\Tools\UserPermissionHelper::SECTION_LOG, \Packetery\Tools\UserPermissionHelper::PERMISSION_VIEW)
+        ) {
             $this->context->smarty->assign('logLink', $this->getAdminLink('PacketeryLogGrid', ['id_order' => $orderId]));
         }
 
