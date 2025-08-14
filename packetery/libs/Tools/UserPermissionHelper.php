@@ -4,13 +4,10 @@ namespace Packetery\Tools;
 
 use Context;
 use Exception;
-use Module;
 use Packetery;
 
 class UserPermissionHelper
 {
-    private const MODULE_NAME = 'packetery';
-
     public const PERMISSION_VIEW = 'view';
     public const PERMISSION_EDIT = 'edit';
 
