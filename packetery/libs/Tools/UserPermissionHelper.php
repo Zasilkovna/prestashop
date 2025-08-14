@@ -35,21 +35,18 @@ class UserPermissionHelper
         }
 
         $module = Module::getInstanceByName(self::MODULE_NAME);
-        if (!$module) {
+        if ($module === false) {
             return false;
         }
 
-        if (!$module->id) {
+        if ($module->id === null || is_int($module->id) === false) {
             return false;
         }
 
         $modulePermissionRole = 'ROLE_MOD_MODULE_PACKETERY_' . strtoupper($permission === 'view' ? 'READ' : 'UPDATE');
         $moduleRoleId = $this->findAuthorizationRoleId($modulePermissionRole);
-        if ($moduleRoleId !== null) {
-            $hasModulePermission = $this->hasAccessPermission($context->employee->id_profile, $moduleRoleId, self::ACCESS_TYPE_MODULE);
-            if (!$hasModulePermission) {
-                return false;
-            }
+        if ($moduleRoleId !== null && $this->hasAccessPermission($context->employee->id_profile, $moduleRoleId, self::ACCESS_TYPE_MODULE) === false) {
+            return false;
         }
 
         $tabPermissionRole = 'ROLE_MOD_TAB_' . strtoupper($section) . '_' . strtoupper($permission === 'view' ? 'READ' : 'UPDATE');
