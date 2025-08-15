@@ -3,7 +3,6 @@
 namespace Packetery\Tools;
 
 use Context;
-use Exception;
 use Packetery;
 use Packetery\UserPermission\UserPermissionRepository;
 
