@@ -5,6 +5,7 @@ namespace Packetery\Order;
 use Packetery;
 use Packetery\Carrier\CarrierTools;
 use Packetery\Tools\Tools;
+use Packetery\UserPermission\UserPermissionHelper;
 
 class OrderDetailsUpdater
 {
@@ -36,6 +37,15 @@ class OrderDetailsUpdater
     public function orderUpdate(&$messages, $packeteryOrder, $orderId)
     {
         if (!Tools::isSubmit('order_update')) {
+            return $packeteryOrder;
+        }
+
+        $userPermissionHelper = $this->module->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_ORDERS, UserPermissionHelper::PERMISSION_EDIT)) {
+            $messages[] = [
+                'text' => $this->module->l('You do not have permission to update order details.', 'orderdetailsupdater'),
+                'class' => 'danger',
+            ];
             return $packeteryOrder;
         }
 
