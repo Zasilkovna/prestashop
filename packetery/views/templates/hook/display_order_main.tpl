@@ -123,42 +123,20 @@
                     </div>
                 {/if}
 
-                <div class="mt-1">
-                    <div class="form-row align-items-center">
-                        <div class="col-sm-2 col-12 my-1">
-                            <label for="price_total">{l s='Packet value' mod='packetery'}:</label>
-                        </div>
-                        <div class="col-sm-2 my-1">
-                            <div class="input-group">
-                                <input
-                                        type="text"
-                                        name="price_total"
-                                        id="price_total"
-                                        class="form-control"
-                                        value="{$total}"
-                                >
-                                <div class="input-group-append">
-                                    <span class="input-group-text">{$exportCurrency}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {if $isCod}
+                {if $showPriceInputs === true}
                     <div class="mt-1">
                         <div class="form-row align-items-center">
                             <div class="col-sm-2 col-12 my-1">
-                                <label for="price_cod">{l s='COD value' mod='packetery'}:</label>
+                                <label for="price_total">{l s='Packet value' mod='packetery'}:</label>
                             </div>
                             <div class="col-sm-2 my-1">
                                 <div class="input-group">
                                     <input
                                             type="text"
-                                            name="price_cod"
-                                            id="price_cod"
+                                            name="price_total"
+                                            id="price_total"
                                             class="form-control"
-                                            value="{$cod}"
+                                            value="{$total}"
                                     >
                                     <div class="input-group-append">
                                         <span class="input-group-text">{$exportCurrency}</span>
@@ -167,6 +145,30 @@
                             </div>
                         </div>
                     </div>
+
+                    {if $isCod}
+                        <div class="mt-1">
+                            <div class="form-row align-items-center">
+                                <div class="col-sm-2 col-12 my-1">
+                                    <label for="price_cod">{l s='COD value' mod='packetery'}:</label>
+                                </div>
+                                <div class="col-sm-2 my-1">
+                                    <div class="input-group">
+                                        <input
+                                                type="text"
+                                                name="price_cod"
+                                                id="price_cod"
+                                                class="form-control"
+                                                value="{$cod}"
+                                        >
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">{$exportCurrency}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
                 {/if}
 
                 {* It is not possible to turn it off for other carriers in case that product for adults is present in the order. *}

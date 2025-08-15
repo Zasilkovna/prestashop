@@ -154,25 +154,45 @@ class OrderExporter
     }
 
     /**
-     * @throws ExportException
+     * @param Order $order
+     * @param array<string, mixed> $packeteryOrder Data from database.
+     * @return PriceConversionParameters
      */
-    public function getCurrencyAndTotalValue(Order $order, array $packeteryOrder): array
+    private function getDataForTotalPriceConversion(Order $order, array $packeteryOrder): PriceConversionParameters
     {
-        $shippingCountryCurrency = $packeteryOrder['currency_branch'];
-
         if ($packeteryOrder['price_total'] === null) {
-            $total = $order->total_paid;
+            $totalPrice = $order->total_paid;
             $defaultPackagePrice = ConfigHelper::get('PACKETERY_DEFAULT_PACKAGE_PRICE');
-            if ($defaultPackagePrice > 0 && $total <= 0) {
-                $total = $defaultPackagePrice;
+            if ($defaultPackagePrice > 0 && $totalPrice <= 0) {
+                $totalPrice = $defaultPackagePrice;
             }
         } else {
-            $total = $packeteryOrder['price_total'];
+            $totalPrice = $packeteryOrder['price_total'];
         }
 
         $orderCurrency = new Currency($order->id_currency);
+
+        return new PriceConversionParameters(
+            $packeteryOrder['currency_branch'],
+            (float) $totalPrice,
+            $orderCurrency
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $packeteryOrder Data from database.
+     * @return array<int, string|float>
+     * @throws ExportException
+     */
+    private function getCurrencyAndTotalValue(Order $order, array $packeteryOrder): array
+    {
+        $priceConversionParameters = $this->getDataForTotalPriceConversion($order, $packeteryOrder);
+        $packeteryCurrency = $priceConversionParameters->getPacketeryCurrency();
+        $orderCurrency = $priceConversionParameters->getOrderCurrency();
         $exportCurrency = $orderCurrency->iso_code;
-        if ($shippingCountryCurrency === null) {
+        $totalPrice = $priceConversionParameters->getTotalPrice();
+
+        if ($packeteryCurrency === null) {
             throw new ExportException(
                 $this->module->l(
                     'Can\'t find currency of pickup point, order',
@@ -181,15 +201,19 @@ class OrderExporter
             );
         }
         if (
-            $orderCurrency->iso_code !== $shippingCountryCurrency &&
+            $orderCurrency->iso_code !== $packeteryCurrency &&
             (bool)ConfigHelper::get(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION) === true
         ) {
-            $exportCurrency = $shippingCountryCurrency;
+            $exportCurrency = $packeteryCurrency;
 
             if ($packeteryOrder['price_total'] === null) {
                 $paymentRepository = $this->module->diContainer->get(PaymentRepository::class);
-                $total = $paymentRepository->getRateTotal($orderCurrency->iso_code, $shippingCountryCurrency, $total);
-                if ($total === null) {
+                $totalPrice = $paymentRepository->getRateTotal(
+                    $orderCurrency->iso_code,
+                    $packeteryCurrency,
+                    $totalPrice
+                );
+                if ($totalPrice === null) {
                     throw new ExportException(
                         $this->module->l(
                             'Unable to find the exchange rate in the PrestaShop currency settings for the destination country of the order',
@@ -200,6 +224,39 @@ class OrderExporter
             }
         }
 
-        return [$exportCurrency, $total];
+        return [$exportCurrency, $totalPrice];
+    }
+
+    /**
+     * Can return currency loaded from PS order instead of from packetery order. Total value is not converted in this case.
+     *
+     * @param array<string, mixed> $packeteryOrder Data from database.
+     * @return array<int, string|float>
+     */
+    public function findCurrencyAndTotalValue(Order $order, array $packeteryOrder): array
+    {
+        $priceConversionParameters =  $this->getDataForTotalPriceConversion($order, $packeteryOrder);
+        $packeteryCurrency = $priceConversionParameters->getPacketeryCurrency();
+        $orderCurrency = $priceConversionParameters->getOrderCurrency();
+        $exportCurrency = $orderCurrency->iso_code;
+        $totalPrice = $priceConversionParameters->getTotalPrice();
+
+        if (
+            $packeteryCurrency !== null &&
+            $orderCurrency->iso_code !== $packeteryCurrency &&
+            (bool)ConfigHelper::get(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION) === true
+        ) {
+            $exportCurrency = $packeteryCurrency;
+            if ($packeteryOrder['price_total'] === null) {
+                $paymentRepository = $this->module->diContainer->get(PaymentRepository::class);
+                $totalPrice = $paymentRepository->getRateTotal(
+                    $orderCurrency->iso_code,
+                    $packeteryCurrency,
+                    $totalPrice
+                );
+            }
+        }
+
+        return [$exportCurrency, $totalPrice];
     }
 }
