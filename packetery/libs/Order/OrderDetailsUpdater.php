@@ -109,36 +109,51 @@ class OrderDetailsUpdater
             'length' => [
                 'translation' => $this->module->l('length', 'orderdetailsupdater'),
                 'validation' => 'int',
+                'nullable' => false,
             ],
             'height' => [
                 'translation' => $this->module->l('height', 'orderdetailsupdater'),
                 'validation' => 'int',
+                'nullable' => false,
             ],
             'width' => [
                 'translation' => $this->module->l('width', 'orderdetailsupdater'),
                 'validation' => 'int',
+                'nullable' => false,
             ],
             'age_verification_required' => [
                 'translation' => $this->module->l('age verification', 'orderdetailsupdater'),
                 'validation' => 'int',
+                'nullable' => false,
             ],
             'price_total' => [
                 'translation' => $this->module->l('packet value', 'orderdetailsupdater'),
                 'validation' => 'float',
+                'nullable' => true,
             ],
             'price_cod' => [
                 'translation' => $this->module->l('COD value', 'orderdetailsupdater'),
                 'validation' => 'float',
+                'nullable' => true,
             ],
             'weight' => [
                 'translation' => $this->module->l('weight', 'orderdetailsupdater'),
                 'validation' => 'float',
+                'nullable' => true,
             ],
         ];
 
         foreach ($inputConfigs as $inputName => $config) {
             $rawValue = Tools::getValue($inputName);
-            if ($rawValue === '' || $rawValue === false) {
+
+            if ($rawValue === false) {
+                continue;
+            }
+
+            if ($rawValue === '') {
+                if ($config['nullable'] === true) {
+                    $newFieldsToUpdate[$inputName] = null;
+                }
                 continue;
             }
 
