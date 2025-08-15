@@ -33,7 +33,6 @@ class UserPermissionHelper
         $this->module = $module;
     }
 
-
     /**
      * @param string $section Section name
      * @param string $permission Permission type (view/edit)
