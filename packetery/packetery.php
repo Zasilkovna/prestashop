@@ -1003,7 +1003,7 @@ class Packetery extends CarrierModule
 
         $postParcelButtonAllowed = false;
         $showActionButtonsDivider = false;
-        if ($apiKey !== false && $isExported === false && $orderWeight !== null && $orderWeight > 0) {
+        if ($apiKey !== false && $isExported === false && $orderWeight !== null && $orderWeight > 0 && $packeteryOrder['id_branch']) {
             $postParcelButtonAllowed = true;
             $showActionButtonsDivider = true;
         }
@@ -1023,7 +1023,7 @@ class Packetery extends CarrierModule
         $order = new Order($orderId);
         /** @var \Packetery\Order\OrderExporter $orderExporter */
         $orderExporter = $this->diContainer->get(\Packetery\Order\OrderExporter::class);
-        list($exportCurrency, $total) = $orderExporter->getCurrencyAndTotalValue($order, $packeteryOrder);
+        [$exportCurrency, $total] = $orderExporter->findCurrencyAndTotalValue($order, $packeteryOrder);
         $this->context->smarty->assign('exportCurrency', $exportCurrency);
         $this->context->smarty->assign('total', Tools::getValue('price_total') === false ? $total : Tools::getValue('price_total'));
 
@@ -1037,6 +1037,10 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('isOrderForAdults', $orderRepository->isOrderForAdults($orderId));
         $this->context->smarty->assign('ageVerificationRequired', $packeteryOrder['age_verification_required'] === null ? null : (bool)$packeteryOrder['age_verification_required']);
         $this->context->smarty->assign('orderWeight', Tools::getValue('weight') === false ? $orderWeight : Tools::getValue('weight'));
+
+        $showPriceInputs = $packeteryOrder['currency_branch'] !== null ||
+            (bool)Packetery\Tools\ConfigHelper::get(Packetery\Tools\ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION) === false;
+        $this->context->smarty->assign('showPriceInputs', $showPriceInputs);
 
         $carrierRequiresSize = null;
         $externalCarrierId = \Packetery\Carrier\CarrierTools::findExternalCarrierId($packeteryOrder);
