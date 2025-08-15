@@ -6,7 +6,7 @@ use Packetery;
 use Packetery\AbstractFormService;
 use Packetery\Module\Options;
 use Packetery\PacketTracking\PacketStatusFactory;
-use Packetery\Tools\UserPermissionHelper;
+use Packetery\UserPermission\UserPermissionHelper;
 
 class OrderStatusChangeFormService extends AbstractFormService
 {

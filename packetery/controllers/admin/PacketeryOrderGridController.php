@@ -36,7 +36,7 @@ use Packetery\Order\PacketSubmitter;
 use Packetery\Order\Tracking;
 use Packetery\PacketTracking\PacketStatusFactory;
 use Packetery\Tools\ConfigHelper;
-use Packetery\Tools\UserPermissionHelper;
+use Packetery\UserPermission\UserPermissionHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
 {

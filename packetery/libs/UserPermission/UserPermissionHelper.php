@@ -1,10 +1,9 @@
 <?php
 
-namespace Packetery\Tools;
+namespace Packetery\UserPermission;
 
 use Context;
 use Packetery;
-use Packetery\UserPermission\UserPermissionRepository;
 
 class UserPermissionHelper
 {

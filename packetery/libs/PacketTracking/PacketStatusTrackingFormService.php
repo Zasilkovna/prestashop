@@ -5,7 +5,7 @@ namespace Packetery\PacketTracking;
 use Packetery;
 use Packetery\AbstractFormService;
 use Packetery\Module\Options;
-use Packetery\Tools\UserPermissionHelper;
+use Packetery\UserPermission\UserPermissionHelper;
 
 class PacketStatusTrackingFormService extends AbstractFormService
 {

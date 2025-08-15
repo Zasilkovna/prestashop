@@ -6,7 +6,7 @@ use Packetery\Carrier\CarrierRepository;
 use Packetery\Carrier\CarrierTools;
 use Packetery\Module\VersionChecker;
 use Packetery\Tools\MessageManager;
-use Packetery\Tools\UserPermissionHelper;
+use Packetery\UserPermission\UserPermissionHelper;
 
 class PacketeryCarrierGridController extends ModuleAdminController
 {

@@ -1,7 +1,7 @@
 <?php
 
 use Packetery\Log\LogRepository;
-use Packetery\Tools\UserPermissionHelper;
+use Packetery\UserPermission\UserPermissionHelper;
 
 class PacketeryLogGridController extends ModuleAdminController
 {

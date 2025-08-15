@@ -5,7 +5,7 @@ namespace Packetery\Order;
 use Packetery;
 use Packetery\Carrier\CarrierTools;
 use Packetery\Tools\Tools;
-use Packetery\Tools\UserPermissionHelper;
+use Packetery\UserPermission\UserPermissionHelper;
 
 class OrderDetailsUpdater
 {

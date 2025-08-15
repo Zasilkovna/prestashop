@@ -4,7 +4,6 @@ namespace Packetery\UserPermission;
 
 use Exception;
 use Packetery\Tools\DbTools;
-use Packetery\Tools\UserPermissionHelper;
 
 class UserPermissionRepository
 {

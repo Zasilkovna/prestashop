@@ -8,7 +8,7 @@ use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\MessageManager;
-use Packetery\Tools\UserPermissionHelper;
+use Packetery\UserPermission\UserPermissionHelper;
 use Tools;
 
 class CarrierAdminForm

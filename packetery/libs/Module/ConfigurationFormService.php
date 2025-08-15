@@ -7,7 +7,7 @@ use Packetery\Exceptions\ApiClientException;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Tools\ConfigHelper;
-use Packetery\Tools\UserPermissionHelper;
+use Packetery\UserPermission\UserPermissionHelper;
 use Tools;
 
 class ConfigurationFormService

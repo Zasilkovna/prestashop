@@ -1,6 +1,6 @@
 <?php
 
-use Packetery\Tools\UserPermissionHelper;
+use Packetery\UserPermission\UserPermissionHelper;
 
 class PacketerySettingController extends ModuleAdminController
 {

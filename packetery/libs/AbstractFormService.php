@@ -12,7 +12,7 @@ use Packetery\Exceptions\FormDataPersistException;
 use Packetery\Module\Options;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\Tools;
-use Packetery\Tools\UserPermissionHelper;
+use Packetery\UserPermission\UserPermissionHelper;
 
 abstract class AbstractFormService
 {
