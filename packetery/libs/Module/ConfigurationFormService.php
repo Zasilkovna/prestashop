@@ -5,10 +5,10 @@ namespace Packetery\Module;
 use Packetery;
 use Packetery\Exceptions\ApiClientException;
 use Packetery\Exceptions\DatabaseException;
-use Tools;
-use Packetery\Tools\UserPermissionHelper;
-use Packetery\Tools\ConfigHelper;
 use Packetery\Payment\PaymentRepository;
+use Packetery\Tools\ConfigHelper;
+use Packetery\Tools\UserPermissionHelper;
+use Tools;
 
 class ConfigurationFormService
 {
@@ -37,13 +37,13 @@ class ConfigurationFormService
         if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CONFIG, UserPermissionHelper::PERMISSION_EDIT)) {
             return [
                 'output' => $this->module->displayError('You do not have permission to save configuration.'),
-                'error' => true
+                'error' => true,
             ];
         }
 
         $confOptions = $this->module->getConfigurationOptions();
         $packeteryOptions = $this->module->diContainer->get(Options::class);
-        
+
         foreach ($confOptions as $option => $optionConf) {
             $value = (string)Tools::getValue($option);
             $configValue = $packeteryOptions->formatOption($option, $value);
@@ -60,7 +60,7 @@ class ConfigurationFormService
 
         return [
             'output' => $output,
-            'error' => $error
+            'error' => $error,
         ];
     }
 
@@ -72,7 +72,7 @@ class ConfigurationFormService
     {
         $paymentRepository = $this->module->diContainer->get(PaymentRepository::class);
         $paymentList = $paymentRepository->getListPayments();
-        
+
         if ($paymentList) {
             foreach ($paymentList as $payment) {
                 if (Tools::getIsset('payment_cod_' . $payment['module_name'])) {
