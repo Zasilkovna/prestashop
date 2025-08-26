@@ -47,6 +47,8 @@ class PacketeryOrderGridController extends ModuleAdminController
     /** @var Packetery */
     private $packetery;
 
+    private $hasBulkLabelPrintingError;
+
     public function __construct()
     {
         $this->bootstrap = true;
@@ -200,6 +202,8 @@ class PacketeryOrderGridController extends ModuleAdminController
         $title = $this->l('Packeta Orders', 'packeteryordergridcontroller');
         $this->meta_title = $title;
         $this->toolbar_title = $title;
+
+        $this->hasBulkLabelPrintingError = false;
 
         $versionChecker = $this->getModule()->diContainer->get(VersionChecker::class);
         if ($versionChecker->isNewVersionAvailable()) {
@@ -366,12 +370,14 @@ class PacketeryOrderGridController extends ModuleAdminController
                 $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
                 if ($packetsEnhanced === []) {
                     $this->warnings[] = $this->l('Label printing failed, you can find more information in the Packeta log.', 'packeteryordergridcontroller');
+                    $this->hasBulkLabelPrintingError = true;
 
                     return;
                 }
                 $this->errors[] = $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, $packetsEnhanced, (int)Tools::getValue('offset'));
             } else {
                 $this->warnings[] = $this->l('No orders have been selected for which labels can be printed.', 'packeteryordergridcontroller');
+                $this->hasBulkLabelPrintingError = true;
             }
         }
     }
@@ -457,6 +463,7 @@ class PacketeryOrderGridController extends ModuleAdminController
                         $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
                         if ($packetsEnhanced === []) {
                             $this->warnings[] = $this->l('Carrier label printing failed, you can find more information in the Packeta log.', 'packeteryordergridcontroller');
+                            $this->hasBulkLabelPrintingError = true;
                         }
                     } else {
                         $type = Labels::TYPE_PACKETA;
@@ -464,7 +471,7 @@ class PacketeryOrderGridController extends ModuleAdminController
                         $maxOffset = (int)$maxOffsets[ConfigHelper::get('PACKETERY_LABEL_FORMAT')];
                     }
                     if ($maxOffset !== 0) {
-                        if (empty($this->warnings)) {
+                        if ($this->hasBulkLabelPrintingError === false) {
                             $this->tpl_list_vars['max_offset'] = $maxOffset;
                             $this->tpl_list_vars['prepareLabelsMode'] = true;
                             $this->tpl_list_vars['REQUEST_URI'] = $_SERVER['REQUEST_URI'];
