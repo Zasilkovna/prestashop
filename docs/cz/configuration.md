@@ -7,7 +7,7 @@ Po úspěšné instalaci klikněte na tlačítko **Konfigurovat** nebo v hlavní
 
 #### Nastavení modulu
 
-V případě, že nemáte uživatelský účet na stránkách Zásilkovny, je možné v rámci testování funkcionality modulu či podávání zásilek požádat o testovací účet na emailu Zákaznického servisu: [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz):
+V případě, že nemáte uživatelský účet na stránkách Zásilkovny, je možné v rámci testování funkcionality modulu či podávání zásilek požádat o testovací účet na emailu Zákaznického servisu: [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com):
 
 - **API heslo**  - vaše API heslo naleznete v [klientské sekci Zásilkovny](https://client.packeta.com/support/) v části **Klientská podpora**
 ![screen3](../assets/cs_api_password.png)
