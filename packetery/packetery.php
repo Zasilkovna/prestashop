@@ -189,7 +189,8 @@ class Packetery extends CarrierModule
 
         if (!self::transportMethod()) {
             $error[] = $this->trans(
-                'No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.'[],
+                'No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.',
+                [],
                 'Modules.Packetery.Packetery'
             );
             $have_error = true;
@@ -234,8 +235,7 @@ class Packetery extends CarrierModule
         $lastCarriersUpdate = Packetery\Tools\ConfigHelper::get('PACKETERY_LAST_CARRIERS_UPDATE');
         if ((bool) $lastCarriersUpdate !== false) {
             $date = new DateTimeImmutable();
-            $date->setTimestamp($lastCarriersUpdate);
-            $lastCarriersUpdate = $date->format('d.m.Y H:i:s');
+            $lastCarriersUpdate = $date->setTimestamp((int) $lastCarriersUpdate)->format('d.m.Y H:i:s');
         }
 
         $totalCarriers = $apiCarrierRepository->getAdAndExternalCount();
