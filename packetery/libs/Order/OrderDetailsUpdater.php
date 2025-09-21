@@ -2,6 +2,10 @@
 
 namespace Packetery\Order;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery;
 use Packetery\Carrier\CarrierTools;
 use Packetery\Tools\Tools;

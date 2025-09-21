@@ -2,6 +2,10 @@
 
 namespace Packetery\Cart;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use CartCore;
 use Packetery\Product\ProductAttributeRepository;
 

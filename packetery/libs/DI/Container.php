@@ -2,6 +2,10 @@
 
 namespace Packetery\DI;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Closure;
 use Exception;
 use ReflectionClass;

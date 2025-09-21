@@ -2,6 +2,10 @@
 
 namespace Packetery\Tools;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Exception;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;

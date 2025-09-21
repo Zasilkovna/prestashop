@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Packetery\PickupPointValidate;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Exception;
 use Packetery\PickupPointValidate\Exception\HttpRequestException;
 use Packetery\Request\PickupPointValidateRequest;

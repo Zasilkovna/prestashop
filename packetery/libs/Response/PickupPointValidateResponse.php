@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Packetery\Response;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class PickupPointValidateResponse
 {
     /** @var bool */

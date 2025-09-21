@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Packetery\Request;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\PickupPointValidate\ValidatedOptions;
 use Packetery\PickupPointValidate\ValidatedPoint;
 

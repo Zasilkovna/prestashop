@@ -2,6 +2,10 @@
 
 namespace Packetery\Cron\Tasks;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery;
 use Packetery\PacketTracking\PacketTrackingCron;
 

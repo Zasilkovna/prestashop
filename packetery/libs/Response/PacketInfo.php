@@ -2,6 +2,10 @@
 
 namespace Packetery\Response;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class PacketInfo extends BaseResponse
 {
     /**

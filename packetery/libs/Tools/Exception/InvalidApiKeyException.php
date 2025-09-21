@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Packetery\Tools\Exception;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class InvalidApiKeyException extends \RuntimeException
 {
     public function __construct(string $message)

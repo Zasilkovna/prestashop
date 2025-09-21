@@ -2,6 +2,10 @@
 
 namespace Packetery\Order;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use DateTimeImmutable;
 use Db;
 use mysqli_result;
