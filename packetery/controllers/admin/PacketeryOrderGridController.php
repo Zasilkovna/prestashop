@@ -49,13 +49,14 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $this->bootstrap = true;
         $this->list_no_link = true;
-        $this->context = Context::getContext();
         $this->lang = false;
         $this->allow_export = true;
 
         $this->table = 'orders';
         $this->identifier = 'id_order';
 
+        parent::__construct();
+        
         // there has to be `id` for 'editable' to work; a.* is prepended
         $this->_select = '
             `a`.`id_order` AS `id`,

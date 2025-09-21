@@ -22,7 +22,6 @@ class PacketeryCarrierGridController extends ModuleAdminController
     {
         $this->bootstrap = true;
         $this->list_no_link = true;
-        $this->context = Context::getContext();
         $this->lang = false;
         $this->allow_export = true;
 

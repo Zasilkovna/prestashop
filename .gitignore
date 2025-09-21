@@ -3,3 +3,5 @@
 .phpcs-cache
 packetery/vendor
 packetery/views/js/write-test.js
+vendor
+*.zip

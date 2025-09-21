@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "prestashop/autoindex": "^2.1"
+    }
+}
