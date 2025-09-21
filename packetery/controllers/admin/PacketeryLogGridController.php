@@ -169,7 +169,7 @@ class PacketeryLogGridController extends ModuleAdminController
      */
     public function renderDate($value, array $row)
     {
-        return Tools::displayDate($value, null, 1);
+        return Tools::displayDate($value, true);
     }
 
     /**
