@@ -20,11 +20,12 @@ class ProductAttributes
 
     /**
      * @param array{ is_adult: string } $dbRow
+     *
      * @return self
      */
     public static function fromDbRow(array $dbRow): ProductAttributes
     {
-        return new self((bool)$dbRow['is_adult']);
+        return new self((bool) $dbRow['is_adult']);
     }
 
     public function isForAdults(): bool

@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{packetery}prestashop>packetery_7e436ecba5095ef42cfeb5b696fbbdfd'] = 'Získajte svojim zákazníkom prístup k bodom vyzdvihnutia v sieti Zásielkovni.';
 $_MODULE['<{packetery}prestashop>packetery_e35932e04a726a6aeaf748a6bb5d4267'] = 'Export objednávok do systému Zásielkovni.';
 $_MODULE['<{packetery}prestashop>packetery_4a93d9164aad959a6abc2de389170ac9'] = 'Zásielkovňa';

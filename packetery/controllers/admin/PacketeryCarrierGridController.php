@@ -127,7 +127,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
     /**
      * @throws PrestaShopException
      * @throws PrestaShopDatabaseException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      * @throws SmartyException
      * @throws ReflectionException
      */
@@ -147,7 +147,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
         if ($this->_list) {
             $module = $this->getModule();
             foreach ($this->_list as $carrierData) {
-                $carrierHelper = new CarrierAdminForm((int)$carrierData['id_carrier'], $module);
+                $carrierHelper = new CarrierAdminForm((int) $carrierData['id_carrier'], $module);
                 $warning = $carrierHelper->getCarrierWarning($carrierData);
                 if ($warning) {
                     $this->warnings[] = $warning;
@@ -161,7 +161,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
     public function renderView()
     {
         if (Tools::getIsset('viewcarrier')) {
-            $carrierHelper = new CarrierAdminForm((int)Tools::getValue('id_carrier'), $this->getModule());
+            $carrierHelper = new CarrierAdminForm((int) Tools::getValue('id_carrier'), $this->getModule());
             $carrierHelper->build();
             if ($carrierHelper->getError()) {
                 $this->errors[] = $carrierHelper->getError();
@@ -169,6 +169,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
                 $this->tpl_view_vars['carrierHelper'] = $carrierHelper->getHtml();
             }
         }
+
         return parent::renderView();
     }
 
@@ -180,7 +181,9 @@ class PacketeryCarrierGridController extends ModuleAdminController
 
     /**
      * @param bool $booleanValue
+     *
      * @return false|string
+     *
      * @throws SmartyException
      */
     public function getIconForBoolean($booleanValue)
@@ -196,6 +199,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
         if (isset($this->availableCarriers[$carrierId])) {
             return $this->availableCarriers[$carrierId];
         }
+
         return $carrierId;
     }
 
@@ -204,6 +208,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
         if ($this->packetery === null) {
             $this->packetery = new Packetery();
         }
+
         return $this->packetery;
     }
 

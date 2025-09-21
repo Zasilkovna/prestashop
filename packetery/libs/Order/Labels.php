@@ -6,12 +6,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
 use Packetery\Log\LogRepository;
 use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
-use SoapClient;
-use SoapFault;
 
 class Labels
 {
@@ -23,16 +20,16 @@ class Labels
      */
     private $configHelper;
 
-    /** @var LogRepository  */
+    /** @var LogRepository */
     private $logRepository;
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     public function __construct(
         ConfigHelper $configHelper,
         LogRepository $logRepository,
-        Packetery $module
+        \Packetery $module,
     ) {
         $this->logRepository = $logRepository;
         $this->configHelper = $configHelper;
@@ -40,15 +37,16 @@ class Labels
     }
 
     /**
-     * @param array $packets Used for packeta labels.
+     * @param array $packets used for packeta labels
      * @param string $type
      * @param int $offset
-     * @param array|null $packetsEnhanced Used for carrier labels.
+     * @param array|null $packetsEnhanced used for carrier labels
+     *
      * @return string|void
      */
     public function packetsLabelsPdf(array $packets, $type, $packetsEnhanced = null, $offset = 0)
     {
-        $client = new SoapClient(SoapApi::WSDL_URL);
+        $client = new \SoapClient(SoapApi::WSDL_URL);
         try {
             if ($type === self::TYPE_CARRIER) {
                 $format = ConfigHelper::get('PACKETERY_CARRIER_LABEL_FORMAT');
@@ -89,7 +87,7 @@ class Labels
 
             echo "\n error \n";
             exit;
-        } catch (SoapFault $e) {
+        } catch (\SoapFault $e) {
             if (isset($e->faultstring)) {
                 $error_msg = $e->faultstring;
                 echo "\n$error_msg\n";

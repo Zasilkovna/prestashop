@@ -1,5 +1,7 @@
 {
     "require-dev": {
-        "prestashop/autoindex": "^2.1"
+        "prestashop/autoindex": "^2.1",
+        "prestashop/php-dev-tools": "^5.0",
+        "friendsofphp/php-cs-fixer": "^3.87"
     }
 }

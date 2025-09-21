@@ -6,9 +6,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use DateTimeImmutable;
-use DateTimeZone;
-use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
 
@@ -25,16 +22,16 @@ class LogRepository
     /** @var DbTools */
     private $dbTools;
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     public static $tableName = 'packetery_log';
 
     /**
      * @param DbTools $dbTools
-     * @param Packetery $module
+     * @param \Packetery $module
      */
-    public function __construct(DbTools $dbTools, Packetery $module)
+    public function __construct(DbTools $dbTools, \Packetery $module)
     {
         $this->dbTools = $dbTools;
         $this->module = $module;
@@ -42,6 +39,7 @@ class LogRepository
 
     /**
      * @param string $action
+     *
      * @return string
      */
     public function getTranslatedAction($action)
@@ -73,7 +71,9 @@ class LogRepository
      * @param array<string, mixed> $params
      * @param string $status
      * @param string|int|null $orderId
+     *
      * @return bool
+     *
      * @throws DatabaseException
      * @throws \DateMalformedStringException
      */
@@ -81,18 +81,20 @@ class LogRepository
     {
         return $this->insert(
             [
-                'order_id' => $orderId === 0 || $orderId === "0" ? null : $orderId,
+                'order_id' => $orderId === 0 || $orderId === '0' ? null : $orderId,
                 'params' => json_encode($params, JSON_UNESCAPED_UNICODE),
                 'status' => $status,
                 'action' => $action,
-                'date' => (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
+                'date' => (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
             ]
         );
     }
 
     /**
      * @param array $data
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function insert(array $data)
@@ -137,19 +139,21 @@ class LogRepository
 
     /**
      * @param int $logExpirationDays
+     *
      * @throws DatabaseException
      */
     public function purge($logExpirationDays)
     {
-        $this->dbTools->delete(self::$tableName, '`date` < DATE_SUB(NOW(), INTERVAL ' . (int)$logExpirationDays . ' DAY)');
+        $this->dbTools->delete(self::$tableName, '`date` < DATE_SUB(NOW(), INTERVAL ' . (int) $logExpirationDays . ' DAY)');
     }
 
     /**
      * @param int|string $orderId
+     *
      * @return bool
      */
     public function hasAnyByOrderId($orderId)
     {
-        return "1" === $this->dbTools->getValue('SELECT "1" FROM `' . $this->getPrefixedTableName() . '` WHERE order_id = ' . (int) $orderId . ';');
+        return '1' === $this->dbTools->getValue('SELECT "1" FROM `' . $this->getPrefixedTableName() . '` WHERE order_id = ' . (int) $orderId . ';');
     }
 }

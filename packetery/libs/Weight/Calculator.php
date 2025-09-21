@@ -12,12 +12,13 @@ class Calculator
 {
     /**
      * @param \OrderCore $order
+     *
      * @return float|null
      */
     public function getComputedOrDefaultWeight(\OrderCore $order)
     {
-        $packagingWeight = (float)ConfigHelper::get('PACKETERY_DEFAULT_PACKAGING_WEIGHT');
-        $defaultOrderWeight = (float)ConfigHelper::get('PACKETERY_DEFAULT_PACKAGE_WEIGHT');
+        $packagingWeight = (float) ConfigHelper::get('PACKETERY_DEFAULT_PACKAGING_WEIGHT');
+        $defaultOrderWeight = (float) ConfigHelper::get('PACKETERY_DEFAULT_PACKAGE_WEIGHT');
         $orderWeight = $this->convertUnits($order->getTotalWeight());
 
         if ($orderWeight === 0.0 && $defaultOrderWeight > 0) {
@@ -36,7 +37,9 @@ class Calculator
 
     /**
      * @param array $packeteryOrder
+     *
      * @return float|null
+     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -53,6 +56,7 @@ class Calculator
 
     /**
      * @param float $weight
+     *
      * @return float
      */
     private function convertUnits($weight)

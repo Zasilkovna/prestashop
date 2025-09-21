@@ -9,13 +9,12 @@ if (!defined('_PS_VERSION_')) {
 use Packetery;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Log\LogRepository;
-use Validate;
 
 class Options
 {
     const API_PASSWORD_LENGTH = 32;
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var SoapApi */
@@ -25,9 +24,9 @@ class Options
     private $logRepository;
 
     public function __construct(
-        Packetery $module,
+        \Packetery $module,
         SoapApi $soapApi,
-        LogRepository $logRepository
+        LogRepository $logRepository,
     ) {
         $this->module = $module;
         $this->soapApi = $soapApi;
@@ -37,8 +36,10 @@ class Options
     /**
      * @param string $id from POST
      * @param string $value from POST
+     *
      * @return false|string false on success, error message on failure
-     * @throws \Packetery\Exceptions\ApiClientException
+     *
+     * @throws Packetery\Exceptions\ApiClientException
      * @throws \ReflectionException
      */
     public function validate($id, $value)
@@ -51,7 +52,7 @@ class Options
 
                 return false;
             case 'PACKETERY_ESHOP_ID':
-                $configHelper = $this->module->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+                $configHelper = $this->module->diContainer->get(Packetery\Tools\ConfigHelper::class);
                 if (!$configHelper->getApiPass()) {
                     // Error for PACKETERY_APIPASS is enough.
                     return false;
@@ -91,26 +92,31 @@ class Options
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
+
                 return $this->module->getTranslator()->trans('Please insert default package price', [], 'Modules.Packetery.Options');
             case 'PACKETERY_DEFAULT_PACKAGE_WEIGHT':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
+
                 return $this->module->getTranslator()->trans('Please insert default package weight in kg', [], 'Modules.Packetery.Options');
             case 'PACKETERY_DEFAULT_PACKAGING_WEIGHT':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
+
                 return $this->module->getTranslator()->trans('Please insert default packaging weight in kg', [], 'Modules.Packetery.Options');
             case 'PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
+
                 return $this->module->getTranslator()->trans('Insert maximum number of orders that will be processed', [], 'Modules.Packetery.Options');
             case 'PACKETERY_PACKET_STATUS_TRACKING_MAX_ORDER_AGE_DAYS':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
+
                 return $this->module->getTranslator()->trans('Insert maximum order age in days', [], 'Modules.Packetery.Options');
             default:
                 return false;
@@ -120,6 +126,7 @@ class Options
     /**
      * @param string $option
      * @param string $value
+     *
      * @return string
      */
     public function formatOption($option, $value)
@@ -136,10 +143,11 @@ class Options
 
     /**
      * @param string $value
+     *
      * @return bool
      */
     public function isNonNegative($value)
     {
-        return (Validate::isUnsignedInt($value) || (Validate::isFloat($value) && $value >= 0));
+        return \Validate::isUnsignedInt($value) || (\Validate::isFloat($value) && $value >= 0);
     }
 }

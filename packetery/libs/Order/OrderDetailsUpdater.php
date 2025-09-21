@@ -11,7 +11,7 @@ use Packetery\Tools\Tools;
 
 class OrderDetailsUpdater
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /**
@@ -20,10 +20,10 @@ class OrderDetailsUpdater
     private $orderRepository;
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
      * @param OrderRepository $orderRepository
      */
-    public function __construct(Packetery $module, OrderRepository $orderRepository)
+    public function __construct(\Packetery $module, OrderRepository $orderRepository)
     {
         $this->module = $module;
         $this->orderRepository = $orderRepository;
@@ -31,9 +31,11 @@ class OrderDetailsUpdater
 
     /**
      * @param array $messages
-     * @param array|bool|null|object $packeteryOrder
+     * @param array|bool|object|null $packeteryOrder
      * @param int $orderId
-     * @return array|bool|null|object
+     *
+     * @return array|bool|object|null
+     *
      * @throws Packetery\Exceptions\DatabaseException
      */
     public function orderUpdate(&$messages, $packeteryOrder, $orderId)
@@ -47,7 +49,7 @@ class OrderDetailsUpdater
         }
 
         $fieldsToUpdate = [];
-        if (! $packeteryOrder['is_ad']) {
+        if (!$packeteryOrder['is_ad']) {
             $this->processPickupPointChange($fieldsToUpdate);
         } else {
             $countryDiffersMessage = $this->module->getTranslator()->trans('The selected delivery address is in a country other than the country of delivery of the order.', [], 'Modules.Packetery.Orderdetailsupdater');
@@ -84,7 +86,7 @@ class OrderDetailsUpdater
             }
         }
 
-        if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
+        if ((bool) $packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
             $messages[] = [
                 'text' => $this->module->getTranslator()->trans(
                     'No pickup point selected for the order. It will not be possible to export the order to Packeta.',
@@ -101,6 +103,7 @@ class OrderDetailsUpdater
     /**
      * @param array $messages
      * @param array $fieldsToUpdate
+     *
      * @return void
      */
     public function processDimensionsChange(&$messages, array &$fieldsToUpdate)
@@ -118,8 +121,8 @@ class OrderDetailsUpdater
             $rawValue = Tools::getValue($dimension);
 
             $value = null;
-            if ((string)(int)$rawValue === $rawValue) {
-                $value = (int)$rawValue;
+            if ((string) (int) $rawValue === $rawValue) {
+                $value = (int) $rawValue;
                 $isValid = $value > 0;
             } elseif ($rawValue === '') {
                 $isValid = true;
@@ -154,16 +157,16 @@ class OrderDetailsUpdater
         ]);
     }
 
-
     /**
      * @param array $fieldsToUpdate
+     *
      * @return void
      */
     public function processPickupPointChange(array &$fieldsToUpdate)
     {
         if (
-            !Tools::getIsset('pickup_point') ||
-            Tools::getValue('pickup_point') === ''
+            !Tools::getIsset('pickup_point')
+            || Tools::getValue('pickup_point') === ''
         ) {
             return;
         }
@@ -175,30 +178,31 @@ class OrderDetailsUpdater
         }
 
         $fieldsToUpdate = array_merge($fieldsToUpdate, [
-            'id_branch' => (int)$pickupPoint->id,
+            'id_branch' => (int) $pickupPoint->id,
             'name_branch' => $pickupPoint->name,
             'currency_branch' => $pickupPoint->currency,
         ]);
 
         if ($pickupPoint->pickupPointType === 'external') {
             $fieldsToUpdate['is_carrier'] = 1;
-            $fieldsToUpdate['id_branch'] = (int)$pickupPoint->carrierId;
+            $fieldsToUpdate['id_branch'] = (int) $pickupPoint->carrierId;
             $fieldsToUpdate['carrier_pickup_point'] = $pickupPoint->carrierPickupPointId;
         }
     }
 
     /**
-     * @param array  $messages
-     * @param array  $fieldsToUpdate
-     * @param array  $packeteryOrder
+     * @param array $messages
+     * @param array $fieldsToUpdate
+     * @param array $packeteryOrder
      * @param string $countryDiffersMessage
+     *
      * @return void
      */
     public function processAddressChange(array &$messages, array &$fieldsToUpdate, array $packeteryOrder, $countryDiffersMessage)
     {
         if (
-            !Tools::getIsset('address') ||
-            Tools::getValue('address') === ''
+            !Tools::getIsset('address')
+            || Tools::getValue('address') === ''
         ) {
             return;
         }
@@ -214,6 +218,7 @@ class OrderDetailsUpdater
                 'text' => $countryDiffersMessage,
                 'class' => 'danger',
             ];
+
             return;
         }
 

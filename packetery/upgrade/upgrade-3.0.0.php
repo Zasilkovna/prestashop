@@ -16,6 +16,7 @@ if (!defined('_PS_VERSION_')) {
 
 /**
  * @param Packetery $module
+ *
  * @return bool
  */
 function upgrade_module_3_0_0($module)
@@ -24,34 +25,34 @@ function upgrade_module_3_0_0($module)
     $installer->setModule($module);
     $uninstaller = $module->diContainer->get(Uninstaller::class);
     $result = (
-        $module->unregisterHook('actionOrderHistoryAddAfter') &&
-        $module->unregisterHook('displayBackOfficeHeader') &&
-        $module->registerHook('actionValidateOrder') &&
-        $module->registerHook('displayBeforeCarrier') &&
-        $module->registerHook('actionObjectCartUpdateBefore') &&
-        $module->registerHook('displayPacketeryOrderGridListAfter') &&
-        $module->registerHook('actionPacketeryOrderGridListingResultsModifier') &&
-        $module->registerHook('actionValidateStepComplete') &&
-        $module->registerHook('displayAdminProductsExtra') &&
-        $module->registerHook('actionProductUpdate') &&
-        $module->registerHook('actionProductDelete') &&
-        $module->registerHook('actionPacketeryCarrierGridListingResultsModifier') &&
-        ConfigHelper::update('PACKETERY_WIDGET_AUTOOPEN', 0) &&
-        ConfigHelper::update('PACKETERY_CRON_TOKEN', Tools::passwdGen(32)) &&
-        ConfigHelper::update('PACKETERY_ID_PREFERENCE', Packetery::ID_PREF_ID) &&
-        ConfigHelper::update('PACKETERY_CARRIER_LABEL_FORMAT', 'A6 on A4') &&
-        ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0) &&
-        ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_WEIGHT', 0) &&
-        ConfigHelper::update('PACKETERY_DEFAULT_PACKAGING_WEIGHT', 0) &&
-        ConfigHelper::update('PACKETERY_LAST_FEATURE_CHECK', (string)time()) &&
-        ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $module->version) &&
-        ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, '') &&
-        ConfigHelper::update(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION, 0) &&
-        Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE') &&
-        Configuration::deleteByName('PACKETERY_ORDERS_PER_PAGE') &&
-        Configuration::deleteByName('PACKETERY_ADDRESS_VALIDATION') &&
-        $uninstaller->deleteTab('Adminpacketery') &&
-        $installer->insertMenuItems()
+        $module->unregisterHook('actionOrderHistoryAddAfter')
+        && $module->unregisterHook('displayBackOfficeHeader')
+        && $module->registerHook('actionValidateOrder')
+        && $module->registerHook('displayBeforeCarrier')
+        && $module->registerHook('actionObjectCartUpdateBefore')
+        && $module->registerHook('displayPacketeryOrderGridListAfter')
+        && $module->registerHook('actionPacketeryOrderGridListingResultsModifier')
+        && $module->registerHook('actionValidateStepComplete')
+        && $module->registerHook('displayAdminProductsExtra')
+        && $module->registerHook('actionProductUpdate')
+        && $module->registerHook('actionProductDelete')
+        && $module->registerHook('actionPacketeryCarrierGridListingResultsModifier')
+        && ConfigHelper::update('PACKETERY_WIDGET_AUTOOPEN', 0)
+        && ConfigHelper::update('PACKETERY_CRON_TOKEN', Tools::passwdGen(32))
+        && ConfigHelper::update('PACKETERY_ID_PREFERENCE', Packetery::ID_PREF_ID)
+        && ConfigHelper::update('PACKETERY_CARRIER_LABEL_FORMAT', 'A6 on A4')
+        && ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0)
+        && ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_WEIGHT', 0)
+        && ConfigHelper::update('PACKETERY_DEFAULT_PACKAGING_WEIGHT', 0)
+        && ConfigHelper::update('PACKETERY_LAST_FEATURE_CHECK', (string) time())
+        && ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $module->version)
+        && ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, '')
+        && ConfigHelper::update(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION, 0)
+        && Configuration::deleteByName('PACKETERY_LAST_BRANCHES_UPDATE')
+        && Configuration::deleteByName('PACKETERY_ORDERS_PER_PAGE')
+        && Configuration::deleteByName('PACKETERY_ADDRESS_VALIDATION')
+        && $uninstaller->deleteTab('Adminpacketery')
+        && $installer->insertMenuItems()
     );
     if ($result === false) {
         return false;
@@ -105,7 +106,7 @@ function upgrade_module_3_0_0($module)
     $internalPickupPointCarriers = $carrierRepository->getInternalPickupPointCarriers();
     if ($internalPickupPointCarriers) {
         foreach ($internalPickupPointCarriers as $carrierData) {
-            $carrierAdminForm = new CarrierAdminForm((int)$carrierData['id_carrier'], $module);
+            $carrierAdminForm = new CarrierAdminForm((int) $carrierData['id_carrier'], $module);
             // Second parameter ensures that internal pickup points are not needed to exist in carriers table.
             $allowedVendorsJson = $carrierAdminForm->getDefaultAllowedVendors($carrierData, ['id' => $carrierData['id_branch']]);
             $carrierUpdates[] = sprintf(

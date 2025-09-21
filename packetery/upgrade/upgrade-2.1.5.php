@@ -7,7 +7,7 @@ if (!defined('_PS_VERSION_')) {
 /* @var $module Packetery */
 function upgrade_module_2_1_5($module)
 {
-    $dbTools = $module->diContainer->get(\Packetery\Tools\DbTools::class);
+    $dbTools = $module->diContainer->get(Packetery\Tools\DbTools::class);
     $result = $dbTools->execute('
         DELETE FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
         WHERE `id_branch` = 0;

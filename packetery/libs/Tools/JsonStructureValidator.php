@@ -19,6 +19,7 @@ class JsonStructureValidator
     /**
      * @param string $json
      * @param array $structure
+     *
      * @return bool
      */
     public function isValid($json, array $structure)
@@ -34,6 +35,7 @@ class JsonStructureValidator
     /**
      * @param array $decodedJson
      * @param array $structure
+     *
      * @return bool
      */
     public function isStructureValid(array $decodedJson, array $structure)
@@ -57,6 +59,7 @@ class JsonStructureValidator
     /**
      * @param mixed $value
      * @param string $type
+     *
      * @return bool
      */
     private function isValidType($value, $type)

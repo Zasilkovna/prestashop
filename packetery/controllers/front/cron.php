@@ -26,10 +26,11 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /**
      * @return void
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      * @throws SmartyException
      */
     public function display()
@@ -38,12 +39,14 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
         if ($this->validateToken() === false) {
             $this->renderError($this->module->getTranslator()->trans('Invalid packetery cron token.', [], 'Modules.Packetery.Packeterycronmodulefront'));
+
             return;
         }
 
         $task = Tools::getValue('task', null);
         if (!$task) {
             $this->renderError($this->module->getTranslator()->trans('Cron task to run was not specified.', [], 'Modules.Packetery.Packeterycronmodulefront'));
+
             return;
         }
 
@@ -109,7 +112,9 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /**
      * @param array $errors
+     *
      * @return void
+     *
      * @throws SmartyException
      */
     public function renderErrors(array $errors)
@@ -121,7 +126,9 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /**
      * @param string $message
+     *
      * @return void
+     *
      * @throws SmartyException
      */
     public function renderMessage($message)
@@ -137,7 +144,9 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /**
      * @param string $message
+     *
      * @return void
+     *
      * @throws SmartyException
      */
     public function renderError($message)

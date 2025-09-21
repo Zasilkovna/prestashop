@@ -14,8 +14,6 @@ use Packetery\Response\PacketInfo;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\Logger;
 use Packetery\Tools\MessageManager;
-use ReflectionException;
-use SoapClient;
 use SoapFault;
 
 class SoapApi
@@ -23,7 +21,7 @@ class SoapApi
     const WSDL_URL = 'http://www.zasilkovna.cz/api/soap-php-bugfix.wsdl';
 
     /**
-     * @var Packetery
+     * @var \Packetery
      */
     private $module;
     /**
@@ -32,10 +30,10 @@ class SoapApi
     private $configHelper;
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
      * @param ConfigHelper $configHelper
      */
-    public function __construct(Packetery $module, ConfigHelper $configHelper)
+    public function __construct(\Packetery $module, ConfigHelper $configHelper)
     {
         $this->module = $module;
         $this->configHelper = $configHelper;
@@ -43,49 +41,55 @@ class SoapApi
 
     /**
      * @param string $senderIndication
-     * @return array with 2 return routing strings for a sender specified by $senderIndication.
+     *
+     * @return array with 2 return routing strings for a sender specified by $senderIndication
+     *
      * @throws SenderGetReturnRoutingException
      */
     public function senderGetReturnRouting($senderIndication)
     {
-        $client = new SoapClient(self::WSDL_URL);
+        $client = new \SoapClient(self::WSDL_URL);
         try {
             $response = $client->senderGetReturnRouting($this->configHelper->getApiPass(), $senderIndication);
+
             return $response->routingSegment;
-        } catch (SoapFault $e) {
+        } catch (\SoapFault $e) {
             throw new SenderGetReturnRoutingException($e->getMessage(), isset($e->detail->SenderNotExists));
         }
     }
 
     /**
      * @param string $packetId
+     *
      * @return PacketInfo
      */
     public function getPacketInfo($packetId)
     {
         $packetInfo = new PacketInfo();
         try {
-            $client = new SoapClient(self::WSDL_URL);
+            $client = new \SoapClient(self::WSDL_URL);
             // get PacketInfoResult
             $response = $client->packetInfo($this->configHelper->getApiPass(), $packetId);
             if (
-                !empty($response->courierInfo) &&
-                isset($response->courierInfo->courierInfoItem, $response->courierInfo->courierInfoItem->courierTrackingUrls)
+                !empty($response->courierInfo)
+                && isset($response->courierInfo->courierInfoItem, $response->courierInfo->courierInfoItem->courierTrackingUrls)
             ) {
                 $packetInfo->setNumber($response->courierInfo->courierInfoItem->courierNumbers->courierNumber);
                 $packetInfo->setTrackingLink($this->getTrackingUrlInProperLanguage(
                     $response->courierInfo->courierInfoItem->courierTrackingUrls->courierTrackingUrl
                 ));
             }
-        } catch (SoapFault $exception) {
+        } catch (\SoapFault $exception) {
             $packetInfo->setFault($this->getFaultIdentifier($exception));
             $packetInfo->setFaultString($exception->faultstring);
         }
+
         return $packetInfo;
     }
 
     /**
      * @param object|array $courierTrackingUrl
+     *
      * @return string|null
      */
     public function getTrackingUrlInProperLanguage($courierTrackingUrl)
@@ -111,8 +115,10 @@ class SoapApi
             if ($urlEn) {
                 return $urlEn;
             }
+
             return $courierTrackingUrl[0]->url;
         }
+
         return null;
     }
 
@@ -120,16 +126,17 @@ class SoapApi
      * Requests carrier number for a packet.
      *
      * @param string $packetId
+     *
      * @return PacketCarrierNumber
      */
     public function packetCarrierNumber($packetId)
     {
         $response = new PacketCarrierNumber();
         try {
-            $soapClient = new SoapClient(self::WSDL_URL);
+            $soapClient = new \SoapClient(self::WSDL_URL);
             $number = $soapClient->packetCourierNumber($this->configHelper->getApiPass(), $packetId);
             $response->setNumber($number);
-        } catch (SoapFault $exception) {
+        } catch (\SoapFault $exception) {
             $response->setFault($this->getFaultIdentifier($exception));
             $response->setFaultString($exception->faultstring);
         }
@@ -139,9 +146,11 @@ class SoapApi
 
     /**
      * @param array $packets
+     *
      * @return array
+     *
      * @throws Packetery\Exceptions\DatabaseException
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function getPacketIdsWithCarrierNumbers($packets)
     {
@@ -159,6 +168,7 @@ class SoapApi
                 if ($response->hasFault()) {
                     if ($response->hasWrongPassword()) {
                         $messageManager->setMessage('warning', $this->module->getTranslator()->trans('Used API password is not valid.', [], 'Modules.Packetery.Soapapi'));
+
                         return $result;
                     }
                     $logger->logToFile(sprintf('Error while retrieving carrier number for order %s: %s', $packetId, $response->getFaultString()));
@@ -180,10 +190,11 @@ class SoapApi
     /**
      * Gets fault identifier from SoapFault exception.
      *
-     * @param SoapFault $exception
+     * @param \SoapFault $exception
+     *
      * @return int|string
      */
-    private function getFaultIdentifier(SoapFault $exception)
+    private function getFaultIdentifier(\SoapFault $exception)
     {
         if (isset($exception->detail)) {
             return array_keys(get_object_vars($exception->detail))[0];
@@ -194,16 +205,18 @@ class SoapApi
 
     /**
      * @param string $packetId
+     *
      * @return array|string
      */
     public function getPacketTracking($packetId)
     {
-        $client = new SoapClient(self::WSDL_URL);
+        $client = new \SoapClient(self::WSDL_URL);
         try {
             $response = $client->packetTracking($this->configHelper->getApiPass(), $packetId);
-        } catch (SoapFault $exception) {
+        } catch (\SoapFault $exception) {
             return $exception->faultstring;
         }
+
         return $response;
     }
 }

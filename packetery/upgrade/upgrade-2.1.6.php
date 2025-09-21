@@ -8,6 +8,7 @@ if (!defined('_PS_VERSION_')) {
 
 /**
  * @param Packetery $module
+ *
  * @return bool
  */
 function upgrade_module_2_1_6($module)
@@ -16,7 +17,7 @@ function upgrade_module_2_1_6($module)
     if (Tools::version_compare(_PS_VERSION_, '1.7.7', '<')) {
         $hookName = 'displayAdminOrderLeft';
     }
-    $result =  $module->registerHook([
+    $result = $module->registerHook([
         $hookName,
         'actionAdminControllerSetMedia',
         'displayOrderConfirmation',
@@ -28,7 +29,7 @@ function upgrade_module_2_1_6($module)
         return false;
     }
 
-    $dbTools = $module->diContainer->get(\Packetery\Tools\DbTools::class);
+    $dbTools = $module->diContainer->get(Packetery\Tools\DbTools::class);
     $result = $dbTools->execute('
         ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
         CHANGE `id_branch` `id_branch` int(11) NULL,

@@ -39,7 +39,7 @@ class ActionObjectOrderUpdateBefore
         OrderRepository $orderRepository,
         OrderSaver $orderSaver,
         CarrierTools $carrierTools,
-        CarrierRepository $carrierRepository
+        CarrierRepository $carrierRepository,
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderSaver = $orderSaver;
@@ -52,20 +52,20 @@ class ActionObjectOrderUpdateBefore
         if (!isset($params['object'], $params['object']->id, $params['object']->id_carrier)) {
             return;
         }
-        $orderId = (int)$params['object']->id;
-        $idCarrier = (int)$params['object']->id_carrier;
+        $orderId = (int) $params['object']->id;
+        $idCarrier = (int) $params['object']->id_carrier;
         $orderOldVersion = new Order($orderId);
 
         $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById($idCarrier);
         $packeteryOrderData = $this->orderRepository->getById($orderId);
         if (!$packeteryOrderData) {
-            if ($packeteryCarrier && $idCarrier !== (int)$orderOldVersion->id_carrier) {
+            if ($packeteryCarrier && $idCarrier !== (int) $orderOldVersion->id_carrier) {
                 $this->orderSaver->save($params['object'], $packeteryCarrier);
             }
 
             return;
         }
-        if ((int)$packeteryOrderData['id_carrier'] !== $idCarrier) {
+        if ((int) $packeteryOrderData['id_carrier'] !== $idCarrier) {
             if ($packeteryCarrier) {
                 $this->orderSaver->save($params['object'], $packeteryCarrier, true);
             } else {
@@ -75,8 +75,8 @@ class ActionObjectOrderUpdateBefore
             return;
         }
 
-        $addressId = (int)$params['object']->id_address_delivery;
-        $oldAddressId = (int)$orderOldVersion->id_address_delivery;
+        $addressId = (int) $params['object']->id_address_delivery;
+        $oldAddressId = (int) $orderOldVersion->id_address_delivery;
         if ($oldAddressId === $addressId) {
             return;
         }

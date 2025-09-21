@@ -21,6 +21,7 @@ class CarrierVendors
 
     /**
      * @param array $countries
+     *
      * @return array
      */
     public function getVendorsByCountries(array $countries)
@@ -104,6 +105,7 @@ class CarrierVendors
     /**
      * @param array $packeteryCarrier
      * @param string $customerCountry
+     *
      * @return array
      */
     public function getWidgetParameter(array $packeteryCarrier, $customerCountry)

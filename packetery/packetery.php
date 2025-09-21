@@ -48,7 +48,7 @@ class Packetery extends CarrierModule
 
     protected $config_form = false;
 
-    /** @var \Packetery\DI\Container */
+    /** @var Packetery\DI\Container */
     public $diContainer;
 
     public function __construct()
@@ -60,7 +60,7 @@ class Packetery extends CarrierModule
         $this->need_instance = 0;
         $this->is_configurable = 1;
 
-        $this->diContainer = \Packetery\DI\ContainerFactory::create();
+        $this->diContainer = Packetery\DI\ContainerFactory::create();
 
         if (Module::isInstalled($this->name)) {
             $errors = [];
@@ -70,7 +70,7 @@ class Packetery extends CarrierModule
             }
         }
 
-        /**
+        /*
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
          */
         $this->bootstrap = true;
@@ -85,7 +85,7 @@ class Packetery extends CarrierModule
         $this->displayName = $this->trans('Packeta', [], 'Modules.Packetery.Packetery');
         $this->description = $this->trans('Packeta pick-up points, orders export, and print shipping labels', [], 'Modules.Packetery.Packetery');
 
-        $this->ps_versions_compliancy = array('min' => '1.7.6.0', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = ['min' => '1.7.6.0', 'max' => _PS_VERSION_];
     }
 
     public function isUsingNewTranslationSystem()
@@ -103,6 +103,7 @@ class Packetery extends CarrierModule
     {
         if (extension_loaded('curl') === false) {
             $this->_errors[] = $this->trans('You have to enable the cURL extension on your server to install this module', [], 'Modules.Packetery.Packetery');
+
             return false;
         }
 
@@ -110,7 +111,8 @@ class Packetery extends CarrierModule
             return false;
         }
 
-        $installer = $this->diContainer->get(\Packetery\Module\Installer::class);
+        $installer = $this->diContainer->get(Packetery\Module\Installer::class);
+
         // instance including id is needed to register hooks
         return $installer->run($this);
     }
@@ -120,7 +122,7 @@ class Packetery extends CarrierModule
      */
     public function uninstall()
     {
-        $uninstaller = $this->diContainer->get(\Packetery\Module\Uninstaller::class);
+        $uninstaller = $this->diContainer->get(Packetery\Module\Uninstaller::class);
         if ($uninstaller->run() === false) {
             return false;
         }
@@ -138,14 +140,15 @@ class Packetery extends CarrierModule
 
     /**
      * @param array $params hook parameters
+     *
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookActionCarrierUpdate(array $params)
     {
         if ($params['id_carrier'] != $params['carrier']->id) {
-            $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-            $carrierRepository->swapId((int)$params['id_carrier'], (int)$params['carrier']->id);
+            $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
+            $carrierRepository->swapId((int) $params['id_carrier'], (int) $params['carrier']->id);
         }
     }
 
@@ -164,15 +167,16 @@ class Packetery extends CarrierModule
         if ($have_url_fopen) {
             return 'fopen';
         }
+
         return false;
     }
 
     public function configurationErrors(&$error = null)
     {
-        $error = array();
+        $error = [];
         $have_error = false;
 
-        $fn = _PS_MODULE_DIR_ . "packetery/views/js/write-test.js";
+        $fn = _PS_MODULE_DIR_ . 'packetery/views/js/write-test.js';
         @touch($fn);
         if (!is_writable($fn)) {
             $error[] = $this->trans(
@@ -185,15 +189,14 @@ class Packetery extends CarrierModule
 
         if (!self::transportMethod()) {
             $error[] = $this->trans(
-                'No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.'
-                [],
+                'No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.'[],
                 'Modules.Packetery.Packetery'
             );
             $have_error = true;
         }
 
-        /** @var \Packetery\Tools\ConfigHelper $configHelper */
-        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+        /** @var Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
         $apiPass = $configHelper->getApiPass();
 
         if (empty($apiPass)) {
@@ -206,6 +209,7 @@ class Packetery extends CarrierModule
 
     /**
      * @return false|string
+     *
      * @throws ReflectionException
      * @throws SmartyException
      */
@@ -213,10 +217,10 @@ class Packetery extends CarrierModule
     {
         $this->context->smarty->assign('module_dir', $this->_path);
 
-        $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
-        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+        $apiCarrierRepository = $this->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
+        $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
         if (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') {
-            $downloader = $this->diContainer->get(\Packetery\ApiCarrier\Downloader::class);
+            $downloader = $this->diContainer->get(Packetery\ApiCarrier\Downloader::class);
             Tools::redirectAdmin($this->getAdminLink('PacketeryCarrierGrid', ['messages' => [$downloader->run()]]));
         }
         if (Tools::getIsset('messages')) {
@@ -227,8 +231,8 @@ class Packetery extends CarrierModule
             Tools::redirectAdmin($this->getAdminLink('PacketeryCarrierGrid', ['action' => 'updateCarriers']));
         }
 
-        $lastCarriersUpdate = \Packetery\Tools\ConfigHelper::get('PACKETERY_LAST_CARRIERS_UPDATE');
-        if ((bool)$lastCarriersUpdate !== false) {
+        $lastCarriersUpdate = Packetery\Tools\ConfigHelper::get('PACKETERY_LAST_CARRIERS_UPDATE');
+        if ((bool) $lastCarriersUpdate !== false) {
             $date = new DateTimeImmutable();
             $date->setTimestamp($lastCarriersUpdate);
             $lastCarriersUpdate = $date->format('d.m.Y H:i:s');
@@ -251,10 +255,11 @@ class Packetery extends CarrierModule
      * Load the configuration form
      *
      * @return string
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function getContent()
     {
@@ -264,41 +269,41 @@ class Packetery extends CarrierModule
             $output .= $this->displayError($this->trans('Soap is disabled. You have to enable Soap on your server', [], 'Modules.Packetery.Packetery'));
         }
 
-        $versionChecker = $this->diContainer->get(\Packetery\Module\VersionChecker::class);
+        $versionChecker = $this->diContainer->get(Packetery\Module\VersionChecker::class);
         if ($versionChecker->isNewVersionAvailable()) {
             $output .= $this->displayWarning($versionChecker->getVersionUpdateMessageHtml());
         }
 
-        if (\Packetery\Weight\Converter::isKgConversionSupported() === false) {
+        if (Packetery\Weight\Converter::isKgConversionSupported() === false) {
             $output .= $this->displayInformation(sprintf(
                 $this->trans('The default weight unit for your store is: %s. When exporting packets, the module will not state its weight for the packet. If you want to export the weight of the packet, you need to set the default unit to one of: %s.', [], 'Modules.Packetery.Packetery'),
                 Configuration::get('PS_WEIGHT_UNIT'),
-                implode(', ', array_keys(\Packetery\Weight\Converter::$mapping))
+                implode(', ', array_keys(Packetery\Weight\Converter::$mapping))
             ));
         }
 
         $error = false;
         $isSubmit = false;
-        /** @var \Packetery\Order\OrderStatusChangeFormService $orderStatusChangeFormService */
-        $orderStatusChangeFormService = $this->diContainer->get(\Packetery\Order\OrderStatusChangeFormService::class);
+        /** @var Packetery\Order\OrderStatusChangeFormService $orderStatusChangeFormService */
+        $orderStatusChangeFormService = $this->diContainer->get(Packetery\Order\OrderStatusChangeFormService::class);
         try {
             if (Tools::isSubmit($orderStatusChangeFormService->getSubmitActionKey())) {
                 $isSubmit = true;
                 $orderStatusChangeFormService->handleSubmit();
             }
-        } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
+        } catch (Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
             $output .= $this->displayError($formDataPersistException->getMessage());
             $error = true;
         }
 
-        /** @var \Packetery\PacketTracking\PacketStatusTrackingFormService $packetStatusTrackingFormService */
-        $packetStatusTrackingFormService = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
+        /** @var Packetery\PacketTracking\PacketStatusTrackingFormService $packetStatusTrackingFormService */
+        $packetStatusTrackingFormService = $this->diContainer->get(Packetery\PacketTracking\PacketStatusTrackingFormService::class);
         try {
             if (Tools::isSubmit($packetStatusTrackingFormService->getSubmitActionKey())) {
                 $isSubmit = true;
                 $packetStatusTrackingFormService->handleSubmit();
             }
-        } catch (\Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
+        } catch (Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
             $output .= $this->displayError($formDataPersistException->getMessage());
             $error = true;
         }
@@ -306,20 +311,20 @@ class Packetery extends CarrierModule
         if (Tools::isSubmit('submit' . $this->name)) {
             $isSubmit = true;
             $confOptions = $this->getConfigurationOptions();
-            /** @var \Packetery\Module\Options $packeteryOptions */
-            $packeteryOptions = $this->diContainer->get(\Packetery\Module\Options::class);
+            /** @var Packetery\Module\Options $packeteryOptions */
+            $packeteryOptions = $this->diContainer->get(Packetery\Module\Options::class);
             foreach ($confOptions as $option => $optionConf) {
-                $value = (string)Tools::getValue($option);
+                $value = (string) Tools::getValue($option);
                 $configValue = $packeteryOptions->formatOption($option, $value);
                 $errorMessage = $packeteryOptions->validate($option, $configValue);
                 if ($errorMessage !== false) {
                     $output .= $this->displayError($errorMessage);
                     $error = true;
                 } else {
-                    \Packetery\Tools\ConfigHelper::update($option, $configValue);
+                    Packetery\Tools\ConfigHelper::update($option, $configValue);
                 }
             }
-            $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
+            $paymentRepository = $this->diContainer->get(Packetery\Payment\PaymentRepository::class);
             $paymentList = $paymentRepository->getListPayments();
             if ($paymentList) {
                 foreach ($paymentList as $payment) {
@@ -345,9 +350,10 @@ class Packetery extends CarrierModule
      * Builds the configuration form
      *
      * @return string HTML code
+     *
      * @throws PrestaShopException
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function displayForm()
     {
@@ -379,7 +385,7 @@ class Packetery extends CarrierModule
             $formInputs[] = $inputData;
         }
 
-        $paymentRepository = $this->diContainer->get(\Packetery\Payment\PaymentRepository::class);
+        $paymentRepository = $this->diContainer->get(Packetery\Payment\PaymentRepository::class);
         $paymentList = $paymentRepository->getListPayments();
         $codOptions = [];
         if ($paymentList) {
@@ -421,23 +427,23 @@ class Packetery extends CarrierModule
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->currentIndex = AdminController::$currentIndex . '&' . http_build_query(['configure' => $this->name]);
         $helper->submit_action = 'submit' . $this->name;
-        $helper->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
+        $helper->default_form_language = (int) Configuration::get('PS_LANG_DEFAULT');
 
         $confOptions = $this->getConfigurationOptions();
-        $packeterySettings = \Packetery\Tools\ConfigHelper::getMultiple(array_keys($confOptions));
+        $packeterySettings = Packetery\Tools\ConfigHelper::getMultiple(array_keys($confOptions));
         foreach ($confOptions as $option => $optionConf) {
             $helper->fields_value[$option] = Tools::getValue($option, $packeterySettings[$option]);
         }
         if ($paymentList) {
             foreach ($paymentList as $payment) {
-                if ((bool)$payment['is_cod'] === true) {
+                if ((bool) $payment['is_cod'] === true) {
                     $helper->fields_value['payment_cod_' . $payment['module_name']] = $payment['module_name'];
                 }
             }
         }
 
-        $packetStatusTrackingFormService = $this->diContainer->get(\Packetery\PacketTracking\PacketStatusTrackingFormService::class);
-        $orderStatusChangeFormService = $this->diContainer->get(\Packetery\Order\OrderStatusChangeFormService::class);
+        $packetStatusTrackingFormService = $this->diContainer->get(Packetery\PacketTracking\PacketStatusTrackingFormService::class);
+        $orderStatusChangeFormService = $this->diContainer->get(Packetery\Order\OrderStatusChangeFormService::class);
 
         return $helper->generateForm([$form]) .
             $packetStatusTrackingFormService->generateForm(
@@ -457,15 +463,16 @@ class Packetery extends CarrierModule
 
     /**
      * @return false|string
+     *
      * @throws SmartyException
      */
     private function generateCronInfoBlock()
     {
-        $token = \Packetery\Tools\ConfigHelper::get('PACKETERY_CRON_TOKEN');
+        $token = Packetery\Tools\ConfigHelper::get('PACKETERY_CRON_TOKEN');
         $link = new Link();
 
-        $numberOfDays = \Packetery\Cron\Tasks\DeleteLabels::DEFAULT_NUMBER_OF_DAYS;
-        $numberOfFiles = \Packetery\Cron\Tasks\DeleteLabels::DEFAULT_NUMBER_OF_FILES;
+        $numberOfDays = Packetery\Cron\Tasks\DeleteLabels::DEFAULT_NUMBER_OF_DAYS;
+        $numberOfFiles = Packetery\Cron\Tasks\DeleteLabels::DEFAULT_NUMBER_OF_FILES;
 
         $deleteLabelsUrl = $link->getModuleLink(
             $this->name,
@@ -478,7 +485,7 @@ class Packetery extends CarrierModule
             ]
         );
 
-        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+        $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
         if ($configHelper->getApiKey()) {
             $updateCarriersUrl = $link->getModuleLink(
                 $this->name,
@@ -556,7 +563,7 @@ class Packetery extends CarrierModule
                 'required' => false,
                 'desc' => $this->trans('Enter the default value for the shipment if the order price is zero', [], 'Modules.Packetery.Packetery'),
             ],
-            \Packetery\Tools\ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION => [
+            Packetery\Tools\ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION => [
                 'title' => $this->trans('Currency conversion', [], 'Modules.Packetery.Packetery'),
                 'options' => [
                     1 => $this->trans('Enable currency conversion according to the exchange rate in PrestaShop', [], 'Modules.Packetery.Packetery'),
@@ -618,6 +625,7 @@ class Packetery extends CarrierModule
 
     /**
      * @param string $valueKey carrier label property to get
+     *
      * @return array
      */
     public function getCarrierLabelFormats($valueKey)
@@ -651,10 +659,12 @@ class Packetery extends CarrierModule
      * Display widget selection button and chosen branch info for every carrier
      *
      * @param array $params
+     *
      * @return string|void
+     *
      * @throws ReflectionException
      * @throws SmartyException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookDisplayCarrierExtraContent(array $params)
     {
@@ -676,37 +686,37 @@ class Packetery extends CarrierModule
             }
         }
 
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$id_carrier);
+        $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int) $id_carrier);
         if (!$packeteryCarrier) {
             return;
         }
 
-        $deliveryAddressCountryIso = \Packetery\Address\AddressTools::getCountryFromCart($cart);
+        $deliveryAddressCountryIso = Packetery\Address\AddressTools::getCountryFromCart($cart);
 
-        /** @var \Packetery\Carrier\CarrierVendors $carrierRepository */
-        $carrierVendors = $this->diContainer->get(\Packetery\Carrier\CarrierVendors::class);
+        /** @var Packetery\Carrier\CarrierVendors $carrierRepository */
+        $carrierVendors = $this->diContainer->get(Packetery\Carrier\CarrierVendors::class);
         $widgetVendors = $carrierVendors->getWidgetParameter($packeteryCarrier, $deliveryAddressCountryIso);
         $this->context->smarty->assign('widget_vendors', $widgetVendors);
 
         $orderData = null;
         if (!empty($cart) && ($packeteryCarrier['pickup_point_type'] !== null || $packeteryCarrier['address_validation'] !== 'none')) {
-            $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-            $orderData = $orderRepository->getByCartAndCarrier((int)$cart->id, (int)$id_carrier);
+            $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
+            $orderData = $orderRepository->getByCartAndCarrier((int) $cart->id, (int) $id_carrier);
         }
 
         $isAddressDelivery = $packeteryCarrier['pickup_point_type'] === null;
         if ($isAddressDelivery) {
             if (
-                $packeteryCarrier['address_validation'] === 'none' ||
-                !in_array(strtoupper($deliveryAddressCountryIso), \Packetery\Carrier\CarrierRepository::ADDRESS_VALIDATION_COUNTRIES)
+                $packeteryCarrier['address_validation'] === 'none'
+                || !in_array(strtoupper($deliveryAddressCountryIso), Packetery\Carrier\CarrierRepository::ADDRESS_VALIDATION_COUNTRIES)
             ) {
                 return;
             }
 
             $template = 'views/templates/front/widgetHd.tpl';
             $addressValidated = false;
-            if ($orderData && \Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
+            if ($orderData && Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
                 $addressValidated = true;
                 $this->context->smarty->assign('customerStreet', $orderData['street']);
                 $this->context->smarty->assign('customerHouseNumber', $orderData['house_number']);
@@ -734,7 +744,7 @@ class Packetery extends CarrierModule
                 $name_branch = $orderData['name_branch'];
                 $currency_branch = $orderData['currency_branch'];
                 $carrierPickupPointId = $orderData['carrier_pickup_point'];
-                if ((bool)$orderData['is_carrier'] === true) {
+                if ((bool) $orderData['is_carrier'] === true) {
                     $id_branch = $orderData['carrier_pickup_point']; // to be consistent with widget behavior
                     $pickupPointType = 'external';
                     $carrierId = $orderData['id_branch'];
@@ -751,14 +761,15 @@ class Packetery extends CarrierModule
 
             $base_uri = __PS_BASE_URI__ === '/' ? '' : Tools::substr(__PS_BASE_URI__, 0, Tools::strlen(__PS_BASE_URI__) - 1);
             $this->context->smarty->assign('baseuri', $base_uri);
-            /** @var \Packetery\Tools\ConfigHelper $configHelper */
-            $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+            /** @var Packetery\Tools\ConfigHelper $configHelper */
+            $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
             $this->context->smarty->assign('packeta_api_key', $configHelper->getApiKey());
         }
         if (isset($params['packetery']['template'])) {
             $template = $params['packetery']['template'];
         }
         $this->context->smarty->assign('localPath', $this->local_path);
+
         return $this->context->smarty->fetch($this->local_path . $template);
     }
 
@@ -767,22 +778,24 @@ class Packetery extends CarrierModule
      * Compatibility: PS 1.6, PS 1.7
      *
      * @param array $params
+     *
      * @return false|string
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
      * @throws SmartyException
-     * @throws \Packetery\Exceptions\DatabaseException
-     * @throws \PrestaShop\PrestaShop\Adapter\CoreException
+     * @throws Packetery\Exceptions\DatabaseException
+     * @throws PrestaShop\PrestaShop\Adapter\CoreException
      */
     public function hookDisplayBeforeCarrier(array $params)
     {
-        /** @var \CartCore $cart */
+        /** @var CartCore $cart */
         $cart = $params['cart'];
 
-        $customerCountry = \Packetery\Address\AddressTools::getCountryFromCart($cart);
+        $customerCountry = Packetery\Address\AddressTools::getCountryFromCart($cart);
 
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
         $deliveryPointCarriers = $carrierRepository->getPickupPointCarriers();
         $deliveryPointCarrierIds = array_column($deliveryPointCarriers, 'id_carrier');
 
@@ -797,7 +810,7 @@ class Packetery extends CarrierModule
         $isOpcEnabled = (bool) Configuration::get('PS_ORDER_PROCESS_TYPE');
 
         $products = $cart->getProducts();
-        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        $productAttributeRepository = $this->diContainer->get(Packetery\Product\ProductAttributeRepository::class);
 
         $isAgeVerificationRequired = false;
         foreach ($products as $product) {
@@ -808,8 +821,8 @@ class Packetery extends CarrierModule
             }
         }
 
-        /** @var \Packetery\Tools\ConfigHelper $configHelper */
-        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+        /** @var Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
         $this->context->smarty->assign('packetaModuleConfig', [
             'baseUri' => $baseUri,
             'apiKey' => $configHelper->getApiKey(),
@@ -828,9 +841,9 @@ class Packetery extends CarrierModule
              *   Option 'toggleExtraContentOnShippingChange' is a workaround for this issue.
              * PS 1.6 5-steps checkout doesn't do that
              */
-            'toggleExtraContentOnShippingChange' => ! ($isPS16 && $isOpcEnabled),
+            'toggleExtraContentOnShippingChange' => !($isPS16 && $isOpcEnabled),
 
-            'widgetAutoOpen' => (bool)\Packetery\Tools\ConfigHelper::get('PACKETERY_WIDGET_AUTOOPEN'),
+            'widgetAutoOpen' => (bool) Packetery\Tools\ConfigHelper::get('PACKETERY_WIDGET_AUTOOPEN'),
             'toggleExtraContent' => false, // TODO: make configurable?
 
             'addressValidationLevels' => $carrierRepository->getAddressValidationLevels(),
@@ -869,7 +882,7 @@ class Packetery extends CarrierModule
             $jsListFinal = $jsList;
         }
 
-        $controllerWrapper = $this->diContainer->get(\Packetery\Tools\ControllerWrapper::class);
+        $controllerWrapper = $this->diContainer->get(Packetery\Tools\ControllerWrapper::class);
         foreach ($jsListFinal as $file) {
             $uri = $this->_path . 'views/js/' . $file;
             $controllerWrapper->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => $jsServer]);
@@ -885,7 +898,7 @@ class Packetery extends CarrierModule
         $controllerWrapper->registerStylesheet('packetery-front', $cssPath, ['server' => $cssServer, 'media' => 'all']);
     }
 
-    /*ORDERS*/
+    /* ORDERS */
     /**
      * Save packetery order after order is created. Called both in FE and admin, once. Not called during order update.
      *
@@ -903,44 +916,47 @@ class Packetery extends CarrierModule
                 null,
                 true
             );
+
             return;
         }
 
-        $orderSaver = $this->diContainer->get(\Packetery\Order\OrderSaver::class);
+        $orderSaver = $this->diContainer->get(Packetery\Order\OrderSaver::class);
         $orderSaver->saveNewOrder($params['cart'], $params['order']);
     }
-    /*END ORDERS*/
+    /* END ORDERS */
 
     /**
      * @param array $params parameters provided by PrestaShop
+     *
      * @return false|string|void
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function packeteryHookDisplayAdminOrder($params)
     {
         $messages = [];
-        $orderId = (int)$params['id_order'];
+        $orderId = (int) $params['id_order'];
         $this->context->smarty->assign('orderId', $orderId);
         $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
         $this->processPostParcel($messages);
 
-        /** @var \Packetery\Tools\ConfigHelper $configHelper */
-        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+        /** @var Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
         $apiKey = $configHelper->getApiKey();
 
-        /** @var \Packetery\Order\OrderRepository $orderRepository */
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        /** @var Packetery\Order\OrderRepository $orderRepository */
+        $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
         $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
         if (!$apiKey || !$packeteryOrder) {
             return;
         }
 
-        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$packeteryOrder['id_carrier']);
+        /** @var Packetery\Carrier\CarrierRepository $carrierRepository */
+        $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int) $packeteryOrder['id_carrier']);
         $showActionButtonsDivider = false;
         if (!$packeteryCarrier) {
             return;
@@ -948,11 +964,11 @@ class Packetery extends CarrierModule
 
         $this->context->smarty->assign('submitButton', 'order_update');
 
-        /** @var \Packetery\Order\OrderDetailsUpdater $orderDetailsUpdater */
-        $orderDetailsUpdater = $this->diContainer->get(\Packetery\Order\OrderDetailsUpdater::class);
+        /** @var Packetery\Order\OrderDetailsUpdater $orderDetailsUpdater */
+        $orderDetailsUpdater = $this->diContainer->get(Packetery\Order\OrderDetailsUpdater::class);
         $packeteryOrder = $orderDetailsUpdater->orderUpdate($messages, $packeteryOrder, $orderId);
 
-        $isAddressDelivery = (bool)$packeteryOrder['is_ad'];
+        $isAddressDelivery = (bool) $packeteryOrder['is_ad'];
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
         $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $packeteryOrder['name_branch']);
         $pickupPointChangeAllowed = false;
@@ -982,7 +998,7 @@ class Packetery extends CarrierModule
                     'latitude' => '',
                     'longitude' => '',
                 ];
-                if (\Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
+                if (Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
                     $validatedAddress = [
                         'street' => $packeteryOrder['street'],
                         'houseNumber' => $packeteryOrder['house_number'],
@@ -1005,13 +1021,13 @@ class Packetery extends CarrierModule
                 $this->prepareAddressChange($apiKey, $packeteryOrder);
             }
             $this->context->smarty->assign('isAddressValidated', $isAddressValidated);
-        } elseif ((int)$packeteryOrder['id_carrier'] !== 0) {
+        } elseif ((int) $packeteryOrder['id_carrier'] !== 0) {
             $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
             $pickupPointChangeAllowed = true;
         }
 
-        /** @var \Packetery\Weight\Calculator $weightCalculator */
-        $weightCalculator = $this->diContainer->get(\Packetery\Weight\Calculator::class);
+        /** @var Packetery\Weight\Calculator $weightCalculator */
+        $weightCalculator = $this->diContainer->get(Packetery\Weight\Calculator::class);
         $orderWeight = $weightCalculator->getFinalWeight($packeteryOrder);
 
         if ($isExported === false && $orderWeight !== null && $orderWeight > 0) {
@@ -1023,12 +1039,12 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
         $this->context->smarty->assign('showActionButtonsDivider', $showActionButtonsDivider);
 
-        if ($this->diContainer->get(\Packetery\Log\LogRepository::class)->hasAnyByOrderId($orderId)) {
+        if ($this->diContainer->get(Packetery\Log\LogRepository::class)->hasAnyByOrderId($orderId)) {
             $this->context->smarty->assign('logLink', $this->getAdminLink('PacketeryLogGrid', ['id_order' => $orderId]));
         }
 
-        /** @var \Packetery\Order\OrderDetailView $orderDetailView */
-        $orderDetailView = $this->diContainer->get(\Packetery\Order\OrderDetailView::class);
+        /** @var Packetery\Order\OrderDetailView $orderDetailView */
+        $orderDetailView = $this->diContainer->get(Packetery\Order\OrderDetailView::class);
         $orderDetailView->addPacketStatus($this->context->smarty, $packeteryOrder);
 
         return $this->display(__FILE__, 'displayOrderMain.tpl');
@@ -1037,17 +1053,18 @@ class Packetery extends CarrierModule
     /**
      * @param string $apiKey
      * @param array $packeteryOrder
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
     private function prepareAddressChange($apiKey, array $packeteryOrder)
     {
-        if (!in_array($packeteryOrder['ps_country'], \Packetery\Carrier\CarrierRepository::ADDRESS_VALIDATION_COUNTRIES, true)) {
+        if (!in_array($packeteryOrder['ps_country'], Packetery\Carrier\CarrierRepository::ADDRESS_VALIDATION_COUNTRIES, true)) {
             return;
         }
 
-        /** @var \Packetery\Tools\ConfigHelper $configHelper */
-        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+        /** @var Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
         $widgetOptions = [
             'apiKey' => $apiKey,
             'country' => strtolower($packeteryOrder['ps_country']),
@@ -1055,7 +1072,7 @@ class Packetery extends CarrierModule
             'appIdentity' => $this->getAppIdentity(),
             'carrierId' => $packeteryOrder['id_branch'],
         ];
-        if (\Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
+        if (Packetery\Address\AddressTools::hasValidatedAddress($packeteryOrder)) {
             $widgetOptions['street'] = $packeteryOrder['street'];
             $widgetOptions['houseNumber'] = $packeteryOrder['house_number'];
             $widgetOptions['city'] = $packeteryOrder['city'];
@@ -1076,12 +1093,13 @@ class Packetery extends CarrierModule
      * @param array $packeteryOrder
      * @param int $orderId
      * @param array $packeteryCarrier
+     *
      * @throws PrestaShopException
      */
     private function preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier)
     {
-        /** @var \Packetery\Tools\ConfigHelper $configHelper */
-        $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+        /** @var Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
         $country = strtolower($packeteryOrder['ps_country']);
         $widgetOptions = [
             'apiKey' => $apiKey,
@@ -1092,9 +1110,9 @@ class Packetery extends CarrierModule
             'vendors' => $this->getAllowedVendorsForOrder($orderId, $country),
         ];
         if (
-            $packeteryCarrier['pickup_point_type'] === 'external' &&
-            $packeteryOrder['id_branch'] !== null &&
-            (bool)$packeteryOrder['is_carrier'] === true
+            $packeteryCarrier['pickup_point_type'] === 'external'
+            && $packeteryOrder['id_branch'] !== null
+            && (bool) $packeteryOrder['is_carrier'] === true
         ) {
             $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
         } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
@@ -1105,18 +1123,20 @@ class Packetery extends CarrierModule
 
     /**
      * @param int $orderId
-     * @param string $country Lowercase.
+     * @param string $country lowercase
+     *
      * @return array
+     *
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function getAllowedVendorsForOrder($orderId, $country)
     {
-        /** @var \Packetery\Order\OrderRepository $orderRepository */
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        /** @var Packetery\Order\OrderRepository $orderRepository */
+        $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
 
-        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        /** @var Packetery\Carrier\CarrierRepository $carrierRepository */
+        $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
 
         $packeteryOrder = $orderRepository->getById($orderId);
         if (empty($packeteryOrder)) {
@@ -1128,8 +1148,8 @@ class Packetery extends CarrierModule
             return [];
         }
 
-        /** @var \Packetery\Carrier\CarrierVendors $carrierRepository */
-        $carrierVendors = $this->diContainer->get(\Packetery\Carrier\CarrierVendors::class);
+        /** @var Packetery\Carrier\CarrierVendors $carrierRepository */
+        $carrierVendors = $this->diContainer->get(Packetery\Carrier\CarrierVendors::class);
 
         return $carrierVendors->getWidgetParameter($packeteryCarrier, $country);
     }
@@ -1140,6 +1160,7 @@ class Packetery extends CarrierModule
      * @param string $controller
      * @param array|null $params
      * @param string|null $anchor
+     *
      * @return string
      */
     public function getAdminLink($controller, array $params = [], $anchor = '')
@@ -1153,6 +1174,7 @@ class Packetery extends CarrierModule
                 $anchor
             );
         }
+
         // Recommended code from PrestaShop 1.7.5
         return $this->context->link->getAdminLink(
             $controller,
@@ -1164,13 +1186,15 @@ class Packetery extends CarrierModule
 
     /**
      * @param array $address
+     *
      * @return bool
+     *
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     private function saveAddressChange(array $address)
     {
-        $orderId = (int)Tools::getValue('order_id');
+        $orderId = (int) Tools::getValue('order_id');
         $packeteryOrderFields = [
             'is_ad' => 1,
             'country' => $address['country'],
@@ -1182,8 +1206,9 @@ class Packetery extends CarrierModule
             'latitude' => $address['latitude'],
             'longitude' => $address['longitude'],
         ];
-        /** @var \Packetery\Order\OrderRepository $orderRepository */
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        /** @var Packetery\Order\OrderRepository $orderRepository */
+        $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
+
         return $orderRepository->updateByOrder($packeteryOrderFields, $orderId);
     }
 
@@ -1255,8 +1280,8 @@ class Packetery extends CarrierModule
         $this->context->controller->addCSS($this->_path . 'views/css/back.css' . $suffix, 'all', null, false);
         $this->context->controller->addJS($this->_path . 'views/js/back.js' . $suffix);
 
-        /** @var \Packetery\Module\VersionChecker $versionChecker */
-        $versionChecker = $this->diContainer->get(\Packetery\Module\VersionChecker::class);
+        /** @var Packetery\Module\VersionChecker $versionChecker */
+        $versionChecker = $this->diContainer->get(Packetery\Module\VersionChecker::class);
         $versionChecker->checkForUpdate();
     }
 
@@ -1264,9 +1289,11 @@ class Packetery extends CarrierModule
      * Shows information about selected pickup point, right after information about sent mail
      *
      * @param array $params
+     *
      * @return string|void
+     *
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookDisplayOrderConfirmation($params)
     {
@@ -1280,8 +1307,8 @@ class Packetery extends CarrierModule
         if (empty($order)) {
             return;
         }
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getByCart((int)$order->id_cart);
+        $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
+        $orderData = $orderRepository->getByCart((int) $order->id_cart);
         if (!$orderData) {
             return;
         }
@@ -1296,17 +1323,19 @@ class Packetery extends CarrierModule
      * Show information about selected pickup point in frontend order detail, between address and products
      *
      * @param array $params
+     *
      * @return string|void
+     *
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookDisplayOrderDetail($params)
     {
         if (!isset($params['order'])) {
             return;
         }
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getById((int)$params['order']->id);
+        $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
+        $orderData = $orderRepository->getById((int) $params['order']->id);
         if (!$orderData) {
             return;
         }
@@ -1322,8 +1351,9 @@ class Packetery extends CarrierModule
      * inspiration: https://github.com/PrestaShop/ps_legalcompliance/blob/dev/ps_legalcompliance.php
      *
      * @param array $params
+     *
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookSendMailAlterTemplateVars(&$params)
     {
@@ -1332,20 +1362,20 @@ class Packetery extends CarrierModule
                 $params['template'],
                 $params['template_vars']['{id_order}'],
                 $params['template_vars']['{carrier}']
-            ) ||
-            strpos((string)$params['template'], 'order') === false
+            )
+            || strpos((string) $params['template'], 'order') === false
         ) {
             return;
         }
 
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getById((int)$params['template_vars']['{id_order}']);
+        $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
+        $orderData = $orderRepository->getById((int) $params['template_vars']['{id_order}']);
         if (!$orderData) {
             return;
         }
 
         $params['template_vars']['{carrier}'] .= ' - ' . $orderData['name_branch'];
-        if ((bool)$orderData['is_carrier'] === false) {
+        if ((bool) $orderData['is_carrier'] === false) {
             $params['template_vars']['{carrier}'] .= sprintf(' (%s)', $orderData['id_branch']);
         }
     }
@@ -1355,12 +1385,13 @@ class Packetery extends CarrierModule
      */
     public function hookActionObjectOrderUpdateBefore($params)
     {
-        $actionObjectOrderUpdateBefore = $this->diContainer->get(\Packetery\Hooks\ActionObjectOrderUpdateBefore::class);
+        $actionObjectOrderUpdateBefore = $this->diContainer->get(Packetery\Hooks\ActionObjectOrderUpdateBefore::class);
         $actionObjectOrderUpdateBefore->execute($params);
     }
 
     /**
      * @param array $params
+     *
      * @throws ReflectionException
      */
     public function hookActionObjectCartUpdateBefore(array $params)
@@ -1375,8 +1406,8 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $addressId = (int)$cart->id_address_delivery;
-        $oldAddressId = (int)$oldCart->id_address_delivery;
+        $addressId = (int) $cart->id_address_delivery;
+        $oldAddressId = (int) $oldCart->id_address_delivery;
         if ($oldAddressId === $addressId) {
             return;
         }
@@ -1387,7 +1418,7 @@ class Packetery extends CarrierModule
             return;
         }
 
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
+        $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
         $orderRepository->deleteByCart($cart->id);
     }
 
@@ -1405,18 +1436,19 @@ class Packetery extends CarrierModule
      * Adds computed weight to orders without saved weight
      *
      * @param array $params Hook parameters
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookActionPacketeryOrderGridListingResultsModifier(&$params)
     {
-        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
+        /** @var Packetery\Carrier\CarrierRepository $carrierRepository */
+        $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
 
-        /** @var \Packetery\Weight\Calculator $weightCalculator */
-        $weightCalculator = $this->diContainer->get(\Packetery\Weight\Calculator::class);
+        /** @var Packetery\Weight\Calculator $weightCalculator */
+        $weightCalculator = $this->diContainer->get(Packetery\Weight\Calculator::class);
 
         $addressValidationLevels = $carrierRepository->getAddressValidationLevels();
         if (isset($params['list']) && is_array($params['list'])) {
@@ -1429,9 +1461,9 @@ class Packetery extends CarrierModule
                 }
 
                 if (
-                    (bool)$order['is_ad'] === true &&
-                    isset($addressValidationLevels[$order['id_carrier']]) &&
-                    in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])
+                    (bool) $order['is_ad'] === true
+                    && isset($addressValidationLevels[$order['id_carrier']])
+                    && in_array($addressValidationLevels[$order['id_carrier']], ['required', 'optional'])
                 ) {
                     if (Packetery\Address\AddressTools::hasValidatedAddress($order)) {
                         $order['is_ad'] = 'HD-OK';
@@ -1447,21 +1479,23 @@ class Packetery extends CarrierModule
      * Called in PS 1.6 after choosing the carrier
      *
      * @param array $params
+     *
      * @return void
+     *
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookActionCarrierProcess($params)
     {
         /** @var CartCore $cart */
         $cart = $params['cart'];
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
+        $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
+        $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int) $cart->id_carrier);
         if (
-            $packeteryCarrier &&
-            $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
-            !$orderRepository->isPickupPointChosenByCart($cart->id)
+            $packeteryCarrier
+            && $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch'])
+            && !$orderRepository->isPickupPointChosenByCart($cart->id)
         ) {
             $this->context->controller->errors[] = $this->trans('Please select pickup point.', [], 'Modules.Packetery.Packetery');
         }
@@ -1473,8 +1507,9 @@ class Packetery extends CarrierModule
      * TODO: use suitable validations in hookActionCarrierProcess, solve like packeteryHookDisplayAdminOrder.
      *
      * @param array $params
+     *
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookActionValidateStepComplete(array &$params)
     {
@@ -1482,34 +1517,38 @@ class Packetery extends CarrierModule
             $this->context->controller->errors[] = $this->trans('Order validation failed, shop owner can find more information in log.', [], 'Modules.Packetery.Packetery');
             PrestaShopLogger::addLog('Cart is not present in hook parameters.', 3, null, null, null, true);
             $params['completed'] = false;
+
             return;
         }
 
         /** @var CartCore $cart */
         $cart = $params['cart'];
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
+        $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int) $cart->id_carrier);
 
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getByCart((int)$cart->id);
+        $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
+        $orderData = $orderRepository->getByCart((int) $cart->id);
 
         if (
-            $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch']) &&
-            empty($orderData['id_branch'])
+            $carrierRepository->isPickupPointCarrier($packeteryCarrier['id_branch'])
+            && empty($orderData['id_branch'])
         ) {
             $this->context->controller->errors[] = $this->trans('Please select pickup point.', [], 'Modules.Packetery.Packetery');
             $params['completed'] = false;
+
             return;
         }
 
         if ($packeteryCarrier['address_validation'] !== 'required') {
             $params['completed'] = true;
+
             return;
         }
 
-        if (!$orderData || !\Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
+        if (!$orderData || !Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
             $this->context->controller->errors[] = $this->trans('Please use widget to validate address.', [], 'Modules.Packetery.Packetery');
             $params['completed'] = false;
+
             return;
         }
 
@@ -1518,15 +1557,16 @@ class Packetery extends CarrierModule
 
     /**
      * @param array $messages
+     *
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
-     * @throws \SmartyException tracking link related exception
+     * @throws Packetery\Exceptions\DatabaseException
+     * @throws SmartyException tracking link related exception
      */
     private function processPostParcel(array &$messages)
     {
         if (
-            !Tools::isSubmit('process_post_parcel') ||
-            !Tools::getIsset('order_id')
+            !Tools::isSubmit('process_post_parcel')
+            || !Tools::getIsset('order_id')
         ) {
             return;
         }
@@ -1538,9 +1578,9 @@ class Packetery extends CarrierModule
         try {
             $trackingNumbers = $packetSubmitter->ordersExport($orderIds);
             foreach ($trackingNumbers as $trackingNumber) {
-                $smarty = new \Smarty();
+                $smarty = new Smarty();
                 $smarty->assign('trackingNumber', $trackingNumber);
-                $smarty->assign('trackingUrl', \Packetery\Module\Helper::getTrackingUrl($trackingNumber));
+                $smarty->assign('trackingUrl', Packetery\Module\Helper::getTrackingUrl($trackingNumber));
                 $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
 
                 $messages[] = [
@@ -1562,15 +1602,16 @@ class Packetery extends CarrierModule
      * Loads zones and countries to carriers
      *
      * @param array $params Hook parameters
+     *
      * @throws ReflectionException
      */
     public function hookActionPacketeryCarrierGridListingResultsModifier(&$params)
     {
-        $carrierTools = $this->diContainer->get(\Packetery\Carrier\CarrierTools::class);
+        $carrierTools = $this->diContainer->get(Packetery\Carrier\CarrierTools::class);
         if (isset($params['list']) && is_array($params['list'])) {
             foreach ($params['list'] as &$carrier) {
                 if ($carrier['name'] === '0') {
-                    $carrier['name'] = \Packetery\Carrier\CarrierTools::getCarrierNameFromShopName();
+                    $carrier['name'] = Packetery\Carrier\CarrierTools::getCarrierNameFromShopName();
                 }
                 list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
                     $carrier['id_carrier']
@@ -1601,7 +1642,9 @@ class Packetery extends CarrierModule
      * Shows Packetery form in BO product detail
      *
      * @param array $params Hook parameter
+     *
      * @return false|string|void
+     *
      * @throws Packetery\Exceptions\DatabaseException
      * @throws ReflectionException
      * @throws PrestaShopDatabaseException
@@ -1610,11 +1653,11 @@ class Packetery extends CarrierModule
     public function hookDisplayAdminProductsExtra(array $params)
     {
         $isPrestaShop16 = Tools::version_compare(_PS_VERSION_, '1.7.0', '<');
-        //Do not use $params to get id_product, prestashop 1.6 doesn't have it.
+        // Do not use $params to get id_product, prestashop 1.6 doesn't have it.
         if ($isPrestaShop16) {
-            $idProduct = (int)\Packetery\Tools\Tools::getValue('id_product');
+            $idProduct = (int) Packetery\Tools\Tools::getValue('id_product');
         } else {
-            $idProduct = (int)$params['id_product'];
+            $idProduct = (int) $params['id_product'];
         }
 
         $product = new Product($idProduct);
@@ -1625,7 +1668,7 @@ class Packetery extends CarrierModule
 
         $isAgeVerificationRequired = null;
         /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
-        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        $productAttributeRepository = $this->diContainer->get(Packetery\Product\ProductAttributeRepository::class);
         $productAttributes = $productAttributeRepository->findByProductId($product->id);
         if ($productAttributes !== null) {
             $isAgeVerificationRequired = $productAttributes->isForAdults();
@@ -1644,8 +1687,10 @@ class Packetery extends CarrierModule
      * Shows Packetery form in BO product detail
      *
      * @param array $params product information
+     *
      * @return void
-     * @throws \Packetery\Exceptions\DatabaseException|ReflectionException
+     *
+     * @throws Packetery\Exceptions\DatabaseException|ReflectionException
      */
     public function hookActionProductUpdate(array $params)
     {
@@ -1654,10 +1699,10 @@ class Packetery extends CarrierModule
         }
         $product = $params['product'];
 
-        $isAdult = (int)Tools::getIsset('packetery_age_verification');
+        $isAdult = (int) Tools::getIsset('packetery_age_verification');
 
         /** @var Packetery\Product\ProductAttributeRepository $dbTools */
-        $productAttribute = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        $productAttribute = $this->diContainer->get(Packetery\Product\ProductAttributeRepository::class);
 
         $productAttributeInfo = $productAttribute->getRow($product->id);
 
@@ -1679,8 +1724,10 @@ class Packetery extends CarrierModule
      * Shows Packetery form in BO product detail
      *
      * @param array $params product information
+     *
      * @return bool
-     * @throws \Packetery\Exceptions\DatabaseException|ReflectionException
+     *
+     * @throws Packetery\Exceptions\DatabaseException|ReflectionException
      */
     public function hookActionProductDelete(array $params)
     {
@@ -1689,7 +1736,7 @@ class Packetery extends CarrierModule
         }
 
         /** @var Packetery\Product\ProductAttributeRepository $dbTools */
-        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
+        $productAttributeRepository = $this->diContainer->get(Packetery\Product\ProductAttributeRepository::class);
         if ($productAttributeRepository->delete($params['product']->id)) {
             return;
         }

@@ -6,8 +6,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use ReflectionClass;
-
 abstract class Base
 {
     /**
@@ -15,7 +13,8 @@ abstract class Base
      */
     public static function getTaskName()
     {
-        $reflectionClass = new ReflectionClass(static::class);
+        $reflectionClass = new \ReflectionClass(static::class);
+
         return $reflectionClass->getShortName();
     }
 }

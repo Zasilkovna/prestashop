@@ -6,16 +6,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Db;
-use Module;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Order\OrderRepository;
 use Packetery\Tools\DbTools;
-use PaymentModule;
 
 class PaymentRepository
 {
-    /** @var Db $db */
+    /** @var \Db */
     private $db;
 
     /** @var DbTools */
@@ -27,11 +24,11 @@ class PaymentRepository
     /**
      * PaymentRepository constructor.
      *
-     * @param Db $db
+     * @param \Db $db
      * @param DbTools $dbTools
      * @param OrderRepository $orderRepository
      */
-    public function __construct(Db $db, DbTools $dbTools, OrderRepository $orderRepository)
+    public function __construct(\Db $db, DbTools $dbTools, OrderRepository $orderRepository)
     {
         $this->db = $db;
         $this->dbTools = $dbTools;
@@ -40,7 +37,9 @@ class PaymentRepository
 
     /**
      * @param string $moduleName
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function existsByModuleName($moduleName)
@@ -50,12 +49,14 @@ class PaymentRepository
             WHERE `module_name` = "' . $this->db->escape($moduleName) . '"'
         );
 
-        return ((int)$result === 1);
+        return (int) $result === 1;
     }
 
     /**
      * @param string $paymentModuleName
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function isCod($paymentModuleName)
@@ -65,25 +66,30 @@ class PaymentRepository
             WHERE `module_name` = "' . $this->db->escape($paymentModuleName) . '"'
         );
 
-        return ((int)$isCod === 1);
+        return (int) $isCod === 1;
     }
 
     /**
      * @param int $value
      * @param string $moduleName
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function setCod($value, $moduleName)
     {
-        $value = (int)$value;
+        $value = (int) $value;
+
         return $this->dbTools->update('packetery_payment', ['is_cod' => $value], '`module_name` = "' . $this->db->escape($moduleName) . '"');
     }
 
     /**
      * @param int $value
      * @param string $moduleName
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function setOrInsert($value, $moduleName)
@@ -91,18 +97,22 @@ class PaymentRepository
         if ($this->existsByModuleName($moduleName)) {
             return $this->setCod($value, $moduleName);
         }
+
         return $this->insert($value, $moduleName);
     }
 
     /**
      * @param int $isCod
      * @param string $moduleName
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function insert($isCod, $moduleName)
     {
-        $isCod = (int)$isCod;
+        $isCod = (int) $isCod;
+
         return $this->dbTools->insert(
             'packetery_payment',
             [
@@ -114,6 +124,7 @@ class PaymentRepository
 
     /**
      * @return array|bool|\mysqli_result|\PDOStatement|resource|null
+     *
      * @throws DatabaseException
      */
     public function getAll()
@@ -127,7 +138,9 @@ class PaymentRepository
      * @param string $orderCurrencyIso
      * @param string $branchCurrencyIso
      * @param float|int $total
-     * @return float|int|null Returns null if rate was not found.
+     *
+     * @return float|int|null returns null if rate was not found
+     *
      * @throws DatabaseException
      */
     public function getRateTotal($orderCurrencyIso, $branchCurrencyIso, $total)
@@ -137,6 +150,7 @@ class PaymentRepository
 
         if ($conversionRateBranch) {
             $conversionRate = $conversionRateBranch / $conversionRateOrder;
+
             return round($conversionRate * $total, 2);
         }
 
@@ -147,11 +161,12 @@ class PaymentRepository
      * Get list of payments for configuration
      *
      * @return array
+     *
      * @throws DatabaseException
      */
     public function getListPayments()
     {
-        $installedPaymentModules = PaymentModule::getInstalledPaymentModules();
+        $installedPaymentModules = \PaymentModule::getInstalledPaymentModules();
         $packeteryPaymentConfig = $this->getAll();
         $paymentModules = [];
         if ($packeteryPaymentConfig) {
@@ -160,14 +175,14 @@ class PaymentRepository
 
         $payments = [];
         foreach ($installedPaymentModules as $installedPaymentModule) {
-            $instance = Module::getInstanceByName($installedPaymentModule['name']);
+            $instance = \Module::getInstanceByName($installedPaymentModule['name']);
             if ($instance === false) {
                 continue;
             }
             $is_cod = (array_key_exists(
                 $installedPaymentModule['name'],
                 $paymentModules
-            ) ? (int)$paymentModules[$installedPaymentModule['name']] : 0
+            ) ? (int) $paymentModules[$installedPaymentModule['name']] : 0
             );
             $payments[] = [
                 'name' => $instance->displayName,
@@ -175,6 +190,7 @@ class PaymentRepository
                 'module_name' => $installedPaymentModule['name'],
             ];
         }
+
         return $payments;
     }
 }

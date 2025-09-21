@@ -12,6 +12,7 @@ class Helper
 
     /**
      * @param string $packetId
+     *
      * @return string
      */
     public static function getTrackingUrl($packetId)
@@ -21,6 +22,7 @@ class Helper
 
     /**
      * @param string $data
+     *
      * @return mixed|null
      */
     public static function unserialize($data)

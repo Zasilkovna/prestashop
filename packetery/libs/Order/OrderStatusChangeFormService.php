@@ -6,7 +6,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
 use Packetery\AbstractFormService;
 use Packetery\Module\Options;
 use Packetery\PacketTracking\PacketStatusFactory;
@@ -15,13 +14,13 @@ class OrderStatusChangeFormService extends AbstractFormService
 {
     const SUBMIT_ACTION_KEY = 'submitOrderStatusChangeSubmit';
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var PacketStatusFactory */
     private $packetStatusFactory;
 
-    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
+    public function __construct(\Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
     {
         parent::__construct($options);
         $this->module = $module;

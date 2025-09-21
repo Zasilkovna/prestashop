@@ -49,9 +49,8 @@ class PacketStatus
         $id,
         $code,
         $translatedCode,
-        $isFinal
+        $isFinal,
     ) {
-
         $this->id = $id;
         $this->code = $code;
         $this->translatedCode = $translatedCode;

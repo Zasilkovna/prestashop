@@ -8,7 +8,6 @@ if (!defined('_PS_VERSION_')) {
 
 use Packetery\PacketTracking\PacketStatusFactory;
 use Packetery\PacketTracking\PacketTrackingRepository;
-use Smarty;
 
 class OrderDetailView
 {
@@ -24,18 +23,19 @@ class OrderDetailView
 
     public function __construct(
         PacketTrackingRepository $packetTrackingRepository,
-        PacketStatusFactory $packetStatusFactory
+        PacketStatusFactory $packetStatusFactory,
     ) {
         $this->packetTrackingRepository = $packetTrackingRepository;
         $this->packetStatusFactory = $packetStatusFactory;
     }
 
     /**
-     * @param Smarty $smarty
+     * @param \Smarty $smarty
      * @param array $packeteryOrder
+     *
      * @return void
      */
-    public function addPacketStatus(Smarty $smarty, array $packeteryOrder)
+    public function addPacketStatus(\Smarty $smarty, array $packeteryOrder)
     {
         if (!$packeteryOrder['tracking_number']) {
             return;

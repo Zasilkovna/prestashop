@@ -13,6 +13,7 @@ class PacketStatusComparator
      *
      * @param PacketStatusRecord[] $apiPacketStatuses
      * @param PacketStatusRecord[] $databasePacketStatuses
+     *
      * @return bool
      */
     public function isDifferenceBetweenApiAndDatabase(array $apiPacketStatuses, array $databasePacketStatuses)
@@ -30,6 +31,7 @@ class PacketStatusComparator
                 return true;
             }
         }
+
         return false;
     }
 }

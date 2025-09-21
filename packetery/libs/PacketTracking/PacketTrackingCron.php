@@ -6,21 +6,16 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use DateTimeImmutable;
-use Order;
-use OrderState;
-use Packetery;
 use Packetery\Log\LogRepository;
 use Packetery\Module\Helper;
 use Packetery\Module\SoapApi;
 use Packetery\Order\OrderRepository;
 use Packetery\Tools\ConfigHelper;
 use PrestaShop\PrestaShop\Adapter\Validate;
-use stdClass;
 
 class PacketTrackingCron
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var OrderRepository */
@@ -39,7 +34,7 @@ class PacketTrackingCron
     private $logRepository;
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
      * @param OrderRepository $orderRepository
      * @param SoapApi $soapApi
      * @param PacketTrackingRepository $packetTrackingRepository
@@ -47,12 +42,12 @@ class PacketTrackingCron
      * @param LogRepository $logRepository
      */
     public function __construct(
-        Packetery $module,
+        \Packetery $module,
         OrderRepository $orderRepository,
         SoapApi $soapApi,
         PacketTrackingRepository $packetTrackingRepository,
         PacketStatusComparator $packetStatusComparator,
-        LogRepository $logRepository
+        LogRepository $logRepository,
     ) {
         $this->module = $module;
         $this->orderRepository = $orderRepository;
@@ -91,7 +86,7 @@ class PacketTrackingCron
         }
 
         $maxOrderAgeDays = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_MAX_ORDER_AGE_DAYS');
-        $oldestOrderDate = new DateTimeImmutable("-{$maxOrderAgeDays} days");
+        $oldestOrderDate = new \DateTimeImmutable("-{$maxOrderAgeDays} days");
 
         $maxProcessedOrders = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS');
         $orders = $this->orderRepository->getOrdersByStateAndLastUpdate($enabledOrderStatuses, $maxProcessedOrders, $oldestOrderDate);
@@ -101,13 +96,13 @@ class PacketTrackingCron
             $statusRecordsOrErrorMessage = $this->soapApi->getPacketTracking($order['tracking_number']);
 
             if (!is_string($statusRecordsOrErrorMessage)) {
-                /** @var stdClass $statusRecords */
+                /** @var \stdClass $statusRecords */
                 $statusRecords = $statusRecordsOrErrorMessage;
 
                 $this->logRepository->insertRow(
                     LogRepository::ACTION_PACKET_TRACKING,
                     [
-                        'response' => (array)$statusRecords,
+                        'response' => (array) $statusRecords,
                     ],
                     LogRepository::STATUS_SUCCESS,
                     $order['id_order']
@@ -124,7 +119,7 @@ class PacketTrackingCron
                 continue;
             }
 
-            if ((is_array($statusRecords->record) && count($statusRecords->record) === 0)) {
+            if (is_array($statusRecords->record) && count($statusRecords->record) === 0) {
                 continue;
             }
 
@@ -182,7 +177,7 @@ class PacketTrackingCron
                 $this->updateOrderStatus($lastRecord, $order['id_order']);
             }
 
-            $this->orderRepository->setLastUpdateTrackingStatus(new DateTimeImmutable('now'), $order['id_order']);
+            $this->orderRepository->setLastUpdateTrackingStatus(new \DateTimeImmutable('now'), $order['id_order']);
         }
 
         return [
@@ -192,8 +187,9 @@ class PacketTrackingCron
     }
 
     /**
-     * @param stdClass $lastRecord
+     * @param \stdClass $lastRecord
      * @param int $orderId
+     *
      * @return void
      */
     private function updateOrderStatus($lastRecord, $orderId)
@@ -201,13 +197,13 @@ class PacketTrackingCron
         $lastStatusCode = $lastRecord->statusCode;
         $newOrderStatus = ConfigHelper::get('PACKETERY_ORDER_STATUS_CHANGE_' . $lastStatusCode);
 
-        $order = new Order($orderId);
+        $order = new \Order($orderId);
         $isOrderExists = Validate::isLoadedObject($order);
         if ($isOrderExists === false) {
             return;
         }
 
-        $orderState = new OrderState($newOrderStatus);
+        $orderState = new \OrderState($newOrderStatus);
         $isOrderStateExists = Validate::isLoadedObject($orderState);
         if ($isOrderStateExists === false) {
             return;
@@ -217,7 +213,7 @@ class PacketTrackingCron
             return;
         }
 
-        $order->setCurrentState((int)$newOrderStatus);
+        $order->setCurrentState((int) $newOrderStatus);
     }
 
     /**

@@ -6,8 +6,7 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_1_4($object)
 {
-
-    return (
-        $object->unregisterHook('displayFooter') &&
-        $object->unregisterHook('displayBeforeCarrier'));
+    return
+        $object->unregisterHook('displayFooter')
+        && $object->unregisterHook('displayBeforeCarrier');
 }
