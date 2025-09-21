@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\Log\LogRepository;
 
 class PacketeryLogGridController extends ModuleAdminController

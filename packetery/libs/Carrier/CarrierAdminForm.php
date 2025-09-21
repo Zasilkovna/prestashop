@@ -2,6 +2,10 @@
 
 namespace Packetery\Carrier;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Country;
 use HelperForm;
 use Packetery;

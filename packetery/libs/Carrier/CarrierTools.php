@@ -2,6 +2,10 @@
 
 namespace Packetery\Carrier;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Carrier;
 use ConfigurationCore as Configuration;
 use Context;

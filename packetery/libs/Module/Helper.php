@@ -2,6 +2,10 @@
 
 namespace Packetery\Module;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class Helper
 {
     const TRACKING_URL = 'https://tracking.packeta.com/Z%s';

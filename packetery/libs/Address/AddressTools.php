@@ -2,6 +2,10 @@
 
 namespace Packetery\Address;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use AddressCore;
 use CartCore;
 use CountryCore;

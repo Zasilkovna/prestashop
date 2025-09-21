@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2017 Zlab Solutions
  *
@@ -23,6 +22,10 @@
  *  @copyright 2017 Zlab Solutions
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 use Packetery\Exceptions\AggregatedException;
 use Packetery\Exceptions\DatabaseException;
@@ -56,7 +59,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         $this->identifier = 'id_order';
 
         parent::__construct();
-        
+
         // there has to be `id` for 'editable' to work; a.* is prepended
         $this->_select = '
             `a`.`id_order` AS `id`,

@@ -2,6 +2,10 @@
 
 namespace Packetery\ApiCarrier;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Message\Response;

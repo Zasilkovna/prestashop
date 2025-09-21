@@ -2,6 +2,10 @@
 
 namespace Packetery\Tools;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 // PrestaShopDatabaseException is extended from PrestaShopException
 use Db;
 use Packetery\Exceptions\DatabaseException;
@@ -167,7 +171,7 @@ class DbTools
      */
     public function insert($table, $data, $nullValues = false, $useCache = true, $type = Db::INSERT, $addPrefix = true)
     {
-        $queryForLog = 'table ' . $table . '; data ' . serialize($data);
+        $queryForLog = 'table ' . $table . '; data ' . json_encode($data);
         try {
             $result = $this->db->insert($table, $data, $nullValues, $useCache, $type, $addPrefix);
         } catch (PrestaShopException $exception) {
@@ -190,7 +194,7 @@ class DbTools
      */
     public function update($table, $data, $where = '', $limit = 0, $nullValues = false, $useCache = true, $addPrefix = true)
     {
-        $queryForLog = 'table ' . $table . '; data ' . serialize($data) . '; where ' . $where;
+        $queryForLog = 'table ' . $table . '; data ' . json_encode($data) . '; where ' . $where;
         try {
             $result = $this->db->update($table, $data, $where, $limit, $nullValues, $useCache, $addPrefix);
         } catch (PrestaShopException $exception) {

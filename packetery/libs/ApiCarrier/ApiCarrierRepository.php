@@ -2,6 +2,10 @@
 
 namespace Packetery\ApiCarrier;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;

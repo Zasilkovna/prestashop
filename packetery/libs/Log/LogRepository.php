@@ -2,6 +2,10 @@
 
 namespace Packetery\Log;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use DateTimeImmutable;
 use DateTimeZone;
 use Packetery;

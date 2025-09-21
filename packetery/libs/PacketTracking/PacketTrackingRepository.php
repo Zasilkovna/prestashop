@@ -2,6 +2,10 @@
 
 namespace Packetery\PacketTracking;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use mysqli_result;
 use Packetery\Tools\DbTools;
 use PDOStatement;

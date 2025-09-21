@@ -2,6 +2,10 @@
 
 namespace Packetery\Tools;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Symfony\Component\HttpFoundation\Request;
 use Tools as PrestaShopTools;
 use ToolsCore;

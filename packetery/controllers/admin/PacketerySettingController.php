@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class PacketerySettingController extends ModuleAdminController
 {
     public function initContent()
