@@ -2,6 +2,10 @@
 
 namespace Packetery\Hooks;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use AddressCore as Address;
 use OrderCore as Order;
 use Packetery\Carrier\CarrierRepository;

@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\Module\Cart;
 use Packetery\Order\Ajax;
 use Packetery\Order\OrderSaver;

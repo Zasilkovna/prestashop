@@ -2,6 +2,10 @@
 
 namespace Packetery\Payment;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Db;
 use Module;
 use Packetery\Exceptions\DatabaseException;

@@ -2,6 +2,10 @@
 
 namespace Packetery\Module;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Language;
 use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;

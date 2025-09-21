@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Carrier\CarrierAdminForm;
 use Packetery\Carrier\CarrierRepository;

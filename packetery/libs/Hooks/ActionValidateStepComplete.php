@@ -2,6 +2,10 @@
 
 namespace Packetery\Hooks;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use CartCore;
 use Packetery;
 use Packetery\Address\AddressTools;

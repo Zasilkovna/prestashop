@@ -2,6 +2,10 @@
 
 namespace Packetery\LogWrapper;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Exception;
 use PrestaShopLogger;
 

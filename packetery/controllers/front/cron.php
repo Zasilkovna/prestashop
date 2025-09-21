@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\Cron\Tasks\DeleteLabels;
 use Packetery\Cron\Tasks\DownloadCarriers;
 use Packetery\Cron\Tasks\PurgeLogs;

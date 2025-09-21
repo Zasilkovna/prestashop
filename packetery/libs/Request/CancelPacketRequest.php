@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Packetery\Request;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class CancelPacketRequest
 {
     /** @var string */

@@ -2,6 +2,10 @@
 
 namespace Packetery\Carrier;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class CarrierVendors
 {
     public const INTERNAL_PICKUP_POINT_CARRIER = 'packeta';

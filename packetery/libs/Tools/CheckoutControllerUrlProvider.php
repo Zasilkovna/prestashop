@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Packetery\Tools;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Link;
 use Packetery;
 use Packetery\Exceptions\CheckoutControllerUrlException;
