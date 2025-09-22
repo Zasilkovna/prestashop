@@ -22,7 +22,6 @@
  *  @copyright Since 2017 Zlab Solutions
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
-
 global $_MODULE;
 $_MODULE = [];
 $_MODULE['<{packetery}prestashop>packetery_7e436ecba5095ef42cfeb5b696fbbdfd'] = 'Získajte svojim zákazníkom prístup k bodom vyzdvihnutia v sieti Zásielkovni.';

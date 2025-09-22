@@ -20,8 +20,7 @@
  *  @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
  *  @copyright Since 2017 Zlab Solutions
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
- */
-// naming convention: PacketerCheckoutModule + moduleId (first letter in upper case)
+ */// naming convention: PacketerCheckoutModule + moduleId (first letter in upper case)
 
 var PacketeryCheckoutModulePs16 = {
 

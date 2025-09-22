@@ -22,7 +22,6 @@
  *  @copyright Since 2017 Zlab Solutions
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
-
 namespace Packetery\Response;
 
 if (!defined('_PS_VERSION_')) {
