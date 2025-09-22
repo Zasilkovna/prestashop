@@ -1152,7 +1152,7 @@ class Packetery extends CarrierModule
      * see https://devdocs.prestashop.com/1.7/modules/core-updates/1.7.5/
      *
      * @param string $controller
-     * @param array|null $params
+     * @param array $params
      * @param string|null $anchor
      *
      * @return string
@@ -1695,7 +1695,7 @@ class Packetery extends CarrierModule
 
         $isAdult = (int) Tools::getIsset('packetery_age_verification');
 
-        /** @var Packetery\Product\ProductAttributeRepository $dbTools */
+        /** @var Packetery\Product\ProductAttributeRepository $productAttribute */
         $productAttribute = $this->diContainer->get(Packetery\Product\ProductAttributeRepository::class);
 
         $productAttributeInfo = $productAttribute->getRow($product->id);
@@ -1729,7 +1729,7 @@ class Packetery extends CarrierModule
             return;
         }
 
-        /** @var Packetery\Product\ProductAttributeRepository $dbTools */
+        /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
         $productAttributeRepository = $this->diContainer->get(Packetery\Product\ProductAttributeRepository::class);
         if ($productAttributeRepository->delete($params['product']->id)) {
             return;
