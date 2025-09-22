@@ -20,7 +20,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
- *  @copyright 2017 Zlab Solutions
+ *  @copyright Since 2017 Zlab Solutions
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 if (!defined('_PS_VERSION_')) {

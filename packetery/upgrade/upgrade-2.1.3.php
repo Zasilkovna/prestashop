@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 2019 RTsoft s.r.o.
+ * 2017 Zlab Solutions
  *
  * NOTICE OF LICENSE
  *
@@ -19,8 +19,8 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author    RTsoft s.r.o
- *  @copyright 2019 RTsoft s.r.o
+ *  @author    Eugene Zubkov <magrabota@gmail.com>, RTsoft s.r.o
+ *  @copyright Since 2017 Zlab Solutions
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 if (!defined('_PS_VERSION_')) {
