@@ -25,12 +25,12 @@ class Helper
      *
      * @return mixed|null
      */
-    public static function unserialize($data)
+    public static function json_to_string($data)
     {
         if (PHP_VERSION_ID >= 70000) {
-            return unserialize($data, ['allowed_classes' => false]);
+            return json_decode($data, true);
         }
 
-        return is_string($data) ? @unserialize($data) : null;
+        return is_string($data) ? @json_decode($data, true) : null;
     }
 }

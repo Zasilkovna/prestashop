@@ -68,7 +68,7 @@ class PacketTrackingCron
         }
 
         $configOrderStatuses = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATES');
-        $orderStatuses = Helper::unserialize($configOrderStatuses);
+        $orderStatuses = Helper::json_to_string($configOrderStatuses);
         if (!is_array($orderStatuses)) {
             return $this->getNoOrderStatusesMessage();
         }
@@ -79,7 +79,7 @@ class PacketTrackingCron
         }
 
         $configPacketStatuses = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_PACKET_STATUSES');
-        $packetStatuses = Helper::unserialize($configPacketStatuses);
+        $packetStatuses = Helper::json_to_string($configPacketStatuses);
 
         if (!is_array($packetStatuses)) {
             $packetStatuses = [];
