@@ -146,26 +146,16 @@ class Packetery extends CarrierModule
         }
     }
 
-    private static function transportMethod()
+    private static function transportMethod(): bool
     {
-        if (extension_loaded('curl')) {
-            $have_curl = true;
-        }
-        if (ini_get('allow_url_fopen')) {
-            $have_url_fopen = true;
-        }
-        // Disabled - more trouble than it's worth
-        if ($have_curl) {
-            return 'curl';
-        }
-        if ($have_url_fopen) {
-            return 'fopen';
+        if (extension_loaded('curl') || ini_get('allow_url_fopen')) {
+            return true;
         }
 
         return false;
     }
 
-    public function configurationErrors(&$error = null)
+    public function configurationErrors(&$error = null): bool
     {
         $error = [];
         $have_error = false;
@@ -456,7 +446,7 @@ class Packetery extends CarrierModule
     }
 
     /**
-     * @return false|string
+     * @return string
      *
      * @throws SmartyException
      */
@@ -1732,7 +1722,7 @@ class Packetery extends CarrierModule
         /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
         $productAttributeRepository = $this->diContainer->get(Packetery\Product\ProductAttributeRepository::class);
         if ($productAttributeRepository->delete($params['product']->id)) {
-            return;
+            return true;
         }
     }
 }

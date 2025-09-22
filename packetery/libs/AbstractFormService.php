@@ -22,7 +22,6 @@
  *  @copyright Since 2017 Zlab Solutions
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
-
 namespace Packetery;
 
 if (!defined('_PS_VERSION_')) {
@@ -151,7 +150,7 @@ abstract class AbstractFormService
                 }
 
                 $value = Tools::getValue($itemKey, $persistedValue);
-                $rawValues = Module\Helper::unserialize($value);
+                $rawValues = Module\Helper::json_to_string($value);
 
                 foreach ($itemConfiguration['values']['query'] as $checkboxItem) {
                     if (isset($rawValues[$checkboxItem['id']])) {
