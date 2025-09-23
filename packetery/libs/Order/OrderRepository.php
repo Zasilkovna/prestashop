@@ -421,19 +421,23 @@ class OrderRepository
 
     /**
      * @param array<int, int> $enabledOrderStatuses
+     * @param int[] $finalStatusIds
      * @param int $maxProcessedOrdersLimit
      * @param DateTimeImmutable $oldestOrderDate
      * @return array|bool|mysqli_result|PDOStatement|resource|null
      */
     public function getOrdersByStateAndLastUpdate(
         array $enabledOrderStatuses,
+        array $finalStatusIds,
         $maxProcessedOrdersLimit,
         DateTimeImmutable $oldestOrderDate
     ) {
         if ($enabledOrderStatuses === []) {
             return [];
         }
+
         $implodedOrderStatuses = implode(',', $enabledOrderStatuses);
+        $implodedIgnoredFinalPacketStatuses = implode(',', $finalStatusIds);
 
         $sql = 'SELECT DISTINCT
             `po`.`id_order`,
@@ -444,11 +448,19 @@ class OrderRepository
         FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
         LEFT JOIN `' . _DB_PREFIX_ . 'orders` `o`
             ON `o`.`id_order` = `po`.`id_order`
-        LEFT JOIN `' . _DB_PREFIX_ . 'packetery_packet_status` `pps`
-            ON `o`.`id_order` = `pps`.`id_order`
+        LEFT JOIN (
+            SELECT `ps`.`id_order`, `ps`.`status_code`
+            FROM `' . _DB_PREFIX_ . 'packetery_packet_status` `ps`
+            INNER JOIN (
+                SELECT `id_order`, MAX(`event_datetime`) AS `last_event`
+                FROM `' . _DB_PREFIX_ . 'packetery_packet_status`
+                GROUP BY `id_order`
+            ) `latest` ON `latest`.`id_order` = `ps`.`id_order` AND `latest`.`last_event` = `ps`.`event_datetime`
+        ) `pps` ON `o`.`id_order` = `pps`.`id_order`
         WHERE `o`.`current_state` IN (' . $this->db->escape($implodedOrderStatuses) . ')
             AND `o`.`date_add` > "' . $oldestOrderDate->format('Y-m-d H:i:s') . '"
             AND `po`.`exported` = 1
+            AND `pps`.`status_code` IS NULL OR `pps`.`status_code` NOT IN (' . $this->db->escape($implodedIgnoredFinalPacketStatuses) . ')
         ORDER BY `po`.`last_update_tracking_status` ASC
         LIMIT ' . (int) $maxProcessedOrdersLimit;
 
