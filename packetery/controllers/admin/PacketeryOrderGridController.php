@@ -42,11 +42,13 @@ class PacketeryOrderGridController extends ModuleAdminController
     const ACTION_BULK_LABEL_PDF = 'bulkLabelPdf';
     const ACTION_BULK_CARRIER_LABEL_PDF = 'bulkCarrierLabelPdf';
 
+    /** @var array */
     protected $statuses_array = array();
 
     /** @var Packetery */
     private $packetery;
 
+    /** @var bool */
     private $hasBulkLabelPrintingError;
 
     public function __construct()
@@ -91,10 +93,10 @@ class PacketeryOrderGridController extends ModuleAdminController
         // Show and/or export only relevant orders from order list.
         $groupId = Shop::getContextShopGroupID(true);
         $shopId = Shop::getContextShopID(true);
-        if ($groupId) {
+        if ($groupId !== null) {
             $this->_where = ' AND `a`.`id_shop_group` = ' . $groupId . ' ';
         }
-        if ($shopId) {
+        if ($shopId !== null) {
             $this->_where = ' AND `a`.`id_shop` = ' . $shopId . ' ';
         }
 
@@ -239,7 +241,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     public function processBulkCreatePacket()
     {
         $ids = $this->boxes;
-        if (!$ids) {
+        if ($ids === []) {
             $this->informations = $this->l('No orders were selected.', 'packeteryordergridcontroller');
             return;
         }
@@ -271,7 +273,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     private function prepareOnlyCarrierPacketNumbers(array $ids)
     {
-        /** @var OrderRepository $orderRepo */
+        /** @var OrderRepository $orderRepository */
         $orderRepository = $this->getModule()->diContainer->get(OrderRepository::class);
 
         $packetNumbers = [];
@@ -345,7 +347,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         if (Tools::isSubmit('submitPrepareLabels')) {
             $packetNumbers = $this->prepareOnlyInternalPacketNumbers($this->boxes);
-            if ($packetNumbers) {
+            if ($packetNumbers !== []) {
                 $this->errors[] = $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA, null, (int)Tools::getValue('offset'));
             } else {
                 $this->warnings[] = $this->l('No orders have been selected for which labels can be printed.', 'packeteryordergridcontroller');
@@ -364,7 +366,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         if (Tools::isSubmit('submitPrepareLabels')) {
             $packetNumbers = $this->prepareOnlyCarrierPacketNumbers($this->boxes);
-            if ($packetNumbers) {
+            if ($packetNumbers !== []) {
                 /** @var SoapApi $soapApi */
                 $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
                 $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);

@@ -54,7 +54,7 @@ class OrderDetailsUpdater
         }
 
         $this->processDimensionsAndPricesChange($messages, $fieldsToUpdate);
-        if ($fieldsToUpdate) {
+        if ($fieldsToUpdate !== []) {
             if (
                 !isset($fieldsToUpdate['age_verification_required']) &&
                 CarrierTools::orderSupportsAgeVerification($packeteryOrder)

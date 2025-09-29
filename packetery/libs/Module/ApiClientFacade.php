@@ -4,7 +4,6 @@ namespace Packetery\Module;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
-use GuzzleHttp\Message\Response;
 use Packetery\Exceptions\ApiClientException;
 
 class ApiClientFacade
@@ -30,7 +29,8 @@ class ApiClientFacade
 
 
             try {
-                /** @var Response $result */
+                // Note: $client->get() may return ResponseInterface in different namespaces
+                // depending on PrestaShop/Guzzle version (\GuzzleHttp\Message\Response vs \GuzzleHttp\Psr7\Response)
                 $result = $client->get($url);
             } catch (TransferException $exception) {
                 throw new ApiClientException($exception->getMessage());

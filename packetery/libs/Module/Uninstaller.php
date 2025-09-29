@@ -67,7 +67,7 @@ class Uninstaller
     public function deleteTab($className)
     {
         $tabId = Tab::getIdFromClassName($className);
-        if ($tabId) {
+        if ($tabId !== false) {
             try {
                 $tab = new Tab($tabId);
             } catch (PrestaShopException $exception) {

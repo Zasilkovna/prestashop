@@ -3,12 +3,11 @@
 namespace Packetery\ApiCarrier;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\TransferException;
-use GuzzleHttp\Message\Response;
 use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\DownloadException;
-use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
 
 class Downloader
@@ -21,7 +20,7 @@ class Downloader
     /** @var ApiCarrierRepository */
     private $apiCarrierRepository;
 
-    /** @var SoapApi */
+    /** @var ConfigHelper */
     private $configHelper;
 
     /**
@@ -29,7 +28,7 @@ class Downloader
      *
      * @param Packetery $module
      * @param ApiCarrierRepository $apiCarrierRepository
-     * @param SoapApi $configHelper
+     * @param ConfigHelper $configHelper
      */
     public function __construct(Packetery $module, ApiCarrierRepository $apiCarrierRepository, ConfigHelper $configHelper)
     {
@@ -57,7 +56,7 @@ class Downloader
                 'class' => 'danger',
             ];
         }
-        if (!$carriers) {
+        if (is_array($carriers) === false || $carriers === []) {
             return [
                 'text' => sprintf(
                     $this->module->l('Carrier download failed: %s Please try again later.', 'downloader'),
@@ -67,7 +66,7 @@ class Downloader
             ];
         }
         $validation_result = $this->validateCarrierData($carriers);
-        if (!$validation_result) {
+        if ($validation_result === false) {
             return [
                 'text' => sprintf(
                     $this->module->l('Carrier download failed: %s Please try again later.', 'downloader'),
@@ -102,7 +101,7 @@ class Downloader
      * Downloads carriers in JSON.
      *
      * @return string
-     * @throws DownloadException DownloadException.
+     * @throws DownloadException|GuzzleException DownloadException.
      */
     private function downloadJson()
     {
@@ -112,7 +111,8 @@ class Downloader
         if (class_exists('GuzzleHttp\Client')) {
             $client = new Client();
             try {
-                /** @var Response $result */
+                // Note: $client->get() may return ResponseInterface in different namespaces
+                // depending on PrestaShop/Guzzle version (\GuzzleHttp\Message\Response vs \GuzzleHttp\Psr7\Response)
                 $result = $client->get($url);
             } catch (TransferException $exception) {
                 throw new DownloadException($exception->getMessage());
