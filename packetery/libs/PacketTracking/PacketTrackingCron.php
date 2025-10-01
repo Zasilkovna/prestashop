@@ -223,10 +223,6 @@ class PacketTrackingCron
             return;
         }
 
-        if ($order->getCurrentOrderState()->shipped) {
-            return;
-        }
-
         $order->setCurrentState((int)$newOrderStatus);
     }
 
