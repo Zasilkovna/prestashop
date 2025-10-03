@@ -3,6 +3,7 @@
         "prestashop/autoindex": "^2.1",
         "prestashop/php-dev-tools": "^5.0",
         "friendsofphp/php-cs-fixer": "^3.87",
-        "prestashop/header-stamp": "^2.6"
+        "prestashop/header-stamp": "^2.6",
+        "squizlabs/php_codesniffer": "^4.0"
     }
 }

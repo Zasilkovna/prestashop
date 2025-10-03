@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2017 Zlab Solutions
  *
@@ -22,6 +23,7 @@
  *  @copyright Since 2017 Zlab Solutions
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
+
 namespace Packetery\ApiCarrier;
 
 if (!defined('_PS_VERSION_')) {
@@ -33,7 +35,6 @@ use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Message\Response;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\DownloadException;
-use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
 
 class Downloader
@@ -46,7 +47,7 @@ class Downloader
     /** @var ApiCarrierRepository */
     private $apiCarrierRepository;
 
-    /** @var SoapApi */
+    /** @var ConfigHelper */
     private $configHelper;
 
     /**
@@ -54,7 +55,7 @@ class Downloader
      *
      * @param \Packetery $module
      * @param ApiCarrierRepository $apiCarrierRepository
-     * @param SoapApi $configHelper
+     * @param ConfigHelper $configHelper
      */
     public function __construct(\Packetery $module, ApiCarrierRepository $apiCarrierRepository, ConfigHelper $configHelper)
     {
