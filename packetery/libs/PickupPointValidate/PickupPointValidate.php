@@ -1,0 +1,81 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Packetery\PickupPointValidate;
+
+use Exception;
+use Packetery\PickupPointValidate\Exception\HttpRequestException;
+use Packetery\Request\PickupPointValidateRequest;
+use Packetery\Response\PickupPointValidateResponse;
+use Packetery\Tools\HttpClientWrapper;
+
+class PickupPointValidate
+{
+    private const URL_VALIDATE_ENDPOINT = 'https://widget.packeta.com/v6/pps/api/widget/v1/validate';
+
+    /** @var string */
+    private $apiKey;
+
+    private function __construct(string $apiKey)
+    {
+        $this->apiKey = $apiKey;
+    }
+
+    /**
+     * @param false|string $apiKey
+     * @param HttpClientWrapper $httpClient
+     * @return PickupPointValidate
+     */
+    public static function createWithValidApiKey($apiKey): PickupPointValidate
+    {
+        return new self($apiKey, $httpClient);
+    }
+
+    public function validate(PickupPointValidateRequest $request): PickupPointValidateResponse
+    {
+        $postData = $request->getSubmittableData();
+        $postData['apiKey'] = $this->apiKey;
+        $options = [
+            'body' => json_encode($postData),
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+        ];
+        if (class_exists('GuzzleHttp\Client')) {
+            $client = new Client();
+            try {
+                /** @var Response $result */
+                $result = $client->post(self::URL_VALIDATE_ENDPOINT, $options);
+            } catch (Exception $exception) {
+                throw new DownloadException($exception->getMessage());
+            }
+
+            $body = $result->getBody();
+            $contents = $body->getContents();
+        } else {
+            $contents = \Tools::file_get_contents(self::URL_VALIDATE_ENDPOINT, false, null, 30, true);
+        }
+        $resultArray = json_decode($contents, true);
+
+        if (!is_array($resultArray)) {
+            throw new HttpRequestException('Invalid JSON response received from API.');
+        }
+
+        if (!array_key_exists('isValid', $resultArray) || !is_bool($resultArray['isValid'])) {
+            throw new HttpRequestException(sprintf(
+                'Invalid API response: expected boolean "isValid" field, got %s.',
+                var_export($resultArray['isValid'] ?? null, true)
+            ));
+        }
+
+        if (!array_key_exists('errors', $resultArray) || !is_array($resultArray['errors'])) {
+            throw new HttpRequestException(sprintf(
+                'Invalid API response: expected array "errors" field, got %s.',
+                var_export($resultArray['errors'] ?? null, true)
+            ));
+        }
+
+        return new PickupPointValidateResponse($resultArray['isValid'], $resultArray['errors']);
+    }
+}

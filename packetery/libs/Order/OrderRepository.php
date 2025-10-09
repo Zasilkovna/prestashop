@@ -168,7 +168,7 @@ class OrderRepository
     public function getByCart($cartId)
     {
         $cartId = (int)$cartId;
-        return $this->dbTools->getRow('SELECT `is_ad`, `id_branch`, `name_branch`, `id_carrier`, `zip` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId);
+        return $this->dbTools->getRow('SELECT `is_ad`, `id_branch`, `name_branch`, `id_carrier`, `zip`, `is_carrier`, `carrier_pickup_point` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId);
     }
 
     /**
