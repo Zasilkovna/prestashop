@@ -32,16 +32,21 @@ class PickupPointValidator
     /** @var CartService */
     private $cartService;
 
+    /** @var HttpClientWrapper */
+    private $httpClient;
+
     public function __construct(
         ConfigHelper $configHelper,
         LogRepository $logRepository,
         Packetery $module,
-        CartRepository $cartRepository
+        CartService $cartService,
+        HttpClientWrapper $httpClient
     ) {
         $this->logRepository = $logRepository;
         $this->configHelper = $configHelper;
         $this->module = $module;
-        $this->cartRepository = $cartRepository;
+        $this->cartService = $cartService;
+        $this->httpClient = $httpClient;
     }
 
     public function validate(PickupPointValidateRequest $request): PickupPointValidateResponse

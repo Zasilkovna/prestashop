@@ -17,9 +17,13 @@ class PickupPointValidate
     /** @var string */
     private $apiKey;
 
-    private function __construct(string $apiKey)
+    /** @var HttpClientWrapper */
+    private $httpClient;
+
+    private function __construct(string $apiKey, HttpClientWrapper $httpClient)
     {
         $this->apiKey = $apiKey;
+        $this->httpClient = $httpClient;
     }
 
     /**
@@ -27,7 +31,7 @@ class PickupPointValidate
      * @param HttpClientWrapper $httpClient
      * @return PickupPointValidate
      */
-    public static function createWithValidApiKey($apiKey): PickupPointValidate
+    public static function createWithValidApiKey($apiKey, HttpClientWrapper $httpClient): PickupPointValidate
     {
         return new self($apiKey, $httpClient);
     }
@@ -42,19 +46,10 @@ class PickupPointValidate
                 'Content-Type' => 'application/json',
             ],
         ];
-        if (class_exists('GuzzleHttp\Client')) {
-            $client = new Client();
-            try {
-                /** @var Response $result */
-                $result = $client->post(self::URL_VALIDATE_ENDPOINT, $options);
-            } catch (Exception $exception) {
-                throw new DownloadException($exception->getMessage());
-            }
-
-            $body = $result->getBody();
-            $contents = $body->getContents();
-        } else {
-            $contents = \Tools::file_get_contents(self::URL_VALIDATE_ENDPOINT, false, null, 30, true);
+        try {
+            $contents = $this->httpClient->post(self::URL_VALIDATE_ENDPOINT, $options);
+        } catch (Exception $e) {
+            throw new HttpRequestException('HTTP Request Exception: ' . $e->getMessage(), 0, $e);
         }
         $resultArray = json_decode($contents, true);
 
