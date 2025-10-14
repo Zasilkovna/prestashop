@@ -18,6 +18,7 @@ class LogRepository
     const ACTION_SENDER_VALIDATION = 'sender-validation';
     const ACTION_PACKET_TRACKING = 'packet-tracking';
     const ACTION_CARRIER_TRACKING_NUMBER = 'carrier-tracking-number';
+    const ACTION_PACKET_CANCELLING = 'packet-cancelling';
 
     /** @var DbTools */
     private $dbTools;
@@ -62,6 +63,7 @@ class LogRepository
             self::ACTION_PACKET_SENDING => $this->module->l('Packet sending', 'logrepository'),
             self::ACTION_PACKET_TRACKING => $this->module->l('Packet tracking', 'logrepository'),
             self::ACTION_CARRIER_TRACKING_NUMBER => $this->module->l('Carrier tracking number', 'logrepository'),
+            self::ACTION_PACKET_CANCELLING => $this->module->l('Packet cancelling', 'logrepository'),
         ];
     }
 

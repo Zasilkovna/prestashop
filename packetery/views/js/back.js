@@ -79,6 +79,11 @@ $(document).ready(function () {
             event.preventDefault();
         }
     });
+    $('#process_cancel_packet').on('click', function (event) {
+        if (!confirm(process_cancel_packet_confirmation)) {
+            event.preventDefault();
+        }
+    });
 });
 
 //workaround for PS 1.6 BO product detail where PS BO product.js hides the packetery tab because it contains the word pack.

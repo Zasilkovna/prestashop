@@ -913,6 +913,10 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
         $this->processPostParcel($messages);
 
+        /** @var \Packetery\Order\PacketCanceller $packetCanceller */
+        $packetCanceller = $this->diContainer->get(\Packetery\Order\PacketCanceller::class);
+        $messages = $packetCanceller->processOrderDetail($messages);
+
         /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
         $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
@@ -1052,6 +1056,18 @@ class Packetery extends CarrierModule
             $carrierRequiresSize = (bool)$apiCarrier['requires_size'];
         }
         $this->context->smarty->assign('carrierRequiresSize', $carrierRequiresSize);
+
+        $showCancelButton = false;
+        if (isset($packeteryOrder['tracking_number']) && $packeteryOrder['tracking_number'] !== '') {
+            /** @var \Packetery\PacketTracking\PacketTrackingRepository $packetTrackingRepository */
+            $packetTrackingRepository = $this->diContainer->get(\Packetery\PacketTracking\PacketTrackingRepository::class);
+            $lastStatusCode = $packetTrackingRepository->getLastStatusCodeByOrderAndPacketId($orderId, $packeteryOrder['tracking_number']);
+            if ($lastStatusCode === null || $lastStatusCode === \Packetery\PacketTracking\PacketStatus::RECEIVED_DATA) {
+                $showCancelButton = true;
+            }
+        }
+        $this->context->smarty->assign('showCancelButton', $showCancelButton);
+        $this->context->smarty->assign('trackingNumber', $packeteryOrder['tracking_number']);
 
         return $this->display(__FILE__, 'display_order_main.tpl');
     }
