@@ -61,7 +61,7 @@ class ActionValidateStepComplete
 
         $orderData = $this->orderRepository->getByCart((int)$cart->id);
 
-        $isExternalPickupPointCarrier = $this->apiCarrierRepository->isPickupPointCarrier((int)$packeteryCarrier['id_branch']);
+        $isExternalPickupPointCarrier = $this->apiCarrierRepository->isExternalPickupPointCarrier((int)$packeteryCarrier['id_branch']);
 
         if ($isExternalPickupPointCarrier === true && empty($orderData['id_branch'])) {
             $params['completed'] = false;

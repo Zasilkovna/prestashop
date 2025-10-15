@@ -1511,7 +1511,7 @@ class Packetery extends CarrierModule
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
         if (
             $packeteryCarrier &&
-            $apiCarrierRepository->isPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
+            $apiCarrierRepository->isExternalPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
             !$orderRepository->isPickupPointChosenByCart($cart->id)
         ) {
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
