@@ -790,18 +790,9 @@ class Packetery extends CarrierModule
         $isPS16 = strpos(_PS_VERSION_, '1.6') === 0;
         $isOpcEnabled = (bool) Configuration::get('PS_ORDER_PROCESS_TYPE');
 
-        $products = $cart->getProducts();
-        /** @var \Packetery\Product\ProductAttributeRepository $productAttributeRepository */
-        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
-
-        $isAgeVerificationRequired = false;
-        foreach ($products as $product) {
-            $productAttributes = $productAttributeRepository->findByProductId($product['id_product']);
-            if ($productAttributes !== null) {
-                $isAgeVerificationRequired = $productAttributes->isForAdults();
-                break;
-            }
-        }
+        /** @var \Packetery\Cart\CartService $cartService */
+        $cartService = $this->diContainer->get(\Packetery\Cart\CartService::class);
+        $isAgeVerificationRequired = $cartService->isAgeVerificationRequired($cart);
 
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
