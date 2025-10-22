@@ -856,12 +856,12 @@ class Packetery extends CarrierModule
 
         $controllerWrapper = $this->diContainer->get(\Packetery\Tools\ControllerWrapper::class);
         foreach ($jsListFinal as $file) {
-            $uri = $this->_path . 'views/js/' . $file;
+            $uri = Tools::getShopDomainSsl(true, true) . $this->_path . 'views/js/' . $file;
             $controllerWrapper->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => $jsServer]);
         }
 
         $cssServer = self::LOCAL;
-        $cssPath = $this->_path . 'views/css/front.css';
+        $cssPath = Tools::getShopDomainSsl(true, true) . $this->_path . 'views/css/front.css';
         if (!Configuration::get('PS_CSS_THEME_CACHE')) {
             $cssPath .= '?v=' . $this->version;
             $cssServer = self::REMOTE;
