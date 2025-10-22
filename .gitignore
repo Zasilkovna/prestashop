@@ -4,3 +4,5 @@
 /vendor/
 /packetery/views/js/write-test.js
 /packetery/packetery_error.log
+/packetery/config_cs.xml
+/packetery/self_config.yml
