@@ -5,6 +5,7 @@ namespace Packetery\PacketTracking;
 use Packetery;
 use Packetery\AbstractFormService;
 use Packetery\Module\Options;
+use Packetery\UserPermission\UserPermissionHelper;
 
 class PacketStatusTrackingFormService extends AbstractFormService
 {
@@ -16,9 +17,9 @@ class PacketStatusTrackingFormService extends AbstractFormService
     /** @var PacketStatusFactory */
     private $packetStatusFactory;
 
-    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
+    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options, UserPermissionHelper $userPermissionHelper)
     {
-        parent::__construct($options);
+        parent::__construct($options, $userPermissionHelper);
         $this->module = $module;
         $this->packetStatusFactory = $packetStatusFactory;
     }

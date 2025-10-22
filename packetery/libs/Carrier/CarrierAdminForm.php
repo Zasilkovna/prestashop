@@ -8,6 +8,7 @@ use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\MessageManager;
+use Packetery\UserPermission\UserPermissionHelper;
 use Tools;
 
 class CarrierAdminForm
@@ -88,8 +89,13 @@ class CarrierAdminForm
         }
 
         if (Tools::isSubmit('submitCarrierForm')) {
-            $carrierData['id_branch'] = Tools::getValue('id_branch');
-            $this->saveCarrier($carrierData);
+            $userPermissionHelper = $this->module->diContainer->get(UserPermissionHelper::class);
+            if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
+                $this->error = $this->module->l('You do not have permission to edit carrier settings.', 'carrieradminform');
+            } else {
+                $carrierData['id_branch'] = Tools::getValue('id_branch');
+                $this->saveCarrier($carrierData);
+            }
         }
 
         if ($carrierData['name'] === '0') {
@@ -158,7 +164,12 @@ class CarrierAdminForm
         }
 
         if (Tools::isSubmit('submitCarrierOptionsForm')) {
-            $this->saveCarrierOptions($carrierData, $apiCarrier);
+            $userPermissionHelper = $this->module->diContainer->get(UserPermissionHelper::class);
+            if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
+                $this->error = $this->module->l('You do not have permission to edit carrier options.', 'carrieradminform');
+            } else {
+                $this->saveCarrierOptions($carrierData, $apiCarrier);
+            }
         }
 
         $possibleVendors = $this->getPossibleVendors($carrierData);
@@ -280,6 +291,12 @@ class CarrierAdminForm
      */
     public function saveCarrier(array $carrierData)
     {
+        $userPermissionHelper = $this->module->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
+            $this->error = $this->module->l('You do not have permission to save carrier settings.', 'carrieradminform');
+            return;
+        }
+
         $apiCarrier = $this->apiRepository->getById($carrierData['id_branch']);
         if (!$apiCarrier) {
             $this->repository->deleteById($this->carrierId);
@@ -327,6 +344,12 @@ class CarrierAdminForm
      */
     public function saveCarrierOptions(array $carrierData, array $apiCarrier)
     {
+        $userPermissionHelper = $this->module->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
+            $this->error = $this->module->l('You do not have permission to save carrier options.', 'carrieradminform');
+            return;
+        }
+
         $formData = Tools::getAllValues();
         $pickupPointType = $this->getPickupPointType($apiCarrier, $carrierData['id_branch']);
 

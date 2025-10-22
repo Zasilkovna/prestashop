@@ -6,6 +6,7 @@ use Packetery\Carrier\CarrierRepository;
 use Packetery\Carrier\CarrierTools;
 use Packetery\Module\VersionChecker;
 use Packetery\Tools\MessageManager;
+use Packetery\UserPermission\UserPermissionHelper;
 
 class PacketeryCarrierGridController extends ModuleAdminController
 {
@@ -43,6 +44,13 @@ class PacketeryCarrierGridController extends ModuleAdminController
 
         // for $this->translator not being null, in PS 1.6
         parent::__construct();
+
+        /** @var UserPermissionHelper $userPermissionHelper */
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_VIEW)) {
+            $this->errors[] = $this->l('You do not have permission to access Packeta carriers. Access denied.', 'packeterycarriergridcontroller');
+            return;
+        }
 
         $module = $this->getModule();
 
@@ -162,9 +170,8 @@ class PacketeryCarrierGridController extends ModuleAdminController
             $carrierHelper->build();
             if ($carrierHelper->getError()) {
                 $this->errors[] = $carrierHelper->getError();
-            } else {
-                $this->tpl_view_vars['carrierHelper'] = $carrierHelper->getHtml();
             }
+            $this->tpl_view_vars['carrierHelper'] = $carrierHelper->getHtml();
         }
         return parent::renderView();
     }
@@ -173,6 +180,13 @@ class PacketeryCarrierGridController extends ModuleAdminController
     {
         parent::initToolbar();
         unset($this->toolbar_btn['new']);
+
+        /** @var UserPermissionHelper $userPermissionHelper */
+        $userPermissionHelper = $this->getModule()->diContainer->get(UserPermissionHelper::class);
+
+        if (!$userPermissionHelper->hasPermission(UserPermissionHelper::SECTION_CARRIERS, UserPermissionHelper::PERMISSION_EDIT)) {
+            unset($this->toolbar_btn['bulk_action']);
+        }
     }
 
     /**
