@@ -76,7 +76,7 @@
                 <div class="mt-4">
                     <div class="form-row align-items-center">
                         <div class="col-sm-2 col-12 my-1">
-                            <label for="weight">{l s='Weight' mod='packetery'}:</label>
+                            <label for="weight">{l s='Weight' d='Modules.Packetery.Displayordermain'}:</label>
                         </div>
                         <div class="col-sm-2 my-1">
                             <div class="input-group">
@@ -127,7 +127,7 @@
                     <div class="mt-1">
                         <div class="form-row align-items-center">
                             <div class="col-sm-2 col-12 my-1">
-                                <label for="price_total">{l s='Packet value' mod='packetery'}:</label>
+                                <label for="price_total">{l s='Packet value' d='Modules.Packetery.Displayordermain'}:</label>
                             </div>
                             <div class="col-sm-2 my-1">
                                 <div class="input-group">
@@ -150,7 +150,7 @@
                         <div class="mt-1">
                             <div class="form-row align-items-center">
                                 <div class="col-sm-2 col-12 my-1">
-                                    <label for="price_cod">{l s='COD value' mod='packetery'}:</label>
+                                    <label for="price_cod">{l s='COD value' d='Modules.Packetery.Displayordermain'}:</label>
                                 </div>
                                 <div class="col-sm-2 my-1">
                                     <div class="input-group">
@@ -188,7 +188,7 @@
                                                     value="1"
                                                     {if ($ageVerificationRequired === null && $isOrderForAdults) || $ageVerificationRequired === true}checked="checked"{/if}
                                             >
-                                            <i class="md-checkbox-control"></i>{l s='Require age verification' mod='packetery'}
+                                            <i class="md-checkbox-control"></i>{l s='Require age verification' d='Modules.Packetery.Displayordermain'}
                                         </label>
                                     </div>
                                 </div>

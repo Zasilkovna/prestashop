@@ -101,7 +101,10 @@ class OrderExporter
         }
         if ($adultContent === true && CarrierTools::orderSupportsAgeVerification($packeteryOrder) === false) {
             throw new ExportException(
-                sprintf($this->module->l('Order %s contains product only for adults, but the carrier does not support age verification.', 'orderexporter'), $order->id)
+                sprintf(
+                    $this->module->getTranslator()->trans('Order %s contains product only for adults, but the carrier does not support age verification.', [], 'Modules.Packetery.Orderexporter'),
+                    $order->id
+                )
             );
         }
 

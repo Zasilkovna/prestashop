@@ -108,37 +108,37 @@ class OrderDetailsUpdater
 
         $inputConfigs = [
             'length' => [
-                'translation' => $this->module->l('length', 'orderdetailsupdater'),
+                'translation' => $this->module->getTranslator()->trans('length', [], 'Modules.Packetery.Orderdetailsupdater'),
                 'validation' => 'int',
                 'nullable' => false,
             ],
             'height' => [
-                'translation' => $this->module->l('height', 'orderdetailsupdater'),
+                'translation' => $this->module->getTranslator()->trans('height', [], 'Modules.Packetery.Orderdetailsupdater'),
                 'validation' => 'int',
                 'nullable' => false,
             ],
             'width' => [
-                'translation' => $this->module->l('width', 'orderdetailsupdater'),
+                'translation' => $this->module->getTranslator()->trans('width', [], 'Modules.Packetery.Orderdetailsupdater'),
                 'validation' => 'int',
                 'nullable' => false,
             ],
             'age_verification_required' => [
-                'translation' => $this->module->l('age verification', 'orderdetailsupdater'),
+                'translation' => $this->module->getTranslator()->trans('age verification', [], 'Modules.Packetery.Orderdetailsupdater'),
                 'validation' => 'int',
                 'nullable' => false,
             ],
             'price_total' => [
-                'translation' => $this->module->l('packet value', 'orderdetailsupdater'),
+                'translation' => $this->module->getTranslator()->trans('packet value', [], 'Modules.Packetery.Orderdetailsupdater'),
                 'validation' => 'float',
                 'nullable' => true,
             ],
             'price_cod' => [
-                'translation' => $this->module->l('COD value', 'orderdetailsupdater'),
+                'translation' => $this->module->getTranslator()->trans('COD value', [], 'Modules.Packetery.Orderdetailsupdater'),
                 'validation' => 'float',
                 'nullable' => true,
             ],
             'weight' => [
-                'translation' => $this->module->l('weight', 'orderdetailsupdater'),
+                'translation' => $this->module->getTranslator()->trans('weight', [], 'Modules.Packetery.Orderdetailsupdater'),
                 'validation' => 'float',
                 'nullable' => true,
             ],
@@ -192,7 +192,7 @@ class OrderDetailsUpdater
             $fieldNamesList = implode(', ', $invalidInts);
             $messages[] = [
                 'text' => sprintf(
-                    $this->module->l('%s must be a whole number, greater than 0.', 'orderdetailsupdater'),
+                    $this->module->getTranslator()->trans('%s must be a whole number, greater than 0.', [], 'Modules.Packetery.Orderdetailsupdater'),
                     ucfirst($fieldNamesList)
                 ),
                 'class' => 'danger',

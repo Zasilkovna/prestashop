@@ -18,7 +18,7 @@ function upgrade_module_3_2_0(Packetery $module): bool
     $dbTools = $module->diContainer->get(DbTools::class);
     $executeResult = $dbTools->executeQueries(
         $sql,
-        $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.2.0'),
+        $module->getTranslator()->trans('Exception raised during Packetery module upgrade:', [], 'Modules.Packetery.Upgrade'),
         true
     );
 

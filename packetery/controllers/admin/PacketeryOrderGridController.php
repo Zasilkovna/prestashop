@@ -348,7 +348,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             if ($packetNumbers) {
                 $this->errors[] = $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA, null, (int)Tools::getValue('offset'));
             } else {
-                $this->warnings[] = $this->l('No orders have been selected for which labels can be printed.', 'packeteryordergridcontroller');
+                $this->warnings[] = $this->module->getTranslator()->trans('No orders have been selected for which labels can be printed.', [], 'Modules.Packetery.Packeteryordergrid');
             }
         }
     }
@@ -369,14 +369,14 @@ class PacketeryOrderGridController extends ModuleAdminController
                 $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
                 $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
                 if ($packetsEnhanced === []) {
-                    $this->warnings[] = $this->l('Label printing failed, you can find more information in the Packeta log.', 'packeteryordergridcontroller');
+                    $this->warnings[] = $this->module->getTranslator()->trans('Label printing failed, you can find more information in the Packeta log.', [], 'Modules.Packetery.Packeteryordergrid');
                     $this->hasBulkLabelPrintingError = true;
 
                     return;
                 }
                 $this->errors[] = $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, $packetsEnhanced, (int)Tools::getValue('offset'));
             } else {
-                $this->warnings[] = $this->l('No orders have been selected for which labels can be printed.', 'packeteryordergridcontroller');
+                $this->warnings[] = $this->module->getTranslator()->trans('No orders have been selected for which labels can be printed.', [], 'Modules.Packetery.Packeteryordergrid');
                 $this->hasBulkLabelPrintingError = true;
             }
         }
@@ -445,10 +445,10 @@ class PacketeryOrderGridController extends ModuleAdminController
             } else {
                 if ($this->action === self::ACTION_BULK_CARRIER_LABEL_PDF) {
                     $packetNumbers = $this->prepareOnlyCarrierPacketNumbers($ids);
-                    $noPacketNumbersMessage = $this->l('No orders have been selected for Packeta carriers', 'packeteryordergridcontroller');
+                    $noPacketNumbersMessage = $this->module->getTranslator()->trans('No orders have been selected for Packeta carriers', [], 'Modules.Packetery.Packeteryordergrid');
                 } else {
                     $packetNumbers = $this->prepareOnlyInternalPacketNumbers($ids);
-                    $noPacketNumbersMessage = $this->l('No orders have been selected for Packeta pick-up points', 'packeteryordergridcontroller');
+                    $noPacketNumbersMessage = $this->module->getTranslator()->trans('No orders have been selected for Packeta pick-up points', [], 'Modules.Packetery.Packeteryordergrid');
                 }
 
                 if ($packetNumbers !== []) {
@@ -462,7 +462,7 @@ class PacketeryOrderGridController extends ModuleAdminController
                         $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
                         $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
                         if ($packetsEnhanced === []) {
-                            $this->warnings[] = $this->l('Carrier label printing failed, you can find more information in the Packeta log.', 'packeteryordergridcontroller');
+                            $this->warnings[] = $this->module->getTranslator()->trans('Carrier label printing failed, you can find more information in the Packeta log.', [], 'Modules.Packetery.Packeteryordergrid');
                             $this->hasBulkLabelPrintingError = true;
                         }
                     } else {

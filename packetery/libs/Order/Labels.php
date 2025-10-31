@@ -72,17 +72,17 @@ class Labels
 
             if ($fallbackToPacketaLabel === true && count($packets) === 1) {
                 $message = sprintf(
-                    $this->module->l('Label printing for packet %s failed, you can find more information in the Packeta log.', 'labels'),
+                    $this->module->getTranslator()->trans('Label printing for packet %s failed, you can find more information in the Packeta log.', [], 'Modules.Packetery.Labels'),
                     array_shift($packets)
                 );
             } elseif ($type === self::TYPE_CARRIER) {
                 $message = sprintf(
-                    $this->module->l('Carrier label printing failed, you can find more information in the Packeta log. Error: %s', 'labels'),
+                    $this->module->getTranslator()->trans('Carrier label printing failed, you can find more information in the Packeta log. Error: %s', [], 'Modules.Packetery.Labels'),
                     $response->getFaultString()
                 );
             } else {
                 $message = sprintf(
-                    $this->module->l('Label printing failed, you can find more information in the Packeta log. Error: %s', 'labels'),
+                    $this->module->getTranslator()->trans('Label printing failed, you can find more information in the Packeta log. Error: %s', [], 'Modules.Packetery.Labels'),
                     $response->getFaultString()
                 );
             }
