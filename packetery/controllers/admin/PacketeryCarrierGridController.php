@@ -110,13 +110,15 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $this->meta_title = $title;
         $this->toolbar_title = $title;
 
+        /** @var MessageManager $messageManager */
         $messageManager = $module->diContainer->get(MessageManager::class);
         $info = $messageManager->getMessageClean('info');
-        if ($info) {
+
+        if ($info !== false) {
             $this->confirmations[] = $info;
         }
         $warning = $messageManager->getMessageClean('warning');
-        if ($warning) {
+        if ($warning !== false) {
             $this->warnings[] = $warning;
         }
     }
@@ -141,7 +143,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $this->addRowAction('edit');
         $list = parent::renderList();
 
-        if ($this->_list) {
+        if (is_array($this->_list)) {
             $module = $this->getModule();
             foreach ($this->_list as $carrierData) {
                 $carrierHelper = new CarrierAdminForm((int)$carrierData['id_carrier'], $module);

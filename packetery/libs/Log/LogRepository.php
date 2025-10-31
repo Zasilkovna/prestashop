@@ -53,9 +53,8 @@ class LogRepository
 
     /**
      * @return array<string, string>
-     * @return void
      */
-    public function getActionTranslations()
+    public function getActionTranslations(): array
     {
         return [
             self::ACTION_LABEL_PRINT => $this->module->l('Label print', 'logrepository'),

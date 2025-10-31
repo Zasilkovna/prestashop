@@ -107,7 +107,7 @@ class OrderSaver
         }
 
         $packeteryWeight = $this->weightCalculator->getComputedOrDefaultWeight($order);
-        if ($packeteryWeight) {
+        if ($packeteryWeight !== null) {
             $data['weight'] = $packeteryWeight;
         }
 

@@ -202,7 +202,7 @@ class Packetery extends CarrierModule
     public function getCarriersContent()
     {
         $this->context->smarty->assign('module_dir', $this->_path);
-
+        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
         $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         if (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') {
@@ -665,7 +665,7 @@ class Packetery extends CarrierModule
                 $customerZip = '';
             }
         }
-
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$id_carrier);
         if (!$packeteryCarrier) {
@@ -674,7 +674,7 @@ class Packetery extends CarrierModule
 
         $deliveryAddressCountryIso = \Packetery\Address\AddressTools::getCountryFromCart($cart);
 
-        /** @var \Packetery\Carrier\CarrierVendors $carrierRepository */
+        /** @var \Packetery\Carrier\CarrierVendors $carrierVendors */
         $carrierVendors = $this->diContainer->get(\Packetery\Carrier\CarrierVendors::class);
         $widgetVendors = $carrierVendors->getWidgetParameter($packeteryCarrier, $deliveryAddressCountryIso);
         $this->context->smarty->assign('widget_vendors', $widgetVendors);
@@ -783,6 +783,7 @@ class Packetery extends CarrierModule
         $isOpcEnabled = (bool) Configuration::get('PS_ORDER_PROCESS_TYPE');
 
         $products = $cart->getProducts();
+        /** @var \Packetery\Product\ProductAttributeRepository $productAttributeRepository */
         $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
 
         $isAgeVerificationRequired = false;
@@ -1149,7 +1150,7 @@ class Packetery extends CarrierModule
             return [];
         }
 
-        /** @var \Packetery\Carrier\CarrierVendors $carrierRepository */
+        /** @var \Packetery\Carrier\CarrierVendors $carrierVendors */
         $carrierVendors = $this->diContainer->get(\Packetery\Carrier\CarrierVendors::class);
 
         return $carrierVendors->getWidgetParameter($packeteryCarrier, $country);
@@ -1298,7 +1299,7 @@ class Packetery extends CarrierModule
             $order = $params['order'];
         }
 
-        if (empty($order)) {
+        if ($order === null) {
             return;
         }
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
@@ -1480,7 +1481,7 @@ class Packetery extends CarrierModule
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $carrierRepository */
+        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
         $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
 
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
@@ -1686,7 +1687,7 @@ class Packetery extends CarrierModule
 
         $isAdult = (int)Tools::getIsset('packetery_age_verification');
 
-        /** @var Packetery\Product\ProductAttributeRepository $dbTools */
+        /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
         $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
 
         $productAttributeInfo = $productAttributeRepository->getRow($product->id);
@@ -1709,19 +1710,17 @@ class Packetery extends CarrierModule
      * Shows Packetery form in BO product detail
      *
      * @param array $params product information
-     * @return bool
+     * @return void
      * @throws \Packetery\Exceptions\DatabaseException|ReflectionException
      */
-    public function hookActionProductDelete(array $params)
+    public function hookActionProductDelete(array $params): void
     {
         if (Validate::isLoadedObject($params['product']) === false) {
             return;
         }
 
-        /** @var Packetery\Product\ProductAttributeRepository $dbTools */
+        /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
         $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
-        if ($productAttributeRepository->delete($params['product']->id)) {
-            return;
-        }
+        $productAttributeRepository->delete($params['product']->id);
     }
 }
