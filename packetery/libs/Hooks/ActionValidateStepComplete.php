@@ -72,6 +72,7 @@ class ActionValidateStepComplete
 
         if (
             $isApiWidgetValidationModeEnabled === true &&
+            $this->isPickupPointCarrier($isExternalPickupPointCarrier, (string)$packeteryCarrier['id_branch']) &&
             is_array($orderData) === true &&
             $orderData !== [] &&
             (bool)$orderData['is_ad'] === false
@@ -100,5 +101,10 @@ class ActionValidateStepComplete
         $params['completed'] = true;
 
         return null;
+    }
+
+    public function isPickupPointCarrier(bool $isExternalPickupPointCarrier, string $idBranch): bool
+    {
+        return ($isExternalPickupPointCarrier === true || $idBranch === Packetery::PP_ALL || $idBranch === Packetery::ZPOINT);
     }
 }
