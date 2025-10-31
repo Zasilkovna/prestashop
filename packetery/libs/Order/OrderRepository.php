@@ -224,6 +224,11 @@ class OrderRepository
                    `po`.`width`,
                    `po`.`exported`,
                    `po`.`tracking_number`,
+                   `po`.`currency_branch`,
+                   `po`.`is_cod`,
+                   `po`.`price_total`,
+                   `po`.`price_cod`,
+                   `po`.`age_verification_required`,
                    `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
@@ -294,8 +299,11 @@ class OrderRepository
                    `po`.`city`,
                    `po`.`street`,
                    `po`.`house_number`,
-                   `o`.`id_shop_group`, 
-                   `o`.`id_shop` 
+                   `po`.`price_total`,
+                   `po`.`price_cod`,
+                   `po`.`age_verification_required`,
+                   `o`.`id_shop_group`,
+                   `o`.`id_shop`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po` 
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
             WHERE `po`.`id_order` = ' . $orderId);
@@ -402,7 +410,7 @@ class OrderRepository
      * @return bool
      * @throws DatabaseException
      */
-    public function isOrderAdult($orderId)
+    public function isOrderForAdults($orderId)
     {
         $sql = 'SELECT ppp.`is_adult` FROM `' . _DB_PREFIX_ . 'order_detail` pod 
                 LEFT JOIN `' . _DB_PREFIX_ . 'packetery_product_attribute` ppp ON (pod.`product_id` = ppp.`id_product`)
@@ -413,19 +421,23 @@ class OrderRepository
 
     /**
      * @param array<int, int> $enabledOrderStatuses
+     * @param int[] $finalStatusIds
      * @param int $maxProcessedOrdersLimit
      * @param DateTimeImmutable $oldestOrderDate
      * @return array|bool|mysqli_result|PDOStatement|resource|null
      */
     public function getOrdersByStateAndLastUpdate(
         array $enabledOrderStatuses,
+        array $finalStatusIds,
         $maxProcessedOrdersLimit,
         DateTimeImmutable $oldestOrderDate
     ) {
         if ($enabledOrderStatuses === []) {
             return [];
         }
+
         $implodedOrderStatuses = implode(',', $enabledOrderStatuses);
+        $implodedIgnoredFinalPacketStatuses = implode(',', $finalStatusIds);
 
         $sql = 'SELECT DISTINCT
             `po`.`id_order`,
@@ -436,11 +448,19 @@ class OrderRepository
         FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
         LEFT JOIN `' . _DB_PREFIX_ . 'orders` `o`
             ON `o`.`id_order` = `po`.`id_order`
-        LEFT JOIN `' . _DB_PREFIX_ . 'packetery_packet_status` `pps`
-            ON `o`.`id_order` = `pps`.`id_order`
+        LEFT JOIN (
+            SELECT `ps`.`id_order`, `ps`.`status_code`
+            FROM `' . _DB_PREFIX_ . 'packetery_packet_status` `ps`
+            INNER JOIN (
+                SELECT `id_order`, MAX(`event_datetime`) AS `last_event`
+                FROM `' . _DB_PREFIX_ . 'packetery_packet_status`
+                GROUP BY `id_order`
+            ) `latest` ON `latest`.`id_order` = `ps`.`id_order` AND `latest`.`last_event` = `ps`.`event_datetime`
+        ) `pps` ON `o`.`id_order` = `pps`.`id_order`
         WHERE `o`.`current_state` IN (' . $this->db->escape($implodedOrderStatuses) . ')
             AND `o`.`date_add` > "' . $oldestOrderDate->format('Y-m-d H:i:s') . '"
             AND `po`.`exported` = 1
+            AND `pps`.`status_code` IS NULL OR `pps`.`status_code` NOT IN (' . $this->db->escape($implodedIgnoredFinalPacketStatuses) . ')
         ORDER BY `po`.`last_update_tracking_status` ASC
         LIMIT ' . (int) $maxProcessedOrdersLimit;
 

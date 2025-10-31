@@ -26,6 +26,7 @@
 
 use Packetery\Exceptions\AggregatedException;
 use Packetery\Exceptions\DatabaseException;
+use Packetery\Exceptions\LabelPrintException;
 use Packetery\Module\SoapApi;
 use Packetery\Module\VersionChecker;
 use Packetery\Order\CsvExporter;
@@ -38,12 +39,15 @@ use Packetery\Tools\ConfigHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
 {
+    const ACTION_BULK_LABEL_PDF = 'bulkLabelPdf';
     const ACTION_BULK_CARRIER_LABEL_PDF = 'bulkCarrierLabelPdf';
 
     protected $statuses_array = array();
 
     /** @var Packetery */
     private $packetery;
+
+    private $hasBulkLabelPrintingError;
 
     public function __construct()
     {
@@ -199,6 +203,8 @@ class PacketeryOrderGridController extends ModuleAdminController
         $this->meta_title = $title;
         $this->toolbar_title = $title;
 
+        $this->hasBulkLabelPrintingError = false;
+
         $versionChecker = $this->getModule()->diContainer->get(VersionChecker::class);
         if ($versionChecker->isNewVersionAvailable()) {
             $this->warnings[] = $versionChecker->getVersionUpdateMessageHtml();
@@ -256,9 +262,43 @@ class PacketeryOrderGridController extends ModuleAdminController
         $module = $this->getModule();
         /** @var Tracking $packeteryTracking */
         $packeteryTracking = $module->diContainer->get(Tracking::class);
-        $packetNumbers = $packeteryTracking->getTrackingFromOrders(implode(',', $ids));
-        if (!$packetNumbers) {
-            $this->warnings[] = $this->module->getTranslator()->trans('Please submit selected orders first.', [], 'Modules.Packetery.Packeteryordergrid');
+
+        return $packeteryTracking->getTrackingFromOrders(implode(',', $ids));
+    }
+
+    /**
+     * @return array
+     */
+    private function prepareOnlyCarrierPacketNumbers(array $ids)
+    {
+        /** @var OrderRepository $orderRepo */
+        $orderRepository = $this->getModule()->diContainer->get(OrderRepository::class);
+
+        $packetNumbers = [];
+        foreach ($ids as $orderId) {
+            $orderData = $orderRepository->getById($orderId);
+            if ((bool)$orderData['is_carrier'] === true || (bool)$orderData['is_ad'] === true) {
+                $packetNumbers[$orderId] = $orderData['tracking_number'];
+            }
+        }
+
+        return $packetNumbers;
+    }
+
+    /**
+     * @return array
+     */
+    private function prepareOnlyInternalPacketNumbers(array $ids)
+    {
+        /** @var OrderRepository $orderRepo */
+        $orderRepository = $this->getModule()->diContainer->get(OrderRepository::class);
+
+        $packetNumbers = [];
+        foreach ($ids as $orderId) {
+            $orderData = $orderRepository->getById($orderId);
+            if ((bool)$orderData['is_carrier'] === false && (bool)$orderData['is_ad'] === false) {
+                $packetNumbers[$orderId] = $orderData['tracking_number'];
+            }
         }
 
         return $packetNumbers;
@@ -269,23 +309,30 @@ class PacketeryOrderGridController extends ModuleAdminController
      * @param string $type
      * @param array|null $packetsEnhanced
      * @param int $offset
+     * @param bool $fallbackToPacketaLabel
+     * @return void|string String on error.
      * @throws ReflectionException
      */
-    private function prepareLabels(array $packetNumbers, $type, $packetsEnhanced = null, $offset = 0)
+    private function prepareLabels(array $packetNumbers, $type, $packetsEnhanced = null, $offset = 0, $fallbackToPacketaLabel = false)
     {
         $module = $this->getModule();
         /** @var Labels $packeteryLabels */
         $packeteryLabels = $module->diContainer->get(Labels::class);
-        $pdfContent = $packeteryLabels->packetsLabelsPdf($packetNumbers, $type, $packetsEnhanced, $offset);
-        header('Content-Type: application/pdf');
-        header(
-            sprintf(
-                'Content-Disposition: attachment; filename="packeta_%s.pdf"',
-                (new \DateTimeImmutable())->format('Y-m-d_H-i-s_u')
-            )
-        );
-        echo $pdfContent;
-        die();
+        try {
+            $pdfContents = $packeteryLabels->packetsLabelsPdf($packetNumbers, $type, $packetsEnhanced, $offset, $fallbackToPacketaLabel);
+
+            header('Content-Type: application/pdf');
+            header(
+                sprintf(
+                    'Content-Disposition: attachment; filename="packeta_%s.pdf"',
+                    (new \DateTimeImmutable())->format('Y-m-d_H-i-s_u')
+                )
+            );
+            echo $pdfContents;
+            die();
+        } catch (LabelPrintException $labelPrintException) {
+            return $labelPrintException->getMessage();
+        }
     }
 
     /**
@@ -297,9 +344,11 @@ class PacketeryOrderGridController extends ModuleAdminController
     public function processBulkLabelPdf()
     {
         if (Tools::isSubmit('submitPrepareLabels')) {
-            $packetNumbers = $this->preparePacketNumbers($this->boxes);
+            $packetNumbers = $this->prepareOnlyInternalPacketNumbers($this->boxes);
             if ($packetNumbers) {
-                $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA, null, (int)Tools::getValue('offset'));
+                $this->errors[] = $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA, null, (int)Tools::getValue('offset'));
+            } else {
+                $this->warnings[] = $this->l('No orders have been selected for which labels can be printed.', 'packeteryordergridcontroller');
             }
         }
     }
@@ -314,12 +363,21 @@ class PacketeryOrderGridController extends ModuleAdminController
     public function processBulkCarrierLabelPdf()
     {
         if (Tools::isSubmit('submitPrepareLabels')) {
-            $packetNumbers = $this->preparePacketNumbers($this->boxes);
+            $packetNumbers = $this->prepareOnlyCarrierPacketNumbers($this->boxes);
             if ($packetNumbers) {
                 /** @var SoapApi $soapApi */
                 $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
                 $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
-                $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, $packetsEnhanced, (int)Tools::getValue('offset'));
+                if ($packetsEnhanced === []) {
+                    $this->warnings[] = $this->l('Label printing failed, you can find more information in the Packeta log.', 'packeteryordergridcontroller');
+                    $this->hasBulkLabelPrintingError = true;
+
+                    return;
+                }
+                $this->errors[] = $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, $packetsEnhanced, (int)Tools::getValue('offset'));
+            } else {
+                $this->warnings[] = $this->l('No orders have been selected for which labels can be printed.', 'packeteryordergridcontroller');
+                $this->hasBulkLabelPrintingError = true;
             }
         }
     }
@@ -332,26 +390,42 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function processPrint()
     {
+        /** @var OrderRepository $orderRepo */
+        $orderRepository = $this->getModule()->diContainer->get(OrderRepository::class);
+        $orderData = $orderRepository->getById((int)Tools::getValue('id_order'));
+        $isExternalCarrier = ((bool)$orderData['is_carrier'] === true || (bool)$orderData['is_ad'] === true);
+
         $packetNumbers = $this->preparePacketNumbers([Tools::getValue('id_order')]);
         if ($packetNumbers) {
-            /** @var SoapApi $soapApi */
-            $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
-            $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
-            if (!empty($packetsEnhanced)) {
-                $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, $packetsEnhanced);
-            } else {
-                $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA);
+            $packetsEnhanced = null;
+            if ($isExternalCarrier) {
+                /** @var SoapApi $soapApi */
+                $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
+                $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
             }
+
+            if (is_array($packetsEnhanced)) {
+                $this->errors[] = $this->prepareLabels($packetNumbers, Labels::TYPE_CARRIER, $packetsEnhanced, 0, true);
+            } else {
+                $this->errors[] = $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA);
+            }
+        } else {
+            $this->warnings[] = $this->module->getTranslator()->trans('Please submit selected orders first.', [], 'Modules.Packetery.Packeteryordergrid');
         }
     }
 
     public function processBulkCsvExport()
     {
+        if ((int)Tools::getValue('submitFilterorders') === 1) {
+            return;
+        }
+
         $ids = $this->boxes;
         if (!$ids) {
             $this->informations[] = $this->module->getTranslator()->trans('Please choose orders first.', [], 'Modules.Packetery.Packeteryordergrid');
             return;
         }
+
         $module = $this->getModule();
         /** @var CsvExporter $csvExporter */
         $csvExporter = $module->diContainer->get(CsvExporter::class);
@@ -361,7 +435,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function renderList()
     {
-        if ($this->action === 'bulkLabelPdf' || $this->action === self::ACTION_BULK_CARRIER_LABEL_PDF) {
+        if ($this->action === self::ACTION_BULK_LABEL_PDF || $this->action === self::ACTION_BULK_CARRIER_LABEL_PDF) {
             if (Tools::getIsset('cancel')) {
                 Tools::redirectAdmin(self::$currentIndex . '&token=' . $this->token);
             }
@@ -369,8 +443,15 @@ class PacketeryOrderGridController extends ModuleAdminController
             if (!$ids) {
                 $this->informations[] = $this->module->getTranslator()->trans('Please choose orders first.', [], 'Modules.Packetery.Packeteryordergrid');
             } else {
-                $packetNumbers = $this->preparePacketNumbers($ids);
-                if ($packetNumbers) {
+                if ($this->action === self::ACTION_BULK_CARRIER_LABEL_PDF) {
+                    $packetNumbers = $this->prepareOnlyCarrierPacketNumbers($ids);
+                    $noPacketNumbersMessage = $this->l('No orders have been selected for Packeta carriers', 'packeteryordergridcontroller');
+                } else {
+                    $packetNumbers = $this->prepareOnlyInternalPacketNumbers($ids);
+                    $noPacketNumbersMessage = $this->l('No orders have been selected for Packeta pick-up points', 'packeteryordergridcontroller');
+                }
+
+                if ($packetNumbers !== []) {
                     // Offset setting form preparation.
                     $packetsEnhanced = null;
                     if ($this->action === self::ACTION_BULK_CARRIER_LABEL_PDF) {
@@ -380,8 +461,9 @@ class PacketeryOrderGridController extends ModuleAdminController
                         /** @var SoapApi $soapApi */
                         $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
                         $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
-                        if (empty($packetsEnhanced)) {
-                            $this->warnings[] = $this->module->getTranslator()->trans('No labels can be printed as carrier labels.', [], 'Modules.Packetery.Packeteryordergrid');
+                        if ($packetsEnhanced === []) {
+                            $this->warnings[] = $this->l('Carrier label printing failed, you can find more information in the Packeta log.', 'packeteryordergridcontroller');
+                            $this->hasBulkLabelPrintingError = true;
                         }
                     } else {
                         $type = Labels::TYPE_PACKETA;
@@ -389,15 +471,17 @@ class PacketeryOrderGridController extends ModuleAdminController
                         $maxOffset = (int)$maxOffsets[ConfigHelper::get('PACKETERY_LABEL_FORMAT')];
                     }
                     if ($maxOffset !== 0) {
-                        if (empty($this->warnings)) {
+                        if ($this->hasBulkLabelPrintingError === false) {
                             $this->tpl_list_vars['max_offset'] = $maxOffset;
                             $this->tpl_list_vars['prepareLabelsMode'] = true;
                             $this->tpl_list_vars['REQUEST_URI'] = $_SERVER['REQUEST_URI'];
                             $this->tpl_list_vars['POST'] = $_POST;
                         }
-                    } else {
-                        $this->prepareLabels($packetNumbers, $type, $packetsEnhanced);
+                    } elseif ($this->action !== self::ACTION_BULK_CARRIER_LABEL_PDF || $packetsEnhanced !== []) {
+                        $this->errors[] = $this->prepareLabels($packetNumbers, $type, $packetsEnhanced);
                     }
+                } else {
+                    $this->warnings[] = $noPacketNumbersMessage;
                 }
             }
         }
@@ -425,25 +509,29 @@ class PacketeryOrderGridController extends ModuleAdminController
 
     public function postProcess()
     {
-        $change = false;
-        /** @var OrderRepository $orderRepo */
-        $orderRepo = $this->getModule()->diContainer->get(OrderRepository::class);
-        // there is no condition on submitPacketeryOrderGrid, so values are saved even before bulk actions
-        foreach ($_POST as $key => $value) {
-            if (preg_match('/^weight_(\d+)$/', $key, $matches)) {
-                $orderId = (int)$matches[1];
-                if ($value === '') {
-                    $value = null;
-                } else {
-                    $value = str_replace([',', ' '], ['.', ''], $value);
-                    $value = (float)$value;
+        // values are saved even before bulk actions
+        if (
+            $this->action !== self::ACTION_BULK_LABEL_PDF && $this->action !== self::ACTION_BULK_CARRIER_LABEL_PDF
+        ) {
+            $change = false;
+            /** @var OrderRepository $orderRepo */
+            $orderRepo = $this->getModule()->diContainer->get(OrderRepository::class);
+            foreach ($_POST as $key => $value) {
+                if (preg_match('/^weight_(\d+)$/', $key, $matches)) {
+                    $orderId = (int)$matches[1];
+                    if ($value === '') {
+                        $value = null;
+                    } else {
+                        $value = str_replace([',', ' '], ['.', ''], $value);
+                        $value = (float)$value;
+                    }
+                    $orderRepo->setWeight($orderId, $value);
+                    $change = true;
                 }
-                $orderRepo->setWeight($orderId, $value);
-                $change = true;
             }
-        }
-        if ($change) {
-            $this->informations[] = $this->module->getTranslator()->trans('Order weights were saved.', [], 'Modules.Packetery.Packeteryordergrid');
+            if ($change) {
+                $this->informations[] = $this->module->getTranslator()->trans('Order weights were saved.', [], 'Modules.Packetery.Packeteryordergrid');
+            }
         }
 
         parent::postProcess();

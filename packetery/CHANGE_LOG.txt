@@ -1,3 +1,18 @@
+3.2.2  - Fixed: Tracking cron now doesn't skip orders statuses with a shipped flag.
+3.2.1  - Fixed: Correct bulk label printing error handling logic.
+       - Fixed: Packet status now updates correctly for final states (delivered, canceled, returned, unknown) via cron.
+3.2.0  - Added: age verification, weight and prices (total, COD) controls added to the order detail form.
+       - Fixed: Correct escaping of Packeta log record parameters.
+       - Updated: Add new fields to CSV export and update version number to 8.
+3.1.0  - Added: Tracking shipment status.
+       - Added: Changing order status if shipment status changes.
+       - Updated: Widget at checkout does not offer z-box if there is a product with required age-verification in the cart.
+       - Added: Notification of new updates.
+       - Updated: The packetAttributesValid endpoint is no longer called before submitting a shipment.
+3.0.4  - Fixed: Correct messages used in the module log.
+       - Fixed: Show Packeta card panel at order detail even after PS carrier update.
+3.0.3  - Fixed: "Class not found" error when going to checkout.
+3.0.2  - Fixed: Do not export CSV again after setting order filter parameter.
 3.0.1  - Fixed: Correct display of the selected pickup point and the message after setting the pickup point for a new order.
 3.0.0  - Updated: Order administration and carrier list were realized using PrestaShop's native grids (controllers).
        - Updated: The module settings page was realized using PrestaShop's native form.

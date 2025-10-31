@@ -17,6 +17,7 @@ class LogRepository
     const ACTION_LABEL_PRINT = 'label-print';
     const ACTION_SENDER_VALIDATION = 'sender-validation';
     const ACTION_PACKET_TRACKING = 'packet-tracking';
+    const ACTION_CARRIER_TRACKING_NUMBER = 'carrier-tracking-number';
 
     /** @var DbTools */
     private $dbTools;
@@ -61,6 +62,7 @@ class LogRepository
             self::ACTION_SENDER_VALIDATION => $this->module->getTranslator()->trans('Sender validation', [], 'Modules.Packetery.Logrepository'),
             self::ACTION_PACKET_SENDING => $this->module->getTranslator()->trans('Packet sending', [], 'Modules.Packetery.Logrepository'),
             self::ACTION_PACKET_TRACKING => $this->module->getTranslator()->trans('Packet tracking', [], 'Modules.Packetery.Logrepository'),
+            self::ACTION_CARRIER_TRACKING_NUMBER => $this->module->getTranslator()->trans('Carrier tracking number', [], 'Modules.Packetery.Logrepository'),
         ];
     }
 
@@ -78,10 +80,10 @@ class LogRepository
         return $this->insert(
             [
                 'order_id' => $orderId === 0 || $orderId === "0" ? null : $orderId,
-                'params' => json_encode($params, JSON_UNESCAPED_UNICODE),
+                'params' => $this->dbTools->db->escape(json_encode($params, JSON_UNESCAPED_UNICODE)),
                 'status' => $status,
                 'action' => $action,
-                'date' => (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
+                'date' => (new DateTimeImmutable('now'))->setTimezone(new DateTimeZone(date_default_timezone_get()))->format('Y-m-d H:i:s'),
             ]
         );
     }
