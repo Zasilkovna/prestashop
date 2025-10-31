@@ -70,7 +70,12 @@ class ActionValidateStepComplete
 
         $isApiWidgetValidationModeEnabled = ConfigHelper::isApiWidgetValidationModeEnabled();
 
-        if ($isApiWidgetValidationModeEnabled === true && (bool)$orderData['is_ad'] === false) {
+        if (
+            $isApiWidgetValidationModeEnabled === true &&
+            is_array($orderData) === true &&
+            $orderData !== [] &&
+            (bool)$orderData['is_ad'] === false
+        ) {
             $pickupPointValidationResponse = $this->pickupPointValidator->validate(
                 $this->pickupPointValidator->createPickupPointValidateRequest($orderData, $cart, $packeteryCarrier)
             );
