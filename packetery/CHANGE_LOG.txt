@@ -1,3 +1,4 @@
+       - Added: The ability to cancel a shipment before it has been shipped.
 3.2.2  - Fixed: Tracking cron now doesn't skip orders statuses with a shipped flag.
 3.2.1  - Fixed: Correct bulk label printing error handling logic.
        - Fixed: Packet status now updates correctly for final states (delivered, canceled, returned, unknown) via cron.

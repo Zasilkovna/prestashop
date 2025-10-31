@@ -6,6 +6,8 @@ use Packetery;
 use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Log\LogRepository;
 use Packetery\Order\OrderRepository;
+use Packetery\Request\CancelPacketRequest;
+use Packetery\Response\CancelPacketResponse;
 use Packetery\Response\PacketCarrierNumber;
 use Packetery\Response\PacketInfo;
 use Packetery\Tools\ConfigHelper;
@@ -260,6 +262,20 @@ class SoapApi
         }
         if ($response->hasPacketIdFault() && count($packetsEnhanced) === 1) {
             $response->setInvalidPacketIds(array_column($packetsEnhanced, 'packetId'));
+        }
+
+        return $response;
+    }
+
+    public function cancelPacket(CancelPacketRequest $request): CancelPacketResponse
+    {
+        $response = new CancelPacketResponse();
+        try {
+            $soapClient = new SoapClient(self::WSDL_URL);
+            $soapClient->cancelPacket($this->configHelper->getApiPass(), $request->getPacketId());
+        } catch (SoapFault $exception) {
+            $response->setFault($this->getFaultIdentifier($exception));
+            $response->setFaultString($exception->faultstring);
         }
 
         return $response;

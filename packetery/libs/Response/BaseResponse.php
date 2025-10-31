@@ -91,4 +91,9 @@ class BaseResponse
     {
         return $this->faultString;
     }
+
+    public function getFault(): ?string
+    {
+        return $this->fault;
+    }
 }
