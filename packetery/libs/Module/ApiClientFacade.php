@@ -14,10 +14,21 @@ class ApiClientFacade
      * @return string|bool
      * @throws \Packetery\Exceptions\ApiClientException
      */
-    public function get($url)
+    public function getWithGithubAuthorizationToken($url)
     {
         if (class_exists('GuzzleHttp\Client')) {
-            $client = new Client();
+            $token = defined('_GITHUB_ACCESS_TOKEN_') ? _GITHUB_ACCESS_TOKEN_ : null;
+
+            if ($token !== null) {
+                $headers['Authorization'] = "token {$token}";
+                $client = new Client([
+                    'headers' => $headers,
+                ]);
+            } else {
+                $client = new Client();
+            }
+
+
             try {
                 /** @var Response $result */
                 $result = $client->get($url);

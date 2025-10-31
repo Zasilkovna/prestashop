@@ -76,33 +76,131 @@
                 <div class="mt-4">
                     <div class="form-row align-items-center">
                         <div class="col-sm-2 col-12 my-1">
-                            <label>{l s='Size (L x W x H):' d='Modules.Packetery.Displayordermain'}</label>
+                            <label for="weight">{l s='Weight' d='Modules.Packetery.Displayordermain'}:</label>
                         </div>
                         <div class="col-sm-2 my-1">
-                            <input class="form-control" name="length" value="{$orderDetails['length']}" placeholder="{l s='Length' d='Modules.Packetery.Displayordermain'}">
-                        </div>
-                        <div class="col-auto my-1">
-                            x
-                        </div>
-                        <div class="col-sm-2 my-1">
-                            <input class="form-control" name="width" value="{$orderDetails['width']}" placeholder="{l s='Width' d='Modules.Packetery.Displayordermain'}">
-                        </div>
-                        <div class="col-auto my-1">
-                            x
-                        </div>
-                        <div class="col-sm-2 my-1">
-                            <input class="form-control" name="height" value="{$orderDetails['height']}" placeholder="{l s='Height' d='Modules.Packetery.Displayordermain'}">
-                        </div>
-                        <div class="col-auto my-1">
-                            (mm)
+                            <div class="input-group">
+                                <input
+                                        type="text"
+                                        name="weight"
+                                        id="weight"
+                                        class="form-control"
+                                        value="{$orderWeight}"
+                                >
+                                <div class="input-group-append">
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                {if $carrierRequiresSize === true}
+                    <div class="mt-1">
+                        <div class="form-row align-items-center">
+                            <div class="col-sm-2 col-12 my-1">
+                                <label>{l s='Size (L x W x H):' d='Modules.Packetery.Displayordermain'}</label>
+                            </div>
+                            <div class="col-sm-2 my-1">
+                                <input class="form-control" name="length" value="{$orderDetails['length']}" placeholder="{l s='Length' d='Modules.Packetery.Displayordermain'}">
+                            </div>
+                            <div class="col-auto my-1">
+                                x
+                            </div>
+                            <div class="col-sm-2 my-1">
+                                <input class="form-control" name="width" value="{$orderDetails['width']}" placeholder="{l s='Width' d='Modules.Packetery.Displayordermain'}">
+                            </div>
+                            <div class="col-auto my-1">
+                                x
+                            </div>
+                            <div class="col-sm-2 my-1">
+                                <input class="form-control" name="height" value="{$orderDetails['height']}" placeholder="{l s='Height' d='Modules.Packetery.Displayordermain'}">
+                            </div>
+                            <div class="col-auto my-1">
+                                (mm)
+                            </div>
+                        </div>
+                    </div>
+                {/if}
+
+                {if $showPriceInputs === true}
+                    <div class="mt-1">
+                        <div class="form-row align-items-center">
+                            <div class="col-sm-2 col-12 my-1">
+                                <label for="price_total">{l s='Packet value' d='Modules.Packetery.Displayordermain'}:</label>
+                            </div>
+                            <div class="col-sm-2 my-1">
+                                <div class="input-group">
+                                    <input
+                                            type="text"
+                                            name="price_total"
+                                            id="price_total"
+                                            class="form-control"
+                                            value="{$total}"
+                                    >
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">{$exportCurrency}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {if $isCod}
+                        <div class="mt-1">
+                            <div class="form-row align-items-center">
+                                <div class="col-sm-2 col-12 my-1">
+                                    <label for="price_cod">{l s='COD value' d='Modules.Packetery.Displayordermain'}:</label>
+                                </div>
+                                <div class="col-sm-2 my-1">
+                                    <div class="input-group">
+                                        <input
+                                                type="text"
+                                                name="price_cod"
+                                                id="price_cod"
+                                                class="form-control"
+                                                value="{$cod}"
+                                        >
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">{$exportCurrency}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
+                {/if}
+
+                {* It is not possible to turn it off for other carriers in case that product for adults is present in the order. *}
+                {if $carrierSupportsAgeVerification}
+                    <div class="mt-1">
+                        <div class="form-row align-items-center">
+                            <div class="col-sm-2 col-12 my-1">
+                            </div>
+                            <div class="col-auto my-1">
+                                <div class="checkbox">
+                                    <div class="md-checkbox md-checkbox-inline">
+                                        <label>
+                                            <input
+                                                    type="checkbox"
+                                                    id="age_verification_required"
+                                                    name="age_verification_required"
+                                                    value="1"
+                                                    {if ($ageVerificationRequired === null && $isOrderForAdults) || $ageVerificationRequired === true}checked="checked"{/if}
+                                            >
+                                            <i class="md-checkbox-control"></i>{l s='Require age verification' d='Modules.Packetery.Displayordermain'}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
+
                 <div class="text-right">
                     <button class="btn btn-primary" name="{$submitButton}">{l s='Save' d='Modules.Packetery.Displayordermain'}</button>
                 </div>
-            {/if }
+            {/if}
         </form>
 
         {* There will be more buttons aka more actions in future. If there is no button hide the divider *}

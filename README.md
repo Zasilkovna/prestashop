@@ -68,8 +68,8 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 - english
 
 ### Supported versions
-- PrestaShop version 1.7, Prestashop 8
-- PHP 7.1 - PHP 8.1
+- PrestaShop version >= 1.7.7, Prestashop 8, PrestaShop 9
+- PHP 7.1 - PHP 8.4
 - If you have problems using the module, please contact us at [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 
 ### Provided functions
@@ -90,6 +90,9 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 - Multistore support.
 - Set age verification for orders containing adult products.
 - Ability to set default shipment weight and packaging material weight.
+- Tracking shipment status.
+- Changing order status if shipment status changes.
+- Widget at checkout does not offer z-box if there is a product with required age-verification in the cart.
 
 ### OPC support
 - One Page Supercheckout from [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout) (since version 6.0.9)
@@ -168,8 +171,8 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - angličtina
 
 ### Podporovaná verze
-- PrestaShop verze 1.7, PrestaShop 8
-- PHP 7.1 - PHP 8.1
+- PrestaShop verze >= 1.7.7, PrestaShop 8, PrestaShop 9
+- PHP 7.1 - PHP 8.4
 - Při problému s použitím modulu nás kontaktujte na adrese [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 
 ### Poskytované funkce
@@ -189,6 +192,9 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - Podpora multistore.
 - Nastavení ověření věku pro objednávky obsahující produkty pro dospělé.
 - Možnost nastavit výchozí hmotnost zásilky a obalového materiálu.
+- Sledování stavu zásilek.
+- Změna stavu objednávky, pokud se změní stav zásilky.
+- Widget v pokladně nenabízí z-box, pokud je v košíku produkt s ověřením věku.
 
 ### Podpora pro OPC
 - One Page Supercheckout od [Knowband.com](https://www.knowband.com/prestashop-one-page-supercheckout?search=supercheckout) (od verze 6.0.9)

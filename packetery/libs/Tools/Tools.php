@@ -41,4 +41,9 @@ class Tools extends ToolsCore
 
         return PrestaShopTools::getValue($key, $default_value);
     }
+
+    public static function sanitizeFloatValue(string $value): string
+    {
+        return str_replace([',', ' '], ['.', ''], $value);
+    }
 }

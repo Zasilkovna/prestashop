@@ -281,7 +281,7 @@ class ApiCarrierRepository
      */
     public function getById($id)
     {
-        return $this->dbTools->getRow('SELECT `id`, `name`, `currency`, `is_pickup_points`, `country`, `disallows_cod`
+        return $this->dbTools->getRow('SELECT `id`, `name`, `currency`, `is_pickup_points`, `country`, `disallows_cod`, `requires_size`
             FROM `' . $this->getPrefixedTableName() . '`
             WHERE `id` = "' . $this->dbTools->db->escape($id) . '"');
     }
@@ -298,5 +298,17 @@ class ApiCarrierRepository
             GROUP BY `country`'
         );
         return array_column($result, 'country');
+    }
+
+    /**
+     * @throws DatabaseException
+     */
+    public function isPickupPointCarrier(int $carrierId): bool
+    {
+        $result = $this->dbTools->getValue(
+            'SELECT 1 FROM `' . $this->getPrefixedTableName() . '` WHERE `is_pickup_points` = 1 AND `id` = "' . $this->dbTools->db->escape($carrierId) . '"'
+        );
+
+        return ((int)$result === 1);
     }
 }

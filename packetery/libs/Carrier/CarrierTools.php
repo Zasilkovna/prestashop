@@ -10,6 +10,16 @@ use CountryCore as Country;
 class CarrierTools
 {
     /**
+     * Czech and Slovak Home Delivery.
+     *
+     * @var int[]
+     */
+    private const CARRIERS_SUPPORTING_AGE_VERIFICATION = [
+        106,
+        131,
+    ];
+
+    /**
      * @param int $carrierId
      * @param string $countryParam name,id_country,iso_code
      * @return array
@@ -73,5 +83,29 @@ class CarrierTools
         $gridBaseUrl = Context::getContext()->link->getAdminLink('PacketeryCarrierGrid');
 
         return sprintf('%s&%s', $gridBaseUrl, $getParameters);
+    }
+
+    public static function orderSupportsAgeVerification(array $packeteryOrder): bool
+    {
+        if ((bool)$packeteryOrder['is_ad'] === false && (bool)$packeteryOrder['is_carrier'] === false) {
+            return true;
+        }
+        if (in_array((int)$packeteryOrder['id_branch'], self::CARRIERS_SUPPORTING_AGE_VERIFICATION)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function findExternalCarrierId(array $packeteryOrder): ?int
+    {
+        if (
+            ((bool)$packeteryOrder['is_ad'] === true || (bool)$packeteryOrder['is_carrier'] === true) &&
+            is_numeric($packeteryOrder['id_branch'])
+        ) {
+            return (int)$packeteryOrder['id_branch'];
+        }
+
+        return null;
     }
 }

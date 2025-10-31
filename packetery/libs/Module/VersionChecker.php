@@ -16,7 +16,7 @@ use Tools;
 class VersionChecker
 {
     const CHECK_INTERVAL_IN_SECONDS = 24 * 3600; // 1 day
-    const LATEST_RELEASES_ENDPOINT_URL = 'https://api.github.com/repos/Zasilkovna/prestashop/releases/latest';
+    const GITHUB_RELEASES_ENDPOINT_URL = 'https://api.github.com/repos/Zasilkovna/prestashop/releases';
 
     /** @var Packetery */
     private $module;
@@ -49,7 +49,14 @@ class VersionChecker
         try {
             $response = $this->getLatestReleaseResponse();
         } catch (Exception $exception) {
-            PrestaShopLogger::addLog('Packetery: ' . $exception->getMessage(), 3, null, null, null, true);
+            if (
+                (defined('_PS_MODE_DEV_') && _PS_MODE_DEV_ === false) &&
+                (defined('_PACKETERY_DEBUG_LOG_') && _PACKETERY_DEBUG_LOG_ === true)
+            ) {
+                PrestaShopLogger::addLog("Packetery: {$exception->getMessage()}", 3, null, null, null, true);
+            } elseif ((defined('_PS_MODE_DEV_') && _PS_MODE_DEV_ === true)) {
+                throw $exception;
+            }
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time());
 
             return;
@@ -57,9 +64,12 @@ class VersionChecker
 
         $version = $response->getVersion();
         $downloadUrl = $response->getDownloadUrl();
-        if ($version !== '' && $downloadUrl !== '' && $this->isNewVersionAvailable($version)) {
+        $releaseNotes = $response->getReleaseNotes();
+
+        if ($this->shouldUpdateStoredVersionData($version, $downloadUrl)) {
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $version);
             ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, $downloadUrl);
+            ConfigHelper::update(ConfigHelper::KEY_LAST_RELEASE_NOTES, $releaseNotes);
         }
 
         ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time());
@@ -70,39 +80,65 @@ class VersionChecker
      * @throws ApiClientException
      * @throws VersionCheckerException
      */
-    private function getLatestReleaseResponse()
+    private function getLatestReleaseResponse(): LatestReleaseResponse
     {
-        $json = $this->apiClientFacade->get(self::LATEST_RELEASES_ENDPOINT_URL);
+        $allowedReleaseTypes = defined('_PACKETERY_ALLOWED_RELEASE_TYPES_') && is_array(_PACKETERY_ALLOWED_RELEASE_TYPES_)
+            ? _PACKETERY_ALLOWED_RELEASE_TYPES_
+            : ['stable'];
+
+        $json = $this->apiClientFacade->getWithGithubAuthorizationToken(self::GITHUB_RELEASES_ENDPOINT_URL);
         if ($json === '' || $json === false) {
-            throw new VersionCheckerException('Failed to retrieve response from GitHub latest releases endpoint.');
+            throw new VersionCheckerException('Failed to retrieve response from GitHub releases endpoint.');
         }
 
-        $data = json_decode($json, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        $releaseList = json_decode($json, true);
+
+        if (!is_array($releaseList) || json_last_error() !== JSON_ERROR_NONE) {
             PrestaShopLogger::addLog('Packetery: JSON decode error: ' . json_last_error_msg(), 3, null, null, null, true);
             throw VersionCheckerException::createForInvalidLatestReleaseResponse();
         }
 
-        $isStructureValid = $this->jsonStructureValidator->isStructureValid(
-            $data,
-            [
-                'tag_name' => 'string',
-                'assets' => [
-                    0 => [
-                        'browser_download_url' => 'string',
+        foreach ($releaseList as $release) {
+            $isStructureValid = $this->jsonStructureValidator->isStructureValid(
+                $release,
+                [
+                    'tag_name' => 'string',
+                    'draft' => 'bool',
+                    'prerelease' => 'bool',
+                    'assets' => [
+                        0 => [
+                            'browser_download_url' => 'string',
+                        ],
                     ],
-                ],
-            ]
-        );
+                    'body' => 'string',
+                ]
+            );
 
-        if (!$isStructureValid) {
-            throw VersionCheckerException::createForInvalidLatestReleaseResponse();
+            if (!$isStructureValid) {
+                throw VersionCheckerException::createForInvalidLatestReleaseResponse();
+            }
+
+            $isDraft = (bool)$release['draft'];
+            $isPrerelease = (bool)$release['prerelease'];
+
+            if ($isDraft) {
+                $releaseType = 'draft';
+            } elseif ($isPrerelease) {
+                $releaseType = 'prerelease';
+            } else {
+                $releaseType = 'stable';
+            }
+
+            if (in_array($releaseType, $allowedReleaseTypes, true)) {
+                return new LatestReleaseResponse(
+                    ltrim($release['tag_name'], 'v'),
+                    $release['assets'][0]['browser_download_url'],
+                    $release['body']
+                );
+            }
         }
 
-        return new LatestReleaseResponse(
-            ltrim($data['tag_name'], 'v'),
-            $data['assets'][0]['browser_download_url']
-        );
+        throw VersionCheckerException::createForInvalidLatestReleaseResponse();
     }
 
     /**
@@ -143,7 +179,15 @@ class VersionChecker
         $smarty->assign('downloadUrl', ConfigHelper::get(ConfigHelper::KEY_LAST_VERSION_URL));
         $smarty->assign('newVersion', ConfigHelper::get(ConfigHelper::KEY_LAST_VERSION));
         $smarty->assign('currentVersion', $this->module->version);
+        $smarty->assign('releaseNotes', ConfigHelper::get(ConfigHelper::KEY_LAST_RELEASE_NOTES));
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/newVersionMessage.tpl');
+    }
+
+    private function shouldUpdateStoredVersionData(string $version, string $downloadUrl): bool
+    {
+        return $version !== '' &&
+               $downloadUrl !== '' &&
+               $this->isNewVersionAvailable($version);
     }
 }
