@@ -133,10 +133,10 @@ parameters:
 			path: ../packetery/libs/Hooks/ActionObjectOrderUpdateBefore.php
 
 		-
-			message: '#^Implicit array creation is not allowed \- variable \$headers does not exist\.$#'
-			identifier: variable.implicitArray
-			count: 1
-			path: ../packetery/libs/Module/ApiClientFacade.php
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 2
+			path: ../packetery/libs/Hooks/ActionValidateStepComplete.php
 
 		-
 			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
@@ -229,6 +229,18 @@ parameters:
 			path: ../packetery/libs/Payment/PaymentRepository.php
 
 		-
+			message: '#^Call to function array_filter\(\) requires parameter \#2 to be passed to avoid loose comparison semantics\.$#'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../packetery/libs/PickupPointValidate/ValidatedOptions.php
+
+		-
+			message: '#^Call to function array_filter\(\) requires parameter \#2 to be passed to avoid loose comparison semantics\.$#'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../packetery/libs/PickupPointValidate/ValidatedPoint.php
+
+		-
 			message: '#^Only booleans are allowed in a ternary operator condition, Employee\|null given\.$#'
 			identifier: ternary.condNotBoolean
 			count: 1
@@ -285,7 +297,7 @@ parameters:
 		-
 			message: '#^Access to property \$errors on an unknown class LegacyControllerBridgeInterface\.$#'
 			identifier: class.notFound
-			count: 8
+			count: 4
 			path: ../packetery/packetery.php
 
 		-
@@ -309,7 +321,7 @@ parameters:
 		-
 			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
 			identifier: empty.notAllowed
-			count: 7
+			count: 5
 			path: ../packetery/packetery.php
 
 		-
@@ -327,12 +339,6 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param for parameter \$params with type array\|null is not subtype of native type array\.$#'
 			identifier: parameter.phpDocType
-			count: 1
-			path: ../packetery/packetery.php
-
-		-
-			message: '#^PHPDoc tag @var with type Packetery\\ApiCarrier\\ApiCarrierRepository is not subtype of type Packetery\\Carrier\\CarrierRepository\.$#'
-			identifier: varTag.type
 			count: 1
 			path: ../packetery/packetery.php
 

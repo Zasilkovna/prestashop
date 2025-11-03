@@ -151,12 +151,13 @@ class Uninstaller
     private function deleteConfiguration()
     {
         return (
-            Configuration::deleteByName('PACKETERY_APIPASS') &&
+            Configuration::deleteByName(ConfigHelper::KEY_APIPASS) &&
             Configuration::deleteByName('PACKETERY_ESHOP_ID') &&
             Configuration::deleteByName('PACKETERY_LABEL_FORMAT') &&
             Configuration::deleteByName('PACKETERY_CARRIER_LABEL_FORMAT') &&
             Configuration::deleteByName('PACKETERY_LAST_CARRIERS_UPDATE') &&
             Configuration::deleteByName('PACKETERY_WIDGET_AUTOOPEN') &&
+            Configuration::deleteByName(ConfigHelper::KEY_WIDGET_VALIDATION_MODE) &&
             Configuration::deleteByName('PACKETERY_CRON_TOKEN') &&
             Configuration::deleteByName('PACKETERY_ID_PREFERENCE') &&
             Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGE_PRICE') &&

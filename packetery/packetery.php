@@ -55,7 +55,7 @@ class Packetery extends CarrierModule
     {
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '3.2.2';
+        $this->version = '3.3.0';
         $this->author = 'Packeta s.r.o.';
         $this->need_instance = 0;
         $this->is_configurable = 1;
@@ -84,7 +84,7 @@ class Packetery extends CarrierModule
         $this->displayName = $this->l('Packeta');
         $this->description = $this->l('Packeta pick-up points, orders export, and print shipping labels');
 
-        $this->ps_versions_compliancy = array('min' => '1.7.0.0', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7.7.0', 'max' => _PS_VERSION_);
     }
 
     /**
@@ -500,7 +500,7 @@ class Packetery extends CarrierModule
     private function getConfigurationOptions()
     {
         return [
-            'PACKETERY_APIPASS' => [
+            \Packetery\Tools\ConfigHelper::KEY_APIPASS => [
                 'title' => $this->l('API password'),
                 'required' => true,
             ],
@@ -535,6 +535,14 @@ class Packetery extends CarrierModule
             ],
             'PACKETERY_WIDGET_AUTOOPEN' => [
                 'title' => $this->l('Automatically open widget in cart'),
+                'options' => [
+                    1 => $this->l('Yes'),
+                    0 => $this->l('No'),
+                ],
+                'required' => false,
+            ],
+            \Packetery\Tools\ConfigHelper::KEY_WIDGET_VALIDATION_MODE => [
+                'title' => $this->l('Validate the pickup point using the API before accepting the order'),
                 'options' => [
                     1 => $this->l('Yes'),
                     0 => $this->l('No'),
@@ -782,18 +790,9 @@ class Packetery extends CarrierModule
         $isPS16 = strpos(_PS_VERSION_, '1.6') === 0;
         $isOpcEnabled = (bool) Configuration::get('PS_ORDER_PROCESS_TYPE');
 
-        $products = $cart->getProducts();
-        /** @var \Packetery\Product\ProductAttributeRepository $productAttributeRepository */
-        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
-
-        $isAgeVerificationRequired = false;
-        foreach ($products as $product) {
-            $productAttributes = $productAttributeRepository->findByProductId($product['id_product']);
-            if ($productAttributes !== null) {
-                $isAgeVerificationRequired = $productAttributes->isForAdults();
-                break;
-            }
-        }
+        /** @var \Packetery\Cart\CartService $cartService */
+        $cartService = $this->diContainer->get(\Packetery\Cart\CartService::class);
+        $isAgeVerificationRequired = $cartService->isAgeVerificationRequired($cart);
 
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
@@ -1136,7 +1135,7 @@ class Packetery extends CarrierModule
         ) {
             $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
         } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
-            $widgetOptions['carriers'] = 'packeta';
+            $widgetOptions['carriers'] = \Packetery\Carrier\CarrierVendors::INTERNAL_PICKUP_POINT_CARRIER;
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
     }
@@ -1503,7 +1502,7 @@ class Packetery extends CarrierModule
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
         if (
             $packeteryCarrier &&
-            $apiCarrierRepository->isPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
+            $apiCarrierRepository->isExternalPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
             !$orderRepository->isPickupPointChosenByCart($cart->id)
         ) {
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
@@ -1521,46 +1520,11 @@ class Packetery extends CarrierModule
      */
     public function hookActionValidateStepComplete(array &$params)
     {
-        if (empty($params['cart'])) {
-            $this->context->controller->errors[] = $this->l('Order validation failed, shop owner can find more information in log.');
-            PrestaShopLogger::addLog('Cart is not present in hook parameters.', 3, null, null, null, true);
-            $params['completed'] = false;
-            return;
+        $actionValidateStepComplete = $this->diContainer->get(\Packetery\Hooks\ActionValidateStepComplete::class);
+        $error = $actionValidateStepComplete->execute($params);
+        if ($error !== null) {
+            $this->context->controller->errors[] = $error;
         }
-
-        /** @var CartCore $cart */
-        $cart = $params['cart'];
-        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
-
-        /** @var \Packetery\Order\OrderRepository $orderRepository */
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getByCart((int)$cart->id);
-
-        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $carrierRepository */
-        $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
-        if (
-            $apiCarrierRepository->isPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
-            empty($orderData['id_branch'])
-        ) {
-            $this->context->controller->errors[] = $this->l('Please select pickup point.');
-            $params['completed'] = false;
-            return;
-        }
-
-        if ($packeteryCarrier['address_validation'] !== 'required') {
-            $params['completed'] = true;
-            return;
-        }
-
-        if (!$orderData || !\Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
-            $this->context->controller->errors[] = $this->l('Please use widget to validate address.');
-            $params['completed'] = false;
-            return;
-        }
-
-        $params['completed'] = true;
     }
 
     /**

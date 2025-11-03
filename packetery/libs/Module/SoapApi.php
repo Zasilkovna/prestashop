@@ -3,8 +3,9 @@
 namespace Packetery\Module;
 
 use Packetery;
-use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Log\LogRepository;
+use Packetery\Module\Exception\IncorrectApiPasswordException;
+use Packetery\Module\Exception\SenderNotExistsException;
 use Packetery\Order\OrderRepository;
 use Packetery\Request\CancelPacketRequest;
 use Packetery\Response\CancelPacketResponse;
@@ -41,17 +42,27 @@ class SoapApi
 
     /**
      * @param string $senderIndication
+     * @param false|string $apiPassword
      * @return array with 2 return routing strings for a sender specified by $senderIndication.
-     * @throws SenderGetReturnRoutingException
+     * @throws IncorrectApiPasswordException
+     * @throws SenderNotExistsException
      */
-    public function senderGetReturnRouting($senderIndication)
+    public function senderGetReturnRouting($senderIndication, $apiPassword)
     {
         $client = new SoapClient(self::WSDL_URL);
         try {
-            $response = $client->senderGetReturnRouting($this->configHelper->getApiPass(), $senderIndication);
+            $response = $client->senderGetReturnRouting($apiPassword, $senderIndication);
+
             return $response->routingSegment;
         } catch (SoapFault $e) {
-            throw new SenderGetReturnRoutingException($e->getMessage(), isset($e->detail->SenderNotExists));
+            if (isset($e->detail->IncorrectApiPasswordFault)) {
+                throw new IncorrectApiPasswordException($e->getMessage());
+            }
+            if (isset($e->detail->SenderNotExists)) {
+                throw new SenderNotExistsException($e->getMessage());
+            }
+
+            return [];
         }
     }
 
