@@ -9,15 +9,15 @@ use Packetery\PickupPointValidate\ValidatedPoint;
 
 class PickupPointValidateRequest
 {
-    /** @var ValidatedOptions|null */
+    /** @var ValidatedOptions */
     private $options;
 
     /** @var ValidatedPoint */
     private $point;
 
     public function __construct(
-        ?ValidatedOptions $options,
-        ?ValidatedPoint $point
+        ValidatedOptions $options,
+        ValidatedPoint $point
     ) {
         $this->options = $options;
         $this->point = $point;
@@ -29,8 +29,8 @@ class PickupPointValidateRequest
     public function getSubmittableData(): array
     {
         return [
-            'options' => $this->options ? $this->options->getSubmittableData() : null,
-            'point' => $this->point ? $this->point->getSubmittableData() : null,
+            'options' => $this->options->getSubmittableData(),
+            'point' => $this->point->getSubmittableData(),
         ];
     }
 }

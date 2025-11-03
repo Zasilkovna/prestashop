@@ -100,7 +100,7 @@ class Downloader
      * Downloads carriers in JSON.
      *
      * @return string
-     * @throws DownloadException|GuzzleException DownloadException.
+     * @throws DownloadException
      */
     private function downloadJson()
     {

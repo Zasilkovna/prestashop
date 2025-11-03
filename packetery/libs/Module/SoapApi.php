@@ -52,15 +52,17 @@ class SoapApi
         $client = new SoapClient(self::WSDL_URL);
         try {
             $response = $client->senderGetReturnRouting($apiPassword, $senderIndication);
+
             return $response->routingSegment;
         } catch (SoapFault $e) {
             if (isset($e->detail->IncorrectApiPasswordFault)) {
                 throw new IncorrectApiPasswordException($e->getMessage());
             }
-
             if (isset($e->detail->SenderNotExists)) {
                 throw new SenderNotExistsException($e->getMessage());
             }
+
+            return [];
         }
     }
 
