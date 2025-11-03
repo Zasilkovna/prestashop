@@ -76,7 +76,7 @@ class CsvExporter
                 'affiliateId' => PacketSubmitter::AFFILIATE_ID,
             ];
             foreach (['carrierPickupPoint', 'street', 'houseNumber', 'city', 'zip'] as $key) {
-                if (!empty($exportData[$key])) {
+                if (isset($exportData[$key])) {
                     $data[$order_id][$key] = $exportData[$key];
                 }
             }

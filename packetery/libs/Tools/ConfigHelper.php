@@ -5,18 +5,22 @@ namespace Packetery\Tools;
 use Configuration;
 use Context;
 use Language;
+use Packetery\Tools\Exception\InvalidApiKeyException;
 use Shop;
 
 class ConfigHelper
 {
-    const KEY_LAST_VERSION_CHECK_TIMESTAMP = 'PACKETERY_LAST_VERSION_CHECK_TIMESTAMP';
-    const KEY_LAST_VERSION_URL = 'PACKETERY_LAST_VERSION_URL';
-    const KEY_LAST_VERSION = 'PACKETERY_LAST_VERSION';
-    const KEY_LAST_RELEASE_NOTES = 'PACKETERY_LAST_RELEASE_NOTES';
-    const KEY_USE_PS_CURRENCY_CONVERSION = 'PACKETERY_USE_PS_CURRENCY_CONVERSION';
+    public const KEY_APIPASS = 'PACKETERY_APIPASS';
+    public const KEY_ESHOP_ID = 'PACKETERY_ESHOP_ID';
+    public const KEY_LAST_VERSION_CHECK_TIMESTAMP = 'PACKETERY_LAST_VERSION_CHECK_TIMESTAMP';
+    public const KEY_LAST_VERSION_URL = 'PACKETERY_LAST_VERSION_URL';
+    public const KEY_LAST_VERSION = 'PACKETERY_LAST_VERSION';
+    public const KEY_LAST_RELEASE_NOTES = 'PACKETERY_LAST_RELEASE_NOTES';
+    public const KEY_USE_PS_CURRENCY_CONVERSION = 'PACKETERY_USE_PS_CURRENCY_CONVERSION';
+    public const KEY_WIDGET_VALIDATION_MODE = 'PACKETERY_WIDGET_VALIDATION_MODE';
 
-    const BEHAVIOR_ALL = 'all'; // default
-    const BEHAVIOR_SEPARATE = 'separate';
+    private const BEHAVIOR_ALL = 'all'; // default
+    private const BEHAVIOR_SEPARATE = 'separate';
 
     private static $configBehavior = [
         // It is possible to have multiple senders for one set of credentials.
@@ -88,10 +92,12 @@ class ConfigHelper
      */
     public function getApiPass()
     {
-        return self::get('PACKETERY_APIPASS');
+        return self::get(self::KEY_APIPASS);
     }
 
     /**
+     * @deprecated
+     * @see getValidApiKey
      * @return false|string
      */
     public function getApiKey()
@@ -133,5 +139,28 @@ class ConfigHelper
         }
 
         return self::BEHAVIOR_ALL;
+    }
+
+    public static function isApiWidgetValidationModeEnabled(): bool
+    {
+        return (bool) self::get(self::KEY_WIDGET_VALIDATION_MODE);
+    }
+
+    /**
+     * @throws InvalidApiKeyException
+     * @return string
+     */
+    public function getValidApiKey(): string
+    {
+        $apiPass = $this->getApiPass();
+        if ($apiPass === false) {
+            return false;
+        }
+
+        $apiKey = self::getApiKeyFromApiPass($apiPass);
+        if ($apiKey === false || $apiKey === '') {
+            throw InvalidApiKeyException::createFromMissingKey();
+        }
+        return $apiKey;
     }
 }

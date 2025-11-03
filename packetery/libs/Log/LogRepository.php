@@ -18,6 +18,8 @@ class LogRepository
     const ACTION_SENDER_VALIDATION = 'sender-validation';
     const ACTION_PACKET_TRACKING = 'packet-tracking';
     const ACTION_CARRIER_TRACKING_NUMBER = 'carrier-tracking-number';
+    const ACTION_PACKET_CANCELLING = 'packet-cancelling';
+    public const ACTION_PICKUP_POINT_VALIDATE = 'pickup-point-validate';
 
     /** @var DbTools */
     private $dbTools;
@@ -53,9 +55,8 @@ class LogRepository
 
     /**
      * @return array<string, string>
-     * @return void
      */
-    public function getActionTranslations()
+    public function getActionTranslations(): array
     {
         return [
             self::ACTION_LABEL_PRINT => $this->module->getTranslator()->trans('Label print', [], 'Modules.Packetery.Logrepository'),
@@ -63,6 +64,8 @@ class LogRepository
             self::ACTION_PACKET_SENDING => $this->module->getTranslator()->trans('Packet sending', [], 'Modules.Packetery.Logrepository'),
             self::ACTION_PACKET_TRACKING => $this->module->getTranslator()->trans('Packet tracking', [], 'Modules.Packetery.Logrepository'),
             self::ACTION_CARRIER_TRACKING_NUMBER => $this->module->getTranslator()->trans('Carrier tracking number', [], 'Modules.Packetery.Logrepository'),
+            self::ACTION_PACKET_CANCELLING => $this->module->getTranslator()->trans('Packet cancelling', [], 'Modules.Packetery.Logrepository'),
+            self::ACTION_PICKUP_POINT_VALIDATE => $this->module->getTranslator()->trans('Pickup point validation', [], 'Modules.Packetery.Logrepository'),
         ];
     }
 

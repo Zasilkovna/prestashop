@@ -3,8 +3,10 @@
 namespace Packetery\Module;
 
 use Packetery;
-use Packetery\Exceptions\SenderGetReturnRoutingException;
 use Packetery\Log\LogRepository;
+use Packetery\Module\Exception\IncorrectApiPasswordException;
+use Packetery\Module\Exception\SenderNotExistsException;
+use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\Tools;
 use Validate;
 
@@ -21,14 +23,19 @@ class Options
     /** @var LogRepository */
     private $logRepository;
 
+    /** @var ConfigHelper */
+    private $configHelper;
+
     public function __construct(
         Packetery $module,
         SoapApi $soapApi,
-        LogRepository $logRepository
+        LogRepository $logRepository,
+        ConfigHelper $configHelper
     ) {
         $this->module = $module;
         $this->soapApi = $soapApi;
         $this->logRepository = $logRepository;
+        $this->configHelper = $configHelper;
     }
 
     /**
@@ -41,20 +48,32 @@ class Options
     public function validate($id, $value)
     {
         switch ($id) {
-            case 'PACKETERY_APIPASS':
+            case ConfigHelper::KEY_APIPASS:
                 if (\Tools::strlen($value) !== self::API_PASSWORD_LENGTH) {
                     return $this->module->getTranslator()->trans('Api password must be 32 characters long.', [], 'Modules.Packetery.Options');
                 }
-
-                return false;
-            case 'PACKETERY_ESHOP_ID':
-                $configHelper = $this->module->diContainer->get(\Packetery\Tools\ConfigHelper::class);
-                if (!$configHelper->getApiPass()) {
-                    // Error for PACKETERY_APIPASS is enough.
+                try {
+                    $this->soapApi->senderGetReturnRouting('', $value);
+                    return false;
+                } catch (IncorrectApiPasswordException $e) {
+                        $this->logRepository->insertRow(
+                            LogRepository::ACTION_SENDER_VALIDATION,
+                            [
+                                'incorrectApiPasswordFaultMessage' => $e->getMessage(),
+                            ],
+                            LogRepository::STATUS_ERROR
+                        );
+                        return $this->module->getTranslator()->trans('Invalid API password.', [], 'Modules.Packetery.Options');
+                } catch (SenderNotExistsException $e) {
+                    return false;
+                }
+            case ConfigHelper::KEY_ESHOP_ID:
+                $apiPassword = $this->configHelper->getApiPass();
+                if (!$apiPassword) {
                     return false;
                 }
                 try {
-                    $this->soapApi->senderGetReturnRouting($value);
+                    $this->soapApi->senderGetReturnRouting($value, $apiPassword);
                     $this->logRepository->insertRow(
                         LogRepository::ACTION_SENDER_VALIDATION,
                         [
@@ -64,25 +83,19 @@ class Options
                     );
 
                     return false;
-                } catch (SenderGetReturnRoutingException $e) {
-                    if ($e->senderNotExists === true) {
-                        return $this->module->getTranslator()->trans('Provided sender indication does not exist.', [], 'Modules.Packetery.Options');
-                    }
-
+                } catch (SenderNotExistsException $e) {
                     $this->logRepository->insertRow(
                         LogRepository::ACTION_SENDER_VALIDATION,
                         [
                             'value' => $value,
-                            'senderNotExists' => $e->senderNotExists,
+                            'senderNotExistsMessage' => $e->getMessage(),
                         ],
                         LogRepository::STATUS_ERROR
                     );
 
-                    return sprintf(
-                        '%s: %s',
-                        $this->module->getTranslator()->trans('Sender indication validation failed', [], 'Modules.Packetery.Options'),
-                        $e->getMessage()
-                    );
+                    return $this->module->getTranslator()->trans('Provided sender indication does not exist.', [], 'Modules.Packetery.Options');
+                } catch (IncorrectApiPasswordException $e) {
+                    return $this->module->getTranslator()->trans('The provided sender cannot be verified: Invalid API password.', [], 'Modules.Packetery.Options');
                 }
             case 'PACKETERY_DEFAULT_PACKAGE_PRICE':
                 if ($this->isNonNegative($value)) {

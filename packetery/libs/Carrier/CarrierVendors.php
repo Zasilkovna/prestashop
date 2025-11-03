@@ -4,6 +4,10 @@ namespace Packetery\Carrier;
 
 class CarrierVendors
 {
+    public const INTERNAL_PICKUP_POINT_CARRIER = 'packeta';
+    public const VENDOR_GROUP_ZPOINT = 'zpoint';
+    private const VENDOR_GROUP_ZBOX = 'zbox';
+
     /** @var \Packetery */
     private $module;
 
@@ -48,48 +52,48 @@ class CarrierVendors
         return [
             'cz' => [
                 [
-                    'group' => 'zpoint',
+                    'group' => self::VENDOR_GROUP_ZPOINT,
                     'country' => 'cz',
                     'name' => $zpointName,
                 ],
                 [
-                    'group' => 'zbox',
+                    'group' => self::VENDOR_GROUP_ZBOX,
                     'country' => 'cz',
                     'name' => $zboxName,
                 ],
             ],
             'sk' => [
                 [
-                    'group' => 'zpoint',
+                    'group' => self::VENDOR_GROUP_ZPOINT,
                     'country' => 'sk',
                     'name' => $zpointName,
                 ],
                 [
-                    'group' => 'zbox',
+                    'group' => self::VENDOR_GROUP_ZBOX,
                     'country' => 'sk',
                     'name' => $zboxName,
                 ],
             ],
             'hu' => [
                 [
-                    'group' => 'zpoint',
+                    'group' => self::VENDOR_GROUP_ZPOINT,
                     'country' => 'hu',
                     'name' => $zpointName,
                 ],
                 [
-                    'group' => 'zbox',
+                    'group' => self::VENDOR_GROUP_ZBOX,
                     'country' => 'hu',
                     'name' => $zboxName,
                 ],
             ],
             'ro' => [
                 [
-                    'group' => 'zpoint',
+                    'group' => self::VENDOR_GROUP_ZPOINT,
                     'country' => 'ro',
                     'name' => $zpointName,
                 ],
                 [
-                    'group' => 'zbox',
+                    'group' => self::VENDOR_GROUP_ZBOX,
                     'country' => 'ro',
                     'name' => $zboxName,
                 ],
@@ -114,7 +118,7 @@ class CarrierVendors
                     }
                     foreach ($vendorGroup as $vendor) {
                         $widgetVendors[] = [
-                            'group' => ($vendor !== 'zpoint' ? $vendor : ''),
+                            'group' => ($vendor !== self::VENDOR_GROUP_ZPOINT ? $vendor : ''),
                             'country' => $country,
                             'selected' => true,
                         ];

@@ -60,7 +60,7 @@
 		{/foreach}
 
 		<div class="panel-footer">
-			<button type="submit" name="cancel" class="btn btn-default">
+			<button type="submit" name="cancelOffsetSelection" class="btn btn-default">
 				<i class="icon-remove"></i>
 				{l s='Cancel' d='Modules.Packetery.Listheader'}
 			</button>

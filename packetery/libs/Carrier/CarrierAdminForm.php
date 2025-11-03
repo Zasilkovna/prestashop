@@ -238,7 +238,7 @@ class CarrierAdminForm
             ];
         }
 
-        if (empty($formInputs)) {
+        if ($formInputs === []) {
             return null;
         }
 
@@ -527,7 +527,7 @@ class CarrierAdminForm
     {
         $possibleVendors = $this->getPossibleVendors($carrierData);
 
-        if (empty($possibleVendors) || !isset($formData['allowed_vendors'])) {
+        if ($possibleVendors === [] || !isset($formData['allowed_vendors'])) {
             return ['error' => $this->module->getTranslator()->trans('You must select at least one vendor for each country.', [], 'Modules.Packetery.Carrieradminform')];
         }
 
@@ -561,7 +561,7 @@ class CarrierAdminForm
      */
     private function getPossibleVendors(array $carrierData, $apiCarrier = null)
     {
-        if (empty($carrierData['id_branch'])) {
+        if (!isset($carrierData['id_branch'])) {
             return [];
         }
         if ($apiCarrier === null) {

@@ -1,0 +1,18 @@
+includes:
+	- phpstan-baseline.neon
+parameters:
+	phpVersion:
+		min: 70100
+		max: 80100
+	fileExtensions:
+		- php
+	level: 2
+	strictRules:
+		allRules: true
+	treatPhpDocTypesAsCertain: false
+	ignoreErrors:
+	bootstrapFiles:
+	paths:
+		- ../packetery
+	scanDirectories:
+		- ../vendor/stancer/php-stubs-prestashop/stubs

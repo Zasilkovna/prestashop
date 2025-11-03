@@ -1,0 +1,373 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 2
+			path: ../packetery/controllers/admin/PacketeryCarrierGridController.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, array\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: ../packetery/controllers/admin/PacketeryCarrierGridController.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: ../packetery/controllers/admin/PacketeryLogGridController.php
+
+		-
+			message: '#^Static method ToolsCore\:\:displayDate\(\) invoked with 3 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: ../packetery/controllers/admin/PacketeryLogGridController.php
+
+		-
+			message: '#^Access to property \$id on an unknown class InstallLanguage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: ../packetery/controllers/admin/PacketeryOrderGridController.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 3
+			path: ../packetery/controllers/admin/PacketeryOrderGridController.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, array given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 2
+			path: ../packetery/controllers/admin/PacketeryOrderGridController.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, array given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: ../packetery/controllers/admin/PacketeryOrderGridController.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, array\<int\|string, bool\|string\> given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: ../packetery/controllers/admin/PacketeryOrderGridController.php
+
+		-
+			message: '#^Variable \$orderRepo in PHPDoc tag @var does not match assigned variable \$orderRepository\.$#'
+			identifier: varTag.differentVariable
+			count: 2
+			path: ../packetery/controllers/admin/PacketeryOrderGridController.php
+
+		-
+			message: '#^Call to an undefined method Module\:\:getAdminLink\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../packetery/controllers/admin/PacketerySettingController.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: ../packetery/controllers/front/cron.php
+
+		-
+			message: '#^Access to property \$id on an unknown class InstallLanguage\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../packetery/libs/AbstractFormService.php
+
+		-
+			message: '#^Call to an undefined method Packetery\\AbstractFormService\:\:getConfigurationFormFields\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../packetery/libs/AbstractFormService.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 2
+			path: ../packetery/libs/Carrier/CarrierAdminForm.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: ../packetery/libs/Carrier/CarrierAdminForm.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, array given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: ../packetery/libs/Carrier/CarrierAdminForm.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, string\|null given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: ../packetery/libs/Carrier/CarrierRepository.php
+
+		-
+			message: '#^Call to an undefined static method Carrier\:\:getCarrierNameFromShopName\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: ../packetery/libs/Carrier/CarrierTools.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 1
+			path: ../packetery/libs/Carrier/CarrierTools.php
+
+		-
+			message: '#^Constant PACKETERY_PLUGIN_DIR not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../packetery/libs/Cron/Tasks/DeleteLabels.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 1
+			path: ../packetery/libs/Hooks/ActionObjectOrderUpdateBefore.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 2
+			path: ../packetery/libs/Hooks/ActionValidateStepComplete.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 1
+			path: ../packetery/libs/Module/Installer.php
+
+		-
+			message: '#^Variable \$result might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../packetery/libs/Module/Installer.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: ../packetery/libs/Module/SoapApi.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, string\|null given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: ../packetery/libs/Module/VersionChecker.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 2
+			path: ../packetery/libs/Order/OrderDetailsUpdater.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 2
+			path: ../packetery/libs/Order/OrderExporter.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, float\|null given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: ../packetery/libs/Order/OrderExporter.php
+
+		-
+			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
+			identifier: ternary.shortNotAllowed
+			count: 3
+			path: ../packetery/libs/Order/OrderExporter.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: ../packetery/libs/Order/OrderSaver.php
+
+		-
+			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
+			identifier: ternary.shortNotAllowed
+			count: 1
+			path: ../packetery/libs/Order/OrderSaver.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: ../packetery/libs/Order/PacketSubmitter.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, array given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: ../packetery/libs/Order/PacketSubmitter.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be true\.$#'
+			identifier: function.strict
+			count: 1
+			path: ../packetery/libs/PacketTracking/PacketTrackingCron.php
+
+		-
+			message: '#^PHPDoc tag @var with type stdClass is not subtype of type array\.$#'
+			identifier: varTag.type
+			count: 1
+			path: ../packetery/libs/PacketTracking/PacketTrackingCron.php
+
+		-
+			message: '#^Binary operation "/" between non\-falsy\-string and string\|false\|null results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: ../packetery/libs/Payment/PaymentRepository.php
+
+		-
+			message: '#^Call to function array_filter\(\) requires parameter \#2 to be passed to avoid loose comparison semantics\.$#'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../packetery/libs/PickupPointValidate/ValidatedOptions.php
+
+		-
+			message: '#^Call to function array_filter\(\) requires parameter \#2 to be passed to avoid loose comparison semantics\.$#'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../packetery/libs/PickupPointValidate/ValidatedPoint.php
+
+		-
+			message: '#^Only booleans are allowed in a ternary operator condition, Employee\|null given\.$#'
+			identifier: ternary.condNotBoolean
+			count: 1
+			path: ../packetery/libs/Tools/ConfigHelper.php
+
+		-
+			message: '#^Call to an undefined method ControllerCore\:\:registerJavascript\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../packetery/libs/Tools/ControllerWrapper.php
+
+		-
+			message: '#^Call to an undefined method ControllerCore\:\:registerStylesheet\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../packetery/libs/Tools/ControllerWrapper.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 2
+			path: ../packetery/libs/Tools/ControllerWrapper.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: ../packetery/libs/Tools/DbTools.php
+
+		-
+			message: '#^Variable \$result might not be defined\.$#'
+			identifier: variable.undefined
+			count: 6
+			path: ../packetery/libs/Tools/DbTools.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: ../packetery/libs/Tools/Tools.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: ../packetery/libs/Tools/Tools.php
+
+		-
+			message: '#^Access to an undefined property Packetery\:\:\$is_configurable\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Access to property \$errors on an unknown class LegacyControllerBridgeInterface\.$#'
+			identifier: class.notFound
+			count: 4
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 3
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Call to method addCSS\(\) on an unknown class LegacyControllerBridgeInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Call to method addJS\(\) on an unknown class LegacyControllerBridgeInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 5
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 4
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^PHPDoc tag @param for parameter \$params with type array\|null is not subtype of native type array\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
+			identifier: ternary.shortNotAllowed
+			count: 4
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Variable \$have_curl might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 1
+			path: ../packetery/upgrade/upgrade-2.1.5.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, list\<array\<string, mixed\>\> given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: ../packetery/upgrade/upgrade-2.1.5.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: ../packetery/upgrade/upgrade-2.1.6.php
