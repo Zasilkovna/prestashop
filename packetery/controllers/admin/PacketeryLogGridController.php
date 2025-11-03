@@ -156,7 +156,10 @@ class PacketeryLogGridController extends ModuleAdminController
      */
     public function renderDate($value, array $row)
     {
-        return Tools::displayDate($value, null, 1);
+        if (Tools::version_compare(_PS_VERSION_, '8', '<') === true) {
+            return Tools::displayDate($value, null, true);
+        }
+        return Tools::displayDate($value, true);
     }
 
     /**

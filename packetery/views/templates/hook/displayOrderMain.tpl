@@ -72,6 +72,23 @@
                 {/if}
             {/if}
 
+            {if $showCancelButton}
+                <form action="{$returnUrl}" method="post">
+                    <p>
+                        <button class="btn btn-outline-secondary btn-default"
+                                type="submit"
+                                name="process_cancel_packet"
+                                id="process_cancel_packet"
+                        >
+                            <i class="material-icons" aria-hidden="true">delete</i>
+                            {l s='Cancel packet' mod='packetery'}
+                        </button>
+                        <input type="hidden" name="order_id" value="{$orderId|intval}">
+                        <input type="hidden" name="tracking_number" value="{$trackingNumber}">
+                    </p>
+                </form>
+            {/if}
+
             {if !$isExported}
                 <div class="mt-4">
                     <div class="form-row align-items-center">
@@ -231,4 +248,5 @@
 </div>
 <script type="application/javascript">
     var process_post_parcel_confirmation = "{l s='Do you really wish to post the parcel?' d='Modules.Packetery.Displayordermain'}";
+    var process_cancel_packet_confirmation = "{l s='Do you really wish to cancel the packet?' d='Modules.Packetery.Displayordermain'}";
 </script>

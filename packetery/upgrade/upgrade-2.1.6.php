@@ -46,7 +46,7 @@ function upgrade_module_2_1_6($module)
         foreach ($previousSettings as $previousSetting) {
             switch ($previousSetting['option']) {
                 case 'APIPASS':
-                    ConfigHelper::update('PACKETERY_APIPASS', $previousSetting['value']);
+                    ConfigHelper::update(ConfigHelper::KEY_APIPASS, $previousSetting['value']);
                     break;
                 case 'ESHOP_ID':
                     ConfigHelper::update('PACKETERY_ESHOP_ID', $previousSetting['value']);

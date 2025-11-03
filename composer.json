@@ -5,21 +5,29 @@
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.12",
         "slevomat/coding-standard": "^8.17",
-        "editorconfig-checker/editorconfig-checker": "^10.7"
+        "editorconfig-checker/editorconfig-checker": "^10.7",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "stancer/php-stubs-prestashop": "^8.2",
+        "phpstan/extension-installer": "^1.4"
     },
     "scripts": {
         "check:ec": "vendor/bin/ec .",
         "check:phpcs": "vendor/bin/phpcs --standard=./phpcs.xml",
         "fix:phpcbf": "vendor/bin/phpcbf --standard=./phpcs.xml",
+        "phpstan": "vendor/bin/phpstan analyse -c phpstan/phpstan.neon",
+        "phpstan-generate-baseline": "phpstan analyse -c  phpstan/phpstan.neon --memory-limit 2G --generate-baseline phpstan/phpstan-baseline.neon",
         "check:all": [
             "@check:ec",
-            "@check:phpcs"
+            "@check:phpcs",
+            "@phpstan"
         ]
     },
     "prefer-stable": true,
     "config": {
         "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
         }
     }
 }

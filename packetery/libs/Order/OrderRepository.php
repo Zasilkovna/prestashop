@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Db;
 use mysqli_result;
 use Packetery\Exceptions\DatabaseException;
+use Packetery\Exceptions\TrackingNumberClearingException;
 use Packetery\Tools\DbTools;
 use PDOStatement;
 use PrestaShopLoggerCore as PrestaShopLogger;
@@ -167,7 +168,7 @@ class OrderRepository
     public function getByCart($cartId)
     {
         $cartId = (int)$cartId;
-        return $this->dbTools->getRow('SELECT `is_ad`, `id_branch`, `name_branch`, `id_carrier`, `zip` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId);
+        return $this->dbTools->getRow('SELECT `is_ad`, `id_branch`, `name_branch`, `id_carrier`, `zip`, `is_carrier`, `carrier_pickup_point` FROM `' . _DB_PREFIX_ . 'packetery_order` WHERE `id_cart` = ' . $cartId);
     }
 
     /**
@@ -352,6 +353,33 @@ class OrderRepository
             ['tracking_number' => $this->db->escape($trackingNumber), 'exported' => 1],
             '`id_order` = ' . $orderId
         );
+    }
+
+    /**
+     * @throws TrackingNumberClearingException
+     */
+    public function clearTrackingNumber(int $orderId): void
+    {
+        $messageBase = "Failed to clear tracking number for order {$orderId}";
+
+        try {
+            $result = $this->dbTools->update(
+                'packetery_order',
+                [
+                    'tracking_number' => null,
+                    'exported' => 0,
+                ],
+                "`id_order` = {$orderId}",
+                1,
+                true
+            );
+        } catch (DatabaseException $e) {
+            throw new TrackingNumberClearingException($messageBase . ': ' . $e->getMessage());
+        }
+
+        if ($result === false) {
+            throw new TrackingNumberClearingException($messageBase);
+        }
     }
 
     /**

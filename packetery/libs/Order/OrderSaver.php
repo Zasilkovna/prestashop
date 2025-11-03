@@ -107,7 +107,7 @@ class OrderSaver
         }
 
         $packeteryWeight = $this->weightCalculator->getComputedOrDefaultWeight($order);
-        if ($packeteryWeight) {
+        if ($packeteryWeight !== null) {
             $data['weight'] = $packeteryWeight;
         }
 
@@ -175,6 +175,8 @@ class OrderSaver
             $packeteryOrderFields['is_carrier'] = 1;
             $packeteryOrderFields['id_branch'] = (int)$widgetCarrierId;
             $packeteryOrderFields['carrier_pickup_point'] = $this->orderRepository->db->escape($carrierPickupPointId);
+        } elseif ($pickupPointType === 'internal') {
+            $packeteryOrderFields['is_carrier'] = 0;
         }
 
         $isOrderSaved = $this->orderRepository->existsByCart($cartId);

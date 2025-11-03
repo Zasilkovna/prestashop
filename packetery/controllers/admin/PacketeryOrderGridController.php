@@ -32,9 +32,12 @@ use Packetery\Module\VersionChecker;
 use Packetery\Order\CsvExporter;
 use Packetery\Order\Labels;
 use Packetery\Order\OrderRepository;
+use Packetery\Order\PacketCanceller;
 use Packetery\Order\PacketSubmitter;
 use Packetery\Order\Tracking;
+use Packetery\PacketTracking\PacketStatus;
 use Packetery\PacketTracking\PacketStatusFactory;
+use Packetery\PacketTracking\PacketTrackingRepository;
 use Packetery\Tools\ConfigHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
@@ -42,11 +45,13 @@ class PacketeryOrderGridController extends ModuleAdminController
     const ACTION_BULK_LABEL_PDF = 'bulkLabelPdf';
     const ACTION_BULK_CARRIER_LABEL_PDF = 'bulkCarrierLabelPdf';
 
+    /** @var array */
     protected $statuses_array = array();
 
     /** @var Packetery */
     private $packetery;
 
+    /** @var bool */
     private $hasBulkLabelPrintingError;
 
     public function __construct()
@@ -91,10 +96,10 @@ class PacketeryOrderGridController extends ModuleAdminController
         // Show and/or export only relevant orders from order list.
         $groupId = Shop::getContextShopGroupID(true);
         $shopId = Shop::getContextShopID(true);
-        if ($groupId) {
+        if ($groupId !== null) {
             $this->_where = ' AND `a`.`id_shop_group` = ' . $groupId . ' ';
         }
-        if ($shopId) {
+        if ($shopId !== null) {
             $this->_where = ' AND `a`.`id_shop` = ' . $shopId . ' ';
         }
 
@@ -239,7 +244,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     public function processBulkCreatePacket()
     {
         $ids = $this->boxes;
-        if (!$ids) {
+        if ($ids === []) {
             $this->informations[] = $this->module->getTranslator()->trans('No orders were selected.', [], 'Modules.Packetery.Packeteryordergrid');
             return;
         }
@@ -271,7 +276,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     private function prepareOnlyCarrierPacketNumbers(array $ids)
     {
-        /** @var OrderRepository $orderRepo */
+        /** @var OrderRepository $orderRepository */
         $orderRepository = $this->getModule()->diContainer->get(OrderRepository::class);
 
         $packetNumbers = [];
@@ -345,7 +350,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         if (Tools::isSubmit('submitPrepareLabels')) {
             $packetNumbers = $this->prepareOnlyInternalPacketNumbers($this->boxes);
-            if ($packetNumbers) {
+            if ($packetNumbers !== []) {
                 $this->errors[] = $this->prepareLabels($packetNumbers, Labels::TYPE_PACKETA, null, (int)Tools::getValue('offset'));
             } else {
                 $this->warnings[] = $this->module->getTranslator()->trans('No orders have been selected for which labels can be printed.', [], 'Modules.Packetery.Packeteryordergrid');
@@ -364,7 +369,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         if (Tools::isSubmit('submitPrepareLabels')) {
             $packetNumbers = $this->prepareOnlyCarrierPacketNumbers($this->boxes);
-            if ($packetNumbers) {
+            if ($packetNumbers !== []) {
                 /** @var SoapApi $soapApi */
                 $soapApi = $this->getModule()->diContainer->get(SoapApi::class);
                 $packetsEnhanced = $soapApi->getPacketIdsWithCarrierNumbers($packetNumbers);
@@ -414,6 +419,35 @@ class PacketeryOrderGridController extends ModuleAdminController
         }
     }
 
+    public function processCancel(): void
+    {
+        $module = $this->getModule();
+        $orderId = (int)Tools::getValue('id_order');
+
+        /** @var OrderRepository $orderRepository */
+        $orderRepository = $module->diContainer->get(OrderRepository::class);
+        $orderData = $orderRepository->getById($orderId);
+
+        if (!is_array($orderData) || !isset($orderData['tracking_number'])) {
+            $this->errors[] = sprintf(
+                $this->l('Order %d does not exist or does not have tracking number.', 'packeteryordergridcontroller'),
+                $orderId
+            );
+
+            return;
+        }
+
+        /** @var PacketCanceller $packetCanceller */
+        $packetCanceller = $module->diContainer->get(PacketCanceller::class);
+        [$cancellationResult, $message] = $packetCanceller->cancelPacket($orderId, $orderData['tracking_number']);
+
+        if ($cancellationResult === true) {
+            $this->informations[] = $message;
+        } else {
+            $this->errors[] = $message;
+        }
+    }
+
     public function processBulkCsvExport()
     {
         if ((int)Tools::getValue('submitFilterorders') === 1) {
@@ -436,7 +470,7 @@ class PacketeryOrderGridController extends ModuleAdminController
     public function renderList()
     {
         if ($this->action === self::ACTION_BULK_LABEL_PDF || $this->action === self::ACTION_BULK_CARRIER_LABEL_PDF) {
-            if (Tools::getIsset('cancel')) {
+            if (Tools::getIsset('cancelOffsetSelection')) {
                 Tools::redirectAdmin(self::$currentIndex . '&token=' . $this->token);
             }
             $ids = $this->boxes;
@@ -657,40 +691,61 @@ class PacketeryOrderGridController extends ModuleAdminController
     }
 
     /**
+     * The action then appears in a method name, for example processPrint.
+     *
      * @param int $orderId
      * @return array
-     * @throws DatabaseException
-     * @throws PrestaShopException
-     * @throws ReflectionException
-     * @throws SmartyException
      */
-    private function getActionLinks($orderId)
+    private function getActionLinks(int $orderId): array
     {
-        $links = [];
         $module = $this->getModule();
+
         /** @var OrderRepository $orderRepository */
         $orderRepository = $module->diContainer->get(OrderRepository::class);
         $orderData = $orderRepository->getById($orderId);
-        if ($orderData) {
-            if ($orderData['tracking_number']) {
-                $action = 'print';
-                $iconClass = 'icon-print';
-                $title = $this->module->getTranslator()->trans('Print labels', [], 'Modules.Packetery.Packeteryordergrid');
-            } else {
-                $action = 'submit';
-                $iconClass = 'icon-send';
-                $title = $this->module->getTranslator()->trans('Submit packet', [], 'Modules.Packetery.Packeteryordergrid');
+
+        /** @var PacketTrackingRepository $packetTrackingRepository */
+        $packetTrackingRepository = $module->diContainer->get(PacketTrackingRepository::class);
+
+        if (!$orderData) {
+            return [];
+        }
+
+        $links = [];
+        if ($orderData['tracking_number']) {
+            $action = 'print';
+            $iconClass = 'icon-print';
+            $title = $this->module->getTranslator()->trans('Print labels', [], 'Modules.Packetery.Packeteryordergrid');
+            $links[$action] = $this->getActionLinkHtml($orderId, $action, $title, $iconClass);
+
+            $lastStatusCode = $packetTrackingRepository->getLastStatusCodeByOrderAndPacketId($orderId, $orderData['tracking_number']);
+            if ($lastStatusCode === null || $lastStatusCode === PacketStatus::RECEIVED_DATA) {
+                $action = 'cancel';
+                $iconClass = 'icon-trash';
+                $title = $this->module->getTranslator()->trans('Cancel Packet', [], 'Modules.Packetery.Packeteryordergrid');
+                $links[$action] = $this->getActionLinkHtml($orderId, $action, $title, $iconClass);
             }
-            $href = $this->getModule()->getAdminLink('PacketeryOrderGrid', ['id_order' => $orderId, 'action' => $action]);
-            $smarty = new Smarty();
-            $smarty->assign('link', $href);
-            $smarty->assign('title', $title);
-            $smarty->assign('icon', $iconClass);
-            $smarty->assign('class', 'btn btn-sm label-tooltip');
-            $links[$action] = $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/link.tpl');
+        } else {
+            $action = 'submit';
+            $iconClass = 'icon-send';
+            $title = $this->module->getTranslator()->trans('Submit packet', [], 'Modules.Packetery.Packeteryordergrid');
+            $links[$action] = $this->getActionLinkHtml($orderId, $action, $title, $iconClass);
         }
 
         return $links;
+    }
+
+    private function getActionLinkHtml(int $orderId, string $action, string $title, string $iconClass): string
+    {
+        $href = $this->getModule()->getAdminLink('PacketeryOrderGrid', ['id_order' => $orderId, 'action' => $action]);
+
+        $smarty = new Smarty();
+        $smarty->assign('link', $href);
+        $smarty->assign('title', $title);
+        $smarty->assign('icon', $iconClass);
+        $smarty->assign('class', 'btn btn-sm label-tooltip');
+
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/link.tpl');
     }
 
     /**
@@ -712,6 +767,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function displayActionLink($token, $orderId)
     {
+        $orderId = (int)$orderId;
         $actionLinkHtml = '';
         foreach ($this->getActionLinks($orderId) as $link) {
             $actionLinkHtml .= $link;
