@@ -62,17 +62,18 @@ class ActionValidateStepComplete
         $orderData = $this->orderRepository->getByCart((int)$cart->id);
 
         $isExternalPickupPointCarrier = $this->apiCarrierRepository->isExternalPickupPointCarrier((int)$packeteryCarrier['id_branch']);
+        $isPickupPointCarrier = $this->isPickupPointCarrier($isExternalPickupPointCarrier, (string)$packeteryCarrier['id_branch']);
 
-        if ($isExternalPickupPointCarrier === true && empty($orderData['id_branch'])) {
+        if ($isPickupPointCarrier === true && empty($orderData['id_branch'])) {
             $params['completed'] = false;
+
             return $this->module->l('Please select pickup point.', 'ordervalidatestepcomplete');
         }
 
         $isApiWidgetValidationModeEnabled = ConfigHelper::isApiWidgetValidationModeEnabled();
-
         if (
+            $isPickupPointCarrier &&
             $isApiWidgetValidationModeEnabled === true &&
-            $this->isPickupPointCarrier($isExternalPickupPointCarrier, (string)$packeteryCarrier['id_branch']) &&
             is_array($orderData) === true &&
             $orderData !== [] &&
             (bool)$orderData['is_ad'] === false
@@ -90,11 +91,13 @@ class ActionValidateStepComplete
 
         if ($packeteryCarrier['address_validation'] !== 'required') {
             $params['completed'] = true;
+
             return null;
         }
 
         if (!$orderData || !AddressTools::hasValidatedAddress($orderData)) {
             $params['completed'] = false;
+
             return $this->module->l('Please use widget to validate address.', 'ordervalidatestepcomplete');
         }
 
