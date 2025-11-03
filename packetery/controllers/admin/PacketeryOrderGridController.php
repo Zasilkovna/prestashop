@@ -430,7 +430,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         if (!is_array($orderData) || !isset($orderData['tracking_number'])) {
             $this->errors[] = sprintf(
-                $this->l('Order %d does not exist or does not have tracking number.', 'packeteryordergridcontroller'),
+                $this->module->getTranslator()->trans('Order %d does not exist or does not have tracking number.', [], 'Modules.Packetery.Packeteryordergrid'),
                 $orderId
             );
 

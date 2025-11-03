@@ -63,7 +63,7 @@ class Options
                             ],
                             LogRepository::STATUS_ERROR
                         );
-                        return $this->module->l('Invalid API password.', 'options');
+                        return $this->module->getTranslator()->trans('Invalid API password.', [], 'Modules.Packetery.Options');
                 } catch (SenderNotExistsException $e) {
                     return false;
                 }

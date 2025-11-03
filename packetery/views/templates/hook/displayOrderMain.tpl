@@ -81,7 +81,7 @@
                                 id="process_cancel_packet"
                         >
                             <i class="material-icons" aria-hidden="true">delete</i>
-                            {l s='Cancel packet' mod='packetery'}
+                            {l s='Cancel packet' d='Modules.Packetery.Displayordermain'}
                         </button>
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="tracking_number" value="{$trackingNumber}">

@@ -49,7 +49,7 @@ class PacketCanceller
             $cancellationResult = false;
 
             $messages[] = sprintf(
-                $this->module->l('The shipment for order no.: %d could not be cancelled. More information can be found in the log.', 'packetcanceller'),
+                $this->module->getTranslator()->trans('The shipment for order no.: %d could not be cancelled. More information can be found in the log.', [], 'Modules.Packetery.Packetcanceller'),
                 $orderId
             );
         } else {
@@ -58,14 +58,14 @@ class PacketCanceller
             ], LogRepository::STATUS_SUCCESS, $orderId);
 
             $messages[] = sprintf(
-                $this->module->l('The shipment for order no.: %d was successfully cancelled in Packeta.', 'packetcanceller'),
+                $this->module->getTranslator()->trans('The shipment for order no.: %d was successfully cancelled in Packeta.', [], 'Modules.Packetery.Packetcanceller'),
                 $orderId
             );
 
             try {
                 $this->orderRepository->clearTrackingNumber($orderId);
             } catch (\Exception $e) {
-                $messages[] = $this->module->l('Unable to remove the tracking number from the order.', 'packetcanceller');
+                $messages[] = $this->module->getTranslator()->trans('Unable to remove the tracking number from the order.', [], 'Modules.Packetery.Packetcanceller');
                 $cancellationResult = false;
             }
         }
@@ -80,7 +80,7 @@ class PacketCanceller
         }
 
         if (!Tools::getIsset('order_id') || !Tools::getIsset('tracking_number')) {
-            $messages[] = $this->module->l('The packet could not be cancelled - order id or tracking number is missing.', 'packetcanceller');
+            $messages[] = $this->module->getTranslator()->trans('The packet could not be cancelled - order id or tracking number is missing.', [], 'Modules.Packetery.Packetcanceller');
 
             return $messages;
         }

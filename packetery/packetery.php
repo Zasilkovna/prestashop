@@ -185,7 +185,7 @@ class Packetery extends CarrierModule
 
         if (!self::transportMethod()) {
             $error[] = $this->trans(
-                'No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.'
+                'No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.',
                 [],
                 'Modules.Packetery.Packetery'
             );
@@ -552,10 +552,10 @@ class Packetery extends CarrierModule
                 'required' => false,
             ],
             \Packetery\Tools\ConfigHelper::KEY_WIDGET_VALIDATION_MODE => [
-                'title' => $this->l('Validate the pickup point using the API before accepting the order'),
+                'title' => $this->trans('Validate the pickup point using the API before accepting the order', [], 'Modules.Packetery.Packetery'),
                 'options' => [
-                    1 => $this->l('Yes'),
-                    0 => $this->l('No'),
+                    1 => $this->trans('Yes', [], 'Modules.Packetery.Packetery'),
+                    0 => $this->trans('No', [], 'Modules.Packetery.Packetery'),
                 ],
                 'required' => false,
             ],
