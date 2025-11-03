@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="c094942e6862342615ed2c1b6e2ee311">
+        <source>Order validation failed, shop owner can find more information in log.</source>
+        <target>Ověření objednávky se nezdařilo, provozovatel eshopu může v logu najít více informací.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="07608de8f1d9e40a5f847709512faa36">
+        <source>Please select pickup point.</source>
+        <target>Vyberte prosím výdejní místo.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="81c7b4b7d7fa76d78583951ccb6e843a">
+        <source>The selected Packeta pickup point could not be validated. Please select another.</source>
+        <target>Vybrané výdejní místo se nepodařilo ověřit. Vyberte prosím jiné.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="492bd00238d3ccba86931c7d815092be">
+        <source>Please use widget to validate address.</source>
+        <target>Použijte prosím widget k ověření adresy.</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

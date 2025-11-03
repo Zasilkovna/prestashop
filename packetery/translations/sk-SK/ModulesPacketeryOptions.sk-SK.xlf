@@ -2,6 +2,16 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
     <body>
+      <trans-unit id="50d7ba2687cdb66864c1655c88d45377">
+        <source>The provided sender cannot be verified: Invalid API password.</source>
+        <target>The provided sender cannot be verified: Invalid API password.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c155e02f4d8b4b842281d39e7cd8897e">
+        <source>Invalid API password.</source>
+        <target>Invalid API password.</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="ac4ea9d06af52e534143ed2979c50841">
         <source>Api password must be 32 characters long.</source>
         <target>Heslo API musí mať 32 znakov.</target>
@@ -10,11 +20,6 @@
       <trans-unit id="d2cfd13754957b947b1fb129f7f00c4b">
         <source>Provided sender indication does not exist.</source>
         <target>Zadané označení odesílatele neexistuje.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="1e55c11920d6ebc07255263ae03d4974">
-        <source>Sender indication validation failed</source>
-        <target>Ověření označení odesílatele selhalo</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="13c2b3c8f8fcb16a73d7b6848a42c37b">

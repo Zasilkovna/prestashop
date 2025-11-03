@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="b8b4057542df38e745e855e6e0a93a7f">
+        <source>Label printing for packet %s failed, you can find more information in the Packeta log.</source>
+        <target>Tisk štítků pro zásilku %s se nezdařil, více informací můžete najít v logu Zásilkovny.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a242fd0e6e8a2043305eae735376f16f">
+        <source>Carrier label printing failed, you can find more information in the Packeta log. Error: %s</source>
+        <target>Tisk štítků dopravců se nezdařil, více informací můžete najít v logu Zásilkovny. Chyba: %s</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3d252dbd3f783e697ac85fad9f9e5c2e">
+        <source>Label printing failed, you can find more information in the Packeta log. Error: %s</source>
+        <target>Tisk štítků se nezdařil, více informací můžete najít v logu Zásilkovny. Chyba: %s</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

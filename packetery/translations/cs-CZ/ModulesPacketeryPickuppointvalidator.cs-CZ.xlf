@@ -2,9 +2,9 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
     <body>
-      <trans-unit id="dccfc27ffe830d44560890217a879cf6">
-        <source>Exception raised during Packetery module upgrade:</source>
-        <target>Výjimka vyvolaná během aktualizace modulu Zásilkovna</target>
+      <trans-unit id="32deda9da06d6c3ef4c538f206914203">
+        <source>API credentials are not set corretly.</source>
+        <target>Přístupové údaje k API nejsou správně nastaveny.</target>
         <note>Line: </note>
       </trans-unit>
     </body>

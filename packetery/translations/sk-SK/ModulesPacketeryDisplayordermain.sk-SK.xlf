@@ -2,6 +2,36 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
     <body>
+      <trans-unit id="0c828717fb5f34d8af236e4f1f8540ea">
+        <source>Do you really wish to cancel the packet?</source>
+        <target>Do you really wish to cancel the packet?</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9372d69e38b4e69275d8cf7458a2ef32">
+        <source>Require age verification</source>
+        <target>Require age verification</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3c6c97bd1e90f19db2db681b277276ec">
+        <source>COD value</source>
+        <target>COD value</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d9c8feeb1d98994bb044a0224bbcdfcc">
+        <source>Packet value</source>
+        <target>Packet value</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8c489d0946f66d17d73f26366a4bf620">
+        <source>Weight</source>
+        <target>Weight</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2bb85e61c8b0a88c1ba37e21161974d7">
+        <source>Cancel packet</source>
+        <target>Cancel packet</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="4a93d9164aad959a6abc2de389170ac9">
         <source>Packeta</source>
         <target>Zásilkovna</target>

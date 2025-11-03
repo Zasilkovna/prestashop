@@ -77,6 +77,16 @@
         <target>Změnit výdejní místo</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="2bb85e61c8b0a88c1ba37e21161974d7">
+        <source>Cancel packet</source>
+        <target>Zrušit zásilku</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8c489d0946f66d17d73f26366a4bf620">
+        <source>Weight</source>
+        <target>Hmotnost</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="b467fdcd05373dcb789d8e055e2f8160">
         <source>Size (L x W x H):</source>
         <target>Rozměry (D x Š x V):</target>
@@ -97,6 +107,21 @@
         <target>Výška</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="d9c8feeb1d98994bb044a0224bbcdfcc">
+        <source>Packet value</source>
+        <target>Hodnota zásilky</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3c6c97bd1e90f19db2db681b277276ec">
+        <source>COD value</source>
+        <target>Hodnota dobírky</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9372d69e38b4e69275d8cf7458a2ef32">
+        <source>Require age verification</source>
+        <target>Vyžadovat ověření věku</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="c9cc8cce247e49bae79f15173ce97354">
         <source>Save</source>
         <target>Uložit</target>
@@ -110,6 +135,11 @@
       <trans-unit id="5606d6f39713e37807ff75042e1ae324">
         <source>Do you really wish to post the parcel?</source>
         <target>Opravdu si přejete podat zásilku?</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="0c828717fb5f34d8af236e4f1f8540ea">
+        <source>Do you really wish to cancel the packet?</source>
+        <target>Opravdu chcete stornovat zásilku?</target>
         <note>Line: </note>
       </trans-unit>
     </body>

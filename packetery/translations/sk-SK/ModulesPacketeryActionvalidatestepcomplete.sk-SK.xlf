@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="492bd00238d3ccba86931c7d815092be">
+        <source>Please use widget to validate address.</source>
+        <target>Please use widget to validate address.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="81c7b4b7d7fa76d78583951ccb6e843a">
+        <source>The selected Packeta pickup point could not be validated. Please select another.</source>
+        <target>The selected Packeta pickup point could not be validated. Please select another.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="07608de8f1d9e40a5f847709512faa36">
+        <source>Please select pickup point.</source>
+        <target>Please select pickup point.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c094942e6862342615ed2c1b6e2ee311">
+        <source>Order validation failed, shop owner can find more information in log.</source>
+        <target>Order validation failed, shop owner can find more information in log.</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

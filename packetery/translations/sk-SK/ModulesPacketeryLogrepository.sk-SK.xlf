@@ -2,6 +2,21 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
     <body>
+      <trans-unit id="26dccf80450fa80d63d87e21742fed49">
+        <source>Pickup point validation</source>
+        <target>Pickup point validation</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="68d789a642e40898fbfd58320b34cd34">
+        <source>Packet cancelling</source>
+        <target>Packet cancelling</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="09b1a60569ddeac970d16cd9546d98ca">
+        <source>Carrier tracking number</source>
+        <target>Carrier tracking number</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="9b5a794d0ef94bb3615638beed3eb2a0">
         <source>Label print</source>
         <target>Tisk štítku</target>

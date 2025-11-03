@@ -17,6 +17,16 @@
         <target>zde</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="2e4abd274d4f97042dfcab2d0663b9b6">
+        <source>Change log:</source>
+        <target>Seznam změn:</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="43340e6cc4e88197d57f8d6d5ea50a46">
+        <source>Read more</source>
+        <target>Zjistit více</target>
+        <note>Line: </note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

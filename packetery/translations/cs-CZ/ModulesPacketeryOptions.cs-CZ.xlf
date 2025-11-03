@@ -2,19 +2,14 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
     <body>
-      <trans-unit id="114c1ca2964f3ed2bf798f80f824fa8b">
-        <source>Insert maximum order age in days</source>
-        <target>Zadejte maximální stáří objednávky ve dnech</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="8e9a43661a754c4ca0f6377a91f2c06c">
-        <source>Insert maximum number of orders that will be processed</source>
-        <target>Zadejte maximální počet zpracovávaných objednávek</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="ac4ea9d06af52e534143ed2979c50841">
         <source>Api password must be 32 characters long.</source>
         <target>API heslo musí mít 32 znaků.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c155e02f4d8b4b842281d39e7cd8897e">
+        <source>Invalid API password.</source>
+        <target>Chybné API heslo</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="d2cfd13754957b947b1fb129f7f00c4b">
@@ -22,9 +17,9 @@
         <target>Zadané označení odesílatele neexistuje.</target>
         <note>Line: </note>
       </trans-unit>
-      <trans-unit id="1e55c11920d6ebc07255263ae03d4974">
-        <source>Sender indication validation failed</source>
-        <target>Ověření označení odesílatele selhalo</target>
+      <trans-unit id="50d7ba2687cdb66864c1655c88d45377">
+        <source>The provided sender cannot be verified: Invalid API password.</source>
+        <target>Zadaný odesílatel nemohl být ověřen: Chybné API heslo</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="13c2b3c8f8fcb16a73d7b6848a42c37b">
@@ -40,6 +35,16 @@
       <trans-unit id="1a30fcd66a1163cd876d8ab94d910e8d">
         <source>Please insert default packaging weight in kg</source>
         <target>Vložte prosím výchozí hmotnost obalového materiálu v kg</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8e9a43661a754c4ca0f6377a91f2c06c">
+        <source>Insert maximum number of orders that will be processed</source>
+        <target>Zadejte maximální počet zpracovávaných objednávek</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="114c1ca2964f3ed2bf798f80f824fa8b">
+        <source>Insert maximum order age in days</source>
+        <target>Zadejte maximální stáří objednávky ve dnech</target>
         <note>Line: </note>
       </trans-unit>
     </body>
