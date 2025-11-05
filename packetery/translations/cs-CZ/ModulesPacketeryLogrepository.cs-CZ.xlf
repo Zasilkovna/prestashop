@@ -2,11 +2,6 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
     <body>
-      <trans-unit id="e470e2b6f2d3d89adf07fb160f256fa8">
-        <source>Packet tracking</source>
-        <target>Sledování zásilky</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="9b5a794d0ef94bb3615638beed3eb2a0">
         <source>Label print</source>
         <target>Tisk štítku</target>
@@ -20,6 +15,26 @@
       <trans-unit id="e768e16ace76f605b3d5659cb8dd9b77">
         <source>Packet sending</source>
         <target>Vytvoření zásilky</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e470e2b6f2d3d89adf07fb160f256fa8">
+        <source>Packet tracking</source>
+        <target>Sledování zásilky</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="09b1a60569ddeac970d16cd9546d98ca">
+        <source>Carrier tracking number</source>
+        <target>Trasovací číslo dopravce</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="68d789a642e40898fbfd58320b34cd34">
+        <source>Packet cancelling</source>
+        <target>Stornování zásilky</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="26dccf80450fa80d63d87e21742fed49">
+        <source>Pickup point validation</source>
+        <target>Validace výdejního místa</target>
         <note>Line: </note>
       </trans-unit>
     </body>

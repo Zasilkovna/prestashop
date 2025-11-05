@@ -2,14 +2,14 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
     <body>
-      <trans-unit id="0dba7c324908f7f67e9f72e3393a4beb">
-        <source>Tracking number not returned for order %s</source>
-        <target>Pro objednávku %s nebylo vráceno trasovací číslo</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="5552dc553d496d4b06866ca45b890b4a">
         <source>Please choose orders first.</source>
         <target>Vyberte prosím nejdříve objednávky.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="0dba7c324908f7f67e9f72e3393a4beb">
+        <source>Tracking number not returned for order %s</source>
+        <target>Pro objednávku %s nebylo vráceno trasovací číslo</target>
         <note>Line: </note>
       </trans-unit>
     </body>

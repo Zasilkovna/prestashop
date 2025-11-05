@@ -2,11 +2,6 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
     <body>
-      <trans-unit id="57278b44f1b40495b05ba12fe8c6db4f">
-        <source>Packet tracking status update</source>
-        <target>Aktualizace sledování stavu zásilky</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="aee4c3ffdf25619455f67b0ca1d1e946">
         <source>Invalid packetery cron token.</source>
         <target>Nesprávný token.</target>
@@ -25,6 +20,11 @@
       <trans-unit id="e689c7a0e375fc4c26686a7544df5829">
         <source>Carrier list update</source>
         <target>Aktualizace seznamu dopravců</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="57278b44f1b40495b05ba12fe8c6db4f">
+        <source>Packet tracking status update</source>
+        <target>Aktualizace sledování stavu zásilky</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="19aad9f2fe3ce0023298ab83f7e75775">

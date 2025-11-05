@@ -2,6 +2,41 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
     <body>
+      <trans-unit id="f320a5706b4ed4f9378547698872658b">
+        <source>Cancel Packet</source>
+        <target>Cancel Packet</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="11d9d36d1635770fdf6d661c90737100">
+        <source>Carrier label printing failed, you can find more information in the Packeta log.</source>
+        <target>Carrier label printing failed, you can find more information in the Packeta log.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="39ed2258de26dc676afbbfa31e83aeec">
+        <source>No orders have been selected for Packeta pick-up points</source>
+        <target>No orders have been selected for Packeta pick-up points</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="318722eaec4201fba2715bfdaba036a4">
+        <source>No orders have been selected for Packeta carriers</source>
+        <target>No orders have been selected for Packeta carriers</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="17cb632eefc334c0050ad10004fa1c93">
+        <source>Order %d does not exist or does not have tracking number.</source>
+        <target>Order %d does not exist or does not have tracking number.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="94a1a28462b21157d38592770d916711">
+        <source>Label printing failed, you can find more information in the Packeta log.</source>
+        <target>Label printing failed, you can find more information in the Packeta log.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e9996bb61fd42b4bcea4a427a5b9224d">
+        <source>No orders have been selected for which labels can be printed.</source>
+        <target>No orders have been selected for which labels can be printed.</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="b718adec73e04ce3ec720dd11a06a308">
         <source>ID</source>
         <target>ID</target>
@@ -100,11 +135,6 @@
       <trans-unit id="5552dc553d496d4b06866ca45b890b4a">
         <source>Please choose orders first.</source>
         <target>Najprv vyberte objednávky.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="b0e18fd5958d01d019dac2d4eb98a23e">
-        <source>No labels can be printed as carrier labels.</source>
-        <target>Žádné štítky nemohou být připraveny jako štítky dopravce.</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="d5bced36fd88402506bdf9d99064697e">

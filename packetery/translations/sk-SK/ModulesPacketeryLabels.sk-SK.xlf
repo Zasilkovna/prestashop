@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
+    <body>
+      <trans-unit id="3d252dbd3f783e697ac85fad9f9e5c2e">
+        <source>Label printing failed, you can find more information in the Packeta log. Error: %s</source>
+        <target>Label printing failed, you can find more information in the Packeta log. Error: %s</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a242fd0e6e8a2043305eae735376f16f">
+        <source>Carrier label printing failed, you can find more information in the Packeta log. Error: %s</source>
+        <target>Carrier label printing failed, you can find more information in the Packeta log. Error: %s</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b8b4057542df38e745e855e6e0a93a7f">
+        <source>Label printing for packet %s failed, you can find more information in the Packeta log.</source>
+        <target>Label printing for packet %s failed, you can find more information in the Packeta log.</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

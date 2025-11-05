@@ -2,6 +2,36 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
     <body>
+      <trans-unit id="11fc030a81fe370f67bfba3d9afcbc54">
+        <source>%s must be a whole number, greater than 0.</source>
+        <target>%s must be a whole number, greater than 0.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="7edabf994b76a00cbc60c95af337db8f">
+        <source>weight</source>
+        <target>weight</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3c6c97bd1e90f19db2db681b277276ec">
+        <source>COD value</source>
+        <target>COD value</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c9b9ec0967a1978438b132b7d8a5dce2">
+        <source>packet value</source>
+        <target>packet value</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c7235e57bb8928d7cc00f91b8576957d">
+        <source>age verification</source>
+        <target>age verification</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1caf86632cd83a016f03f3e5b75e911e">
+        <source>Order update failed.</source>
+        <target>Order update failed.</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="44e05cef9b23421538483520e6cc0934">
         <source>The selected delivery address is in a country other than the country of delivery of the order.</source>
         <target>Zvolená dodací adresa je v jiné zemi, než je země doručení objednávky.</target>
@@ -10,11 +40,6 @@
       <trans-unit id="3fb2c4a1bb0ea1f05da513ae133a21ee">
         <source>Data has been successfully saved</source>
         <target>Data byla úspěšně uložena</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="9adba94d0538aa24decee46ce7511368">
-        <source>Address could not be changed.</source>
-        <target>Nepodařilo se změnit adresu.</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="47838d234bae5339a17c704bb605d01a">

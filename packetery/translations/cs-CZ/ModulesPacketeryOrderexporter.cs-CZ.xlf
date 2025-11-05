@@ -7,6 +7,11 @@
         <target>Nepodařilo se načíst údaje potřebné pro exportování objednávky</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="387864e6d8e99d61dfb31d03c23d2bad">
+        <source>Order %s contains product only for adults, but the carrier does not support age verification.</source>
+        <target>Objednávka %s obsahuje produkt pouze pro dospělé, ale dopravce nepodporuje ověření věku.</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="1a0b6dfe7253ca6b0d6689da91cd0402">
         <source>Can't find currency of pickup point, order</source>
         <target>Nepodařilo se nalézt měnu výdejního místa, objednávka</target>

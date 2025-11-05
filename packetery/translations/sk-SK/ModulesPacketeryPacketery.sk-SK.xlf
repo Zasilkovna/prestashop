@@ -2,6 +2,16 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin736ge9mnhcpnpwgwv7h" source-language="sk-SK" target-language="sk-SK" datatype="plaintext">
     <body>
+      <trans-unit id="3a96bf4f496513bed1746881af7b11c0">
+        <source>Validate the pickup point using the API before accepting the order</source>
+        <target>Validate the pickup point using the API before accepting the order</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5488268ddc84626385570bad05d6eed6">
+        <source>No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.</source>
+        <target>No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="7e436ecba5095ef42cfeb5b696fbbdfd">
         <source>Get your customers access to pick-up point in Packeta delivery network.</source>
         <target>Získajte svojim zákazníkom prístup k bodom vyzdvihnutia v sieti Zásielkovni.</target>
@@ -240,16 +250,6 @@
       <trans-unit id="07608de8f1d9e40a5f847709512faa36">
         <source>Please select pickup point.</source>
         <target>Vyberte prosím výdejní místo.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="c094942e6862342615ed2c1b6e2ee311">
-        <source>Order validation failed, shop owner can find more information in log.</source>
-        <target>Ověření objednávky se nezdařilo, provozovatel obchodu  může najít více informací v záznamech.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="492bd00238d3ccba86931c7d815092be">
-        <source>Please use widget to validate address.</source>
-        <target>Pro ověření adresy použijte prosím widget.</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="3bbd0c26a030a37f3aa35043965f9df1">

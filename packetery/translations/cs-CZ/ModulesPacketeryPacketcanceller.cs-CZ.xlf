@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin736ge9mnhcpnpwgwv7h" source-language="cs-CZ" target-language="cs-CZ" datatype="plaintext">
+    <body>
+      <trans-unit id="a7b9ac4c54d8105881e748c245969786">
+        <source>The shipment for order no.: %d could not be cancelled. More information can be found in the log.</source>
+        <target>Zásilka pro objednávku č. %d nemohla být stornována. Více informací lze nalézt v logu.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="14b1f21c1403dd1fc826196269d4db96">
+        <source>The shipment for order no.: %d was successfully cancelled in Packeta.</source>
+        <target>Zásilka pro objednávku č. %d byla v Zásilkovně úspěšně stornována.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d4d5f56924fab836370442fb2705c3d5">
+        <source>Unable to remove the tracking number from the order.</source>
+        <target>Nepodařilo se odmazat trasovací číslo od objednávky.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4cdbca02f49aefea19486266d3463bda">
+        <source>The packet could not be cancelled - order id or tracking number is missing.</source>
+        <target>Zásilka nemohla být stornována - chybí id objednávky nebo trasovací číslo.</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
