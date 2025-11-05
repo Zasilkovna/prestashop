@@ -68,9 +68,14 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 - english
 
 ### Supported versions
-- PrestaShop version >= 1.7.7, Prestashop 8, PrestaShop 9
+- PrestaShop 8, PrestaShop 9
 - PHP 7.1 - PHP 8.4
 - If you have problems using the module, please contact us at [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
+
+| Installation package name         | PS versions supported | PHP support | HummingBird theme support |
+|-----------------------------------|-----------------------|-------------|---------------------------|
+| `ps1.7-ps8-packeta-modul-3.3.zip` | 1.7.7 - 8.x           | 7.1 - 8.1   | no                        |
+| `ps8-ps9-packeta-modul-3.3.zip`   | 8.0.0 - 9.x           | 7.1 - 8.4   | yes                       |
 
 ### Provided functions
 - Integration of [widget v6](https://widget.packeta.com/v6) for selection of pickup points in the e-shop cart.
@@ -171,9 +176,14 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - angličtina
 
 ### Podporovaná verze
-- PrestaShop verze >= 1.7.7, PrestaShop 8, PrestaShop 9
+- PrestaShop 8, PrestaShop 9
 - PHP 7.1 - PHP 8.4
 - Při problému s použitím modulu nás kontaktujte na adrese [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
+
+| Název instalačního souboru        | Podporované verze PS | Podpora PHP | Podpora šablony HummingBird |
+|-----------------------------------|----------------------|-------------|-----------------------------|
+| `ps1.7-ps8-packeta-modul-3.3.zip` | 1.7.7 - 8.x          | 7.1 - 8.1   | ne                          |
+| `ps8-ps9-packeta-modul-3.3.zip`   | 8.0.0 - 9.x          | 7.1 - 8.4   | ano                         |
 
 ### Poskytované funkce
 - Integrace [widgetu v6](https://widget.packeta.com/v6) pro výběr výdejních míst v košíku eshopu.
