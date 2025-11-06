@@ -1,6 +1,6 @@
 [Návod v češtině](#modul-pro-prestashop-17-prestashop-8)
 
-# Module for PrestaShop 1.7, PrestaShop 8
+# Module for PrestaShop 1.7, PrestaShop 8, PrestaShop 9
 
 ### Download link
 [Download the latest version](https://github.com/Zasilkovna/prestashop/releases/latest)
@@ -68,8 +68,8 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 - english
 
 ### Supported versions
-- PrestaShop version 1.7.7 – 1.7.8, Prestashop 8
-- PHP 7.1 - PHP 8.1
+- PrestaShop version 1.7.7 – 1.7.8, PrestaShop 8, PrestaShop 9
+- PHP 7.1 - PHP 8.4
 - If you have problems using the module, please contact us at [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 
 ### Provided functions
@@ -100,7 +100,7 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 In case you are using another third-party cart module, please write to [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 Packeta module may not work with another OPC module.
 
-# Modul pro PrestaShop 1.7, PrestaShop 8
+# Modul pro PrestaShop 1.7, PrestaShop 8, PrestaShop 9
 
 ### Stažení modulu
 [Aktuální verze (Stáhnout »)](https://github.com/Zasilkovna/prestashop/releases/latest)
@@ -171,8 +171,8 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - angličtina
 
 ### Podporovaná verze
-- PrestaShop verze 1.7.7 - 1.7.8, PrestaShop 8
-- PHP 7.1 - PHP 8.1
+- PrestaShop verze 1.7.7 - 1.7.8, PrestaShop 8, PrestaShop 9
+- PHP 7.1 - PHP 8.4
 - Při problému s použitím modulu nás kontaktujte na adrese [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 
 ### Poskytované funkce
