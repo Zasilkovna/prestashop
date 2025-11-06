@@ -97,6 +97,7 @@ class PickupPointValidator
         $externalCarrierId = CarrierTools::findExternalCarrierId($orderData);
         $externalCarrierId = $externalCarrierId !== null ? (string)$externalCarrierId : null;
         $resolvedCarrierId = $externalCarrierId ?? CarrierVendors::INTERNAL_PICKUP_POINT_CARRIER;
+        $idBranch = (string)$orderData['id_branch'];
 
         $allowedVendors = null;
         if ($packeteryCarrier['allowed_vendors'] !== null) {
@@ -136,7 +137,7 @@ class PickupPointValidator
                 $vendors
             ),
             new ValidatedPoint(
-                $externalCarrierId === null ? $orderData['id_branch'] : null,
+                $externalCarrierId === null ? $idBranch : null,
                 $externalCarrierId,
                 $externalCarrierId !== null ? $orderData['carrier_pickup_point'] : null
             )
