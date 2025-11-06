@@ -121,12 +121,6 @@ $_MODULE['<{packetery}prestashop>carriersinfo_ad26b2c4320499b7daf5b347dec3ef27']
 $_MODULE['<{packetery}prestashop>carriersinfo_563aa2b422ea845f64587b776b722275'] = 'Seznam dopravců je momentálně prázdný.';
 $_MODULE['<{packetery}prestashop>carriersinfo_8e3d020b07f69c7a130016693ea5e4b8'] = 'Ruční aktualizace dopravců';
 $_MODULE['<{packetery}prestashop>carriersinfo_ff7008e17044128984c90f92fef65368'] = 'Aktualizaci dopravců nelze využít. Nejprve nastavte API heslo.';
-$_MODULE['<{packetery}prestashop>listheader_36e5769d3d33717f601e1f1dc3409d11'] = 'Tisk štítků';
-$_MODULE['<{packetery}prestashop>listheader_910b7b9a83a45de4d15f9c5b141a087b'] = 'Nevynechávat žádné pole';
-$_MODULE['<{packetery}prestashop>listheader_bee548697b56304883fdbd8436000eb3'] = 'Vynechat 1 pole';
-$_MODULE['<{packetery}prestashop>listheader_5182dfef2124178acde4250919ba2c4f'] = 'Vynechat %s polí';
-$_MODULE['<{packetery}prestashop>listheader_ea4788705e6873b424c65e91c2846b19'] = 'Zrušit';
-$_MODULE['<{packetery}prestashop>listheader_40cd014b7b6251e3a22e6a45a73a64e1'] = 'Provést';
 $_MODULE['<{packetery}prestashop>widgethd_412d643c177ac66b1f8d2dc84ac74779'] = 'Ověřit adresu doručení';
 $_MODULE['<{packetery}prestashop>widgethd_d57ac83f33b2ef09dc08ec77e7e4f421'] = 'Vybraná doručovací adresa';
 $_MODULE['<{packetery}prestashop>widget_422f03dbebc5e4e66d1d5b7e4564c355'] = 'Vybrat místo vyzvednutí:';
@@ -282,6 +276,12 @@ $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_5552dc553d496d4b06
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_318722eaec4201fba2715bfdaba036a4'] = 'Nebyly vybrány žádné objednávky na dopravce Zásilkovny';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_39ed2258de26dc676afbbfa31e83aeec'] = 'Nebyly vybrány žádné objednávky na výdejní místa Zásilkovny';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_11d9d36d1635770fdf6d661c90737100'] = 'Tisk štítků dopravců selhal, více informací naleznete v logu Zásilkovny.';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_36e5769d3d33717f601e1f1dc3409d11'] = 'Tisk štítků';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_910b7b9a83a45de4d15f9c5b141a087b'] = 'Nevynechávat žádné pole';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_bee548697b56304883fdbd8436000eb3'] = 'Vynechat 1 pole';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_5182dfef2124178acde4250919ba2c4f'] = 'Vynechat %s polí';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_ea4788705e6873b424c65e91c2846b19'] = 'Zrušit';
+$_MODULE['<{packetery}prestashop>packeteryordergridcontroller_40cd014b7b6251e3a22e6a45a73a64e1'] = 'Provést';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_d5bced36fd88402506bdf9d99064697e'] = 'Hmotnosti objednávek byly uloženy.';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_c879cb3351593188d1178647eb2032fe'] = 'Tisk štítků';
 $_MODULE['<{packetery}prestashop>packeteryordergridcontroller_f320a5706b4ed4f9378547698872658b'] = 'Stornovat zásilku';

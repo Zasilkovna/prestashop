@@ -510,6 +510,15 @@ class PacketeryOrderGridController extends ModuleAdminController
                             $this->tpl_list_vars['prepareLabelsMode'] = true;
                             $this->tpl_list_vars['REQUEST_URI'] = $_SERVER['REQUEST_URI'];
                             $this->tpl_list_vars['POST'] = $_POST;
+                            $translations = [
+                                'labelPrinting' => $this->module->l('Label printing', 'packeteryordergridcontroller'),
+                                'doNotSkipAnyFields' => $this->module->l('Do not skip any fields', 'packeteryordergridcontroller'),
+                                'skipOneField' => $this->module->l('Skip 1 field', 'packeteryordergridcontroller'),
+                                'skipNFields' => $this->module->l('Skip %s fields', 'packeteryordergridcontroller'),
+                                'cancel' => $this->module->l('Cancel', 'packeteryordergridcontroller'),
+                                'execute' => $this->module->l('Execute', 'packeteryordergridcontroller'),
+                            ];
+                            $this->tpl_list_vars['translations'] = $translations;
                         }
                     } elseif ($this->action !== self::ACTION_BULK_CARRIER_LABEL_PDF || $packetsEnhanced !== []) {
                         $this->errors[] = $this->prepareLabels($packetNumbers, $type, $packetsEnhanced);
