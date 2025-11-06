@@ -29,7 +29,7 @@
 {if isset($prepareLabelsMode) && $prepareLabelsMode}
 <div class="panel">
 	<div class="panel-heading">
-		{l s='Label printing' mod='packetery'}
+		{$translations['labelPrinting']}
 	</div>
 	<form action="{$REQUEST_URI}" method="post">
 		<div class="radio">
@@ -37,12 +37,12 @@
 				<select id="offset" name="offset">
 					{for $var=0 to $max_offset}
 						{if $var === 0}
-							<option value="{$var|intval}">{l s='Do not skip any fields' mod='packetery' sprintf=[$var]}</option>
-						{else if $var === 1}
-							<option value="{$var|intval}">{l s='Skip 1 field' mod='packetery' sprintf=[$var]}</option>
+							<option value="{$var|intval}">{$translations['doNotSkipAnyFields']}</option>
+						{elseif $var === 1}
+							<option value="{$var|intval}">{$translations['skipOneField']}</option>
 						{else}
 							{* We do not fix range 2-4 - PrestaShop has no support: https://github.com/PrestaShop/PrestaShop/issues/15870 *}
-							<option value="{$var|intval}">{l s='Skip %s fields' mod='packetery' sprintf=[$var]}</option>
+							<option value="{$var|intval}">{$translations['skipNFields']|sprintf:$var}</option>
 						{/if}
 					{/for}
 				</select>
@@ -60,13 +60,13 @@
 		{/foreach}
 
 		<div class="panel-footer">
-			<button type="submit" name="cancel" class="btn btn-default">
+			<button type="submit" class="btn btn-default" name="cancelOffsetSelection">
 				<i class="icon-remove"></i>
-				{l s='Cancel' mod='packetery'}
+				{$translations['cancel']}
 			</button>
 			<button type="submit" class="btn btn-default" name="submitPrepareLabels">
 				<i class="icon-check"></i>
-				{l s='Execute' mod='packetery'}
+				{$translations['execute']}
 			</button>
 		</div>
 	</form>

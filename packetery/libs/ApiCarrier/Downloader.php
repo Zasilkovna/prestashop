@@ -2,14 +2,11 @@
 
 namespace Packetery\ApiCarrier;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
-use GuzzleHttp\Message\Response;
 use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\DownloadException;
-use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
+use Packetery\Tools\HttpClientWrapper;
 
 class Downloader
 {
@@ -21,21 +18,22 @@ class Downloader
     /** @var ApiCarrierRepository */
     private $apiCarrierRepository;
 
-    /** @var SoapApi */
+    /** @var ConfigHelper */
     private $configHelper;
 
-    /**
-     * Downloader constructor.
-     *
-     * @param Packetery $module
-     * @param ApiCarrierRepository $apiCarrierRepository
-     * @param SoapApi $configHelper
-     */
-    public function __construct(Packetery $module, ApiCarrierRepository $apiCarrierRepository, ConfigHelper $configHelper)
-    {
+    /** @var HttpClientWrapper */
+    private $httpClient;
+
+    public function __construct(
+        Packetery $module,
+        ApiCarrierRepository $apiCarrierRepository,
+        ConfigHelper $configHelper,
+        HttpClientWrapper $httpClient
+    ) {
         $this->module = $module;
         $this->apiCarrierRepository = $apiCarrierRepository;
         $this->configHelper = $configHelper;
+        $this->httpClient = $httpClient;
     }
 
     /**
@@ -57,7 +55,7 @@ class Downloader
                 'class' => 'danger',
             ];
         }
-        if (!$carriers) {
+        if (is_array($carriers) === false || $carriers === []) {
             return [
                 'text' => sprintf(
                     $this->module->l('Carrier download failed: %s Please try again later.', 'downloader'),
@@ -67,7 +65,7 @@ class Downloader
             ];
         }
         $validation_result = $this->validateCarrierData($carriers);
-        if (!$validation_result) {
+        if ($validation_result === false) {
             return [
                 'text' => sprintf(
                     $this->module->l('Carrier download failed: %s Please try again later.', 'downloader'),
@@ -102,30 +100,17 @@ class Downloader
      * Downloads carriers in JSON.
      *
      * @return string
-     * @throws DownloadException DownloadException.
+     * @throws DownloadException
      */
     private function downloadJson()
     {
         $url = sprintf(self::API_URL, $this->configHelper->getApiKey());
 
-        // Guzzle version 5 is included from PrestaShop 1.7.0
-        if (class_exists('GuzzleHttp\Client')) {
-            $client = new Client();
-            try {
-                /** @var Response $result */
-                $result = $client->get($url);
-            } catch (TransferException $exception) {
-                throw new DownloadException($exception->getMessage());
-            }
-
-            $body = $result->getBody();
-            if (isset($body)) {
-                return $body->getContents();
-            }
-            return '';
+        try {
+            return $this->httpClient->get($url);
+        } catch (\Exception $exception) {
+            throw new DownloadException($exception->getMessage());
         }
-
-        return \Tools::file_get_contents($url, false, null, 30, true);
     }
 
     /**

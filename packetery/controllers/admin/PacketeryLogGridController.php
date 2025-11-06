@@ -42,30 +42,30 @@ class PacketeryLogGridController extends ModuleAdminController
 
         $this->fields_list = [
             'status' => [
-                'title' => $this->l('Status', 'packeteryloggridcontroller'),
+                'title' => $this->module->l('Status', 'packeteryloggridcontroller'),
                 'type' => 'select',
                 'list' => [
-                    LogRepository::STATUS_SUCCESS => $this->l('Success', 'packeteryloggridcontroller'),
-                    LogRepository::STATUS_ERROR => $this->l('Error', 'packeteryloggridcontroller'),
+                    LogRepository::STATUS_SUCCESS => $this->module->l('Success', 'packeteryloggridcontroller'),
+                    LogRepository::STATUS_ERROR => $this->module->l('Error', 'packeteryloggridcontroller'),
                 ],
                 'align' => 'left',
                 'callback' => 'renderStatus',
                 'filter_key' => 'a!status',
             ],
             'order_id' => [
-                'title' => $this->l('Order ID', 'packeteryloggridcontroller'),
+                'title' => $this->module->l('Order ID', 'packeteryloggridcontroller'),
                 'align' => 'left',
                 'callback' => 'renderOrderId',
                 'filter_key' => 'a!order_id',
             ],
             'date' => [
-                'title' => $this->l('Date', 'packeteryloggridcontroller'),
+                'title' => $this->module->l('Date', 'packeteryloggridcontroller'),
                 'type' => 'datetime',
                 'align' => 'left',
                 'filter_key' => 'a!date',
             ],
             'action' => [
-                'title' => $this->l('Action', 'packeteryloggridcontroller'),
+                'title' => $this->module->l('Action', 'packeteryloggridcontroller'),
                 'type' => 'select',
                 'list' => $this->logRepository->getActionTranslations(),
                 'align' => 'left',
@@ -73,7 +73,7 @@ class PacketeryLogGridController extends ModuleAdminController
                 'filter_key' => 'a!action',
             ],
             'note' => [
-                'title' => $this->l('Note', 'packeteryloggridcontroller'),
+                'title' => $this->module->l('Note', 'packeteryloggridcontroller'),
                 'callback' => 'renderNoteColumn',
                 'align' => 'left',
                 'orderby' => false,
@@ -83,7 +83,7 @@ class PacketeryLogGridController extends ModuleAdminController
 
         $this->bulk_actions = [];
 
-        $title = $this->l('Logs', 'packeteryloggridcontroller');
+        $title = $this->module->l('Logs', 'packeteryloggridcontroller');
         $this->meta_title = $title;
         $this->toolbar_title = $title;
     }
@@ -156,7 +156,10 @@ class PacketeryLogGridController extends ModuleAdminController
      */
     public function renderDate($value, array $row)
     {
-        return Tools::displayDate($value, null, 1);
+        if (Tools::version_compare(_PS_VERSION_, '8', '<') === true) {
+            return Tools::displayDate($value, null, true);
+        }
+        return Tools::displayDate($value, true);
     }
 
     /**
@@ -167,10 +170,10 @@ class PacketeryLogGridController extends ModuleAdminController
     public function renderStatus($value, array $row)
     {
         if ($value === 'success') {
-            return '<span class="packeteryloggrid-success">' . $this->l('Success', 'packeteryloggridcontroller') . '</span>';
+            return '<span class="packeteryloggrid-success">' . $this->module->l('Success', 'packeteryloggridcontroller') . '</span>';
         }
 
-        return '<span class="packeteryloggrid-error">' . $this->l('Error', 'packeteryloggridcontroller') . '</span>';
+        return '<span class="packeteryloggrid-error">' . $this->module->l('Error', 'packeteryloggridcontroller') . '</span>';
     }
 
     /**

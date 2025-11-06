@@ -2,13 +2,19 @@
 
 namespace Packetery\Module;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
-use GuzzleHttp\Message\Response;
 use Packetery\Exceptions\ApiClientException;
+use Packetery\Tools\HttpClientWrapper;
 
 class ApiClientFacade
 {
+    /** @var HttpClientWrapper */
+    private $httpClient;
+
+    public function __construct(HttpClientWrapper $httpClient)
+    {
+        $this->httpClient = $httpClient;
+    }
+
     /**
      * @param string $url
      * @return string|bool
@@ -16,34 +22,20 @@ class ApiClientFacade
      */
     public function getWithGithubAuthorizationToken($url)
     {
-        if (class_exists('GuzzleHttp\Client')) {
-            $token = defined('_GITHUB_ACCESS_TOKEN_') ? _GITHUB_ACCESS_TOKEN_ : null;
-
-            if ($token !== null) {
-                $headers['Authorization'] = "token {$token}";
-                $client = new Client([
-                    'headers' => $headers,
-                ]);
-            } else {
-                $client = new Client();
-            }
-
-
-            try {
-                /** @var Response $result */
-                $result = $client->get($url);
-            } catch (TransferException $exception) {
-                throw new ApiClientException($exception->getMessage());
-            }
-            $body = $result->getBody();
-
-            if (isset($body)) {
-                return $body->getContents();
-            }
-
-            return '';
+        $options = [];
+        $token = defined('_GITHUB_ACCESS_TOKEN_') ? _GITHUB_ACCESS_TOKEN_ : null;
+        if ($token !== null) {
+            $options = [
+                'headers' => [
+                    'Authorization' => "token {$token}",
+                ],
+            ];
         }
 
-        return \Tools::file_get_contents($url, false, null, 30, true);
+        try {
+            return $this->httpClient->get($url, $options);
+        } catch (\Exception $exception) {
+            throw new ApiClientException($exception->getMessage());
+        }
     }
 }

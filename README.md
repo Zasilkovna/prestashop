@@ -68,7 +68,7 @@ In the **Orders** tab you will find a list of all orders for which the Packeta s
 - english
 
 ### Supported versions
-- PrestaShop version 1.7, Prestashop 8
+- PrestaShop version 1.7.7 – 1.7.8, Prestashop 8
 - PHP 7.1 - PHP 8.1
 - If you have problems using the module, please contact us at [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 
@@ -171,7 +171,7 @@ V záložce **objednávky** naleznete seznam všech objednávek u kterých byla 
 - angličtina
 
 ### Podporovaná verze
-- PrestaShop verze 1.7, PrestaShop 8
+- PrestaShop verze 1.7.7 - 1.7.8, PrestaShop 8
 - PHP 7.1 - PHP 8.1
 - Při problému s použitím modulu nás kontaktujte na adrese [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com).
 

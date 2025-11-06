@@ -24,7 +24,7 @@ class AddressTools
      */
     public static function getCountryFromCart(CartCore $cart)
     {
-        if (isset($cart->id_address_delivery) && !empty($cart->id_address_delivery)) {
+        if (isset($cart->id_address_delivery)) {
             $address = new AddressCore($cart->id_address_delivery);
             return strtolower(CountryCore::getIsoById($address->id_country));
         }

@@ -55,7 +55,7 @@ class Packetery extends CarrierModule
     {
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '3.2.2';
+        $this->version = '3.3.0';
         $this->author = 'Packeta s.r.o.';
         $this->need_instance = 0;
         $this->is_configurable = 1;
@@ -84,7 +84,7 @@ class Packetery extends CarrierModule
         $this->displayName = $this->l('Packeta');
         $this->description = $this->l('Packeta pick-up points, orders export, and print shipping labels');
 
-        $this->ps_versions_compliancy = array('min' => '1.7.0.0', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7.7.0', 'max' => _PS_VERSION_);
     }
 
     /**
@@ -202,7 +202,7 @@ class Packetery extends CarrierModule
     public function getCarriersContent()
     {
         $this->context->smarty->assign('module_dir', $this->_path);
-
+        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
         $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
         if (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') {
@@ -234,7 +234,7 @@ class Packetery extends CarrierModule
             $this->context->smarty->assign('updateCarriersLink', $updateCarriersLink);
         }
 
-        return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriers_info.tpl');
+        return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriersInfo.tpl');
     }
 
     /**
@@ -500,7 +500,7 @@ class Packetery extends CarrierModule
     private function getConfigurationOptions()
     {
         return [
-            'PACKETERY_APIPASS' => [
+            \Packetery\Tools\ConfigHelper::KEY_APIPASS => [
                 'title' => $this->l('API password'),
                 'required' => true,
             ],
@@ -535,6 +535,14 @@ class Packetery extends CarrierModule
             ],
             'PACKETERY_WIDGET_AUTOOPEN' => [
                 'title' => $this->l('Automatically open widget in cart'),
+                'options' => [
+                    1 => $this->l('Yes'),
+                    0 => $this->l('No'),
+                ],
+                'required' => false,
+            ],
+            \Packetery\Tools\ConfigHelper::KEY_WIDGET_VALIDATION_MODE => [
+                'title' => $this->l('Validate the pickup point using the API before accepting the order'),
                 'options' => [
                     1 => $this->l('Yes'),
                     0 => $this->l('No'),
@@ -665,7 +673,7 @@ class Packetery extends CarrierModule
                 $customerZip = '';
             }
         }
-
+        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$id_carrier);
         if (!$packeteryCarrier) {
@@ -674,7 +682,7 @@ class Packetery extends CarrierModule
 
         $deliveryAddressCountryIso = \Packetery\Address\AddressTools::getCountryFromCart($cart);
 
-        /** @var \Packetery\Carrier\CarrierVendors $carrierRepository */
+        /** @var \Packetery\Carrier\CarrierVendors $carrierVendors */
         $carrierVendors = $this->diContainer->get(\Packetery\Carrier\CarrierVendors::class);
         $widgetVendors = $carrierVendors->getWidgetParameter($packeteryCarrier, $deliveryAddressCountryIso);
         $this->context->smarty->assign('widget_vendors', $widgetVendors);
@@ -694,7 +702,7 @@ class Packetery extends CarrierModule
                 return;
             }
 
-            $template = 'views/templates/front/widget-hd.tpl';
+            $template = 'views/templates/front/widgetHd.tpl';
             $addressValidated = false;
             if ($orderData && \Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
                 $addressValidated = true;
@@ -782,17 +790,9 @@ class Packetery extends CarrierModule
         $isPS16 = strpos(_PS_VERSION_, '1.6') === 0;
         $isOpcEnabled = (bool) Configuration::get('PS_ORDER_PROCESS_TYPE');
 
-        $products = $cart->getProducts();
-        $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
-
-        $isAgeVerificationRequired = false;
-        foreach ($products as $product) {
-            $productAttributes = $productAttributeRepository->findByProductId($product['id_product']);
-            if ($productAttributes !== null) {
-                $isAgeVerificationRequired = $productAttributes->isForAdults();
-                break;
-            }
-        }
+        /** @var \Packetery\Cart\CartService $cartService */
+        $cartService = $this->diContainer->get(\Packetery\Cart\CartService::class);
+        $isAgeVerificationRequired = $cartService->isAgeVerificationRequired($cart);
 
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
@@ -802,6 +802,7 @@ class Packetery extends CarrierModule
             'frontAjaxToken' => Tools::getToken('ajax_front'),
             'appIdentity' => $this->getAppIdentity(),
             'prestashopVersion' => _PS_VERSION_,
+            'prestashopMajorVersion' => substr(_PS_VERSION_, 0, strpos(_PS_VERSION_, '.', 0)),
             'shopLanguage' => $shopLanguage,
             'customerCountry' => $customerCountry,
             'deliveryPointCarrierIds' => $deliveryPointCarrierIds,
@@ -911,6 +912,10 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('orderId', $orderId);
         $this->context->smarty->assign('returnUrl', $this->getAdminLink('AdminOrders', ['id_order' => $orderId, 'vieworder' => true], '#packetaPickupPointChange'));
         $this->processPostParcel($messages);
+
+        /** @var \Packetery\Order\PacketCanceller $packetCanceller */
+        $packetCanceller = $this->diContainer->get(\Packetery\Order\PacketCanceller::class);
+        $messages = $packetCanceller->processOrderDetail($messages);
 
         /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
@@ -1052,7 +1057,19 @@ class Packetery extends CarrierModule
         }
         $this->context->smarty->assign('carrierRequiresSize', $carrierRequiresSize);
 
-        return $this->display(__FILE__, 'display_order_main.tpl');
+        $showCancelButton = false;
+        if (isset($packeteryOrder['tracking_number']) && $packeteryOrder['tracking_number'] !== '') {
+            /** @var \Packetery\PacketTracking\PacketTrackingRepository $packetTrackingRepository */
+            $packetTrackingRepository = $this->diContainer->get(\Packetery\PacketTracking\PacketTrackingRepository::class);
+            $lastStatusCode = $packetTrackingRepository->getLastStatusCodeByOrderAndPacketId($orderId, $packeteryOrder['tracking_number']);
+            if ($lastStatusCode === null || $lastStatusCode === \Packetery\PacketTracking\PacketStatus::RECEIVED_DATA) {
+                $showCancelButton = true;
+            }
+        }
+        $this->context->smarty->assign('showCancelButton', $showCancelButton);
+        $this->context->smarty->assign('trackingNumber', $packeteryOrder['tracking_number']);
+
+        return $this->display(__FILE__, 'displayOrderMain.tpl');
     }
 
     /**
@@ -1119,7 +1136,7 @@ class Packetery extends CarrierModule
         ) {
             $widgetOptions['carriers'] = $packeteryOrder['id_branch'];
         } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
-            $widgetOptions['carriers'] = 'packeta';
+            $widgetOptions['carriers'] = \Packetery\Carrier\CarrierVendors::INTERNAL_PICKUP_POINT_CARRIER;
         }
         $this->context->smarty->assign('widgetOptions', $widgetOptions);
     }
@@ -1149,7 +1166,7 @@ class Packetery extends CarrierModule
             return [];
         }
 
-        /** @var \Packetery\Carrier\CarrierVendors $carrierRepository */
+        /** @var \Packetery\Carrier\CarrierVendors $carrierVendors */
         $carrierVendors = $this->diContainer->get(\Packetery\Carrier\CarrierVendors::class);
 
         return $carrierVendors->getWidgetParameter($packeteryCarrier, $country);
@@ -1298,7 +1315,7 @@ class Packetery extends CarrierModule
             $order = $params['order'];
         }
 
-        if (empty($order)) {
+        if ($order === null) {
             return;
         }
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
@@ -1419,7 +1436,7 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayPacketeryOrderGridListAfter()
     {
-        return $this->display(__FILE__, 'display_order_list_footer.tpl');
+        return $this->display(__FILE__, 'displayOrderListFooter.tpl');
     }
 
     /**
@@ -1480,13 +1497,13 @@ class Packetery extends CarrierModule
         $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
         /** @var \Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $carrierRepository */
+        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
         $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
 
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
         if (
             $packeteryCarrier &&
-            $apiCarrierRepository->isPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
+            $apiCarrierRepository->isExternalPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
             !$orderRepository->isPickupPointChosenByCart($cart->id)
         ) {
             $this->context->controller->errors[] = $this->l('Please select pickup point.');
@@ -1504,46 +1521,11 @@ class Packetery extends CarrierModule
      */
     public function hookActionValidateStepComplete(array &$params)
     {
-        if (empty($params['cart'])) {
-            $this->context->controller->errors[] = $this->l('Order validation failed, shop owner can find more information in log.');
-            PrestaShopLogger::addLog('Cart is not present in hook parameters.', 3, null, null, null, true);
-            $params['completed'] = false;
-            return;
+        $actionValidateStepComplete = $this->diContainer->get(\Packetery\Hooks\ActionValidateStepComplete::class);
+        $error = $actionValidateStepComplete->execute($params);
+        if ($error !== null) {
+            $this->context->controller->errors[] = $error;
         }
-
-        /** @var CartCore $cart */
-        $cart = $params['cart'];
-        /** @var \Packetery\Carrier\CarrierRepository $carrierRepository */
-        $carrierRepository = $this->diContainer->get(\Packetery\Carrier\CarrierRepository::class);
-        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
-
-        /** @var \Packetery\Order\OrderRepository $orderRepository */
-        $orderRepository = $this->diContainer->get(\Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getByCart((int)$cart->id);
-
-        /** @var \Packetery\ApiCarrier\ApiCarrierRepository $carrierRepository */
-        $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
-        if (
-            $apiCarrierRepository->isPickupPointCarrier((int)$packeteryCarrier['id_branch']) &&
-            empty($orderData['id_branch'])
-        ) {
-            $this->context->controller->errors[] = $this->l('Please select pickup point.');
-            $params['completed'] = false;
-            return;
-        }
-
-        if ($packeteryCarrier['address_validation'] !== 'required') {
-            $params['completed'] = true;
-            return;
-        }
-
-        if (!$orderData || !\Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
-            $this->context->controller->errors[] = $this->l('Please use widget to validate address.');
-            $params['completed'] = false;
-            return;
-        }
-
-        $params['completed'] = true;
     }
 
     /**
@@ -1667,7 +1649,7 @@ class Packetery extends CarrierModule
             'isPrestaShop16' => $isPrestaShop16,
         ]);
 
-        return $this->display(__FILE__, 'display_admin_product_extra.tpl');
+        return $this->display(__FILE__, 'displayAdminProductExtra.tpl');
     }
 
     /**
@@ -1686,7 +1668,7 @@ class Packetery extends CarrierModule
 
         $isAdult = (int)Tools::getIsset('packetery_age_verification');
 
-        /** @var Packetery\Product\ProductAttributeRepository $dbTools */
+        /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
         $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
 
         $productAttributeInfo = $productAttributeRepository->getRow($product->id);
@@ -1709,19 +1691,17 @@ class Packetery extends CarrierModule
      * Shows Packetery form in BO product detail
      *
      * @param array $params product information
-     * @return bool
+     * @return void
      * @throws \Packetery\Exceptions\DatabaseException|ReflectionException
      */
-    public function hookActionProductDelete(array $params)
+    public function hookActionProductDelete(array $params): void
     {
         if (Validate::isLoadedObject($params['product']) === false) {
             return;
         }
 
-        /** @var Packetery\Product\ProductAttributeRepository $dbTools */
+        /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
         $productAttributeRepository = $this->diContainer->get(\Packetery\Product\ProductAttributeRepository::class);
-        if ($productAttributeRepository->delete($params['product']->id)) {
-            return;
-        }
+        $productAttributeRepository->delete($params['product']->id);
     }
 }
