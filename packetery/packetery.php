@@ -234,7 +234,7 @@ class Packetery extends CarrierModule
             $this->context->smarty->assign('updateCarriersLink', $updateCarriersLink);
         }
 
-        return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriers_info.tpl');
+        return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/carriersInfo.tpl');
     }
 
     /**
@@ -702,7 +702,7 @@ class Packetery extends CarrierModule
                 return;
             }
 
-            $template = 'views/templates/front/widget-hd.tpl';
+            $template = 'views/templates/front/widgetHd.tpl';
             $addressValidated = false;
             if ($orderData && \Packetery\Address\AddressTools::hasValidatedAddress($orderData)) {
                 $addressValidated = true;
@@ -1069,7 +1069,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('showCancelButton', $showCancelButton);
         $this->context->smarty->assign('trackingNumber', $packeteryOrder['tracking_number']);
 
-        return $this->display(__FILE__, 'display_order_main.tpl');
+        return $this->display(__FILE__, 'displayOrderMain.tpl');
     }
 
     /**
@@ -1436,7 +1436,7 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayPacketeryOrderGridListAfter()
     {
-        return $this->display(__FILE__, 'display_order_list_footer.tpl');
+        return $this->display(__FILE__, 'displayOrderListFooter.tpl');
     }
 
     /**
@@ -1649,7 +1649,7 @@ class Packetery extends CarrierModule
             'isPrestaShop16' => $isPrestaShop16,
         ]);
 
-        return $this->display(__FILE__, 'display_admin_product_extra.tpl');
+        return $this->display(__FILE__, 'displayAdminProductExtra.tpl');
     }
 
     /**
