@@ -13,6 +13,7 @@ use Packetery\Order\OrderRepository;
 use Packetery\Tools\ConfigHelper;
 use PrestaShop\PrestaShop\Adapter\Validate;
 use stdClass;
+use Tools;
 
 class PacketTrackingCron
 {
@@ -64,7 +65,7 @@ class PacketTrackingCron
         $this->packetStatusFactory = $packetStatusFactory;
     }
 
-    public function run()
+    public function run(): array
     {
         $isPacketStatusTrackingEnabled = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_ENABLED');
         if (!$isPacketStatusTrackingEnabled) {
@@ -104,7 +105,14 @@ class PacketTrackingCron
         );
 
         $isStatusChangeEnabled = ConfigHelper::get('PACKETERY_ORDER_STATUS_CHANGE_ENABLED');
+
+        $debugMessages = [];
+        if ($orders === []) {
+            $debugMessages[] = "No suitable orders found";
+        }
+
         foreach ($orders as $order) {
+            $debugMessages[] = "Processing order {$order['id_order']}";
             $statusRecordsOrErrorMessage = $this->soapApi->getPacketTracking($order['tracking_number']);
 
             if (!is_string($statusRecordsOrErrorMessage)) {
@@ -119,6 +127,8 @@ class PacketTrackingCron
                     LogRepository::STATUS_SUCCESS,
                     $order['id_order']
                 );
+
+                $debugMessages[] = "Tracking acquired";
             } else {
                 $this->logRepository->insertRow(
                     LogRepository::ACTION_PACKET_TRACKING,
@@ -128,10 +138,15 @@ class PacketTrackingCron
                     LogRepository::STATUS_ERROR,
                     $order['id_order']
                 );
+
+                $debugMessages[] = "Tracking not acquired: {$statusRecordsOrErrorMessage}";
+
                 continue;
             }
 
             if ((is_array($statusRecords->record) && count($statusRecords->record) === 0)) {
+                $debugMessages[] = "Zero status records received";
+
                 continue;
             }
 
@@ -145,32 +160,40 @@ class PacketTrackingCron
                 !in_array($lastRecord->statusCode, $finalStatusIds, true) &&
                 !in_array($lastRecord->statusCode, array_keys($packetStatuses, 'on', true), false)
             ) {
+                $debugMessages[] = "Last status {$lastRecord->statusCode} is final or is not configured";
+
                 continue;
             }
 
             $apiPacketRecords = is_array($statusRecords->record) ? $statusRecords->record : [$statusRecords->record];
             $apiPacketStatuses = array_map(function ($apiPacketStatus) {
-                return PacketStatusRecordFactory::createFromSoapApi((array) $apiPacketStatus);
+                return PacketStatusRecordFactory::createFromSoapApi((array)$apiPacketStatus);
             }, $apiPacketRecords);
 
             $databasePacketStatuses = $this->packetTrackingRepository->getPacketStatusesByOrderId($order['id_order']);
 
             $databasePacketStatuses = array_map(function ($databasePacketStatus) {
-                return PacketStatusRecordFactory::createFromDatabase((array) $databasePacketStatus);
+                return PacketStatusRecordFactory::createFromDatabase((array)$databasePacketStatus);
             }, $databasePacketStatuses);
 
             $changedStatuses = $this->packetStatusComparator->isDifferenceBetweenApiAndDatabase($apiPacketStatuses, $databasePacketStatuses);
 
             if (!$changedStatuses) {
+                $debugMessages[] = "API status records are already in sync with status records in database";
+
                 continue;
             }
 
             if (count($databasePacketStatuses) > 0) {
+                $debugMessages[] = "Removing status records from database";
+
                 $this->packetTrackingRepository->delete($order['id_order']);
             }
 
             if (is_array($statusRecords->record) && count($statusRecords->record) > 0) {
                 foreach ($statusRecords->record as $statusRecord) {
+                    $debugMessages[] = "Inserting status record: {$statusRecord->statusCode} ({$statusRecord->dateTime})";
+
                     $this->packetTrackingRepository->insert(
                         $order['id_order'],
                         $order['tracking_number'],
@@ -180,6 +203,8 @@ class PacketTrackingCron
                     );
                 }
             } else {
+                $debugMessages[] = "Inserting status record: {$lastRecord->statusCode} ({$statusRecord->dateTime})";
+
                 $this->packetTrackingRepository->insert(
                     $order['id_order'],
                     $order['tracking_number'],
@@ -189,12 +214,22 @@ class PacketTrackingCron
                 );
             }
             if ($isStatusChangeEnabled) {
+                $debugMessages[] = "Updating order status";
+
                 $this->updateOrderStatus($lastRecord, $order['id_order']);
             }
 
             $this->orderRepository->setLastUpdateTrackingStatus(new DateTimeImmutable('now'), $order['id_order']);
         }
 
+        if (Tools::getValue('debug') === '1') {
+            return [
+                'text' => implode('... ', $debugMessages),
+                'class' => 'danger',
+            ];
+        }
+
+        // TODO: remove message, is never shown
         return [
             'text' => $this->module->l('Order statuses have been updated.', 'packetrackingcron'),
             'class' => 'success',
