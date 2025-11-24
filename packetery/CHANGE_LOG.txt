@@ -1,4 +1,5 @@
        - Updated: Added company to shipment submission via API.
+       - Updated: Removed czech language from slovak translations.
 3.3.0  - Added: Support for PrestaShop 9.
        - Added: The option to enable API validation of the pickup location in the cart.
        - Added: The ability to cancel a shipment before it has been shipped.
