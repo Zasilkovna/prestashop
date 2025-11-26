@@ -78,6 +78,10 @@ class PacketSubmitter
             'affiliateId' => self::AFFILIATE_ID,
         ];
 
+        if ($exportData['company'] !== '') {
+            $packetAttributes['company'] = $exportData['company'];
+        }
+
         if (count($exportData['size']) > 0) {
             $packetAttributes['size'] = $exportData['size'];
         }

@@ -119,7 +119,7 @@ class OrderExporter
 
             'firstName' => ($address->firstname ?: $customer->firstname),
             'lastName' => ($address->lastname ?: $customer->lastname),
-            'company' => $customer->company,
+            'company' => ($address->company ?: $customer->company),
             'phone' => $phone,
             'email' => $customer->email,
             'adultContent' => $adultContent,
