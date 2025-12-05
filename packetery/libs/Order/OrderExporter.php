@@ -105,6 +105,7 @@ class OrderExporter
             );
         }
 
+        $company = ($address->company ?: $customer->company);
         $data = [
             'number' => $number,
             'currency' => $exportCurrency,
@@ -119,7 +120,7 @@ class OrderExporter
 
             'firstName' => ($address->firstname ?: $customer->firstname),
             'lastName' => ($address->lastname ?: $customer->lastname),
-            'company' => ($address->company ?: $customer->company),
+            'company' => ($company ?? ''),
             'phone' => $phone,
             'email' => $customer->email,
             'adultContent' => $adultContent,
