@@ -1,3 +1,4 @@
+3.3.1  - Fixed: Correct Ajax behavior in checkout if friendly URLs are not enabled.
 3.3.0  - Added: Support for PrestaShop 9.
        - Added: The option to enable API validation of the pickup location in the cart.
        - Added: The ability to cancel a shipment before it has been shipped.

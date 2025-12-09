@@ -55,7 +55,7 @@ class Packetery extends CarrierModule
     {
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '3.3.0';
+        $this->version = '3.3.1';
         $this->author = 'Packeta s.r.o.';
         $this->need_instance = 0;
         $this->is_configurable = 1;
@@ -796,6 +796,23 @@ class Packetery extends CarrierModule
 
         /** @var \Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
+
+        $checkoutControllerPath = null;
+        /** @var \Packetery\Tools\CheckoutControllerUrlProvider $checkoutControllerUrlProvider */
+        $checkoutControllerUrlProvider = $this->diContainer->get(\Packetery\Tools\CheckoutControllerUrlProvider::class);
+        try {
+            $checkoutControllerPath = $checkoutControllerUrlProvider->getPath();
+        } catch (\Packetery\Exceptions\CheckoutControllerUrlException $contextUnavailableException) {
+            PrestaShopLogger::addLog(
+                $contextUnavailableException->getMessage(),
+                PrestaShopLoggerCore::LOG_SEVERITY_LEVEL_ERROR,
+                null,
+                null,
+                null,
+                true
+            );
+        }
+
         $this->context->smarty->assign('packetaModuleConfig', [
             'baseUri' => \Packetery\Module\Helper::getBaseUri(),
             'apiKey' => $configHelper->getApiKey(),
@@ -806,6 +823,7 @@ class Packetery extends CarrierModule
             'shopLanguage' => $shopLanguage,
             'customerCountry' => $customerCountry,
             'deliveryPointCarrierIds' => $deliveryPointCarrierIds,
+            'checkoutControllerPath' => $checkoutControllerPath,
 
             /*
              * PS 1.6 OPC re-creates the list of shipping methods, throwing out extra content in the process.
