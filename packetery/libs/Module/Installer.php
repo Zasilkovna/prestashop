@@ -265,7 +265,7 @@ class Installer
             $parentId = 0;
         }
         $tab->id_parent = $parentId;
-        $tab->module = 'packetery';
+        $tab->module = Packetery::MODULE_SLUG;
         $tab->class_name = $className;
         $tab->name = $this->createMultiLangField($name);
         $tab->position = Tab::getNewLastPosition($parentId);

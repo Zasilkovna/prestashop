@@ -46,6 +46,8 @@ class Packetery extends CarrierModule
     const LOCAL = 'local';
     const REMOTE = 'remote';
 
+    public const MODULE_SLUG = 'packetery';
+
     protected $config_form = false;
 
     /** @var \Packetery\DI\Container */
@@ -53,7 +55,7 @@ class Packetery extends CarrierModule
 
     public function __construct()
     {
-        $this->name = 'packetery';
+        $this->name = self::MODULE_SLUG;
         $this->tab = 'shipping_logistics';
         $this->version = '3.3.1';
         $this->author = 'Packeta s.r.o.';
@@ -751,8 +753,8 @@ class Packetery extends CarrierModule
             $configHelper = $this->diContainer->get(\Packetery\Tools\ConfigHelper::class);
             $this->context->smarty->assign('packeta_api_key', $configHelper->getApiKey());
         }
-        if (isset($params['packetery']['template'])) {
-            $template = $params['packetery']['template'];
+        if (isset($params[self::MODULE_SLUG]['template'])) {
+            $template = $params[self::MODULE_SLUG]['template'];
         }
         $this->context->smarty->assign('localPath', $this->local_path);
         return $this->context->smarty->fetch($this->local_path . $template);

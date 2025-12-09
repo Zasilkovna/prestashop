@@ -31,7 +31,7 @@ class CheckoutControllerUrlProvider
             throw new CheckoutControllerUrlException('Packetery: property link of Context is not set.');
         }
 
-        $controllerUrl = $context->link->getModuleLink('packetery', 'checkout');
+        $controllerUrl = $context->link->getModuleLink(Packetery::MODULE_SLUG, 'checkout');
         if ($controllerUrl === '') {
             throw new CheckoutControllerUrlException('Packetery: getModuleLink returned empty string.');
         }
