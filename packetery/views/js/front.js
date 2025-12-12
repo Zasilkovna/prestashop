@@ -470,8 +470,7 @@ PacketaModule.ui = {
 PacketaModule.ajax = {
     post: function (action, data, onSuccess) {
         var url =
-            PacketaModule.config.baseUri +
-            '/module/packetery/checkout?action=' + action +
+            PacketaModule.config.checkoutControllerPath + action +
             '&token=' + PacketaModule.config.frontAjaxToken;
 
         return $.ajax({
