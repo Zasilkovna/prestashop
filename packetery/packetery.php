@@ -55,7 +55,9 @@ class Packetery extends CarrierModule
 
     public function __construct()
     {
-        $this->name = self::MODULE_SLUG;
+        // Must not be extracted to constant.
+        $this->name = 'packetery';
+
         $this->tab = 'shipping_logistics';
         $this->version = '3.3.1';
         $this->author = 'Packeta s.r.o.';
