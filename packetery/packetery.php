@@ -1103,7 +1103,7 @@ class Packetery extends CarrierModule
             $widgetOptions['city'] = $deliveryAddress->city;
             $widgetOptions['street'] = $deliveryAddress->address1;
         }
-        $this->context->smarty->assign('widgetOptions', $widgetOptions);
+        $this->context->smarty->assign('widgetOptions', json_encode($widgetOptions));
     }
 
     /**
@@ -1136,7 +1136,7 @@ class Packetery extends CarrierModule
         } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
             $widgetOptions['carriers'] = Packetery\Carrier\CarrierVendors::INTERNAL_PICKUP_POINT_CARRIER;
         }
-        $this->context->smarty->assign('widgetOptions', $widgetOptions);
+        $this->context->smarty->assign('widgetOptions', json_encode($widgetOptions));
     }
 
     /**
