@@ -139,7 +139,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     {
         $templateFilePath = __DIR__ . '/../../views/templates/front/cron-message-row.tpl';
         $template = $this->context->smarty->createTemplate($templateFilePath, [
-            'message' => $message,
+            'message' => html_entity_decode($message),
         ]);
 
         // gzip compression forces browser to wait for all messages, no point in calling flush()
