@@ -1,3 +1,8 @@
+/**
+ * @copyright 2017-2026 Packeta s.r.o.
+ * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
+ */
+
 $(document).ready(function () {
     var $widgetHdButton = $('.open-packeta-hd-widget');
     if ($widgetHdButton.length === 1) {

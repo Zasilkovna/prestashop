@@ -1,3 +1,8 @@
+{**
+ * @copyright 2017-2026 Packeta s.r.o.
+ * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
+ *}
+
 <div class="card mt-2 packetery panel" id="packetaPickupPointChange">
     <div class="card-header">
         <h3 class="card-header-title">

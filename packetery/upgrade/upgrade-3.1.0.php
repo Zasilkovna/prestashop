@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * (c) Packeta s.r.o. 2017-2026
+ * SPDX-License-Identifier: AFL-3.0
+ */
+
 use Packetery\PacketTracking\PacketTrackingRepository;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\DbTools;

@@ -1,3 +1,8 @@
+{**
+ * @copyright 2017-2026 Packeta s.r.o.
+ * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
+ *}
+
 {l s='A new version of the Packeta module is available: %newVersion% (current version: %currentVersion%).' sprintf=['%newVersion%'=>$newVersion,'%currentVersion%'=>$currentVersion] mod='packetery'}
 {if $downloadUrl}
     {l s='Download it' mod='packetery'} <a href="{$downloadUrl}" target="_blank">{l s='here' mod='packetery'}</a>.
