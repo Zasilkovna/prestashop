@@ -677,7 +677,7 @@ class Packetery extends CarrierModule
         /** @var Packetery\Carrier\CarrierVendors $carrierVendors */
         $carrierVendors = $this->diContainer->get(Packetery\Carrier\CarrierVendors::class);
         $widgetVendors = $carrierVendors->getWidgetParameter($packeteryCarrier, $deliveryAddressCountryIso);
-        $this->context->smarty->assign('widget_vendors', $widgetVendors);
+        $this->context->smarty->assign('widget_vendors', json_encode($widgetVendors));
 
         $orderData = null;
         if (!empty($cart) && ($packeteryCarrier['pickup_point_type'] !== null || $packeteryCarrier['address_validation'] !== 'none')) {
