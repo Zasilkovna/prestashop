@@ -9,7 +9,8 @@
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-strict-rules": "^2.0",
         "stancer/php-stubs-prestashop": "^8.2",
-        "phpstan/extension-installer": "^1.4"
+        "phpstan/extension-installer": "^1.4",
+        "prestashop/php-dev-tools": "^4.0"
     },
     "scripts": {
         "check:ec": "vendor/bin/ec .",
@@ -17,9 +18,12 @@
         "fix:phpcbf": "vendor/bin/phpcbf --standard=./phpcs.xml",
         "phpstan": "vendor/bin/phpstan analyse -c phpstan/phpstan.neon",
         "phpstan-generate-baseline": "phpstan analyse -c  phpstan/phpstan.neon --memory-limit 2G --generate-baseline phpstan/phpstan-baseline.neon",
+        "check:phpcsfixer": "vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php",
+        "fix:phpcsfixer": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php",
         "check:all": [
             "@check:ec",
             "@check:phpcs",
+            "@check:phpcsfixer",
             "@phpstan"
         ]
     },
