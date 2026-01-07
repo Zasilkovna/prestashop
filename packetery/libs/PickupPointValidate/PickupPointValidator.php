@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Packetery\PickupPointValidate;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use CartCore;
 use Exception;
 use Packetery;

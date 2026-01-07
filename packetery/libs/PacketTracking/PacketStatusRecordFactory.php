@@ -2,6 +2,10 @@
 
 namespace Packetery\PacketTracking;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use DateTimeImmutable;
 
 class PacketStatusRecordFactory

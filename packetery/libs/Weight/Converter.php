@@ -2,6 +2,10 @@
 
 namespace Packetery\Weight;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class Converter
 {
     /** @var array */

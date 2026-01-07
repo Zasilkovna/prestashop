@@ -2,6 +2,10 @@
 
 namespace Packetery\Tools;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 /**
  * Class JsonStructureValidator
  *

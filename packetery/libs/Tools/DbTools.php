@@ -2,6 +2,10 @@
 
 namespace Packetery\Tools;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 // PrestaShopDatabaseException is extended from PrestaShopException
 use Db;
 use Packetery\Exceptions\DatabaseException;

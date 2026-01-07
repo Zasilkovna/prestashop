@@ -2,6 +2,10 @@
 
 namespace Packetery;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use AdminController;
 use Configuration;
 use Context;

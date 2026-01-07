@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Packetery\Order;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery;
 use Packetery\Log\LogRepository;
 use Packetery\Module\SoapApi;
