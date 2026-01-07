@@ -1025,6 +1025,12 @@ class Packetery extends CarrierModule
             $postParcelButtonAllowed = true;
             $showActionButtonsDivider = true;
         }
+
+        foreach ($messages as $key => $message) {
+            if (isset($message['text'])) {
+                $messages[$key]['text'] = nl2br($message['text']);
+            }
+        }
         $this->context->smarty->assign('messages', $messages);
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
@@ -1561,7 +1567,7 @@ class Packetery extends CarrierModule
                 $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
 
                 $messages[] = [
-                    'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryTrackingLink,
+                    'text' => $this->l('The shipment was successfully submitted under shipment number:') . ' ' . $packeteryTrackingLink,
                     'class' => 'success',
                 ];
             }

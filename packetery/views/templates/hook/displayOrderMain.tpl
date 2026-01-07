@@ -246,7 +246,7 @@
         {/if}
         {if isset($messages)}
             {foreach from=$messages item=message}
-                <div class="alert alert-{$message.class}">{$message.text|nl2br}</div>
+                <div class="alert alert-{$message.class}">{$message.text}</div>
             {/foreach}
         {/if}
     </div>
