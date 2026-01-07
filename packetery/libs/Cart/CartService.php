@@ -6,7 +6,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use CartCore;
 use Packetery\Product\ProductAttributeRepository;
 
 class CartService
@@ -19,7 +18,7 @@ class CartService
         $this->productAttributeRepository = $productAttributeRepository;
     }
 
-    public function isAgeVerificationRequired(CartCore $cart): bool
+    public function isAgeVerificationRequired(\CartCore $cart): bool
     {
         $products = $cart->getProducts();
         $isAgeVerificationRequired = false;
@@ -33,6 +32,7 @@ class CartService
                 }
             }
         }
+
         return $isAgeVerificationRequired;
     }
 }

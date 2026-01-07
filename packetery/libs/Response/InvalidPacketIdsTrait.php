@@ -15,6 +15,7 @@ trait InvalidPacketIdsTrait
 
     /**
      * @param string[] $invalidPacketIds
+     *
      * @return void
      */
     public function setInvalidPacketIds(array $invalidPacketIds)
@@ -24,6 +25,7 @@ trait InvalidPacketIdsTrait
 
     /**
      * @param string $packetId
+     *
      * @return bool|null
      */
     public function hasInvalidPacketId($packetId)

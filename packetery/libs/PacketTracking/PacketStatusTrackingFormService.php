@@ -6,21 +6,20 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
 use Packetery\AbstractFormService;
 use Packetery\Module\Options;
 
 class PacketStatusTrackingFormService extends AbstractFormService
 {
-    const SUBMIT_ACTION_KEY = 'submitPacketStatusTrackingSubmit';
+    public const SUBMIT_ACTION_KEY = 'submitPacketStatusTrackingSubmit';
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var PacketStatusFactory */
     private $packetStatusFactory;
 
-    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
+    public function __construct(\Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
     {
         parent::__construct($options);
         $this->module = $module;

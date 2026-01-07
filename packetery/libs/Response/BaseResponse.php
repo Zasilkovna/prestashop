@@ -29,7 +29,7 @@ class BaseResponse
      */
     public function hasFault()
     {
-        return (bool)$this->fault;
+        return (bool) $this->fault;
     }
 
     /**
@@ -39,7 +39,7 @@ class BaseResponse
      */
     public function hasWrongPassword()
     {
-        return ('IncorrectApiPasswordFault' === $this->fault);
+        return 'IncorrectApiPasswordFault' === $this->fault;
     }
 
     /**
@@ -69,7 +69,7 @@ class BaseResponse
     /**
      * Sets fault identifier.
      *
-     * @param string $fault Fault identifier.
+     * @param string $fault fault identifier
      */
     public function setFault($fault)
     {
@@ -79,7 +79,7 @@ class BaseResponse
     /**
      * Sets fault string.
      *
-     * @param string $faultString Fault string.
+     * @param string $faultString fault string
      */
     public function setFaultString($faultString)
     {

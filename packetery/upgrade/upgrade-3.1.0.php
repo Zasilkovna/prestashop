@@ -10,6 +10,7 @@ if (!defined('_PS_VERSION_')) {
 
 /**
  * @param Packetery $module
+ *
  * @return bool
  */
 function upgrade_module_3_1_0($module)
@@ -28,9 +29,9 @@ function upgrade_module_3_1_0($module)
         $sql,
         $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.1.0'),
         true
-    ) &&
-        ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time()) &&
-        Configuration::deleteByName('PACKETERY_LAST_FEATURE_CHECK');
+    )
+        && ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time())
+        && Configuration::deleteByName('PACKETERY_LAST_FEATURE_CHECK');
 
     return $executeResult !== false;
 }

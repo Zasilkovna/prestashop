@@ -6,7 +6,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
 use Packetery\Tools\Tools;
 
 /**
@@ -14,26 +13,26 @@ use Packetery\Tools\Tools;
  */
 class DeleteLabels extends Base
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     public $module;
 
     /**
      * Delete files older than DEFAULT_NUMBER_OF_DAYS
      */
-    const DEFAULT_NUMBER_OF_DAYS = 7;
+    public const DEFAULT_NUMBER_OF_DAYS = 7;
 
     /**
      * Delete number of files in one batch
      */
-    const DEFAULT_NUMBER_OF_FILES = 500;
+    public const DEFAULT_NUMBER_OF_FILES = 500;
 
     /** @var int set default limit to delete PDF labels equals 1 day */
     private $limit = 86400;
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
      */
-    public function __construct(Packetery $module)
+    public function __construct(\Packetery $module)
     {
         $this->module = $module;
     }
@@ -46,8 +45,8 @@ class DeleteLabels extends Base
         $errors = [];
         $getLabels = glob(PACKETERY_PLUGIN_DIR . '/labels/*.pdf', GLOB_NOSORT);
 
-        $deleteNumberOfDays = (int)Tools::getValue('number_of_days', self::DEFAULT_NUMBER_OF_DAYS);
-        $deleteNumberOfFiles = (int)Tools::getValue('number_of_files', self::DEFAULT_NUMBER_OF_FILES);
+        $deleteNumberOfDays = (int) Tools::getValue('number_of_days', self::DEFAULT_NUMBER_OF_DAYS);
+        $deleteNumberOfFiles = (int) Tools::getValue('number_of_files', self::DEFAULT_NUMBER_OF_FILES);
 
         if ($deleteNumberOfDays <= 0) {
             $deleteNumberOfDays = self::DEFAULT_NUMBER_OF_DAYS;

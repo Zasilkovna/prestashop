@@ -6,8 +6,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Currency;
-
 class PriceConversionParameters
 {
     /**
@@ -19,14 +17,14 @@ class PriceConversionParameters
      */
     private $totalPrice;
     /**
-     * @var Currency
+     * @var \Currency
      */
     private $orderCurrency;
 
     public function __construct(
         ?string $packeteryCurrency,
         float $totalPrice,
-        Currency $orderCurrency
+        \Currency $orderCurrency
     ) {
         $this->packeteryCurrency = $packeteryCurrency;
         $this->totalPrice = $totalPrice;
@@ -43,7 +41,7 @@ class PriceConversionParameters
         return $this->totalPrice;
     }
 
-    public function getOrderCurrency(): Currency
+    public function getOrderCurrency(): \Currency
     {
         return $this->orderCurrency;
     }

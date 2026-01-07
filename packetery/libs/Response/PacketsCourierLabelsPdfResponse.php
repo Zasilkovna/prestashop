@@ -38,6 +38,7 @@ class PacketsCourierLabelsPdfResponse extends BaseResponse
 
     /**
      * @param string[] $invalidCourierNumbers
+     *
      * @return void
      */
     public function setInvalidCourierNumbers(array $invalidCourierNumbers)
@@ -55,6 +56,7 @@ class PacketsCourierLabelsPdfResponse extends BaseResponse
 
     /**
      * @param string $courierNumber
+     *
      * @return bool|null
      */
     public function hasInvalidCourierNumber($courierNumber)

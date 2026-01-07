@@ -6,10 +6,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Context;
-use ControllerCore;
-use Db;
-
 class ContainerFactory
 {
     /**
@@ -19,12 +15,12 @@ class ContainerFactory
     {
         $container = new Container();
 
-        $container->register(Db::class, function () {
-            return Db::getInstance();
+        $container->register(\Db::class, function () {
+            return \Db::getInstance();
         });
 
-        $container->register(ControllerCore::class, function () {
-            return Context::getContext()->controller;
+        $container->register(\ControllerCore::class, function () {
+            return \Context::getContext()->controller;
         });
 
         return $container;

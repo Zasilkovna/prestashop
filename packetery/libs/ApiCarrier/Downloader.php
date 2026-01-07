@@ -6,7 +6,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\DownloadException;
 use Packetery\Tools\ConfigHelper;
@@ -14,9 +13,9 @@ use Packetery\Tools\HttpClientWrapper;
 
 class Downloader
 {
-    const API_URL = 'https://www.zasilkovna.cz/api/v4/%s/branch.json?address-delivery';
+    public const API_URL = 'https://www.zasilkovna.cz/api/v4/%s/branch.json?address-delivery';
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var ApiCarrierRepository */
@@ -29,7 +28,7 @@ class Downloader
     private $httpClient;
 
     public function __construct(
-        Packetery $module,
+        \Packetery $module,
         ApiCarrierRepository $apiCarrierRepository,
         ConfigHelper $configHelper,
         HttpClientWrapper $httpClient
@@ -44,6 +43,7 @@ class Downloader
      * Runs update and returns result.
      *
      * @return array
+     *
      * @throws DatabaseException
      */
     public function run()
@@ -91,7 +91,8 @@ class Downloader
      * Downloads carriers and returns in array.
      *
      * @return array|null
-     * @throws DownloadException DownloadException.
+     *
+     * @throws DownloadException downloadException
      */
     private function fetchAsArray()
     {
@@ -104,6 +105,7 @@ class Downloader
      * Downloads carriers in JSON.
      *
      * @return string
+     *
      * @throws DownloadException
      */
     private function downloadJson()
@@ -120,20 +122,22 @@ class Downloader
     /**
      * Converts JSON to array.
      *
-     * @param string $json JSON.
+     * @param string $json JSON
+     *
      * @return array|null
      */
     private function getFromJson($json)
     {
         $carriers_data = json_decode($json, true);
 
-        return (isset($carriers_data['carriers']) ? $carriers_data['carriers'] : null);
+        return isset($carriers_data['carriers']) ? $carriers_data['carriers'] : null;
     }
 
     /**
      * Validates data from API.
      *
-     * @param array $carriers Data retrieved from API.
+     * @param array $carriers data retrieved from API
+     *
      * @return bool
      */
     public function validateCarrierData(array $carriers)

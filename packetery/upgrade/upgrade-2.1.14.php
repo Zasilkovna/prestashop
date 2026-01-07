@@ -6,14 +6,16 @@ if (!defined('_PS_VERSION_')) {
 
 /**
  * @param Packetery $module
+ *
  * @return bool
+ *
  * @throws PrestaShopDatabaseException
  * @throws PrestaShopException
  */
 function upgrade_module_2_1_14(Packetery $module)
 {
-    return (
-        $module->unregisterHook('backOfficeHeader') &&
-        $module->registerHook('displayBackOfficeHeader')
-    );
+    return
+        $module->unregisterHook('backOfficeHeader')
+        && $module->registerHook('displayBackOfficeHeader')
+    ;
 }

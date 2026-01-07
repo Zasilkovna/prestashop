@@ -6,17 +6,15 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
-
 class PacketStatusFactory
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
      */
-    public function __construct(Packetery $module)
+    public function __construct(\Packetery $module)
     {
         $this->module = $module;
     }

@@ -8,22 +8,22 @@ if (!defined('_PS_VERSION_')) {
 
 class PacketStatus
 {
-    const RECEIVED_DATA = 1;
-    const ARRIVED = 2;
-    const PREPARED_FOR_DEPARTURE = 3;
-    const DEPARTED = 4;
-    const READY_FOR_PICKUP = 5;
-    const HANDED_TO_CARRIER = 6;
-    const DELIVERED = 7;
-    const POSTED_BACK = 9;
-    const RETURNED = 10;
-    const CANCELLED = 11;
-    const COLLECTED = 12;
-    const CUSTOMS = 14;
-    const REVERSE_PACKET_ARRIVED = 15;
-    const DELIVERY_ATTEMPT = 16;
-    const REJECTED_BY_RECIPIENT = 17;
-    const UNKNOWN = 999;
+    public const RECEIVED_DATA = 1;
+    public const ARRIVED = 2;
+    public const PREPARED_FOR_DEPARTURE = 3;
+    public const DEPARTED = 4;
+    public const READY_FOR_PICKUP = 5;
+    public const HANDED_TO_CARRIER = 6;
+    public const DELIVERED = 7;
+    public const POSTED_BACK = 9;
+    public const RETURNED = 10;
+    public const CANCELLED = 11;
+    public const COLLECTED = 12;
+    public const CUSTOMS = 14;
+    public const REVERSE_PACKET_ARRIVED = 15;
+    public const DELIVERY_ATTEMPT = 16;
+    public const REJECTED_BY_RECIPIENT = 17;
+    public const UNKNOWN = 999;
 
     /**
      * @var int
@@ -51,7 +51,6 @@ class PacketStatus
         $translatedCode,
         $isFinal
     ) {
-
         $this->id = $id;
         $this->code = $code;
         $this->translatedCode = $translatedCode;

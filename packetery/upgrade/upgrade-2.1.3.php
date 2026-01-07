@@ -19,23 +19,23 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author    RTsoft s.r.o
- *  @copyright 2019 RTsoft s.r.o
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    Squiz Pty Ltd <products@squiz.net>
+ * @copyright 2019 Squiz Pty Ltd (ABN 77 084 670 600)
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 /**
  * @param $module
+ *
  * @return bool
  */
 function upgrade_module_2_1_3($module)
 {
     $insertData = [];
-    $dbTools = $module->diContainer->get(\Packetery\Tools\DbTools::class);
+    $dbTools = $module->diContainer->get(Packetery\Tools\DbTools::class);
     $oldSettings = $dbTools->getRows('SELECT * FROM `' . _DB_PREFIX_ . 'packetery_settings`');
     if ($oldSettings) {
         foreach ($oldSettings as $oldSetting) {
@@ -72,5 +72,6 @@ function upgrade_module_2_1_3($module)
     if ($result === false) {
         return false;
     }
+
     return $dbTools->insert('packetery_settings', $insertData);
 }

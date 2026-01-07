@@ -18,6 +18,7 @@ class Converter
 
     /**
      * @param float $value
+     *
      * @return float|null
      */
     public static function getKilograms($value)
@@ -37,6 +38,7 @@ class Converter
     public static function isKgConversionSupported()
     {
         $unit = strtolower(\Configuration::get('PS_WEIGHT_UNIT'));
+
         return isset(self::$mapping[$unit]);
     }
 }

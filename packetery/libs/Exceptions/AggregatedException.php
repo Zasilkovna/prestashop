@@ -6,17 +6,15 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Exception;
-
-class AggregatedException extends Exception
+class AggregatedException extends \Exception
 {
-    /** @var Exception[] */
+    /** @var \Exception[] */
     private $exceptions = [];
 
     /**
      * AggregatedException constructor.
      *
-     * @param Exception[] $exceptions
+     * @param \Exception[] $exceptions
      */
     public function __construct(array $exceptions)
     {
@@ -25,7 +23,7 @@ class AggregatedException extends Exception
     }
 
     /**
-     * @return Exception[]
+     * @return \Exception[]
      */
     public function getExceptions()
     {

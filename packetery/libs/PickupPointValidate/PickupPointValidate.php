@@ -8,7 +8,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Exception;
 use Packetery\PickupPointValidate\Exception\HttpRequestException;
 use Packetery\Request\PickupPointValidateRequest;
 use Packetery\Response\PickupPointValidateResponse;
@@ -33,6 +32,7 @@ class PickupPointValidate
     /**
      * @param false|string $apiKey
      * @param HttpClientWrapper $httpClient
+     *
      * @return PickupPointValidate
      */
     public static function createWithValidApiKey($apiKey, HttpClientWrapper $httpClient): PickupPointValidate
@@ -52,7 +52,7 @@ class PickupPointValidate
         ];
         try {
             $contents = $this->httpClient->post(self::URL_VALIDATE_ENDPOINT, $options);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new HttpRequestException('HTTP Request Exception: ' . $e->getMessage(), 0, $e);
         }
         $resultArray = json_decode($contents, true);
@@ -62,17 +62,11 @@ class PickupPointValidate
         }
 
         if (!array_key_exists('isValid', $resultArray) || !is_bool($resultArray['isValid'])) {
-            throw new HttpRequestException(sprintf(
-                'Invalid API response: expected boolean "isValid" field, got %s.',
-                var_export($resultArray['isValid'] ?? null, true)
-            ));
+            throw new HttpRequestException(sprintf('Invalid API response: expected boolean "isValid" field, got %s.', var_export($resultArray['isValid'] ?? null, true)));
         }
 
         if (!array_key_exists('errors', $resultArray) || !is_array($resultArray['errors'])) {
-            throw new HttpRequestException(sprintf(
-                'Invalid API response: expected array "errors" field, got %s.',
-                var_export($resultArray['errors'] ?? null, true)
-            ));
+            throw new HttpRequestException(sprintf('Invalid API response: expected array "errors" field, got %s.', var_export($resultArray['errors'] ?? null, true)));
         }
 
         return new PickupPointValidateResponse($resultArray['isValid'], $resultArray['errors']);

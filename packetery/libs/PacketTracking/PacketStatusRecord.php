@@ -6,11 +6,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use DateTimeImmutable;
-
 class PacketStatusRecord
 {
-    /** @var DateTimeImmutable */
+    /** @var \DateTimeImmutable */
     private $dateTime;
 
     /** @var string */
@@ -20,11 +18,11 @@ class PacketStatusRecord
     private $statusText;
 
     /**
-     * @param DateTimeImmutable $dateTime
+     * @param \DateTimeImmutable $dateTime
      * @param string $statusCode
      * @param string $statusText
      */
-    public function __construct(DateTimeImmutable $dateTime, $statusCode, $statusText)
+    public function __construct(\DateTimeImmutable $dateTime, $statusCode, $statusText)
     {
         $this->dateTime = $dateTime;
         $this->statusCode = $statusCode;

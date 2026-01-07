@@ -6,7 +6,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
 use Packetery\Exceptions\LabelPrintException;
 use Packetery\Log\LogRepository;
 use Packetery\Module\SoapApi;
@@ -16,30 +15,32 @@ use Packetery\Tools\ConfigHelper;
 
 class Labels
 {
-    const TYPE_PACKETA = 'packeta';
-    const TYPE_CARRIER = 'carrier';
+    public const TYPE_PACKETA = 'packeta';
+    public const TYPE_CARRIER = 'carrier';
 
     /** @var LogRepository */
     private $logRepository;
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     public function __construct(
         LogRepository $logRepository,
-        Packetery $module
+        \Packetery $module
     ) {
         $this->logRepository = $logRepository;
         $this->module = $module;
     }
 
     /**
-     * @param array $packets Used for packeta labels.
+     * @param array $packets used for packeta labels
      * @param string $type
-     * @param array|null $packetsEnhanced Used for carrier labels.
+     * @param array|null $packetsEnhanced used for carrier labels
      * @param int $offset
      * @param bool $fallbackToPacketaLabel
+     *
      * @return string
+     *
      * @throws LabelPrintException
      */
     public function packetsLabelsPdf(array $packets, $type, $packetsEnhanced = null, $offset = 0, $fallbackToPacketaLabel = false)
@@ -113,6 +114,7 @@ class Labels
      * @param string $type
      * @param array $carrierNumbers
      * @param PacketsLabelsPdfResponse|PacketsCourierLabelsPdfResponse $response
+     *
      * @return array
      */
     public function buildLogProperties($packetNumber, $format, $type, array $carrierNumbers, $response)
@@ -128,8 +130,8 @@ class Labels
         if (isset($carrierNumbers[$packetNumber])) {
             $logProperties['packetCourierNumber'] = $carrierNumbers[$packetNumber];
             if (
-                $response instanceof PacketsCourierLabelsPdfResponse &&
-                $response->hasInvalidCourierNumber($carrierNumbers[$packetNumber]) === true
+                $response instanceof PacketsCourierLabelsPdfResponse
+                && $response->hasInvalidCourierNumber($carrierNumbers[$packetNumber]) === true
             ) {
                 $logProperties['isCourierNumberInvalid'] = true;
             }

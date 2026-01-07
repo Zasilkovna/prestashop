@@ -8,11 +8,12 @@ if (!defined('_PS_VERSION_')) {
 
 /**
  * @param Packetery $module
+ *
  * @return bool
  */
 function upgrade_module_2_1_7($module)
 {
-    $dbTools = $module->diContainer->get(\Packetery\Tools\DbTools::class);
+    $dbTools = $module->diContainer->get(Packetery\Tools\DbTools::class);
     $result = $dbTools->update('packetery_order', ['id_branch' => null], '`id_branch` = 0', 0, true);
     if ($result === false) {
         return false;
@@ -32,8 +33,8 @@ function upgrade_module_2_1_7($module)
     $orderRepository = $module->diContainer->get(OrderRepository::class);
     foreach ($ordersWithoutIdCarrier as $orderWithoutIdCarrier) {
         $result = $orderRepository->updateCarrierId(
-            (int)$orderWithoutIdCarrier['id_order'],
-            (int)$orderWithoutIdCarrier['id_carrier_pad']
+            (int) $orderWithoutIdCarrier['id_order'],
+            (int) $orderWithoutIdCarrier['id_carrier_pad']
         );
         if ($result === false) {
             return false;

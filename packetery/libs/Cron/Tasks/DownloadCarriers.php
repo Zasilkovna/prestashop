@@ -6,23 +6,22 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
 use Packetery\ApiCarrier\Downloader;
 use Packetery\Exceptions\DatabaseException;
 
 class DownloadCarriers extends Base
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     public $module;
 
     /** @var Downloader */
     private $downloader;
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
      * @param Downloader $downloader
      */
-    public function __construct(Packetery $module, Downloader $downloader)
+    public function __construct(\Packetery $module, Downloader $downloader)
     {
         $this->module = $module;
         $this->downloader = $downloader;
@@ -30,6 +29,7 @@ class DownloadCarriers extends Base
 
     /**
      * @return string[]
+     *
      * @throws DatabaseException
      */
     public function execute()
@@ -38,6 +38,7 @@ class DownloadCarriers extends Base
         if ($result['class'] === 'danger') {
             return [$result['text']];
         }
+
         return [];
     }
 }

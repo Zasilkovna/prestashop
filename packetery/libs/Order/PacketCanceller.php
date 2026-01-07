@@ -8,11 +8,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
 use Packetery\Log\LogRepository;
 use Packetery\Module\SoapApi;
 use Packetery\Request\CancelPacketRequest;
-use Tools;
 
 class PacketCanceller
 {
@@ -20,13 +18,13 @@ class PacketCanceller
     private $soapApi;
     /** @var OrderRepository */
     private $orderRepository;
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
     /** @var LogRepository */
     private $logRepository;
 
     public function __construct(
-        Packetery $module,
+        \Packetery $module,
         SoapApi $soapApi,
         OrderRepository $orderRepository,
         LogRepository $logRepository
@@ -79,17 +77,17 @@ class PacketCanceller
 
     public function processOrderDetail(array $messages): array
     {
-        if (!Tools::isSubmit('process_cancel_packet')) {
+        if (!\Tools::isSubmit('process_cancel_packet')) {
             return $messages;
         }
 
-        if (!Tools::getIsset('order_id') || !Tools::getIsset('tracking_number')) {
+        if (!\Tools::getIsset('order_id') || !\Tools::getIsset('tracking_number')) {
             $messages[] = $this->module->l('The packet could not be cancelled - order id or tracking number is missing.', 'packetcanceller');
 
             return $messages;
         }
 
-        [$cancellationResult, $message] = $this->cancelPacket((int)Tools::getValue('order_id'), (string)Tools::getValue('tracking_number'));
+        [$cancellationResult, $message] = $this->cancelPacket((int) \Tools::getValue('order_id'), (string) \Tools::getValue('tracking_number'));
         $messages[] = [
             'text' => $message,
             'class' => $cancellationResult ? 'success' : 'danger',

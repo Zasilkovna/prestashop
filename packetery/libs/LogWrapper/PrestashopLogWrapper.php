@@ -6,9 +6,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Exception;
-use PrestaShopLogger;
-
 class PrestashopLogWrapper
 {
     public const LEVEL_INFO = 1;
@@ -32,7 +29,7 @@ class PrestashopLogWrapper
         ?int $objectId = null,
         bool $allowDuplicate = true
     ): void {
-        PrestaShopLogger::addLog(
+        \PrestaShopLogger::addLog(
             $message,
             $severity,
             $errorCode,
@@ -45,7 +42,7 @@ class PrestashopLogWrapper
     /**
      * Log an error with exception details
      */
-    public static function logException(string $message, Exception $exception): void
+    public static function logException(string $message, \Exception $exception): void
     {
         $fullMessage =
             "{$message} Error: {$exception->getMessage()} in {$exception->getFile()}:{$exception->getLine()}";
