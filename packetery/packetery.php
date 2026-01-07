@@ -791,7 +791,7 @@ class Packetery extends CarrierModule
 
         /** @var Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
-        $this->context->smarty->assign('packetaModuleConfig', [
+        $this->context->smarty->assign('packetaModuleConfig', json_encode([
             'baseUri' => Packetery\Module\Helper::getBaseUri(),
             'apiKey' => $configHelper->getApiKey(),
             'frontAjaxToken' => Tools::getToken('ajax_front'),
@@ -819,7 +819,7 @@ class Packetery extends CarrierModule
             'addressNotValidatedMessage' => $this->l('Address is not valid.'),
             'countryDiffersMessage' => $this->l('The selected delivery address is in a country other than the country of delivery of the order.'),
             'isAgeVerificationRequired' => $isAgeVerificationRequired,
-        ]);
+        ]));
 
         $this->context->smarty->assign('mustSelectPointText', $this->l('Please select pickup point'));
 
