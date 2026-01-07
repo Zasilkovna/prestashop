@@ -18,16 +18,12 @@ class PacketStatusTrackingFormService extends AbstractFormService
 {
     public const SUBMIT_ACTION_KEY = 'submitPacketStatusTrackingSubmit';
 
-    /** @var \Packetery */
-    private $module;
-
     /** @var PacketStatusFactory */
     private $packetStatusFactory;
 
     public function __construct(\Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
     {
-        parent::__construct($options);
-        $this->module = $module;
+        parent::__construct($options, $module);
         $this->packetStatusFactory = $packetStatusFactory;
     }
 

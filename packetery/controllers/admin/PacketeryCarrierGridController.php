@@ -30,7 +30,6 @@ class PacketeryCarrierGridController extends ModuleAdminController
     {
         $this->bootstrap = true;
         $this->list_no_link = true;
-        $this->context = Context::getContext();
         $this->lang = false;
         $this->allow_export = true;
 
@@ -225,8 +224,12 @@ class PacketeryCarrierGridController extends ModuleAdminController
             return '';
         }
 
+        $module = $this->getModule();
+        /** @var CarrierTools $carrierTools */
+        $carrierTools = $module->diContainer->get(CarrierTools::class);
+
         $smarty = new Smarty();
-        $smarty->assign('link', CarrierTools::getEditLink($carrierId));
+        $smarty->assign('link', $carrierTools->getEditLink($carrierId));
         $smarty->assign('title', $this->module->l('Edit', 'packeterycarriergridcontroller'));
         $smarty->assign('class', 'edit btn btn-default');
         $smarty->assign('icon', 'icon-pencil');

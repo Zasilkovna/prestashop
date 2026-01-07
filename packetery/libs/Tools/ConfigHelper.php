@@ -132,9 +132,9 @@ class ConfigHelper
     /**
      * @return string|false
      */
-    public function getBackendLanguage()
+    public function getBackendLanguage(\Packetery $module)
     {
-        $employee = \Context::getContext()->employee;
+        $employee = $module->getContext()->employee;
 
         return \Language::getIsoById($employee ? $employee->id_lang : \Configuration::get('PS_LANG_DEFAULT'));
     }

@@ -13,10 +13,7 @@ if (!defined('_PS_VERSION_')) {
 
 class ContainerFactory
 {
-    /**
-     * @return Container
-     */
-    public static function create()
+    public static function create(\Packetery $module): Container
     {
         $container = new Container();
 
@@ -24,8 +21,8 @@ class ContainerFactory
             return \Db::getInstance();
         });
 
-        $container->register(\ControllerCore::class, function () {
-            return \Context::getContext()->controller;
+        $container->register(\ControllerCore::class, function () use ($module) {
+            return $module->getContext()->controller;
         });
 
         return $container;

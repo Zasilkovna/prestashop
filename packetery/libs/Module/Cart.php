@@ -11,15 +11,21 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
-
 class Cart
 {
+    /** @var \Packetery */
+    private $module;
+
+    public function __construct(\Packetery $module)
+    {
+        $this->module = $module;
+    }
+
     /** Endpoint is called in PS 1.6 only. PS 1.6 does not have hook for carrier extra content.
      *
      * @return string
      *
-     * @throws Packetery\Exceptions\DatabaseException
+     * @throws \Packetery\Exceptions\DatabaseException
      * @throws \ReflectionException
      * @throws \SmartyException
      */
@@ -36,7 +42,7 @@ class Cart
             'carrier' => [
                 'id' => $carrierId,
             ],
-            'cart' => \Context::getContext()->cart,
+            'cart' => $this->module->getContext()->cart,
         ];
 
         return $packetery->hookDisplayCarrierExtraContent($params);

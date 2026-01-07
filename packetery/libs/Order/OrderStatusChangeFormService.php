@@ -19,16 +19,12 @@ class OrderStatusChangeFormService extends AbstractFormService
 {
     public const SUBMIT_ACTION_KEY = 'submitOrderStatusChangeSubmit';
 
-    /** @var \Packetery */
-    private $module;
-
     /** @var PacketStatusFactory */
     private $packetStatusFactory;
 
     public function __construct(\Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
     {
-        parent::__construct($options);
-        $this->module = $module;
+        parent::__construct($options, $module);
         $this->packetStatusFactory = $packetStatusFactory;
     }
 

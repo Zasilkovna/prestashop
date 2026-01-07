@@ -26,6 +26,14 @@ class CarrierTools
         131,
     ];
 
+    /** @var \Packetery */
+    private $module;
+
+    public function __construct(\Packetery $module)
+    {
+        $this->module = $module;
+    }
+
     /**
      * @param int $carrierId
      * @param string $countryParam name,id_country,iso_code
@@ -80,17 +88,15 @@ class CarrierTools
 
     /**
      * @param int $carrierId
-     *
-     * @return string
      */
-    public static function getEditLink($carrierId)
+    public function getEditLink($carrierId): string
     {
         $parameters = [
             'id_carrier' => $carrierId,
             'viewcarrier' => 1,
         ];
         $getParameters = http_build_query($parameters);
-        $gridBaseUrl = \Context::getContext()->link->getAdminLink('PacketeryCarrierGrid');
+        $gridBaseUrl = $this->module->getContext()->link->getAdminLink('PacketeryCarrierGrid');
 
         return sprintf('%s&%s', $gridBaseUrl, $getParameters);
     }

@@ -36,6 +36,9 @@ class OrderSaver
     /** @var Calculator */
     private $weightCalculator;
 
+    /** @var \Packetery */
+    private $module;
+
     /**
      * TODO: later inherit from some Base class
      *
@@ -50,13 +53,15 @@ class OrderSaver
         PaymentRepository $paymentRepository,
         Logger $logger,
         CarrierRepository $carrierRepository,
-        Calculator $weightCalculator
+        Calculator $weightCalculator,
+        \Packetery $module
     ) {
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
         $this->logger = $logger;
         $this->carrierRepository = $carrierRepository;
         $this->weightCalculator = $weightCalculator;
+        $this->module = $module;
     }
 
     /**
@@ -128,7 +133,7 @@ class OrderSaver
      */
     private function savePickupPointInCart()
     {
-        $cartId = \Context::getContext()->cart->id;
+        $cartId = $this->module->getContext()->cart->id;
 
         if (
             !isset($cartId)

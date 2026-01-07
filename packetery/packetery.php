@@ -40,7 +40,7 @@ class Packetery extends CarrierModule
         $this->need_instance = 0;
         $this->is_configurable = 1;
 
-        $this->diContainer = Packetery\DI\ContainerFactory::create();
+        $this->diContainer = Packetery\DI\ContainerFactory::create($this);
 
         $moduleId = Module::getModuleIdByName($this->name);
         if ($moduleId > 0) {
@@ -1086,7 +1086,7 @@ class Packetery extends CarrierModule
         $widgetOptions = [
             'apiKey' => $apiKey,
             'country' => strtolower($packeteryOrder['ps_country']),
-            'language' => $configHelper->getBackendLanguage(),
+            'language' => $configHelper->getBackendLanguage($this),
             'appIdentity' => $this->getAppIdentity(),
             'carrierId' => $packeteryOrder['id_branch'],
         ];
@@ -1124,7 +1124,7 @@ class Packetery extends CarrierModule
             'appIdentity' => $this->getAppIdentity(),
             'country' => $country,
             'module_dir' => _MODULE_DIR_,
-            'lang' => $configHelper->getBackendLanguage(),
+            'lang' => $configHelper->getBackendLanguage($this),
             'vendors' => $this->getAllowedVendorsForOrder($orderId, $country),
         ];
         if (

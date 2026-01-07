@@ -295,7 +295,7 @@ class CarrierAdminForm
         if (!$apiCarrier) {
             $this->repository->deleteById($this->carrierId);
             $this->messageManager->setMessage('info', $this->module->l('Carrier has been saved.', 'carrieradminform'));
-            \Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
+            \Tools::redirectAdmin($this->tools->getEditLink($this->carrierId));
         }
 
         $pickupPointType = $this->getPickupPointType($apiCarrier, $carrierData['id_branch']);
@@ -327,7 +327,7 @@ class CarrierAdminForm
         }
 
         $this->messageManager->setMessage('info', $this->module->l('Carrier has been saved.', 'carrieradminform'));
-        \Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
+        \Tools::redirectAdmin($this->tools->getEditLink($this->carrierId));
     }
 
     /**
@@ -350,7 +350,7 @@ class CarrierAdminForm
 
         if (isset($allowedVendors['error'])) {
             $this->messageManager->setMessage('warning', $allowedVendors['error']);
-            \Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
+            \Tools::redirectAdmin($this->tools->getEditLink($this->carrierId));
         }
 
         $this->repository->setPacketeryCarrier(
@@ -365,7 +365,7 @@ class CarrierAdminForm
         );
 
         $this->messageManager->setMessage('info', $this->module->l('Carrier settings were saved.', 'carrieradminform'));
-        \Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
+        \Tools::redirectAdmin($this->tools->getEditLink($this->carrierId));
     }
 
     public function getError()
