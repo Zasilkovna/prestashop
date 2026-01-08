@@ -144,7 +144,7 @@ class OrderSaver
         ) {
             return [
                 'result' => false,
-                'message' => 'Cart id, carrier id or pickup point details are not set: ' . serialize([
+                'message' => 'Cart id, carrier id or pickup point details are not set: ' . json_encode([
                     'cartId' => $cartId,
                     'POST' => $_POST,
                 ]),
