@@ -50,9 +50,7 @@ class Packetery extends CarrierModule
             }
         }
 
-        /*
-         * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
-         */
+        // Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
         $this->bootstrap = true;
 
         parent::__construct();
@@ -865,7 +863,6 @@ class Packetery extends CarrierModule
         $controllerWrapper->registerStylesheet('packetery-front', $cssPath, ['server' => $cssServer, 'media' => 'all']);
     }
 
-    /* ORDERS */
     /**
      * Save packetery order after order is created. Called both in FE and admin, once. Not called during order update.
      *
@@ -890,7 +887,6 @@ class Packetery extends CarrierModule
         $orderSaver = $this->diContainer->get(Packetery\Order\OrderSaver::class);
         $orderSaver->saveNewOrder($params['cart'], $params['order']);
     }
-    /* END ORDERS */
 
     /**
      * @param array $params parameters provided by PrestaShop
