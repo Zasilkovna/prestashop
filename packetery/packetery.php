@@ -710,17 +710,10 @@ class Packetery extends CarrierModule
             }
 
             $addressInfoArray = [];
-            if ($this->context->smarty->getTemplateVars('customerStreet') !== '') {
-                $addressInfoArray[] = $this->context->smarty->getTemplateVars('customerStreet');
-            }
-            if ($this->context->smarty->getTemplateVars('customerHouseNumber') !== '') {
-                $addressInfoArray[] = $this->context->smarty->getTemplateVars('customerHouseNumber');
-            }
-            if ($this->context->smarty->getTemplateVars('customerCity') !== '') {
-                $addressInfoArray[] = $this->context->smarty->getTemplateVars('customerCity');
-            }
-            if ($this->context->smarty->getTemplateVars('customerZip') !== '') {
-                $addressInfoArray[] = $this->context->smarty->getTemplateVars('customerZip');
+            foreach (['customerStreet', 'customerHouseNumber', 'customerCity', 'customerZip'] as $addressPart) {
+                if ($this->context->smarty->getTemplateVars($addressPart) !== '') {
+                    $addressInfoArray[] = $this->context->smarty->getTemplateVars($addressPart);
+                }
             }
             $addressInfo = implode(', ', $addressInfoArray);
             $this->context->smarty->assign('addressInfo', $addressInfo);
