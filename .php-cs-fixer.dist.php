@@ -8,7 +8,6 @@ $config = new PacketeryCsFixerConfig();
 $finder = Finder::create()
     ->in(__DIR__ . '/packetery')
     ->exclude('vendor')
-    ->exclude('translations')
     ->name('*.php');
 
 $config->setFinder($finder);
