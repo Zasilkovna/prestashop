@@ -202,6 +202,16 @@ class VersionChecker
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/newVersionMessage.tpl');
     }
 
+    public function getVersionUpdateMessage(): string
+    {
+        return sprintf(
+            $this->module->l('A new version of the Packeta module is available: %s (current version: %s).', 'versionchecker'),
+            ConfigHelper::get(ConfigHelper::KEY_LAST_VERSION),
+            $this->module->version
+        ) . ' ' .
+            $this->module->l('More information can be found on the configuration page.', 'versionchecker');
+    }
+
     private function shouldUpdateStoredVersionData(string $version, string $downloadUrl): bool
     {
         return $version !== ''

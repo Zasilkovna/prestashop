@@ -142,9 +142,10 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $module = $this->getModule();
         $carriersInformation = $module->getCarriersContent();
 
+        /** @var VersionChecker $versionChecker */
         $versionChecker = $module->diContainer->get(VersionChecker::class);
         if ($versionChecker->isNewVersionAvailable()) {
-            $this->warnings[] = $versionChecker->getVersionUpdateMessageHtml();
+            $this->warnings[] = $versionChecker->getVersionUpdateMessage();
         }
 
         $this->addRowAction('edit');

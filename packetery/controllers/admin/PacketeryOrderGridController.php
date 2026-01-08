@@ -196,8 +196,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         $versionChecker = $this->getModule()->diContainer->get(VersionChecker::class);
         if ($versionChecker->isNewVersionAvailable()) {
-            // todo 3040 remove?
-            $this->warnings[] = strip_tags($versionChecker->getVersionUpdateMessageHtml());
+            $this->warnings[] = $versionChecker->getVersionUpdateMessage();
         }
     }
 
