@@ -1,3 +1,4 @@
+       - Updated: Multiple issues form PrestaShop validator resolved.
        - Updated: Added company to shipment submission via API.
        - Updated: Removed czech language from slovak translations.
 3.3.0  - Added: Support for PrestaShop 9.

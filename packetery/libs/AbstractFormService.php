@@ -87,7 +87,7 @@ abstract class AbstractFormService
                 $value = Tools::getValue($this->getCheckboxKeyName($option, $checkboxItem['id']));
                 $values[$checkboxItem['id']] = $value;
             }
-            $this->persistFormData($option, serialize($values));
+            $this->persistFormData($option, json_encode($values));
         } else {
             $value = Tools::getValue($option);
             $this->persistFormData($option, $value);
@@ -129,11 +129,11 @@ abstract class AbstractFormService
             if ($itemConfiguration['type'] === 'checkbox') {
                 $persistedValue = $packeterySettings[$itemKey];
                 if ($persistedValue === false) {
-                    $persistedValue = serialize([]);
+                    $persistedValue = json_encode([]);
                 }
 
                 $value = Tools::getValue($itemKey, $persistedValue);
-                $rawValues = Module\Helper::unserialize($value);
+                $rawValues = json_decode($value, true);
 
                 foreach ($itemConfiguration['values']['query'] as $checkboxItem) {
                     if (isset($rawValues[$checkboxItem['id']])) {
