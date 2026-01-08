@@ -34,7 +34,7 @@ function upgrade_module_2_1_5($module)
         SELECT `id_carrier`, `is_cod` FROM `' . _DB_PREFIX_ . 'packetery_carrier`');
     if ($oldPacketeryCarriers) {
         $psCarriers = Carrier::getCarriers(
-            Configuration::get('PS_LANG_DEFAULT'),
+            (int)Configuration::get('PS_LANG_DEFAULT'),
             false,
             false,
             false,

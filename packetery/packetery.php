@@ -42,7 +42,8 @@ class Packetery extends CarrierModule
 
         $this->diContainer = Packetery\DI\ContainerFactory::create();
 
-        if (Module::isInstalled($this->name)) {
+        $moduleId = Module::getModuleIdByName($this->name);
+        if ($moduleId > 0) {
             $errors = [];
             $this->configurationErrors($errors);
             foreach ($errors as $error) {
@@ -126,6 +127,8 @@ class Packetery extends CarrierModule
 
     private static function transportMethod()
     {
+        $have_curl = false;
+        $have_url_fopen = false;
         if (extension_loaded('curl')) {
             $have_curl = true;
         }
@@ -203,7 +206,7 @@ class Packetery extends CarrierModule
         $lastCarriersUpdate = Packetery\Tools\ConfigHelper::get('PACKETERY_LAST_CARRIERS_UPDATE');
         if ((bool) $lastCarriersUpdate !== false) {
             $date = new DateTimeImmutable();
-            $date->setTimestamp($lastCarriersUpdate);
+            $date = $date->setTimestamp((int)$lastCarriersUpdate);
             $lastCarriersUpdate = $date->format('d.m.Y H:i:s');
         }
 
@@ -431,8 +434,7 @@ class Packetery extends CarrierModule
     }
 
     /**
-     * @return false|string
-     *
+     * @return string
      * @throws SmartyException
      */
     private function generateCronInfoBlock()
@@ -1043,10 +1045,10 @@ class Packetery extends CarrierModule
         $carrierRequiresSize = null;
         $externalCarrierId = Packetery\Carrier\CarrierTools::findExternalCarrierId($packeteryOrder);
         if ($externalCarrierId !== null) {
-            /** @var Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
-            $apiCarrierRepository = $this->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
-            $apiCarrier = $apiCarrierRepository->getById($externalCarrierId);
-            $carrierRequiresSize = (bool) $apiCarrier['requires_size'];
+            /** @var \Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
+            $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
+            $apiCarrier = $apiCarrierRepository->getById((string)$externalCarrierId);
+            $carrierRequiresSize = (bool)$apiCarrier['requires_size'];
         }
         $this->context->smarty->assign('carrierRequiresSize', $carrierRequiresSize);
 
@@ -1173,9 +1175,8 @@ class Packetery extends CarrierModule
      * see https://devdocs.prestashop.com/1.7/modules/core-updates/1.7.5/
      *
      * @param string $controller
-     * @param array|null $params
-     * @param string|null $anchor
-     *
+     * @param array $params
+     * @param string $anchor
      * @return string
      */
     public function getAdminLink($controller, array $params = [], $anchor = '')
@@ -1197,34 +1198,6 @@ class Packetery extends CarrierModule
             [],
             $params
         ) . $anchor;
-    }
-
-    /**
-     * @param array $address
-     *
-     * @return bool
-     *
-     * @throws ReflectionException
-     * @throws Packetery\Exceptions\DatabaseException
-     */
-    private function saveAddressChange(array $address)
-    {
-        $orderId = (int) Tools::getValue('order_id');
-        $packeteryOrderFields = [
-            'is_ad' => 1,
-            'country' => $address['country'],
-            'county' => $address['county'],
-            'zip' => $address['postcode'],
-            'city' => $address['city'],
-            'street' => $address['street'],
-            'house_number' => $address['houseNumber'],
-            'latitude' => $address['latitude'],
-            'longitude' => $address['longitude'],
-        ];
-        /** @var Packetery\Order\OrderRepository $orderRepository */
-        $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
-
-        return $orderRepository->updateByOrder($packeteryOrderFields, $orderId);
     }
 
     /**
@@ -1417,7 +1390,7 @@ class Packetery extends CarrierModule
         /** @var Cart $cart */
         $cart = $params['cart'];
         $oldCart = new CartCore($cart->id);
-        if (!is_object($cart) || !is_object($oldCart)) {
+        if (!is_object($oldCart)) {
             return;
         }
 

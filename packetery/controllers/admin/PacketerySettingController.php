@@ -12,8 +12,10 @@ class PacketerySettingController extends ModuleAdminController
 {
     public function initContent()
     {
+        /** @var Packetery $module */
+        $module = $this->module;
         Tools::redirectAdmin(
-            $this->module->getAdminLink('AdminModules', ['configure' => $this->module->name, 'tab_module' => $this->module->tab, 'module_name' => $this->module->name])
+            $module->getAdminLink('AdminModules', ['configure' => $module->name, 'tab_module' => $module->tab, 'module_name' => $module->name])
         );
     }
 }
