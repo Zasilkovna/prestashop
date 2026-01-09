@@ -35,7 +35,7 @@ class Packetery extends CarrierModule
     {
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '3.3.0';
+        $this->version = '3.4.0';
         $this->author = 'Packeta s.r.o.';
         $this->need_instance = 0;
         $this->is_configurable = 1;

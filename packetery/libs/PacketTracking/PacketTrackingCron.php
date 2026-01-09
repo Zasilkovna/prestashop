@@ -12,7 +12,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use Packetery\Log\LogRepository;
-use Packetery\Module\Helper;
 use Packetery\Module\SoapApi;
 use Packetery\Order\OrderRepository;
 use Packetery\Tools\ConfigHelper;
@@ -79,7 +78,7 @@ class PacketTrackingCron
         }
 
         $configOrderStatuses = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATES');
-        $orderStatuses = Helper::unserialize($configOrderStatuses);
+        $orderStatuses = json_decode($configOrderStatuses, true);
         if (!is_array($orderStatuses)) {
             return $this->getNoOrderStatusesMessage();
         }
@@ -90,8 +89,7 @@ class PacketTrackingCron
         }
 
         $configPacketStatuses = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_PACKET_STATUSES');
-        $packetStatuses = Helper::unserialize($configPacketStatuses);
-
+        $packetStatuses = json_decode($configPacketStatuses, true);
         if (!is_array($packetStatuses)) {
             $packetStatuses = [];
         }
