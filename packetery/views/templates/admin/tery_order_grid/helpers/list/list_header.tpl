@@ -6,6 +6,9 @@
 {extends file="helpers/list/list_header.tpl"}
 
 {block name=leadin}
+{if isset($versionUpdateMessageHtml)}
+	{$versionUpdateMessageHtml}
+{/if}
 {if isset($prepareLabelsMode) && $prepareLabelsMode}
 <div class="panel">
 	<div class="panel-heading">

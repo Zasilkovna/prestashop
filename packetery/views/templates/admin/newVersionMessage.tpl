@@ -10,7 +10,8 @@
 <br>
 {if $releaseNotes}
     {l s='Change log:' mod='packetery'}<br>
-    {foreach $releaseNotes as $releaseNote}
-        {$releaseNotes|nl2br|truncate:400:"… <a target='_blank href='https://github.com/Zasilkovna/prestashop/releases'>{l s='Read more' mod='packetery'}</a>" nofilter}
-    {/foreach}
+    {$releaseNotes}
+    {if $showReadMoreLink === true}
+        … <a target="_blank" href="https://github.com/Zasilkovna/prestashop/releases">{l s='Read more' mod='packetery'}</a>
+    {/if}
 {/if}

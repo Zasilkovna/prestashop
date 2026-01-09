@@ -22,16 +22,17 @@ class Ajax
     /** @var CarrierRepository */
     private $carrierRepository;
 
-    /**
-     * Ajax constructor.
-     *
-     * @param OrderRepository $orderRepository
-     * @param CarrierRepository $carrierRepository
-     */
-    public function __construct(OrderRepository $orderRepository, CarrierRepository $carrierRepository)
-    {
+    /** @var \Packetery */
+    private $module;
+
+    public function __construct(
+        OrderRepository $orderRepository,
+        CarrierRepository $carrierRepository,
+        \Packetery $module
+    ) {
         $this->orderRepository = $orderRepository;
         $this->carrierRepository = $carrierRepository;
+        $this->module = $module;
     }
 
     /**
@@ -39,7 +40,7 @@ class Ajax
      */
     public function saveAddressInCart()
     {
-        $cart = \Context::getContext()->cart;
+        $cart = $this->module->getContext()->cart;
         $cartId = $cart->id;
 
         if (!isset($cartId) || !\Tools::getIsset('address')) {

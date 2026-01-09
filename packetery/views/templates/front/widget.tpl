@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AFL-3.0
  *}
 <div id="packetery-carrier-{$carrier_id|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" id="widget_vendors" name="widget_vendors" value='{$widget_vendors|@json_encode|escape}'>
+    <input type="hidden" id="widget_vendors" name="widget_vendors" value='{$widget_vendors}'>
     <!--Packetery widget-->
     <div id="packetery-widget" class="clearfix">
         <div class="widget-left">

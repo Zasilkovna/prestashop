@@ -116,7 +116,7 @@ class SoapApi
         if (is_array($courierTrackingUrl)) {
             $urlPreferred = null;
             $urlEn = null;
-            $preferredLang = $this->configHelper->getBackendLanguage();
+            $preferredLang = $this->configHelper->getBackendLanguage($this->module);
             foreach ($courierTrackingUrl as $courierTrackingUrlObject) {
                 if ($courierTrackingUrlObject->lang === $preferredLang) {
                     $urlPreferred = $courierTrackingUrlObject->url;

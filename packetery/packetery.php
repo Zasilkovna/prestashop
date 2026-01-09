@@ -40,7 +40,7 @@ class Packetery extends CarrierModule
         $this->need_instance = 0;
         $this->is_configurable = 1;
 
-        $this->diContainer = Packetery\DI\ContainerFactory::create();
+        $this->diContainer = Packetery\DI\ContainerFactory::create($this);
 
         $moduleId = Module::getModuleIdByName($this->name);
         if ($moduleId > 0) {
@@ -677,7 +677,7 @@ class Packetery extends CarrierModule
         /** @var Packetery\Carrier\CarrierVendors $carrierVendors */
         $carrierVendors = $this->diContainer->get(Packetery\Carrier\CarrierVendors::class);
         $widgetVendors = $carrierVendors->getWidgetParameter($packeteryCarrier, $deliveryAddressCountryIso);
-        $this->context->smarty->assign('widget_vendors', $widgetVendors);
+        $this->context->smarty->assign('widget_vendors', json_encode($widgetVendors));
 
         $orderData = null;
         if (!empty($cart) && ($packeteryCarrier['pickup_point_type'] !== null || $packeteryCarrier['address_validation'] !== 'none')) {
@@ -708,6 +708,16 @@ class Packetery extends CarrierModule
                 $this->context->smarty->assign('customerCity', $customerCity);
                 $this->context->smarty->assign('customerZip', $customerZip);
             }
+
+            $addressInfoArray = [];
+            foreach (['customerStreet', 'customerHouseNumber', 'customerCity', 'customerZip'] as $addressPart) {
+                if ($this->context->smarty->getTemplateVars($addressPart) !== '') {
+                    $addressInfoArray[] = $this->context->smarty->getTemplateVars($addressPart);
+                }
+            }
+            $addressInfo = implode(', ', $addressInfoArray);
+            $this->context->smarty->assign('addressInfo', $addressInfo);
+
             $this->context->smarty->assign('addressValidationSetting', $packeteryCarrier['address_validation']);
             $this->context->smarty->assign('addressValidated', $addressValidated);
             $this->context->smarty->assign('addressValidatedMessage', $this->l('Address is valid.'));
@@ -791,7 +801,7 @@ class Packetery extends CarrierModule
 
         /** @var Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
-        $this->context->smarty->assign('packetaModuleConfig', [
+        $this->context->smarty->assign('packetaModuleConfig', json_encode([
             'baseUri' => Packetery\Module\Helper::getBaseUri(),
             'apiKey' => $configHelper->getApiKey(),
             'frontAjaxToken' => Tools::getToken('ajax_front'),
@@ -819,7 +829,7 @@ class Packetery extends CarrierModule
             'addressNotValidatedMessage' => $this->l('Address is not valid.'),
             'countryDiffersMessage' => $this->l('The selected delivery address is in a country other than the country of delivery of the order.'),
             'isAgeVerificationRequired' => $isAgeVerificationRequired,
-        ]);
+        ]));
 
         $this->context->smarty->assign('mustSelectPointText', $this->l('Please select pickup point'));
 
@@ -1008,6 +1018,12 @@ class Packetery extends CarrierModule
             $postParcelButtonAllowed = true;
             $showActionButtonsDivider = true;
         }
+
+        foreach ($messages as $key => $message) {
+            if (isset($message['text'])) {
+                $messages[$key]['text'] = nl2br($message['text']);
+            }
+        }
         $this->context->smarty->assign('messages', $messages);
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
@@ -1086,7 +1102,7 @@ class Packetery extends CarrierModule
         $widgetOptions = [
             'apiKey' => $apiKey,
             'country' => strtolower($packeteryOrder['ps_country']),
-            'language' => $configHelper->getBackendLanguage(),
+            'language' => $configHelper->getBackendLanguage($this),
             'appIdentity' => $this->getAppIdentity(),
             'carrierId' => $packeteryOrder['id_branch'],
         ];
@@ -1103,7 +1119,7 @@ class Packetery extends CarrierModule
             $widgetOptions['city'] = $deliveryAddress->city;
             $widgetOptions['street'] = $deliveryAddress->address1;
         }
-        $this->context->smarty->assign('widgetOptions', $widgetOptions);
+        $this->context->smarty->assign('widgetOptions', json_encode($widgetOptions));
     }
 
     /**
@@ -1124,7 +1140,7 @@ class Packetery extends CarrierModule
             'appIdentity' => $this->getAppIdentity(),
             'country' => $country,
             'module_dir' => _MODULE_DIR_,
-            'lang' => $configHelper->getBackendLanguage(),
+            'lang' => $configHelper->getBackendLanguage($this),
             'vendors' => $this->getAllowedVendorsForOrder($orderId, $country),
         ];
         if (
@@ -1136,7 +1152,7 @@ class Packetery extends CarrierModule
         } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
             $widgetOptions['carriers'] = Packetery\Carrier\CarrierVendors::INTERNAL_PICKUP_POINT_CARRIER;
         }
-        $this->context->smarty->assign('widgetOptions', $widgetOptions);
+        $this->context->smarty->assign('widgetOptions', json_encode($widgetOptions));
     }
 
     /**
@@ -1544,7 +1560,7 @@ class Packetery extends CarrierModule
                 $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
 
                 $messages[] = [
-                    'text' => $this->l('The shipment was successfully submitted under shipment number:') . $packeteryTrackingLink,
+                    'text' => $this->l('The shipment was successfully submitted under shipment number:') . ' ' . $packeteryTrackingLink,
                     'class' => 'success',
                 ];
             }

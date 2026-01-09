@@ -186,7 +186,18 @@ class VersionChecker
         $smarty->assign('downloadUrl', ConfigHelper::get(ConfigHelper::KEY_LAST_VERSION_URL));
         $smarty->assign('newVersion', ConfigHelper::get(ConfigHelper::KEY_LAST_VERSION));
         $smarty->assign('currentVersion', $this->module->version);
-        $smarty->assign('releaseNotes', ConfigHelper::get(ConfigHelper::KEY_LAST_RELEASE_NOTES));
+
+        $showReadMoreLink = false;
+        $releaseNotes = ConfigHelper::get(ConfigHelper::KEY_LAST_RELEASE_NOTES);
+        $releaseNotes = nl2br($releaseNotes);
+        $limit = 400;
+        if (mb_strlen($releaseNotes, 'UTF-8') > $limit) {
+            $showReadMoreLink = true;
+            $releaseNotes = mb_substr($releaseNotes, 0, $limit, 'UTF-8');
+        }
+
+        $smarty->assign('releaseNotes', $releaseNotes);
+        $smarty->assign('showReadMoreLink', $showReadMoreLink);
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/newVersionMessage.tpl');
     }

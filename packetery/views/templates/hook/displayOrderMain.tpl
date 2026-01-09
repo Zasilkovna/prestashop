@@ -45,7 +45,7 @@
                 {if isset($widgetOptions) && !$isExported}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-hd-widget"
-                           data-widget-options="{$widgetOptions|@json_encode|escape}">
+                           data-widget-options="{$widgetOptions}">
                             {if isset($validatedAddress) && $validatedAddress['zip']}
                                 {l s='Change validated delivery address' mod='packetery'}
                             {else}
@@ -70,7 +70,7 @@
                 {if $pickupPointChangeAllowed && !$isExported}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-widget"
-                           data-widget-options="{$widgetOptions|@json_encode|escape}">{l s='Change pickup point' mod='packetery'}</a>
+                           data-widget-options="{$widgetOptions}">{l s='Change pickup point' mod='packetery'}</a>
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="pickup_point">
                     </p>
@@ -246,7 +246,7 @@
         {/if}
         {if isset($messages)}
             {foreach from=$messages item=message}
-                <div class="alert alert-{$message.class}">{$message.text|nl2br}</div>
+                <div class="alert alert-{$message.class}">{$message.text}</div>
             {/foreach}
         {/if}
     </div>

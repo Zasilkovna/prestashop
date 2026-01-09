@@ -21,9 +21,13 @@ abstract class AbstractFormService
     /** @var Options */
     private $options;
 
-    public function __construct(Options $options)
+    /** @var \Packetery */
+    protected $module;
+
+    public function __construct(Options $options, \Packetery $module)
     {
         $this->options = $options;
+        $this->module = $module;
     }
 
     /**
@@ -186,7 +190,7 @@ abstract class AbstractFormService
      */
     public function getOrderStates()
     {
-        $orderStates = \OrderState::getOrderStates((int) \Context::getContext()->language->id);
+        $orderStates = \OrderState::getOrderStates((int) $this->module->getContext()->language->id);
 
         $orderStatuses = [];
         foreach ($orderStates as $orderState) {

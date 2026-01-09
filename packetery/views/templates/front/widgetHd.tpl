@@ -20,12 +20,7 @@
                     <ul>
                         <li>{l s='Selected delivery address' mod='packetery'}:
                             <span class="picked-delivery-place">
-                                {assign var=addressInfo value=[]}
-                                {if $customerStreet}{$addressInfo[]=$customerStreet}{/if}
-                                {if $customerHouseNumber}{$addressInfo[]=$customerHouseNumber}{/if}
-                                {if $customerCity}{$addressInfo[]=$customerCity}{/if}
-                                {if $customerZip}{$addressInfo[]=$customerZip}{/if}
-                                {', '|implode:$addressInfo}
+                                {$addressInfo}
                             </span>
                             <br>
                             <span class="address-validation-result{if $addressValidated} address-validated{/if}">

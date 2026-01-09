@@ -42,7 +42,6 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $this->bootstrap = true;
         $this->list_no_link = true;
-        $this->context = Context::getContext();
         $this->lang = false;
         $this->allow_export = true;
 
@@ -61,11 +60,15 @@ class PacketeryOrderGridController extends ModuleAdminController
             `os`.`color`,
             `ps`.`status_code`
         ';
+
+        parent::__construct();
+
+        $context = $this->getModule()->getContext();
         $this->_join = '
             JOIN `' . _DB_PREFIX_ . 'packetery_order` `po` ON `po`.`id_order` = `a`.`id_order`
             JOIN `' . _DB_PREFIX_ . 'customer` `c` ON `c`.`id_customer` = `a`.`id_customer`
             LEFT JOIN `' . _DB_PREFIX_ . 'order_state` `os` ON `os`.`id_order_state` = `a`.`current_state`
-            LEFT JOIN `' . _DB_PREFIX_ . 'order_state_lang` `osl` ON (`os`.`id_order_state` = `osl`.`id_order_state` AND `osl`.`id_lang` = ' . (int) $this->context->language->id . ')
+            LEFT JOIN `' . _DB_PREFIX_ . 'order_state_lang` `osl` ON (`os`.`id_order_state` = `osl`.`id_order_state` AND `osl`.`id_lang` = ' . (int) $context->language->id . ')
             LEFT JOIN (
                 SELECT `id_order`, `status_code`, `packet_id`
                 FROM `' . _DB_PREFIX_ . 'packetery_packet_status` 
@@ -92,13 +95,10 @@ class PacketeryOrderGridController extends ModuleAdminController
         $this->_use_found_rows = true;
         // $this->_pagination = [20, 50, 100, 300, 1000];
 
-        $statuses = OrderState::getOrderStates((int) $this->context->language->id);
+        $statuses = OrderState::getOrderStates((int) $context->language->id);
         foreach ($statuses as $status) {
             $this->statuses_array[$status['id_order_state']] = $status['name'];
         }
-
-        // for $this->translator not being null, in PS 1.6
-        parent::__construct();
 
         $this->fields_list = [
             'id_order' => [
@@ -193,11 +193,6 @@ class PacketeryOrderGridController extends ModuleAdminController
         $this->toolbar_title = $title;
 
         $this->hasBulkLabelPrintingError = false;
-
-        $versionChecker = $this->getModule()->diContainer->get(VersionChecker::class);
-        if ($versionChecker->isNewVersionAvailable()) {
-            $this->warnings[] = $versionChecker->getVersionUpdateMessageHtml();
-        }
     }
 
     /**
@@ -522,6 +517,11 @@ class PacketeryOrderGridController extends ModuleAdminController
         }
 
         $this->addRowAction('action');
+
+        $versionChecker = $this->getModule()->diContainer->get(VersionChecker::class);
+        if ($versionChecker->isNewVersionAvailable()) {
+            $this->tpl_list_vars['versionUpdateMessageHtml'] = $this->module->displayWarning($versionChecker->getVersionUpdateMessageHtml());
+        }
 
         return parent::renderList();
     }

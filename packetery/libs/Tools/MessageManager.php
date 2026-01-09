@@ -15,6 +15,14 @@ class MessageManager
 {
     public const PREFIX = 'packetery_';
 
+    /** @var \Packetery */
+    private $module;
+
+    public function __construct(\Packetery $module)
+    {
+        $this->module = $module;
+    }
+
     /**
      * We are working with one message, Cookie does not allow arrays.
      *
@@ -50,7 +58,7 @@ class MessageManager
      */
     private function getContextAndKey($errorLevel)
     {
-        $context = \Context::getContext();
+        $context = $this->module->getContext();
         $key = self::PREFIX . $errorLevel;
 
         return [$context, $key];
