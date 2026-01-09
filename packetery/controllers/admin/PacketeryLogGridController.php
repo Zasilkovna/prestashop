@@ -169,23 +169,6 @@ class PacketeryLogGridController extends ModuleAdminController
      * @param array<string, string> $row
      *
      * @return string
-     *
-     * @throws PrestaShopException
-     */
-    public function renderDate($value, array $row)
-    {
-        if (Tools::version_compare(_PS_VERSION_, '8', '<') === true) {
-            return Tools::displayDate($value, null, true);
-        }
-
-        return Tools::displayDate($value, true);
-    }
-
-    /**
-     * @param string $value
-     * @param array<string, string> $row
-     *
-     * @return string
      */
     public function renderStatus($value, array $row)
     {

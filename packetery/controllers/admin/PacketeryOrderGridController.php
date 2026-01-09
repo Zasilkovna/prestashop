@@ -283,7 +283,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     private function prepareOnlyInternalPacketNumbers(array $ids)
     {
-        /** @var OrderRepository $orderRepo */
+        /** @var OrderRepository $orderRepository */
         $orderRepository = $this->getModule()->diContainer->get(OrderRepository::class);
 
         $packetNumbers = [];
@@ -304,11 +304,11 @@ class PacketeryOrderGridController extends ModuleAdminController
      * @param int $offset
      * @param bool $fallbackToPacketaLabel
      *
-     * @return void|string string on error
+     * @return string string on error
      *
      * @throws ReflectionException
      */
-    private function prepareLabels(array $packetNumbers, $type, $packetsEnhanced = null, $offset = 0, $fallbackToPacketaLabel = false)
+    private function prepareLabels(array $packetNumbers, $type, $packetsEnhanced = null, $offset = 0, $fallbackToPacketaLabel = false): string
     {
         $module = $this->getModule();
         /** @var Labels $packeteryLabels */
@@ -386,7 +386,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function processPrint()
     {
-        /** @var OrderRepository $orderRepo */
+        /** @var OrderRepository $orderRepository */
         $orderRepository = $this->getModule()->diContainer->get(OrderRepository::class);
         $orderData = $orderRepository->getById((int) Tools::getValue('id_order'));
         $isExternalCarrier = ((bool) $orderData['is_carrier'] === true || (bool) $orderData['is_ad'] === true);
