@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Tools;
 
@@ -6,7 +11,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Exception;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
@@ -31,7 +35,7 @@ class HttpClientWrapper
             $client = HttpClient::create($options);
             $result = $client->request(self::GET_METHOD, $url);
         } catch (TransportExceptionInterface $e) {
-            throw new Exception($e->getMessage());
+            throw new \Exception($e->getMessage());
         }
 
         return $result->getContent();
@@ -49,7 +53,7 @@ class HttpClientWrapper
             $client = HttpClient::create($options);
             $result = $client->request(self::POST_METHOD, $url);
         } catch (ExceptionInterface $e) {
-            throw new Exception($e->getMessage());
+            throw new \Exception($e->getMessage());
         }
 
         return $result->getContent();

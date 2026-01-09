@@ -1,7 +1,11 @@
 <?php
-
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{packetery}prestashop>packetery_7e436ecba5095ef42cfeb5b696fbbdfd'] = 'Získejte zákazníkům přístup k vyzvedávacím bodům v síti Zásilkovny.';
 $_MODULE['<{packetery}prestashop>packetery_e35932e04a726a6aeaf748a6bb5d4267'] = 'Export objednávek do systému Zásilkovny.';
 $_MODULE['<{packetery}prestashop>packetery_4a93d9164aad959a6abc2de389170ac9'] = 'Zásilkovna';

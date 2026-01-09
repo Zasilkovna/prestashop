@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\PacketTracking;
 
@@ -6,9 +11,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use mysqli_result;
 use Packetery\Tools\DbTools;
-use PDOStatement;
 
 class PacketTrackingRepository
 {
@@ -41,6 +44,7 @@ class PacketTrackingRepository
      * @param string $eventDatetime
      * @param int $statusCode
      * @param string $statusText
+     *
      * @return bool
      */
     public function insert($orderId, $packetId, $eventDatetime, $statusCode, $statusText)
@@ -60,19 +64,20 @@ class PacketTrackingRepository
     /**
      * @param int $orderId
      * @param string $packetId
+     *
      * @return int|null
      */
     public function getLastStatusCodeByOrderAndPacketId($orderId, $packetId)
     {
         $statusCode = $this->dbTools->getValue('SELECT `status_code` FROM `' . $this->getPrefixedTableName() . '`
-            WHERE `id_order` = ' . (int)$orderId . ' AND `packet_id` = "' . $this->dbTools->db->escape($packetId) . '"
+            WHERE `id_order` = ' . (int) $orderId . ' AND `packet_id` = "' . $this->dbTools->db->escape($packetId) . '"
             ORDER BY `event_datetime` DESC');
 
         if ($statusCode === false || !is_numeric($statusCode)) {
             return null;
         }
 
-        return (int)$statusCode;
+        return (int) $statusCode;
     }
 
     /**
@@ -103,22 +108,25 @@ class PacketTrackingRepository
 
     /**
      * @param int $orderId
+     *
      * @return bool
      */
     public function delete($orderId)
     {
-        return $this->dbTools->delete(self::$tableName, '`id_order` = ' . (int)$orderId);
+        return $this->dbTools->delete(self::$tableName, '`id_order` = ' . (int) $orderId);
     }
 
     /**
      * @param int $orderId
-     * @return array|bool|mysqli_result|PDOStatement|resource|null
+     *
+     * @return array|bool|\mysqli_result|\PDOStatement|resource|null
      */
     public function getPacketStatusesByOrderId($orderId)
     {
         $sql = 'SELECT `id`, `id_order`, `packet_id`, `event_datetime`, `status_code`, `status_text` 
                 FROM `' . $this->getPrefixedTableName() . '`
-                WHERE `id_order` = ' . (int)$orderId;
+                WHERE `id_order` = ' . (int) $orderId;
+
         return $this->dbTools->getRows($sql);
     }
 }

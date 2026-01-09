@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Log;
 
@@ -6,38 +11,35 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use DateTimeImmutable;
-use DateTimeZone;
-use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
 
 class LogRepository
 {
-    const STATUS_SUCCESS = 'success';
-    const STATUS_ERROR = 'error';
+    public const STATUS_SUCCESS = 'success';
+    public const STATUS_ERROR = 'error';
 
-    const ACTION_PACKET_SENDING = 'packet-sending';
-    const ACTION_LABEL_PRINT = 'label-print';
-    const ACTION_SENDER_VALIDATION = 'sender-validation';
-    const ACTION_PACKET_TRACKING = 'packet-tracking';
-    const ACTION_CARRIER_TRACKING_NUMBER = 'carrier-tracking-number';
-    const ACTION_PACKET_CANCELLING = 'packet-cancelling';
+    public const ACTION_PACKET_SENDING = 'packet-sending';
+    public const ACTION_LABEL_PRINT = 'label-print';
+    public const ACTION_SENDER_VALIDATION = 'sender-validation';
+    public const ACTION_PACKET_TRACKING = 'packet-tracking';
+    public const ACTION_CARRIER_TRACKING_NUMBER = 'carrier-tracking-number';
+    public const ACTION_PACKET_CANCELLING = 'packet-cancelling';
     public const ACTION_PICKUP_POINT_VALIDATE = 'pickup-point-validate';
 
     /** @var DbTools */
     private $dbTools;
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     public static $tableName = 'packetery_log';
 
     /**
      * @param DbTools $dbTools
-     * @param Packetery $module
+     * @param \Packetery $module
      */
-    public function __construct(DbTools $dbTools, Packetery $module)
+    public function __construct(DbTools $dbTools, \Packetery $module)
     {
         $this->dbTools = $dbTools;
         $this->module = $module;
@@ -45,6 +47,7 @@ class LogRepository
 
     /**
      * @param string $action
+     *
      * @return string
      */
     public function getTranslatedAction($action)
@@ -78,7 +81,9 @@ class LogRepository
      * @param array<string, mixed> $params
      * @param string $status
      * @param string|int|null $orderId
+     *
      * @return bool
+     *
      * @throws DatabaseException
      * @throws \DateMalformedStringException
      */
@@ -86,18 +91,20 @@ class LogRepository
     {
         return $this->insert(
             [
-                'order_id' => $orderId === 0 || $orderId === "0" ? null : $orderId,
+                'order_id' => $orderId === 0 || $orderId === '0' ? null : $orderId,
                 'params' => $this->dbTools->db->escape(json_encode($params, JSON_UNESCAPED_UNICODE)),
                 'status' => $status,
                 'action' => $action,
-                'date' => (new DateTimeImmutable('now'))->setTimezone(new DateTimeZone(date_default_timezone_get()))->format('Y-m-d H:i:s'),
+                'date' => (new \DateTimeImmutable('now'))->setTimezone(new \DateTimeZone(date_default_timezone_get()))->format('Y-m-d H:i:s'),
             ]
         );
     }
 
     /**
      * @param array $data
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function insert(array $data)
@@ -142,19 +149,21 @@ class LogRepository
 
     /**
      * @param int $logExpirationDays
+     *
      * @throws DatabaseException
      */
     public function purge($logExpirationDays)
     {
-        $this->dbTools->delete(self::$tableName, '`date` < DATE_SUB(NOW(), INTERVAL ' . (int)$logExpirationDays . ' DAY)');
+        $this->dbTools->delete(self::$tableName, '`date` < DATE_SUB(NOW(), INTERVAL ' . (int) $logExpirationDays . ' DAY)');
     }
 
     /**
      * @param int|string $orderId
+     *
      * @return bool
      */
     public function hasAnyByOrderId($orderId)
     {
-        return "1" === $this->dbTools->getValue('SELECT "1" FROM `' . $this->getPrefixedTableName() . '` WHERE order_id = ' . (int) $orderId . ';');
+        return '1' === $this->dbTools->getValue('SELECT "1" FROM `' . $this->getPrefixedTableName() . '` WHERE order_id = ' . (int) $orderId . ';');
     }
 }

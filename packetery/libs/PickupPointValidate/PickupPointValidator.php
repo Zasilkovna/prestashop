@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 declare(strict_types=1);
 
 namespace Packetery\PickupPointValidate;
@@ -8,9 +12,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use CartCore;
-use Exception;
-use Packetery;
 use Packetery\Address\AddressTools;
 use Packetery\Carrier\CarrierTools;
 use Packetery\Carrier\CarrierVendors;
@@ -30,7 +31,7 @@ class PickupPointValidator
     /** @var ConfigHelper */
     private $configHelper;
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var CartService */
@@ -42,7 +43,7 @@ class PickupPointValidator
     public function __construct(
         ConfigHelper $configHelper,
         LogRepository $logRepository,
-        Packetery $module,
+        \Packetery $module,
         CartService $cartService,
         HttpClientWrapper $httpClient
     ) {
@@ -63,7 +64,7 @@ class PickupPointValidator
                 'errorMessage' => $this->module->l('API credentials are not set corretly.', 'pickuptointvalidate'),
             ];
 
-            $this->logRepository->insertRow(logRepository::ACTION_PICKUP_POINT_VALIDATE, $record, 'error');
+            $this->logRepository->insertRow(LogRepository::ACTION_PICKUP_POINT_VALIDATE, $record, 'error');
 
             return new PickupPointValidateResponse(true, []);
         }
@@ -75,18 +76,19 @@ class PickupPointValidator
                 'errors' => $pickupPointValidateResponse->getErrors(),
             ];
             if ($pickupPointValidateResponse->isValid()) {
-                $this->logRepository->insertRow(logRepository::ACTION_PICKUP_POINT_VALIDATE, $record, 'success');
+                $this->logRepository->insertRow(LogRepository::ACTION_PICKUP_POINT_VALIDATE, $record, 'success');
             } else {
-                $this->logRepository->insertRow(logRepository::ACTION_PICKUP_POINT_VALIDATE, $record, 'error');
+                $this->logRepository->insertRow(LogRepository::ACTION_PICKUP_POINT_VALIDATE, $record, 'error');
             }
+
             return $pickupPointValidateResponse;
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $record = [
                 'errorMessage' => $exception->getMessage(),
                 'request' => $request->getSubmittableData(),
             ];
 
-            $this->logRepository->insertRow(logRepository::ACTION_PICKUP_POINT_VALIDATE, $record, 'error');
+            $this->logRepository->insertRow(LogRepository::ACTION_PICKUP_POINT_VALIDATE, $record, 'error');
 
             return new PickupPointValidateResponse(true, []);
         }
@@ -94,14 +96,14 @@ class PickupPointValidator
 
     public function createPickupPointValidateRequest(
         array $orderData,
-        CartCore $cart,
+        \CartCore $cart,
         array $packeteryCarrier
     ): PickupPointValidateRequest {
         $customerCountry = AddressTools::getCountryFromCart($cart);
         $externalCarrierId = CarrierTools::findExternalCarrierId($orderData);
-        $externalCarrierId = $externalCarrierId !== null ? (string)$externalCarrierId : null;
+        $externalCarrierId = $externalCarrierId !== null ? (string) $externalCarrierId : null;
         $resolvedCarrierId = $externalCarrierId ?? CarrierVendors::INTERNAL_PICKUP_POINT_CARRIER;
-        $idBranch = (string)$orderData['id_branch'];
+        $idBranch = (string) $orderData['id_branch'];
 
         $allowedVendors = null;
         if ($packeteryCarrier['allowed_vendors'] !== null) {

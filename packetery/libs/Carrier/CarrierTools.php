@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Carrier;
 
@@ -6,9 +11,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Carrier;
 use ConfigurationCore as Configuration;
-use Context;
 use CountryCore as Country;
 
 class CarrierTools
@@ -26,11 +29,12 @@ class CarrierTools
     /**
      * @param int $carrierId
      * @param string $countryParam name,id_country,iso_code
+     *
      * @return array
      */
     public function getZonesAndCountries($carrierId, $countryParam = 'name')
     {
-        $carrier = new Carrier($carrierId);
+        $carrier = new \Carrier($carrierId);
         $carrierZones = $carrier->getZones();
         $carrierCountries = [];
         foreach ($carrierZones as $carrierZone) {
@@ -50,13 +54,14 @@ class CarrierTools
 
     /**
      * @param int $carrierId
+     *
      * @return array
      */
     public function getCountries($carrierId, $countryParam = 'name')
     {
         $zonesAndCountries = $this->getZonesAndCountries($carrierId, $countryParam);
 
-        return (array)array_pop($zonesAndCountries);
+        return (array) array_pop($zonesAndCountries);
     }
 
     /**
@@ -67,7 +72,7 @@ class CarrierTools
         // in old PrestaShop 1.6 method does not exist
         // cannot use CarrierCore, causes "Fatal error: Cannot redeclare class CarrierCore"
         if (method_exists('Carrier', 'getCarrierNameFromShopName')) {
-            return Carrier::getCarrierNameFromShopName();
+            return \Carrier::getCarrierNameFromShopName();
         }
 
         return str_replace(['#', ';'], '', Configuration::get('PS_SHOP_NAME'));
@@ -75,6 +80,7 @@ class CarrierTools
 
     /**
      * @param int $carrierId
+     *
      * @return string
      */
     public static function getEditLink($carrierId)
@@ -84,17 +90,17 @@ class CarrierTools
             'viewcarrier' => 1,
         ];
         $getParameters = http_build_query($parameters);
-        $gridBaseUrl = Context::getContext()->link->getAdminLink('PacketeryCarrierGrid');
+        $gridBaseUrl = \Context::getContext()->link->getAdminLink('PacketeryCarrierGrid');
 
         return sprintf('%s&%s', $gridBaseUrl, $getParameters);
     }
 
     public static function orderSupportsAgeVerification(array $packeteryOrder): bool
     {
-        if ((bool)$packeteryOrder['is_ad'] === false && (bool)$packeteryOrder['is_carrier'] === false) {
+        if ((bool) $packeteryOrder['is_ad'] === false && (bool) $packeteryOrder['is_carrier'] === false) {
             return true;
         }
-        if (in_array((int)$packeteryOrder['id_branch'], self::CARRIERS_SUPPORTING_AGE_VERIFICATION)) {
+        if (in_array((int) $packeteryOrder['id_branch'], self::CARRIERS_SUPPORTING_AGE_VERIFICATION)) {
             return true;
         }
 
@@ -104,10 +110,10 @@ class CarrierTools
     public static function findExternalCarrierId(array $packeteryOrder): ?int
     {
         if (
-            ((bool)$packeteryOrder['is_ad'] === true || (bool)$packeteryOrder['is_carrier'] === true) &&
-            is_numeric($packeteryOrder['id_branch'])
+            ((bool) $packeteryOrder['is_ad'] === true || (bool) $packeteryOrder['is_carrier'] === true)
+            && is_numeric($packeteryOrder['id_branch'])
         ) {
-            return (int)$packeteryOrder['id_branch'];
+            return (int) $packeteryOrder['id_branch'];
         }
 
         return null;

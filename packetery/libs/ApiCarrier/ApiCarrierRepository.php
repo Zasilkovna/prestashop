@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\ApiCarrier;
 
@@ -6,7 +11,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
 
@@ -62,7 +66,7 @@ class ApiCarrierRepository
     /** @var DbTools */
     private $dbTools;
 
-    /** @var Packetery|null */
+    /** @var \Packetery|null */
     private $module;
 
     public static $tableName = 'packetery_carriers';
@@ -85,19 +89,20 @@ class ApiCarrierRepository
     /**
      * Maps input data to storage structure.
      *
-     * @param array $carriers Validated data retrieved from API.
+     * @param array $carriers validated data retrieved from API
+     *
      * @return array data to store in db
      */
     private function carriersMapper(array $carriers)
     {
         $mappedData = [];
         foreach ($carriers as $carrier) {
-            $carrierId = (int)$carrier['id'];
+            $carrierId = (int) $carrier['id'];
             $carrierData = [
                 'name' => $this->dbTools->db->escape($carrier['name']),
                 'country' => $this->dbTools->db->escape($carrier['country']),
                 'currency' => $this->dbTools->db->escape($carrier['currency']),
-                'max_weight' => (float)$carrier['maxWeight'],
+                'max_weight' => (float) $carrier['maxWeight'],
                 'deleted' => false,
             ];
             foreach (self::$columnDefinitions as $columnName => $columnOptions) {
@@ -113,15 +118,16 @@ class ApiCarrierRepository
 
     /**
      * @param array $mappedData data to store in db
+     *
      * @return array
      */
     private function addNonApiCarriers(array $mappedData)
     {
         $defaultPickupPointsValues = array_combine(array_keys(self::$columnDefinitions), array_column(self::$columnDefinitions, 'defaultPPValue'));
-        $mappedData[Packetery::ZPOINT] = $defaultPickupPointsValues;
-        $mappedData[Packetery::ZPOINT]['name'] = $this->module->l('Packeta pickup points', 'apicarrierrepository');
-        $mappedData[Packetery::PP_ALL] = $defaultPickupPointsValues;
-        $mappedData[Packetery::PP_ALL]['name'] = $this->module->l('Packeta pickup points (Packeta + carriers)', 'apicarrierrepository');
+        $mappedData[\Packetery::ZPOINT] = $defaultPickupPointsValues;
+        $mappedData[\Packetery::ZPOINT]['name'] = $this->module->l('Packeta pickup points', 'apicarrierrepository');
+        $mappedData[\Packetery::PP_ALL] = $defaultPickupPointsValues;
+        $mappedData[\Packetery::PP_ALL]['name'] = $this->module->l('Packeta pickup points (Packeta + carriers)', 'apicarrierrepository');
 
         return $mappedData;
     }
@@ -129,10 +135,11 @@ class ApiCarrierRepository
     /**
      * Saves carriers.
      *
-     * @param array $carriers Validated data retrieved from API.
+     * @param array $carriers validated data retrieved from API
+     *
      * @throws DatabaseException
      */
-    public function save(array $carriers, Packetery $module)
+    public function save(array $carriers, \Packetery $module)
     {
         $this->module = $module;
         $mappedData = $this->carriersMapper($carriers);
@@ -143,8 +150,8 @@ class ApiCarrierRepository
         $carriersInDb = array_column($carrierCheck, 'id');
         foreach ($mappedData as $carrierId => $carrier) {
             $carriersInFeed[] = $carrierId;
-            if (in_array((string)$carrierId, $carriersInDb, true)) {
-                $this->update($carrier, (string)$carrierId);
+            if (in_array((string) $carrierId, $carriersInDb, true)) {
+                $this->update($carrier, (string) $carrierId);
             } else {
                 $carrier['id'] = $carrierId;
                 $this->insert($carrier);
@@ -182,6 +189,7 @@ class ApiCarrierRepository
 
     /**
      * @param array $data
+     *
      * @throws DatabaseException
      */
     public function insert(array $data)
@@ -192,11 +200,12 @@ class ApiCarrierRepository
     /**
      * @param array $data
      * @param string $carrierId
+     *
      * @throws DatabaseException
      */
     public function update(array $data, $carrierId)
     {
-        $carrierId = (string)$carrierId;
+        $carrierId = (string) $carrierId;
         $this->dbTools->update(self::$tableName, $data, '`id` = "' . $this->dbTools->db->escape($carrierId) . '"');
     }
 
@@ -212,6 +221,7 @@ class ApiCarrierRepository
      * Set those not in feed as deleted.
      *
      * @param array $carriersInFeed
+     *
      * @throws DatabaseException
      */
     public function setOthersAsDeleted(array $carriersInFeed)
@@ -222,13 +232,14 @@ class ApiCarrierRepository
 
     /**
      * @return int
+     *
      * @throws DatabaseException
      */
     public function getAdAndExternalCount()
     {
         $result = $this->dbTools->getValue('SELECT COUNT(*) FROM `' . $this->getPrefixedTableName() . '`');
         if ($result > 0) {
-            return (int)$result;
+            return (int) $result;
         }
 
         return 0;
@@ -236,6 +247,7 @@ class ApiCarrierRepository
 
     /**
      * @return array
+     *
      * @throws DatabaseException
      */
     public function getAdAndExternalCarriers()
@@ -248,7 +260,7 @@ class ApiCarrierRepository
         $carriers = [];
         if ($result) {
             foreach ($result as $carrier) {
-                if ($carrier['id'] === Packetery::ZPOINT) {
+                if ($carrier['id'] === \Packetery::ZPOINT) {
                     $pickupPointType = 'internal';
                 } else {
                     $pickupPointType = ($carrier['is_pickup_points'] ? 'external' : null);
@@ -261,17 +273,21 @@ class ApiCarrierRepository
                 ];
             }
         }
+
         return $carriers;
     }
 
     /**
      * @param array $countryIsoCodes
+     *
      * @return array|bool|\mysqli_result|\PDOStatement|resource|null
+     *
      * @throws DatabaseException
      */
     public function getByCountries(array $countryIsoCodes)
     {
         $countryIsoCodesSql = '"' . implode('","', $countryIsoCodes) . '"';
+
         return $this->dbTools->getRows('SELECT `id`, `name`
             FROM `' . $this->getPrefixedTableName() . '`
             WHERE `country` IN (' . $countryIsoCodesSql . ') OR `country` = ""
@@ -280,7 +296,9 @@ class ApiCarrierRepository
 
     /**
      * @param string $id
+     *
      * @return array|bool|object|null
+     *
      * @throws DatabaseException
      */
     public function getById($id)
@@ -292,6 +310,7 @@ class ApiCarrierRepository
 
     /**
      * @return array|bool|\mysqli_result|\PDOStatement|resource|null
+     *
      * @throws DatabaseException
      */
     public function getExternalPickupPointCountries()
@@ -301,6 +320,7 @@ class ApiCarrierRepository
             WHERE `deleted` = 0 AND `is_pickup_points` = 1 AND `country` != ""
             GROUP BY `country`'
         );
+
         return array_column($result, 'country');
     }
 
@@ -313,6 +333,6 @@ class ApiCarrierRepository
             'SELECT 1 FROM `' . $this->getPrefixedTableName() . '` WHERE `is_pickup_points` = 1 AND `id` = "' . $this->dbTools->db->escape($carrierId) . '"'
         );
 
-        return ((int)$result === 1);
+        return (int) $result === 1;
     }
 }

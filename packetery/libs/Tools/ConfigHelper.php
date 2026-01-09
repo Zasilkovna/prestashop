@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Tools;
 
@@ -6,11 +11,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Configuration;
-use Context;
-use Language;
 use Packetery\Tools\Exception\InvalidApiKeyException;
-use Shop;
 
 class ConfigHelper
 {
@@ -35,27 +36,28 @@ class ConfigHelper
      * We do not try to fix rare errors caused by using pre 3.0 versions with multistore on.
      *
      * @param string $key
+     *
      * @return false|string
      */
     public static function get($key, $groupId = false, $shopId = false)
     {
         if (self::getConfigBehavior($key) === self::BEHAVIOR_ALL) {
-            return Configuration::get($key, null, null, null);
+            return \Configuration::get($key, null, null, null);
         }
 
         if ($groupId === false) {
-            $groupId = Shop::getContextShopGroupID(true);
+            $groupId = \Shop::getContextShopGroupID(true);
         }
         if ($shopId === false) {
-            $shopId = Shop::getContextShopID(true);
+            $shopId = \Shop::getContextShopID(true);
         }
-        $value = Configuration::get($key, null, $groupId, $shopId);
+        $value = \Configuration::get($key, null, $groupId, $shopId);
         // if no value set, try to get value set in older module version, but not for another shop
         if ($value === false && $groupId && $shopId) {
-            $value = Configuration::get($key, null, $groupId);
+            $value = \Configuration::get($key, null, $groupId);
         }
         if ($value === false && $groupId) {
-            $value = Configuration::get($key);
+            $value = \Configuration::get($key);
         }
 
         return $value;
@@ -63,6 +65,7 @@ class ConfigHelper
 
     /**
      * @param array $keys
+     *
      * @return array
      */
     public static function getMultiple($keys)
@@ -78,6 +81,7 @@ class ConfigHelper
     /**
      * @param string $key
      * @param mixed $values
+     *
      * @return bool
      */
     public static function update($key, $values)
@@ -85,10 +89,10 @@ class ConfigHelper
         if (self::getConfigBehavior($key) === self::BEHAVIOR_ALL) {
             // Shop group id and shop id is 0, which is saved as null. Passing null makes PS load active ones,
             // that is not desired. Empty string would work the same way.
-            return Configuration::updateValue($key, $values, false, 0, 0);
+            return \Configuration::updateValue($key, $values, false, 0, 0);
         }
 
-        return Configuration::updateValue($key, $values);
+        return \Configuration::updateValue($key, $values);
     }
 
     /**
@@ -102,6 +106,7 @@ class ConfigHelper
     /**
      * @deprecated
      * @see getValidApiKey
+     *
      * @return false|string
      */
     public function getApiKey()
@@ -116,6 +121,7 @@ class ConfigHelper
 
     /**
      * @param string $apiPass
+     *
      * @return false|string
      */
     public static function getApiKeyFromApiPass($apiPass)
@@ -128,12 +134,14 @@ class ConfigHelper
      */
     public function getBackendLanguage()
     {
-        $employee = Context::getContext()->employee;
-        return Language::getIsoById($employee ? $employee->id_lang : Configuration::get('PS_LANG_DEFAULT'));
+        $employee = \Context::getContext()->employee;
+
+        return \Language::getIsoById($employee ? $employee->id_lang : \Configuration::get('PS_LANG_DEFAULT'));
     }
 
     /**
      * @param string $key
+     *
      * @return string
      */
     private static function getConfigBehavior($key)
@@ -151,8 +159,9 @@ class ConfigHelper
     }
 
     /**
-     * @throws InvalidApiKeyException
      * @return string
+     *
+     * @throws InvalidApiKeyException
      */
     public function getValidApiKey(): string
     {
@@ -165,6 +174,7 @@ class ConfigHelper
         if ($apiKey === false || $apiKey === '') {
             throw InvalidApiKeyException::createFromMissingKey();
         }
+
         return $apiKey;
     }
 }

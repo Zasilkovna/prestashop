@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Order;
 
@@ -8,7 +13,6 @@ if (!defined('_PS_VERSION_')) {
 
 use Packetery\PacketTracking\PacketStatusFactory;
 use Packetery\PacketTracking\PacketTrackingRepository;
-use Smarty;
 
 class OrderDetailView
 {
@@ -31,11 +35,12 @@ class OrderDetailView
     }
 
     /**
-     * @param Smarty $smarty
+     * @param \Smarty $smarty
      * @param array $packeteryOrder
+     *
      * @return void
      */
-    public function addPacketStatus(Smarty $smarty, array $packeteryOrder)
+    public function addPacketStatus(\Smarty $smarty, array $packeteryOrder)
     {
         if (!$packeteryOrder['tracking_number']) {
             return;

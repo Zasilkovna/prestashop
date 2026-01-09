@@ -1,3 +1,7 @@
+{**
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *}
 {*
  This file is inserted before the list of shipping methods:
  * PS 1.6: 5-steps checkout

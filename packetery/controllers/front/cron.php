@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -26,10 +30,11 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /**
      * @return void
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
-     * @throws \Packetery\Exceptions\DatabaseException
+     * @throws Packetery\Exceptions\DatabaseException
      * @throws SmartyException
      */
     public function display()
@@ -38,12 +43,14 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
         if ($this->validateToken() === false) {
             $this->renderError($this->module->l('Invalid packetery cron token.', 'cron'));
+
             return;
         }
 
         $task = Tools::getValue('task', null);
         if (!$task) {
             $this->renderError($this->module->l('Cron task to run was not specified.', 'cron'));
+
             return;
         }
 
@@ -109,7 +116,9 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /**
      * @param array $errors
+     *
      * @return void
+     *
      * @throws SmartyException
      */
     public function renderErrors(array $errors)
@@ -121,7 +130,9 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /**
      * @param string $message
+     *
      * @return void
+     *
      * @throws SmartyException
      */
     public function renderMessage($message)
@@ -137,7 +148,9 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
     /**
      * @param string $message
+     *
      * @return void
+     *
      * @throws SmartyException
      */
     public function renderError($message)

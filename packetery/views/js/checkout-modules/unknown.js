@@ -1,3 +1,8 @@
+/**
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+
 // naming convention: PacketerCheckoutModule + moduleId (first letter in upper case)
 
 // todo remove? Untestable.

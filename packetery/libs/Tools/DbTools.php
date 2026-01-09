@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Tools;
 
@@ -7,24 +12,21 @@ if (!defined('_PS_VERSION_')) {
 }
 
 // PrestaShopDatabaseException is extended from PrestaShopException
-use Db;
 use Packetery\Exceptions\DatabaseException;
-use PrestaShopException;
-use PrestaShopLogger;
 
 class DbTools
 {
-    /** @var Db */
+    /** @var \Db */
     public $db;
 
     /** @var Logger */
     private $logger;
 
     /**
-     * @param Db $db
+     * @param \Db $db
      * @param Logger $logger
      */
-    public function __construct(Db $db, Logger $logger)
+    public function __construct(\Db $db, Logger $logger)
     {
         $this->db = $db;
         $this->logger = $logger;
@@ -34,6 +36,7 @@ class DbTools
      * @param array $queries
      * @param string $logMessage
      * @param bool $returnFalseOnException true in Installer, false in Uninstaller
+     *
      * @return bool
      */
     public function executeQueries($queries, $logMessage, $returnFalseOnException = false)
@@ -43,7 +46,7 @@ class DbTools
                 $this->execute($query);
             } catch (DatabaseException $exception) {
                 // there are more details in Packeta log
-                PrestaShopLogger::addLog($logMessage . ' ' .
+                \PrestaShopLogger::addLog($logMessage . ' ' .
                     $exception->getMessage(), 3, null, null, null, true);
                 if ($returnFalseOnException) {
                     return false;
@@ -56,12 +59,13 @@ class DbTools
 
     /**
      * @param string $query
-     * @param PrestaShopException|null $exception
+     * @param \PrestaShopException|null $exception
+     *
      * @throws DatabaseException
      */
     private function logAndThrow($query, $exception = null)
     {
-        if ($exception instanceof PrestaShopException) {
+        if ($exception instanceof \PrestaShopException) {
             $this->logger->logToFile($exception->getMessage() . ', query: ' . $query);
             throw new DatabaseException($exception->getMessage() . ', see details in Packeta log');
         } else {
@@ -75,33 +79,39 @@ class DbTools
 
     /**
      * @param string $sql SQL query
+     *
      * @return array|bool|\mysqli_result|\PDOStatement|resource|null
+     *
      * @throws DatabaseException
      */
     public function getRows($sql)
     {
         try {
             $result = $this->db->executeS($sql);
-        } catch (PrestaShopException $exception) {
+        } catch (\PrestaShopException $exception) {
             $this->logAndThrow($sql, $exception);
         }
         $this->logAndThrow($sql);
+
         return $result;
     }
 
     /**
      * @param string $sql SQL query
+     *
      * @return array|bool|object|null
+     *
      * @throws DatabaseException
      */
     public function getRow($sql)
     {
         try {
             $result = $this->db->getRow($sql);
-        } catch (PrestaShopException $exception) {
+        } catch (\PrestaShopException $exception) {
             $this->logAndThrow($sql, $exception);
         }
         $this->logAndThrow($sql);
+
         return $result;
     }
 
@@ -109,7 +119,9 @@ class DbTools
      * Simplified fork of Db::getValue
      *
      * @param string $sql SQL query
+     *
      * @return false|string|null
+     *
      * @throws DatabaseException
      */
     public function getValue($sql)
@@ -118,23 +130,27 @@ class DbTools
         if (!$result) {
             return false;
         }
+
         return array_shift($result);
     }
 
     /**
      * @param string $sql
      * @param bool $useCache
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function execute($sql, $useCache = true)
     {
         try {
             $result = $this->db->execute($sql, $useCache);
-        } catch (PrestaShopException $exception) {
+        } catch (\PrestaShopException $exception) {
             $this->logAndThrow($sql, $exception);
         }
         $this->logAndThrow($sql);
+
         return $result;
     }
 
@@ -144,7 +160,9 @@ class DbTools
      * @param int $limit
      * @param bool $useCache
      * @param bool $addPrefix
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function delete($table, $where = '', $limit = 0, $useCache = true, $addPrefix = true)
@@ -152,10 +170,11 @@ class DbTools
         $queryForLog = 'table ' . $table . '; where ' . $where;
         try {
             $result = $this->db->delete($table, $where, $limit, $useCache, $addPrefix);
-        } catch (PrestaShopException $exception) {
+        } catch (\PrestaShopException $exception) {
             $this->logAndThrow($queryForLog, $exception);
         }
         $this->logAndThrow($queryForLog);
+
         return $result;
     }
 
@@ -166,18 +185,21 @@ class DbTools
      * @param bool $useCache
      * @param int $type
      * @param bool $addPrefix
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
-    public function insert($table, $data, $nullValues = false, $useCache = true, $type = Db::INSERT, $addPrefix = true)
+    public function insert($table, $data, $nullValues = false, $useCache = true, $type = \Db::INSERT, $addPrefix = true)
     {
         $queryForLog = 'table ' . $table . '; data ' . serialize($data);
         try {
             $result = $this->db->insert($table, $data, $nullValues, $useCache, $type, $addPrefix);
-        } catch (PrestaShopException $exception) {
+        } catch (\PrestaShopException $exception) {
             $this->logAndThrow($queryForLog, $exception);
         }
         $this->logAndThrow($queryForLog);
+
         return $result;
     }
 
@@ -189,7 +211,9 @@ class DbTools
      * @param false $nullValues
      * @param bool $useCache
      * @param bool $addPrefix
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function update($table, $data, $where = '', $limit = 0, $nullValues = false, $useCache = true, $addPrefix = true)
@@ -197,10 +221,11 @@ class DbTools
         $queryForLog = 'table ' . $table . '; data ' . serialize($data) . '; where ' . $where;
         try {
             $result = $this->db->update($table, $data, $where, $limit, $nullValues, $useCache, $addPrefix);
-        } catch (PrestaShopException $exception) {
+        } catch (\PrestaShopException $exception) {
             $this->logAndThrow($queryForLog, $exception);
         }
         $this->logAndThrow($queryForLog);
+
         return $result;
     }
 
@@ -208,6 +233,7 @@ class DbTools
      * @param array $result
      * @param string $indexKey
      * @param string $valueKey
+     *
      * @return array|false
      */
     public function getPairs($result, $indexKey, $valueKey)

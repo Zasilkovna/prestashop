@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Order;
 
@@ -6,20 +11,15 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Order;
-use Packetery;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
-use PrestaShopDatabaseException;
-use PrestaShopException;
-use ReflectionException;
 
 class CsvExporter
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
-    public function __construct(Packetery $module)
+    public function __construct(\Packetery $module)
     {
         $this->module = $module;
     }
@@ -28,11 +28,13 @@ class CsvExporter
      * Get data for CSV Export
      *
      * @param array $order_ids - IDs of orders to be exported
+     *
      * @return array - Order data
+     *
      * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     * @throws ReflectionException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     * @throws \ReflectionException
      */
     private function collectOrdersDataForCsvExport(array $order_ids)
     {
@@ -42,7 +44,7 @@ class CsvExporter
         $orderExporter = $this->module->diContainer->get(OrderExporter::class);
         $data = [];
         foreach ($order_ids as $order_id) {
-            $order = new Order($order_id);
+            $order = new \Order($order_id);
             try {
                 $exportData = $orderExporter->prepareData($order);
             } catch (ExportException $exception) {
@@ -93,10 +95,11 @@ class CsvExporter
 
     /**
      * @param array $orders
+     *
      * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     * @throws ReflectionException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     * @throws \ReflectionException
      */
     public function outputCsvExport(array $orders)
     {

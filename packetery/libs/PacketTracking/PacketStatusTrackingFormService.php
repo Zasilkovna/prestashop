@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\PacketTracking;
 
@@ -6,21 +11,20 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery;
 use Packetery\AbstractFormService;
 use Packetery\Module\Options;
 
 class PacketStatusTrackingFormService extends AbstractFormService
 {
-    const SUBMIT_ACTION_KEY = 'submitPacketStatusTrackingSubmit';
+    public const SUBMIT_ACTION_KEY = 'submitPacketStatusTrackingSubmit';
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var PacketStatusFactory */
     private $packetStatusFactory;
 
-    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
+    public function __construct(\Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
     {
         parent::__construct($options);
         $this->module = $module;

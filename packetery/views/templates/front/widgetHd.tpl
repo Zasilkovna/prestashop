@@ -1,3 +1,8 @@
+{**
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *}
+
 <div id="packetery-carrier-{$carrier_id|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerStreet" name="customerStreet" value="{$customerStreet|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerHouseNumber" name="customerHouseNumber" value="{$customerHouseNumber|escape:'htmlall':'UTF-8'}">

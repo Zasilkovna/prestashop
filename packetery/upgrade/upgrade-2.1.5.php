@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -7,7 +11,7 @@ if (!defined('_PS_VERSION_')) {
 /* @var $module Packetery */
 function upgrade_module_2_1_5($module)
 {
-    $dbTools = $module->diContainer->get(\Packetery\Tools\DbTools::class);
+    $dbTools = $module->diContainer->get(Packetery\Tools\DbTools::class);
     $result = $dbTools->execute('
         DELETE FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
         WHERE `id_branch` = 0;

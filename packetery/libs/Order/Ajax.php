@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Order;
 
@@ -42,7 +47,7 @@ class Ajax
         }
 
         $address = \Tools::getValue('address');
-        $carrierId = (int)$cart->id_carrier;
+        $carrierId = (int) $cart->id_carrier;
         $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById($carrierId);
         $packeteryOrderFields = [
             'is_ad' => 1,
@@ -64,7 +69,7 @@ class Ajax
         if ($isOrderSaved) {
             $this->orderRepository->updateByCart($packeteryOrderFields, $cartId);
         } else {
-            $packeteryOrderFields['id_cart'] = ((int)$cartId);
+            $packeteryOrderFields['id_cart'] = ((int) $cartId);
             $this->orderRepository->insert($packeteryOrderFields);
         }
     }

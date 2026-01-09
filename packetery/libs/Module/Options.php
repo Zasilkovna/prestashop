@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Module;
 
@@ -12,13 +17,12 @@ use Packetery\Module\Exception\IncorrectApiPasswordException;
 use Packetery\Module\Exception\SenderNotExistsException;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\Tools;
-use Validate;
 
 class Options
 {
-    const API_PASSWORD_LENGTH = 32;
+    public const API_PASSWORD_LENGTH = 32;
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var SoapApi */
@@ -31,7 +35,7 @@ class Options
     private $configHelper;
 
     public function __construct(
-        Packetery $module,
+        \Packetery $module,
         SoapApi $soapApi,
         LogRepository $logRepository,
         ConfigHelper $configHelper
@@ -45,8 +49,10 @@ class Options
     /**
      * @param string $id from POST
      * @param string $value from POST
+     *
      * @return false|string false on success, error message on failure
-     * @throws \Packetery\Exceptions\ApiClientException
+     *
+     * @throws Packetery\Exceptions\ApiClientException
      * @throws \ReflectionException
      */
     public function validate($id, $value)
@@ -58,16 +64,18 @@ class Options
                 }
                 try {
                     $this->soapApi->senderGetReturnRouting('', $value);
+
                     return false;
                 } catch (IncorrectApiPasswordException $e) {
-                        $this->logRepository->insertRow(
-                            LogRepository::ACTION_SENDER_VALIDATION,
-                            [
-                                'incorrectApiPasswordFaultMessage' => $e->getMessage(),
-                            ],
-                            LogRepository::STATUS_ERROR
-                        );
-                        return $this->module->l('Invalid API password.', 'options');
+                    $this->logRepository->insertRow(
+                        LogRepository::ACTION_SENDER_VALIDATION,
+                        [
+                            'incorrectApiPasswordFaultMessage' => $e->getMessage(),
+                        ],
+                        LogRepository::STATUS_ERROR
+                    );
+
+                    return $this->module->l('Invalid API password.', 'options');
                 } catch (SenderNotExistsException $e) {
                     return false;
                 }
@@ -105,26 +113,31 @@ class Options
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
+
                 return $this->module->l('Please insert default package price', 'options');
             case 'PACKETERY_DEFAULT_PACKAGE_WEIGHT':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
+
                 return $this->module->l('Please insert default package weight in kg', 'options');
             case 'PACKETERY_DEFAULT_PACKAGING_WEIGHT':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
+
                 return $this->module->l('Please insert default packaging weight in kg', 'options');
             case 'PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
+
                 return $this->module->l('Insert maximum number of orders that will be processed', 'options');
             case 'PACKETERY_PACKET_STATUS_TRACKING_MAX_ORDER_AGE_DAYS':
                 if ($this->isNonNegative($value)) {
                     return false;
                 }
+
                 return $this->module->l('Insert maximum order age in days', 'options');
             default:
                 return false;
@@ -134,6 +147,7 @@ class Options
     /**
      * @param string $option
      * @param string $value
+     *
      * @return string
      */
     public function formatOption($option, $value)
@@ -150,10 +164,11 @@ class Options
 
     /**
      * @param string $value
+     *
      * @return bool
      */
     public function isNonNegative($value)
     {
-        return (Validate::isUnsignedInt($value) || (Validate::isFloat($value) && $value >= 0));
+        return \Validate::isUnsignedInt($value) || (\Validate::isFloat($value) && $value >= 0);
     }
 }

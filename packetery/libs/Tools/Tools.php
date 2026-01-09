@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Tools;
 
@@ -8,9 +13,8 @@ if (!defined('_PS_VERSION_')) {
 
 use Symfony\Component\HttpFoundation\Request;
 use Tools as PrestaShopTools;
-use ToolsCore;
 
-class Tools extends ToolsCore
+class Tools extends \ToolsCore
 {
     /**
      * Get a value from $_POST / $_GET
@@ -18,6 +22,7 @@ class Tools extends ToolsCore
      *
      * @param string $key Value key
      * @param mixed $default_value (optional)
+     *
      * @return mixed Value
      */
     public static function getValue($key, $default_value = false)

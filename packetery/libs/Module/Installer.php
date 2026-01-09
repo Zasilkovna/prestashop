@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Module;
 
@@ -6,8 +11,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Language;
-use Packetery;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Log\LogRepository;
@@ -15,20 +18,16 @@ use Packetery\PacketTracking\PacketTrackingRepository;
 use Packetery\Product\ProductAttributeRepository;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\DbTools;
-use PrestaShopDatabaseException;
-use PrestaShopException;
-use PrestaShopLogger;
-use Tab;
 
 class Installer
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var DbTools */
     private $dbTools;
 
-    const TRANSLATED_LANGUAGES = ['cs', 'sk'];
+    public const TRANSLATED_LANGUAGES = ['cs', 'sk'];
 
     /**
      * @param DbTools $dbTools
@@ -39,24 +38,26 @@ class Installer
     }
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
+     *
      * @return bool
      */
-    public function run(Packetery $module)
+    public function run(\Packetery $module)
     {
         $this->setModule($module);
-        return (
-            $this->updateConfiguration() &&
-            $this->installDatabase() &&
-            $this->module->registerHook($this->module->getModuleHooksList()) &&
-            $this->insertMenuItems()
-        );
+
+        return
+            $this->updateConfiguration()
+            && $this->installDatabase()
+            && $this->module->registerHook($this->module->getModuleHooksList())
+            && $this->insertMenuItems()
+        ;
     }
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
      */
-    public function setModule(Packetery $module)
+    public function setModule(\Packetery $module)
     {
         $this->module = $module;
     }
@@ -110,9 +111,10 @@ class Installer
                     return false;
                 }
             }
+
             return $result;
-        } catch (PrestaShopException $exception) {
-            PrestaShopLogger::addLog($this->getExceptionRaisedText() . ' ' .
+        } catch (\PrestaShopException $exception) {
+            \PrestaShopLogger::addLog($this->getExceptionRaisedText() . ' ' .
                 $exception->getMessage(), 3, null, null, null, true);
 
             return false;
@@ -121,13 +123,15 @@ class Installer
 
     /**
      * @param string $translationKey
+     *
      * @return array
+     *
      * @throws DatabaseException
      */
     private function createMultiLangField($translationKey)
     {
         $multiLangField = [];
-        $languages = Language::getLanguages();
+        $languages = \Language::getLanguages();
         foreach ($languages as $language) {
             // We check if we have translation for that language. l method never returns the original english string.
             $haveTranslation = in_array($language['iso_code'], self::TRANSLATED_LANGUAGES);
@@ -139,6 +143,7 @@ class Installer
 
     /**
      * @return bool
+     *
      * @throws \ReflectionException
      */
     private function installDatabase()
@@ -226,21 +231,21 @@ class Installer
      */
     private function updateConfiguration()
     {
-        return (
-            ConfigHelper::update('PACKETERY_LABEL_FORMAT', 'A6 on A4') &&
-            ConfigHelper::update('PACKETERY_CARRIER_LABEL_FORMAT', 'A6 on A4') &&
-            ConfigHelper::update('PACKETERY_WIDGET_AUTOOPEN', 0) &&
-            ConfigHelper::update(ConfigHelper::KEY_WIDGET_VALIDATION_MODE, 0) &&
-            ConfigHelper::update('PACKETERY_CRON_TOKEN', \Tools::passwdGen(32)) &&
-            ConfigHelper::update('PACKETERY_ID_PREFERENCE', Packetery::ID_PREF_ID) &&
-            ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0) &&
-            ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_WEIGHT', 0) &&
-            ConfigHelper::update('PACKETERY_DEFAULT_PACKAGING_WEIGHT', 0) &&
-            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time()) &&
-            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $this->module->version) &&
-            ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, '') &&
-            ConfigHelper::update(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION, 0)
-        );
+        return
+            ConfigHelper::update('PACKETERY_LABEL_FORMAT', 'A6 on A4')
+            && ConfigHelper::update('PACKETERY_CARRIER_LABEL_FORMAT', 'A6 on A4')
+            && ConfigHelper::update('PACKETERY_WIDGET_AUTOOPEN', 0)
+            && ConfigHelper::update(ConfigHelper::KEY_WIDGET_VALIDATION_MODE, 0)
+            && ConfigHelper::update('PACKETERY_CRON_TOKEN', \Tools::passwdGen(32))
+            && ConfigHelper::update('PACKETERY_ID_PREFERENCE', \Packetery::ID_PREF_ID)
+            && ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_PRICE', 0)
+            && ConfigHelper::update('PACKETERY_DEFAULT_PACKAGE_WEIGHT', 0)
+            && ConfigHelper::update('PACKETERY_DEFAULT_PACKAGING_WEIGHT', 0)
+            && ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP, time())
+            && ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $this->module->version)
+            && ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, '')
+            && ConfigHelper::update(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION, 0)
+        ;
     }
 
     /**
@@ -255,15 +260,17 @@ class Installer
      * @param string $parentClassName
      * @param string $className
      * @param string $name
+     *
      * @return bool
-     * @throws PrestaShopException
-     * @throws PrestaShopDatabaseException
+     *
+     * @throws \PrestaShopException
+     * @throws \PrestaShopDatabaseException
      * @throws DatabaseException
      */
     private function addTab($parentClassName, $className, $name)
     {
-        $tab = new Tab();
-        $parentId = Tab::getIdFromClassName($parentClassName);
+        $tab = new \Tab();
+        $parentId = \Tab::getIdFromClassName($parentClassName);
         // PrestaShop 1.6 without the SELL tab group.
         if ($parentId === false) {
             $parentId = 0;
@@ -272,7 +279,7 @@ class Installer
         $tab->module = 'packetery';
         $tab->class_name = $className;
         $tab->name = $this->createMultiLangField($name);
-        $tab->position = Tab::getNewLastPosition($parentId);
+        $tab->position = \Tab::getNewLastPosition($parentId);
         if ($parentClassName === 'SELL') {
             $tab->icon = 'local_shipping';
         }

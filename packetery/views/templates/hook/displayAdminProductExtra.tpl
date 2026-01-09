@@ -1,3 +1,8 @@
+{**
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *}
+
 <div id="module-packetery" class="panel product-tab">
     {if $isPrestaShop16}
         <input type="hidden" name="submitted_tabs[]" value="ModulePacketery"/>
@@ -35,4 +40,3 @@
         </div>
     {/if}
 </div>
-

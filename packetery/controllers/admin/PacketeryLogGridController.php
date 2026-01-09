@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -95,8 +99,10 @@ class PacketeryLogGridController extends ModuleAdminController
     /**
      * @param string $value
      * @param array<string, string> $row
+     *
      * @return string
-     * @throws \PrestaShopException
+     *
+     * @throws PrestaShopException
      */
     public function renderAction($value, array $row)
     {
@@ -106,12 +112,14 @@ class PacketeryLogGridController extends ModuleAdminController
     /**
      * @param string $value
      * @param array<string, string> $row
+     *
      * @return string
-     * @throws \PrestaShopException
+     *
+     * @throws PrestaShopException
      */
     public function renderOrderId($value, array $row)
     {
-        if ((int)$value === 0) {
+        if ((int) $value === 0) {
             return '';
         }
 
@@ -121,7 +129,9 @@ class PacketeryLogGridController extends ModuleAdminController
     /**
      * @param string $value
      * @param array $row
+     *
      * @return string
+     *
      * @throws PrestaShopException
      * @throws SmartyException
      */
@@ -138,16 +148,18 @@ class PacketeryLogGridController extends ModuleAdminController
     /**
      * @param string $link
      * @param string $columnValue
+     *
      * @return false|string
+     *
      * @throws SmartyException
      */
     public function getColumnLink($link, $columnValue)
     {
         $smarty = new Smarty();
         $smarty->assign([
-                            'link' => $link,
-                            'columnValue' => $columnValue,
-                        ]);
+            'link' => $link,
+            'columnValue' => $columnValue,
+        ]);
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/targetBlankLink.tpl');
     }
@@ -155,20 +167,24 @@ class PacketeryLogGridController extends ModuleAdminController
     /**
      * @param string $value
      * @param array<string, string> $row
+     *
      * @return string
-     * @throws \PrestaShopException
+     *
+     * @throws PrestaShopException
      */
     public function renderDate($value, array $row)
     {
         if (Tools::version_compare(_PS_VERSION_, '8', '<') === true) {
             return Tools::displayDate($value, null, true);
         }
+
         return Tools::displayDate($value, true);
     }
 
     /**
      * @param string $value
      * @param array<string, string> $row
+     *
      * @return string
      */
     public function renderStatus($value, array $row)
@@ -181,19 +197,21 @@ class PacketeryLogGridController extends ModuleAdminController
     }
 
     /**
-     * @return \Packetery
+     * @return Packetery
      */
     private function getModule()
     {
         if ($this->packetery === null) {
             $this->packetery = new Packetery();
         }
+
         return $this->packetery;
     }
 
     /**
      * @param string $value
      * @param array<string, string> $row
+     *
      * @return string
      */
     public function renderNoteColumn($value, array $row)
@@ -216,12 +234,13 @@ class PacketeryLogGridController extends ModuleAdminController
 
     /**
      * @return false|string
-     * @throws \PrestaShopException
+     *
+     * @throws PrestaShopException
      */
     public function renderList()
     {
         if (Tools::getValue('id_order')) {
-            $this->_where = 'AND `a`.`order_id` = ' . (int)Tools::getValue('id_order');
+            $this->_where = 'AND `a`.`order_id` = ' . (int) Tools::getValue('id_order');
         }
 
         return parent::renderList();

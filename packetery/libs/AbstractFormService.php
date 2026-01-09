@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery;
 
@@ -6,12 +11,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use AdminController;
-use Configuration;
-use Context;
-use HelperForm;
-use OrderState;
-use Packetery;
 use Packetery\Exceptions\FormDataPersistException;
 use Packetery\Module\Options;
 use Packetery\Tools\ConfigHelper;
@@ -41,7 +40,9 @@ abstract class AbstractFormService
     /**
      * @param string $option
      * @param string $value
+     *
      * @return void
+     *
      * @throws FormDataPersistException
      */
     public function persistFormData($option, $value)
@@ -58,6 +59,7 @@ abstract class AbstractFormService
     /**
      * @param string $fieldName
      * @param string $checkboxItemId
+     *
      * @return string
      */
     private function getCheckboxKeyName($fieldName, $checkboxItemId)
@@ -68,7 +70,9 @@ abstract class AbstractFormService
     /**
      * @param string $option
      * @param array{type: string, values: array{query: array{id: string}}} $optionConfig
+     *
      * @return void
+     *
      * @throws FormDataPersistException
      */
     public function handleConfigOption($option, array $optionConfig)
@@ -90,26 +94,28 @@ abstract class AbstractFormService
      * @param string $name
      * @param string $table
      * @param string $submitActionKey
-     * @return HelperForm
+     *
+     * @return \HelperForm
      */
     public function createHelperForm($name, $table, $submitActionKey)
     {
-        $helperForm = new HelperForm();
+        $helperForm = new \HelperForm();
         $helperForm->table = $table;
         $helperForm->name_controller = $name;
         $helperForm->token = Tools::getAdminTokenLite('AdminModules');
-        $helperForm->currentIndex = AdminController::$currentIndex . '&' . http_build_query(['configure' => $name]);
+        $helperForm->currentIndex = \AdminController::$currentIndex . '&' . http_build_query(['configure' => $name]);
         $helperForm->submit_action = $submitActionKey . $name;
-        $helperForm->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
+        $helperForm->default_form_language = (int) \Configuration::get('PS_LANG_DEFAULT');
 
         return $helperForm;
     }
 
     /**
      * @param array<string, mixed> $fieldsConfig
+     *
      * @return void
      */
-    public function fillHelperForm(HelperForm $packetStatusTrackingHelper, array $fieldsConfig)
+    public function fillHelperForm(\HelperForm $packetStatusTrackingHelper, array $fieldsConfig)
     {
         $packeterySettings = ConfigHelper::getMultiple(
             array_keys($fieldsConfig)
@@ -123,7 +129,7 @@ abstract class AbstractFormService
                 }
 
                 $value = Tools::getValue($itemKey, $persistedValue);
-                $rawValues = Packetery\Module\Helper::unserialize($value);
+                $rawValues = Module\Helper::unserialize($value);
 
                 foreach ($itemConfiguration['values']['query'] as $checkboxItem) {
                     if (isset($rawValues[$checkboxItem['id']])) {
@@ -148,6 +154,7 @@ abstract class AbstractFormService
      * @param string $table
      * @param string $title
      * @param string $submitButtonTitle
+     *
      * @return string
      */
     public function generateForm($name, $table, $title, $submitButtonTitle)
@@ -179,7 +186,7 @@ abstract class AbstractFormService
      */
     public function getOrderStates()
     {
-        $orderStates = OrderState::getOrderStates((int)Context::getContext()->language->id);
+        $orderStates = \OrderState::getOrderStates((int) \Context::getContext()->language->id);
 
         $orderStatuses = [];
         foreach ($orderStates as $orderState) {

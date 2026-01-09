@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Order;
 
@@ -22,7 +27,9 @@ class Tracking
      * Returns packetery order tracking number
      *
      * @param string $id_orders Comma separated integers
+     *
      * @return array
+     *
      * @throws DatabaseException
      */
     public function getTrackingFromOrders($id_orders)
@@ -34,6 +41,7 @@ class Tracking
                 $tracking[$tn['id_order']] = $tn['tracking_number'];
             }
         }
+
         return $tracking;
     }
 
@@ -42,7 +50,9 @@ class Tracking
      *
      * @param int $id_order
      * @param string $tracking_number numeric
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function updateOrderTrackingNumber($id_order, $tracking_number)
@@ -50,8 +60,8 @@ class Tracking
         if (!isset($id_order, $tracking_number)) {
             return false;
         }
-        if ($this->orderRepository->existsByOrder((int)$id_order)) {
-            return $this->orderRepository->setTrackingNumber((int)$id_order, $tracking_number);
+        if ($this->orderRepository->existsByOrder((int) $id_order)) {
+            return $this->orderRepository->setTrackingNumber((int) $id_order, $tracking_number);
         }
 
         return false;

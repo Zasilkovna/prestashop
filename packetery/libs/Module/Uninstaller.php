@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Module;
 
@@ -6,30 +11,25 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Configuration;
-use Exception;
 use Packetery;
 use Packetery\Log\LogRepository;
 use Packetery\PacketTracking\PacketTrackingRepository;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\DbTools;
-use PrestaShopException;
-use PrestaShopLogger;
-use Tab;
 
 class Uninstaller
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var DbTools */
     private $dbTools;
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
      * @param DbTools $dbTools
      */
-    public function __construct(Packetery $module, DbTools $dbTools)
+    public function __construct(\Packetery $module, DbTools $dbTools)
     {
         $this->module = $module;
         $this->dbTools = $dbTools;
@@ -37,49 +37,53 @@ class Uninstaller
 
     /**
      * @return bool
-     * @throws PrestaShopException
+     *
+     * @throws \PrestaShopException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShop\PrestaShop\Adapter\CoreException
      * @throws \ReflectionException
      */
     public function run()
     {
-        return (
-            $this->deleteMenuItems() &&
-            $this->uninstallDatabase() &&
-            $this->unregisterHooks() &&
-            $this->deleteConfiguration()
-        );
+        return
+            $this->deleteMenuItems()
+            && $this->uninstallDatabase()
+            && $this->unregisterHooks()
+            && $this->deleteConfiguration()
+        ;
     }
 
     private function deleteMenuItems()
     {
-        return $this->deleteTab('Packetery') &&
-            $this->deleteTab('PacketerySetting') &&
-            $this->deleteTab('PacketeryCarrierGrid') &&
-            $this->deleteTab('PacketeryOrderGrid') &&
-            $this->deleteTab('PacketeryLogGrid');
+        return $this->deleteTab('Packetery')
+            && $this->deleteTab('PacketerySetting')
+            && $this->deleteTab('PacketeryCarrierGrid')
+            && $this->deleteTab('PacketeryOrderGrid')
+            && $this->deleteTab('PacketeryLogGrid');
     }
 
     /**
      * @param string $className
+     *
      * @return bool
-     * @throws PrestaShopException
+     *
+     * @throws \PrestaShopException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShop\PrestaShop\Adapter\CoreException
      */
     public function deleteTab($className)
     {
-        $tabId = Tab::getIdFromClassName($className);
+        $tabId = \Tab::getIdFromClassName($className);
         if ($tabId !== false) {
             try {
-                $tab = new Tab($tabId);
-            } catch (PrestaShopException $exception) {
-                PrestaShopLogger::addLog($this->getExceptionRaisedText() . ' ' .
+                $tab = new \Tab($tabId);
+            } catch (\PrestaShopException $exception) {
+                \PrestaShopLogger::addLog($this->getExceptionRaisedText() . ' ' .
                     $exception->getMessage(), 3, null, null, null, true);
 
                 return false;
             }
+
             return $tab->delete();
         }
 
@@ -88,6 +92,7 @@ class Uninstaller
 
     /**
      * @return bool
+     *
      * @throws \ReflectionException
      */
     private function uninstallDatabase()
@@ -137,13 +142,13 @@ class Uninstaller
                 if ($this->module->unregisterHook($hookName) === false) {
                     $failedHooks[] = $hookName;
                 }
-            } catch (Exception $exception) {
+            } catch (\Exception $exception) {
                 $failedHooks[] = $hookName . ' - ' . $exception->getMessage();
             }
         }
 
         if (count($failedHooks) > 0) {
-            PrestaShopLogger::addLog('Packetery: Failed to unregister hooks: ' . implode(', ', $failedHooks), 3, null, null, null, true);
+            \PrestaShopLogger::addLog('Packetery: Failed to unregister hooks: ' . implode(', ', $failedHooks), 3, null, null, null, true);
         }
 
         return true;
@@ -154,24 +159,24 @@ class Uninstaller
      */
     private function deleteConfiguration()
     {
-        return (
-            Configuration::deleteByName(ConfigHelper::KEY_APIPASS) &&
-            Configuration::deleteByName('PACKETERY_ESHOP_ID') &&
-            Configuration::deleteByName('PACKETERY_LABEL_FORMAT') &&
-            Configuration::deleteByName('PACKETERY_CARRIER_LABEL_FORMAT') &&
-            Configuration::deleteByName('PACKETERY_LAST_CARRIERS_UPDATE') &&
-            Configuration::deleteByName('PACKETERY_WIDGET_AUTOOPEN') &&
-            Configuration::deleteByName(ConfigHelper::KEY_WIDGET_VALIDATION_MODE) &&
-            Configuration::deleteByName('PACKETERY_CRON_TOKEN') &&
-            Configuration::deleteByName('PACKETERY_ID_PREFERENCE') &&
-            Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGE_PRICE') &&
-            Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGE_WEIGHT') &&
-            Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGING_WEIGHT') &&
-            Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP) &&
-            Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION) &&
-            Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION_URL) &&
-            Configuration::deleteByName(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION)
-        );
+        return
+            \Configuration::deleteByName(ConfigHelper::KEY_APIPASS)
+            && \Configuration::deleteByName('PACKETERY_ESHOP_ID')
+            && \Configuration::deleteByName('PACKETERY_LABEL_FORMAT')
+            && \Configuration::deleteByName('PACKETERY_CARRIER_LABEL_FORMAT')
+            && \Configuration::deleteByName('PACKETERY_LAST_CARRIERS_UPDATE')
+            && \Configuration::deleteByName('PACKETERY_WIDGET_AUTOOPEN')
+            && \Configuration::deleteByName(ConfigHelper::KEY_WIDGET_VALIDATION_MODE)
+            && \Configuration::deleteByName('PACKETERY_CRON_TOKEN')
+            && \Configuration::deleteByName('PACKETERY_ID_PREFERENCE')
+            && \Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGE_PRICE')
+            && \Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGE_WEIGHT')
+            && \Configuration::deleteByName('PACKETERY_DEFAULT_PACKAGING_WEIGHT')
+            && \Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION_CHECK_TIMESTAMP)
+            && \Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION)
+            && \Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION_URL)
+            && \Configuration::deleteByName(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION)
+        ;
     }
 
     /**
