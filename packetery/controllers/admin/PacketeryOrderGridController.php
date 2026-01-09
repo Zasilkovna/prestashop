@@ -303,7 +303,9 @@ class PacketeryOrderGridController extends ModuleAdminController
      * @param array|null $packetsEnhanced
      * @param int $offset
      * @param bool $fallbackToPacketaLabel
-     * @return string String on error.
+     *
+     * @return string string on error
+     *
      * @throws ReflectionException
      */
     private function prepareLabels(array $packetNumbers, $type, $packetsEnhanced = null, $offset = 0, $fallbackToPacketaLabel = false): string

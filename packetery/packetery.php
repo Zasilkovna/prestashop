@@ -206,7 +206,7 @@ class Packetery extends CarrierModule
         $lastCarriersUpdate = Packetery\Tools\ConfigHelper::get('PACKETERY_LAST_CARRIERS_UPDATE');
         if ((bool) $lastCarriersUpdate !== false) {
             $date = new DateTimeImmutable();
-            $date = $date->setTimestamp((int)$lastCarriersUpdate);
+            $date = $date->setTimestamp((int) $lastCarriersUpdate);
             $lastCarriersUpdate = $date->format('d.m.Y H:i:s');
         }
 
@@ -435,6 +435,7 @@ class Packetery extends CarrierModule
 
     /**
      * @return string
+     *
      * @throws SmartyException
      */
     private function generateCronInfoBlock()
@@ -1045,10 +1046,10 @@ class Packetery extends CarrierModule
         $carrierRequiresSize = null;
         $externalCarrierId = Packetery\Carrier\CarrierTools::findExternalCarrierId($packeteryOrder);
         if ($externalCarrierId !== null) {
-            /** @var \Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
-            $apiCarrierRepository = $this->diContainer->get(\Packetery\ApiCarrier\ApiCarrierRepository::class);
-            $apiCarrier = $apiCarrierRepository->getById((string)$externalCarrierId);
-            $carrierRequiresSize = (bool)$apiCarrier['requires_size'];
+            /** @var Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
+            $apiCarrierRepository = $this->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
+            $apiCarrier = $apiCarrierRepository->getById((string) $externalCarrierId);
+            $carrierRequiresSize = (bool) $apiCarrier['requires_size'];
         }
         $this->context->smarty->assign('carrierRequiresSize', $carrierRequiresSize);
 
@@ -1177,6 +1178,7 @@ class Packetery extends CarrierModule
      * @param string $controller
      * @param array $params
      * @param string $anchor
+     *
      * @return string
      */
     public function getAdminLink($controller, array $params = [], $anchor = '')
