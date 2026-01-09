@@ -9,6 +9,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use Packetery\Log\LogRepository;
+use Packetery\Module\VersionChecker;
 
 class PacketeryLogGridController extends ModuleAdminController
 {
@@ -223,6 +224,12 @@ class PacketeryLogGridController extends ModuleAdminController
     {
         if (Tools::getValue('id_order')) {
             $this->_where = 'AND `a`.`order_id` = ' . (int) Tools::getValue('id_order');
+        }
+        $module = $this->getModule();
+        /** @var VersionChecker $versionChecker */
+        $versionChecker = $module->diContainer->get(VersionChecker::class);
+        if ($versionChecker->isNewVersionAvailable()) {
+            $this->tpl_list_vars['versionUpdateMessageHtml'] = $this->module->displayWarning($versionChecker->getVersionUpdateMessageHtml());
         }
 
         return parent::renderList();

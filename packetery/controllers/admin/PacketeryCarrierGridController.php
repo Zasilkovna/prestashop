@@ -145,7 +145,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
         /** @var VersionChecker $versionChecker */
         $versionChecker = $module->diContainer->get(VersionChecker::class);
         if ($versionChecker->isNewVersionAvailable()) {
-            $this->warnings[] = $versionChecker->getVersionUpdateMessage();
+            $this->tpl_list_vars['versionUpdateMessageHtml'] = $this->module->displayWarning($versionChecker->getVersionUpdateMessageHtml());
         }
 
         $this->addRowAction('edit');

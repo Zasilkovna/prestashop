@@ -193,11 +193,6 @@ class PacketeryOrderGridController extends ModuleAdminController
         $this->toolbar_title = $title;
 
         $this->hasBulkLabelPrintingError = false;
-
-        $versionChecker = $this->getModule()->diContainer->get(VersionChecker::class);
-        if ($versionChecker->isNewVersionAvailable()) {
-            $this->warnings[] = $versionChecker->getVersionUpdateMessage();
-        }
     }
 
     /**
@@ -522,6 +517,11 @@ class PacketeryOrderGridController extends ModuleAdminController
         }
 
         $this->addRowAction('action');
+
+        $versionChecker = $this->getModule()->diContainer->get(VersionChecker::class);
+        if ($versionChecker->isNewVersionAvailable()) {
+            $this->tpl_list_vars['versionUpdateMessageHtml'] = $this->module->displayWarning($versionChecker->getVersionUpdateMessageHtml());
+        }
 
         return parent::renderList();
     }
