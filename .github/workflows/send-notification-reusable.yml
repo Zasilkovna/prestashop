@@ -1,0 +1,30 @@
+name: Send Notification Reusable
+
+on:
+  workflow_call:
+    inputs:
+      action_name:
+        required: true
+        type: string
+    secrets:
+      webhook_url:
+        required: true
+
+jobs:
+  sendNotifications:
+    name: "Send MS-teams notification"
+    runs-on: ubuntu-24.04
+    steps:
+      - name: "Init env variables"
+        run: |
+          echo "WEBHOOK_URL=${{ secrets.webhook_url }}" >> $GITHUB_ENV
+          echo "ACTION_NAME='${{ inputs.action_name }}'" >> $GITHUB_ENV
+          echo "PUSHER_NAME=${{ github.event.pusher.name }}" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE=${{ github.event.head_commit.message }}" >> $GITHUB_ENV
+          echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
+      - name: "Init dependency"
+        uses: actions/checkout@v4
+      - name: "Send notifications"
+        shell: bash
+        run: |
+          ${GITHUB_WORKSPACE}/.github/send-notifications.sh
