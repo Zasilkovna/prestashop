@@ -52,7 +52,7 @@ class OrderExporter
             throw new ExportException($this->module->l('Unable to load information required to export order', 'orderexporter') . ' ' . $order->id);
         }
 
-        list($exportCurrency, $total) = $this->getCurrencyAndTotalValue($order, $packeteryOrder);
+        [$exportCurrency, $total] = $this->getCurrencyAndTotalValue($order, $packeteryOrder);
 
         $isCod = $packeteryOrder['is_cod'];
         if ($isCod) {
@@ -86,7 +86,8 @@ class OrderExporter
         $weight = (!$weight ? '' : $weight);
 
         $number = (string) (\Packetery::ID_PREF_REF === ConfigHelper::get('PACKETERY_ID_PREFERENCE') ? $order->reference : $order->id);
-        $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
+        $idShop = ((string) $packeteryOrder['id_shop'] !== '') ? $packeteryOrder['id_shop'] : '';
+        $senderLabel = (string) ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $idShop);
         $customer = $order->getCustomer();
 
         $size = [];
@@ -106,7 +107,16 @@ class OrderExporter
             throw new ExportException(sprintf($this->module->l('Order %s contains product only for adults, but the carrier does not support age verification.', 'orderexporter'), $order->id));
         }
 
-        $company = ($address->company ?: $customer->company);
+        $company = ($address->company === '') ? $customer->company : $address->company;
+
+        $note = strtr(
+            (string) ConfigHelper::get('PACKETERY_LABEL_NOTE'),
+            [
+                '{{order-id}}' => (string) $order->id,
+                '{{order-reference}}' => $order->reference,
+            ]
+        );
+
         $data = [
             'number' => $number,
             'currency' => $exportCurrency,
@@ -119,12 +129,13 @@ class OrderExporter
             'pickupPointOrCarrier' => $packeteryOrder['id_branch'],
             'carrierPickupPoint' => $packeteryOrder['carrier_pickup_point'],
 
-            'firstName' => ($address->firstname ?: $customer->firstname),
-            'lastName' => ($address->lastname ?: $customer->lastname),
+            'firstName' => $address->firstname === '' ? $customer->firstname : $address->firstname,
+            'lastName' => $address->lastname === '' ? $customer->lastname : $address->lastname,
             'company' => ($company ?? ''),
             'phone' => $phone,
             'email' => $customer->email,
             'adultContent' => $adultContent,
+            'note' => $note,
         ];
 
         if ($packeteryOrder['is_ad']) {

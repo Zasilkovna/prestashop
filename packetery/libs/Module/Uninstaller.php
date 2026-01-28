@@ -164,6 +164,7 @@ class Uninstaller
             && \Configuration::deleteByName('PACKETERY_ESHOP_ID')
             && \Configuration::deleteByName('PACKETERY_LABEL_FORMAT')
             && \Configuration::deleteByName('PACKETERY_CARRIER_LABEL_FORMAT')
+            && \Configuration::deleteByName('PACKETERY_LABEL_NOTE')
             && \Configuration::deleteByName('PACKETERY_LAST_CARRIERS_UPDATE')
             && \Configuration::deleteByName('PACKETERY_WIDGET_AUTOOPEN')
             && \Configuration::deleteByName(ConfigHelper::KEY_WIDGET_VALIDATION_MODE)
