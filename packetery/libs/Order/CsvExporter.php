@@ -75,7 +75,7 @@ class CsvExporter
                 'width' => isset($exportData['size']['width']) ? $exportData['size']['width'] : '',
                 'height' => isset($exportData['size']['length']) ? $exportData['size']['length'] : '',
                 'depth' => isset($exportData['size']['height']) ? $exportData['size']['height'] : '',
-                'note' => '',
+                'note' => $exportData['note'] ?? '',
                 'allowPublicTracking' => '',
                 'allowTrackingForUsers' => '',
                 'romaniaCIFNumber' => '',

@@ -77,6 +77,7 @@ class PacketSubmitter
             'weight' => $exportData['weight'],
             'adultContent' => $exportData['adultContent'],
             'affiliateId' => self::AFFILIATE_ID,
+            'note' => $exportData['note'],
         ];
 
         if ($exportData['company'] !== '') {

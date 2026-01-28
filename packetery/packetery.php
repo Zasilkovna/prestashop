@@ -331,9 +331,10 @@ class Packetery extends CarrierModule
     {
         $formInputs = [];
         $confOptions = $this->getConfigurationOptions();
+
         foreach ($confOptions as $option => $optionConf) {
             $inputData = [
-                'type' => 'text',
+                'type' => $optionConf['type'] ?? 'text',
                 'label' => $optionConf['title'],
                 'name' => $option,
                 'required' => $optionConf['required'],
@@ -351,9 +352,13 @@ class Packetery extends CarrierModule
                 }
                 $inputData['values'] = $options;
             }
-            if (isset($optionConf['desc'])) {
-                $inputData['desc'] = $optionConf['desc'];
+
+            foreach (['cols', 'rows', 'desc'] as $key) {
+                if (isset($optionConf[$key])) {
+                    $inputData[$key] = $optionConf[$key];
+                }
             }
+
             $formInputs[] = $inputData;
         }
 
@@ -513,6 +518,17 @@ class Packetery extends CarrierModule
                 'title' => $this->l('Carrier label format'),
                 'options' => $this->getCarrierLabelFormats('name'),
                 'required' => false,
+            ],
+            'PACKETERY_LABEL_NOTE' => [
+                'type' => 'textarea',
+                'title' => $this->l('Carrier label note'),
+                'required' => false,
+                'desc' => sprintf(
+                    $this->l('You can enter the packet note. At %s is described carriers support list and maximal note length. You can use {{order-id}} as order id and {{order-reference}} as order code.'),
+                    '<a href="https://docs.packeta.com/docs/label-printing/carrier-label">Packeta API Documentation</a>'
+                ),
+                'cols' => 8,
+                'rows' => 4,
             ],
             'PACKETERY_ID_PREFERENCE' => [
                 'title' => $this->l('As the order ID, use'),
