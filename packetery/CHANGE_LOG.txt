@@ -1,4 +1,4 @@
-       - Updated: Load library.js only in new order page.
+       - Updated: Load JavaScript Packeta widget library only in 'new order' module page.
        - Updated: Multiple issues form PrestaShop validator resolved.
        - Updated: Added company to shipment submission via API.
        - Updated: Removed czech language from slovak translations.
