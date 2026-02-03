@@ -857,7 +857,7 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayHeader()
     {
-        /* @phpstan-ignore-next-line LegacyControllerBridgeInterface is required, but we cant load it yet */
+        // @phpstan-ignore class.notFound
         if ($this->context->controller->php_self !== 'order') {
             return;
         }
