@@ -857,6 +857,10 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayHeader()
     {
+        // @phpstan-ignore class.notFound
+        if ($this->context->controller->php_self !== 'order') {
+            return;
+        }
         $jsList = [
             'front.js',
         ];

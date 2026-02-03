@@ -1,3 +1,4 @@
+       - Updated: Loading the widget javascript library only on the checkout page.
        - Updated: Multiple issues form PrestaShop validator resolved.
        - Updated: Added company to shipment submission via API.
        - Updated: Removed czech language from slovak translations.
