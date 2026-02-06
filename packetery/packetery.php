@@ -1383,27 +1383,9 @@ class Packetery extends CarrierModule
      */
     public function hookSendMailAlterTemplateVars(&$params)
     {
-        if (
-            !isset(
-                $params['template'],
-                $params['template_vars']['{id_order}'],
-                $params['template_vars']['{carrier}']
-            )
-            || strpos((string) $params['template'], 'order') === false
-        ) {
-            return;
-        }
-
-        $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getById((int) $params['template_vars']['{id_order}']);
-        if (!$orderData) {
-            return;
-        }
-
-        $params['template_vars']['{carrier}'] .= ' - ' . $orderData['name_branch'];
-        if ((bool) $orderData['is_carrier'] === false) {
-            $params['template_vars']['{carrier}'] .= sprintf(' (%s)', $orderData['id_branch']);
-        }
+        /** @var Packetery\Hooks\SendMailAlterTemplateVars $sendMailAlterTemplateVars */
+        $sendMailAlterTemplateVars = $this->diContainer->get(Packetery\Hooks\SendMailAlterTemplateVars::class);
+        $sendMailAlterTemplateVars->execute($params);
     }
 
     /**
