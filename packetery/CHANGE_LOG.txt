@@ -1,3 +1,6 @@
+
+v3.4
+       - Added: Information about the selected pickup point to emails for e-shop owner.
        - Updated: Loading the widget javascript library only on the checkout page.
        - Updated: Multiple issues form PrestaShop validator resolved.
        - Updated: Added company to shipment submission via API.
