@@ -68,12 +68,11 @@ class DbTools
         if ($exception instanceof \PrestaShopException) {
             $this->logger->logToFile($exception->getMessage() . ', query: ' . $query);
             throw new DatabaseException($exception->getMessage() . ', see details in Packeta log');
-        } else {
-            $error = $this->db->getNumberError();
-            if ($error) {
-                $this->logger->logToFile($this->db->getMsgError() . ', query: ' . $query);
-                throw new DatabaseException($this->db->getMsgError() . ', see details in Packeta log');
-            }
+        }
+        $error = $this->db->getNumberError();
+        if ($error) {
+            $this->logger->logToFile($this->db->getMsgError() . ', query: ' . $query);
+            throw new DatabaseException($this->db->getMsgError() . ', see details in Packeta log');
         }
     }
 
