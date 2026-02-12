@@ -25,6 +25,10 @@
             "@check:phpcs",
             "@check:phpcsfixer",
             "@phpstan"
+        ],
+        "fix:all": [
+            "@fix:phpcbf",
+            "@fix:phpcsfixer"
         ]
     },
     "prefer-stable": true,
