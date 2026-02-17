@@ -26,6 +26,8 @@ class Packetery extends CarrierModule
     public const LOCAL = 'local';
     public const REMOTE = 'remote';
 
+    private const PACKETA_SUPPORT_EMAIL = 'e-commerce.support@packeta.com';
+
     protected $config_form = false;
 
     /** @var Packetery\DI\Container */
@@ -986,6 +988,7 @@ class Packetery extends CarrierModule
         $apiKey = $configHelper->getApiKey();
 
         $pickupPointChangeAllowed = false;
+        $widgetOptions = null;
         if ($apiKey !== false && (bool) $packeteryCarrier === true) {
             if ($isAddressDelivery === true) {
                 $isAddressValidated = false;
@@ -1019,14 +1022,20 @@ class Packetery extends CarrierModule
                         $isAddressValidated = true;
                     }
                     $this->context->smarty->assign('validatedAddress', $validatedAddress);
-                    $this->prepareAddressChange($apiKey, $packeteryOrder);
+                    $widgetOptions = $this->prepareAddressChange($apiKey, $packeteryOrder, $orderId);
                 }
+
                 $this->context->smarty->assign('isAddressValidated', $isAddressValidated);
             } elseif ((int) $packeteryOrder['id_carrier'] !== 0) {
-                $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
                 $pickupPointChangeAllowed = true;
+                $widgetOptions = $this->preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier);
+                if ($widgetOptions === null) {
+                    $pickupPointChangeAllowed = false;
+                }
             }
         }
+
+        $this->context->smarty->assign('widgetOptions', $widgetOptions);
 
         /** @var Packetery\Weight\Calculator $weightCalculator */
         $weightCalculator = $this->diContainer->get(Packetery\Weight\Calculator::class);
@@ -1105,16 +1114,15 @@ class Packetery extends CarrierModule
     }
 
     /**
-     * @param string $apiKey
-     * @param array $packeteryOrder
+     * @param array<string,string> $packeteryOrder
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
-    private function prepareAddressChange($apiKey, array $packeteryOrder)
+    private function prepareAddressChange(string $apiKey, array $packeteryOrder, int $orderId): ?string
     {
         if (!in_array($packeteryOrder['ps_country'], Packetery\Carrier\CarrierRepository::ADDRESS_VALIDATION_COUNTRIES, true)) {
-            return;
+            return null;
         }
 
         /** @var Packetery\Tools\ConfigHelper $configHelper */
@@ -1132,25 +1140,22 @@ class Packetery extends CarrierModule
             $widgetOptions['city'] = $packeteryOrder['city'];
             $widgetOptions['zip'] = str_replace(' ', '', $packeteryOrder['zip']);
         } else {
-            $order = new Order($packeteryOrder['id_order']);
+            $order = new Order($orderId);
             $deliveryAddress = new Address($order->id_address_delivery);
             $widgetOptions['houseNumber'] = '';
             $widgetOptions['zip'] = str_replace(' ', '', $deliveryAddress->postcode);
             $widgetOptions['city'] = $deliveryAddress->city;
             $widgetOptions['street'] = $deliveryAddress->address1;
         }
-        $this->context->smarty->assign('widgetOptions', json_encode($widgetOptions));
+
+        return $this->getValidWidgetOptions($widgetOptions, $orderId);
     }
 
     /**
-     * @param string $apiKey
-     * @param array $packeteryOrder
-     * @param int $orderId
-     * @param array $packeteryCarrier
-     *
-     * @throws PrestaShopException
+     * @param array<string,string> $packeteryOrder
+     * @param array<string,string> $packeteryCarrier
      */
-    private function preparePickupPointChange($apiKey, $packeteryOrder, $orderId, $packeteryCarrier)
+    private function preparePickupPointChange(string $apiKey, array $packeteryOrder, int $orderId, array $packeteryCarrier): ?string
     {
         /** @var Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
@@ -1163,6 +1168,7 @@ class Packetery extends CarrierModule
             'lang' => $configHelper->getBackendLanguage($this),
             'vendors' => $this->getAllowedVendorsForOrder($orderId, $country),
         ];
+
         if (
             $packeteryCarrier['pickup_point_type'] === 'external'
             && $packeteryOrder['id_branch'] !== null
@@ -1172,7 +1178,8 @@ class Packetery extends CarrierModule
         } elseif ($packeteryCarrier['pickup_point_type'] === 'internal') {
             $widgetOptions['carriers'] = Packetery\Carrier\CarrierVendors::INTERNAL_PICKUP_POINT_CARRIER;
         }
-        $this->context->smarty->assign('widgetOptions', json_encode($widgetOptions));
+
+        return $this->getValidWidgetOptions($widgetOptions, $orderId);
     }
 
     /**
@@ -1716,5 +1723,35 @@ class Packetery extends CarrierModule
         /** @var Packetery\Product\ProductAttributeRepository $productAttributeRepository */
         $productAttributeRepository = $this->diContainer->get(Packetery\Product\ProductAttributeRepository::class);
         $productAttributeRepository->delete($params['product']->id);
+    }
+
+    /**
+     * Validates and encodes widget options to escaped JSON string
+     *
+     * @param array<string, string|int> $widgetOptions
+     *
+     * @return string|null Escaped JSON string or null on failure
+     */
+    private function getValidWidgetOptions(array $widgetOptions, int $orderId): ?string
+    {
+        $logMessage = sprintf(
+            $this->l('Can not change delivery place in administration detail for order id %d, please copy this log to %s.'),
+            $orderId,
+            self::PACKETA_SUPPORT_EMAIL
+        );
+        $logMessage .= ' ';
+
+        try {
+            return htmlspecialchars(Packetery\Module\Helper::transformArrayToJson($widgetOptions), ENT_QUOTES);
+        } catch (Packetery\Exceptions\EmptyArrayToJsonConvertException $e) {
+            $logMessage .= $this->l($e->getMessage());
+            Packetery\LogWrapper\PrestashopLogWrapper::addLog($logMessage, Packetery\LogWrapper\PrestashopLogWrapper::LEVEL_WARNING);
+        } catch (Packetery\Exceptions\FailedToConvertJsonException $e) {
+            $logMessage .= $this->l('Function transformArrayToJson failed:') . ' ' . $e->getMessage() . ', ';
+            $logMessage .= $this->l('data:') . ' ' . print_r(Packetery\Module\Helper::escapeArray($widgetOptions), true);
+            Packetery\LogWrapper\PrestashopLogWrapper::addLog($logMessage, Packetery\LogWrapper\PrestashopLogWrapper::LEVEL_WARNING);
+        }
+
+        return null;
     }
 }

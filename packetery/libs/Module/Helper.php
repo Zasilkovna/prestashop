@@ -7,6 +7,9 @@
 
 namespace Packetery\Module;
 
+use Packetery\Exceptions\EmptyArrayToJsonConvertException;
+use Packetery\Exceptions\FailedToConvertJsonException;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -47,5 +50,49 @@ class Helper
                 'allowed_classes' => false,
             ]
         );
+    }
+
+    /**
+     * Transforms non-empty array to JSON string
+     *
+     * @param array<int|string, mixed> $data
+     *
+     * @return string
+     *
+     * @throws EmptyArrayToJsonConvertException
+     * @throws FailedToConvertJsonException
+     */
+    public static function transformArrayToJson(array $data): string
+    {
+        if ($data === []) {
+            throw new EmptyArrayToJsonConvertException('Function transformArrayToJson got empty array.');
+        }
+
+        $json = json_encode($data, JSON_UNESCAPED_UNICODE);
+        if ($json === false) {
+            throw new FailedToConvertJsonException(json_last_error_msg());
+        }
+
+        return $json;
+    }
+
+    /**
+     * Recursively escapes all string values in common array
+     * Non-string values (int, float, bool, null) are preserved.
+     *
+     * @param array<int|string, mixed> $array
+     *
+     * @return array<int|string, mixed>
+     */
+    public static function escapeArray(array $array): array
+    {
+        $resultArray = $array;
+        array_walk_recursive($resultArray, function (&$value) {
+            if (is_string($value)) {
+                $value = htmlspecialchars($value, ENT_QUOTES | ENT_HTML5);
+            }
+        });
+
+        return $resultArray;
     }
 }
