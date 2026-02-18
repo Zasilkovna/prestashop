@@ -14,6 +14,7 @@ if (!defined('_PS_VERSION_')) {
 class PrestashopLogWrapper
 {
     public const LEVEL_INFO = 1;
+    public const LEVEL_WARNING = 2;
     public const LEVEL_ERROR = 3;
 
     /**
