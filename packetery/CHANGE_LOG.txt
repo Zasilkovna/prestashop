@@ -1,5 +1,7 @@
 
-v3.4.0
+v3.4
+       - Updated: When Packeta pick-up point selected using widget, save and display proper information about place, street, city, zip (front/admin)
+       - Updated: Display proper information in Packeta Orders administration list and detail
        - Updated: If Packeta pick-up point list is not loaded correctly in administration Order detail, log error and do not display button for choose pick-up point/change address.
        - Added: Information about the selected pickup point to emails for e-shop owner.
        - Updated: Loading the widget javascript library only on the checkout page.

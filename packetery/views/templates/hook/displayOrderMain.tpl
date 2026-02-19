@@ -25,8 +25,13 @@
                 <p>
                     {l s='Carrier' mod='packetery'}:
                     <strong class="picked-delivery-place" data-validated="{$isAddressValidated}">
-                        {if $pickupPointOrAddressDeliveryName}
-                            {$pickupPointOrAddressDeliveryName}
+                        <br>
+                        {if $pointOrderAddressName}
+                            {$pointOrderAddressName}
+                            {if pointOrderAddress}
+                                <br>
+                                {$pointOrderAddress}
+                            {/if}
                         {else}
                             {l s='Please select shipment method again' mod='packetery'}
                         {/if}
@@ -59,9 +64,14 @@
                 {/if}
             {else}
                 <p>{l s='Pickup point' mod='packetery'}:
+                    <br>
                     <strong class="picked-delivery-place">
-                        {if $pickupPointOrAddressDeliveryName}
-                            {$pickupPointOrAddressDeliveryName}
+                        {if $pointOrderAddressName}
+                            {$pointOrderAddressName}
+                            {if pointOrderAddress}
+                                <br>
+                                {$pointOrderAddress}
+                            {/if}
                         {else}
                             {l s='Please select pickup point' mod='packetery'}
                         {/if}

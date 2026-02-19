@@ -263,6 +263,10 @@ class OrderRepository
                    `po`.`price_total`,
                    `po`.`price_cod`,
                    `po`.`age_verification_required`,
+                   `po`.`point_place`,
+                   `po`.`point_street`,
+                   `po`.`point_city`,
+                   `po`.`point_zip`,
                    `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`

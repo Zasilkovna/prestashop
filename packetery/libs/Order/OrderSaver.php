@@ -158,6 +158,10 @@ class OrderSaver
         $pickupPointType = (\Tools::getIsset('pickup_point_type') ? \Tools::getValue('pickup_point_type') : 'internal');
         $widgetCarrierId = (\Tools::getIsset('widget_carrier_id') ? \Tools::getValue('widget_carrier_id') : null);
         $carrierPickupPointId = (\Tools::getIsset('carrier_pickup_point_id') ? \Tools::getValue('carrier_pickup_point_id') : null);
+        $pointPlace = (\Tools::getIsset('point_place') ? \Tools::getValue('point_place') : null);
+        $pointStreet = (\Tools::getIsset('point_street') ? \Tools::getValue('point_street') : null);
+        $pointCity = (\Tools::getIsset('point_city') ? \Tools::getValue('point_city') : null);
+        $pointZip = (\Tools::getIsset('point_zip') ? \Tools::getValue('point_zip') : null);
 
         $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int) $prestashopCarrierId);
         $isCod = $packeteryCarrier['is_cod'];
@@ -183,7 +187,12 @@ class OrderSaver
             'house_number' => null,
             'latitude' => null,
             'longitude' => null,
+            'point_place' => $pointPlace !== null ? $this->orderRepository->db->escape($pointPlace) : null,
+            'point_street' => $pointStreet !== null ? $this->orderRepository->db->escape($pointStreet) : null,
+            'point_city' => $pointCity !== null ? $this->orderRepository->db->escape($pointCity) : null,
+            'point_zip' => $pointZip !== null ? $this->orderRepository->db->escape($pointZip) : null,
         ];
+
         if ($pickupPointType === 'external') {
             $packeteryOrderFields['is_carrier'] = 1;
             $packeteryOrderFields['id_branch'] = (int) $widgetCarrierId;

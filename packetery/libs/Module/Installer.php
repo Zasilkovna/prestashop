@@ -181,6 +181,10 @@ class Installer
             `price_total` decimal(20,6) NULL,
             `price_cod` decimal(20,6) NULL,
             `age_verification_required` tinyint(1) unsigned NULL,
+            `point_place` varchar(70) NULL,
+            `point_street` varchar(120) NULL,
+            `point_zip` varchar(10) NULL,
+            `point_city` varchar(70) NULL,
             UNIQUE(`id_order`),
             UNIQUE(`id_cart`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';

@@ -748,6 +748,10 @@ class Packetery extends CarrierModule
             $pickupPointType = 'internal';
             $carrierId = '';
             $carrierPickupPointId = '';
+            $pointPlace = '';
+            $pointStreet = '';
+            $pointZip = '';
+            $pointCity = '';
             if ($orderData) {
                 $name_branch = $orderData['name_branch'];
                 $currency_branch = $orderData['currency_branch'];
@@ -758,12 +762,20 @@ class Packetery extends CarrierModule
                     $carrierId = $orderData['id_branch'];
                 } else {
                     $id_branch = $orderData['id_branch'];
+                    $pointPlace = ($orderData['point_place'] ?? '');
+                    $pointStreet = ($orderData['point_street'] ?? '');
+                    $pointZip = ($orderData['point_zip'] ?? '');
+                    $pointCity = ($orderData['point_city'] ?? '');
                 }
             }
             $this->context->smarty->assign('id_branch', $id_branch);
             $this->context->smarty->assign('name_branch', $name_branch);
             $this->context->smarty->assign('currency_branch', $currency_branch);
             $this->context->smarty->assign('pickup_point_type', $pickupPointType);
+            $this->context->smarty->assign('point_place', $pointPlace);
+            $this->context->smarty->assign('point_street', $pointStreet);
+            $this->context->smarty->assign('point_zip', $pointZip);
+            $this->context->smarty->assign('point_city', $pointCity);
             $this->context->smarty->assign('packeta_carrier_id', $carrierId);
             $this->context->smarty->assign('carrier_pickup_point_id', $carrierPickupPointId);
             $this->context->smarty->assign('baseuri', Packetery\Module\Helper::getBaseUri());
@@ -960,9 +972,33 @@ class Packetery extends CarrierModule
 
         $isAddressDelivery = (bool) $packeteryOrder['is_ad'];
         $this->context->smarty->assign('isAddressDelivery', $isAddressDelivery);
-        $this->context->smarty->assign('pickupPointOrAddressDeliveryName', $packeteryOrder['name_branch']);
-        $isExported = (bool) $packeteryOrder['exported'];
 
+        $isCarrier = (bool) $packeteryOrder['is_carrier'];
+
+        /** @var Packetery\Carrier\CarrierRepository $carrierRepository */
+        $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
+        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int) $packeteryOrder['id_carrier']);
+        if ((bool) $packeteryCarrier === false) {
+            $oldCarrier = new Carrier($packeteryOrder['id_carrier']);
+            $newCarrier = Carrier::getCarrierByReference($oldCarrier->id_reference);
+            if ($newCarrier) {
+                $packeteryCarrier = $carrierRepository->getPacketeryCarrierById($newCarrier->id);
+            }
+        }
+
+        /** @var Packetery\Order\OrderDetailView $orderDetailView */
+        $orderDetailView = $this->diContainer->get(Packetery\Order\OrderDetailView::class);
+        [$pointOrderAddressName, $pointOrderAddress] = $orderDetailView->getPickupPointOrDeliveryAddress(
+            $packeteryOrder,
+            $isCarrier,
+            $isAddressDelivery,
+            $packeteryCarrier['name_branch']
+        );
+
+        $this->context->smarty->assign('pointOrderAddressName', $pointOrderAddressName);
+        $this->context->smarty->assign('pointOrderAddress', $pointOrderAddress);
+
+        $isExported = (bool) $packeteryOrder['exported'];
         if ($isExported === false) {
             $orderDetails = [
                 'length' => Tools::getValue('length') ?: $packeteryOrder['length'],
