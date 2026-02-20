@@ -246,11 +246,18 @@ class OrderDetailsUpdater
             return;
         }
 
-        $fieldsToUpdate = array_merge($fieldsToUpdate, [
-            'id_branch' => (int) $pickupPoint->id,
-            'name_branch' => $pickupPoint->name,
-            'currency_branch' => $pickupPoint->currency,
-        ]);
+        $fieldsToUpdate = array_merge(
+            $fieldsToUpdate,
+            [
+                'id_branch' => (int) $pickupPoint->id,
+                'name_branch' => $pickupPoint->name,
+                'currency_branch' => $pickupPoint->currency,
+                'point_place' => $pickupPoint->place,
+                'point_street' => $pickupPoint->street,
+                'point_city' => $pickupPoint->city,
+                'point_zip' => $pickupPoint->zip,
+            ]
+        );
 
         if ($pickupPoint->pickupPointType === 'external') {
             $fieldsToUpdate['is_carrier'] = 1;

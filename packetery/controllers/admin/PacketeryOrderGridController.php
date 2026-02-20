@@ -51,7 +51,22 @@ class PacketeryOrderGridController extends ModuleAdminController
         // there has to be `id` for 'editable' to work; a.* is prepended
         $this->_select = '
             `a`.`id_order` AS `id`,
-            `po`.`is_cod`, `po`.`name_branch`, `po`.`is_ad`, `po`.`zip`, `po`.`exported`,
+            `po`.`is_cod`,
+             IF (
+               `po`.`point_place` IS NULL,
+               `po`.`name_branch`,
+                CASE
+                    WHEN `po`.`is_carrier` = 0 AND `po`.`is_ad` = 0
+                    THEN CONCAT(
+                        `po`.`point_place`,
+                        \' (\', `po`.`id_branch`, \')\' 
+                    )
+                ELSE `po`.`point_place`
+             END
+             ) AS `name_branch`,
+            `po`.`is_ad`,
+            `po`.`zip`,
+            `po`.`exported`,
             IF(`po`.`tracking_number` IS NOT NULL, `po`.`tracking_number`, \'\') AS `tracking_number`,
             CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
             IF(`a`.`valid`, 1, 0) AS `badge_success`,

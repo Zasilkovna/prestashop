@@ -13,8 +13,21 @@
                         <button class="btn btn-sm btn-success pull-left open-packeta-widget" id="open-packeta-widget">{l s='Select pick-up point:' mod='packetery'}</button>
                     </div>
                     <ul id="selected-branch">
-                        <li>{l s='Selected pick-up point:' mod='packetery'}
-                            <span id="picked-delivery-place" class="picked-delivery-place">{$name_branch}</span>
+                        <li>
+                            {l s='Selected pick-up point:' mod='packetery'}
+                            <br>
+                            <span id="picked-delivery-place" class="picked-delivery-place">
+                                {if $pickup_point_type === 'external'}
+                                    {$name_branch}
+                                {else}
+                                    {$point_place}<br>
+                                    {if $point_street}
+                                        {$point_street},
+                                    {/if}
+                                    {$point_city}
+                                    {$point_zip}
+                                {/if}
+                            </span>
                         </li>
                     </ul>
                     <input type="hidden" id="packeta-branch-id" class="packeta-branch-id" name="packeta-branch-id"
@@ -29,6 +42,14 @@
                            value="{$packeta_carrier_id}">
                     <input type="hidden" id="packeta-carrier-pickup-point-id" class="packeta-carrier-pickup-point-id" name="packeta-carrier-pickup-point-id"
                            value="{$carrier_pickup_point_id}">
+                    <input type="hidden" id="packeta-point-place" class="packeta-point-place" name="packeta-point-place"
+                           value="{$point_place}">
+                    <input type="hidden" id="packeta-point-street" class="packeta-point-street" name="packeta-point-street"
+                           value="{$point_street}">
+                    <input type="hidden" id="packeta-point-city" class="packeta-point-city" name="packeta-point-city"
+                           value="{$point_city}">
+                    <input type="hidden" id="packeta-point-zip" class="packeta-point-zip" name="packeta-point-zip"
+                           value="{$point_zip}">
                 </div>
             </div>
         </div>

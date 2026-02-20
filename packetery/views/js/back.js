@@ -71,7 +71,11 @@ $(document).ready(function () {
             Packeta.Widget.pick(widgetOptionsData['apiKey'], function (pickupPoint) {
                 if (pickupPoint !== null) {
                     $('.packetery form input[name="pickup_point"]').val(JSON.stringify(pickupPoint));
-                    $('.picked-delivery-place').text(pickupPoint.name);
+                    $('.picked-delivery-place')
+                        .empty()
+                        .append(document.createTextNode(pickupPoint.place))
+                        .append(document.createElement('br'))
+                        .append(document.createTextNode(pickupPoint.street + ', ' + pickupPoint.city + ' ' + pickupPoint.zip));
                 }
             }, widgetOptions);
         });
