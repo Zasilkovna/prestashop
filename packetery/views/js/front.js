@@ -317,6 +317,7 @@ PacketaModule.ui = {
                 widgetOptions.livePickupPoint = true;
             }
 
+            console.log('Pickup point widget options: apiKey: ' + PacketaModule.config.apiKey + ', ' + stringifyOptions(widgetOptions));
             Packeta.Widget.pick(PacketaModule.config.apiKey, function (pickupPoint) {
                 if (pickupPoint == null) {
                     return;
@@ -402,6 +403,7 @@ PacketaModule.ui = {
             if (customerZip) {
                 widgetOptions.postCode = customerZip;
             }
+            console.log('Address widget options: apiKey: ' + PacketaModule.config.apiKey + ', ' + stringifyOptions(widgetOptions));
             Packeta.Widget.pick(PacketaModule.config.apiKey, function (result) {
                 if (result != null && result.address != null) {
                     // there is also property packetaWidgetMessage which is true

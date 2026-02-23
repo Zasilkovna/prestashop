@@ -33,6 +33,7 @@ $(document).ready(function () {
 
         $widgetHdButton.on('click', function (event) {
             event.preventDefault();
+            console.log('Address widget options: apiKey: ' + widgetHdOptionsData['apiKey'] + ', ' + stringifyOptions(widgetHdOptions));
             Packeta.Widget.pick(widgetHdOptionsData['apiKey'], function (result) {
                 if (result !== null && result.address !== null) {
                     var address = result.address;
@@ -68,6 +69,7 @@ $(document).ready(function () {
 
         $widgetButton.on('click', function (event) {
             event.preventDefault();
+            console.log('Pickup point widget options: apiKey: ' + widgetOptionsData['apiKey'] + ', ' + stringifyOptions(widgetOptions));
             Packeta.Widget.pick(widgetOptionsData['apiKey'], function (pickupPoint) {
                 if (pickupPoint !== null) {
                     $('.packetery form input[name="pickup_point"]').val(JSON.stringify(pickupPoint));

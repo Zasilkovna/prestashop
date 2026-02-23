@@ -285,7 +285,7 @@ parameters:
 		-
 			message: '#^Call to method addJS\(\) on an unknown class LegacyControllerBridgeInterface\.$#'
 			identifier: class.notFound
-			count: 1
+			count: 2
 			path: ../packetery/packetery.php
 
 		-
