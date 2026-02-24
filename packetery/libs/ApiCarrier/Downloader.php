@@ -18,7 +18,7 @@ use Packetery\Tools\HttpClientWrapper;
 
 class Downloader
 {
-    public const API_URL = 'https://www.zasilkovna.cz/api/v4/%s/branch.json?address-delivery';
+    private const API_URL = 'https://pickup-point.api.packeta.com/v5/%s/carrier/json';
 
     /** @var \Packetery */
     private $module;
@@ -83,6 +83,7 @@ class Downloader
                 'class' => 'danger',
             ];
         }
+
         $this->apiCarrierRepository->save($carriers, $this->module);
         ConfigHelper::update('PACKETERY_LAST_CARRIERS_UPDATE', time());
 
@@ -126,16 +127,15 @@ class Downloader
 
     /**
      * Converts JSON to array.
-     *
-     * @param string $json JSON
-     *
-     * @return array|null
      */
-    private function getFromJson($json)
+    private function getFromJson(string $json): ?array
     {
-        $carriers_data = json_decode($json, true);
+        $carriersData = json_decode($json, true);
+        if (is_array($carriersData)) {
+            return $carriersData;
+        }
 
-        return isset($carriers_data['carriers']) ? $carriers_data['carriers'] : null;
+        return null;
     }
 
     /**
@@ -162,7 +162,8 @@ class Downloader
                     $carrier['requiresPhone'],
                     $carrier['requiresSize'],
                     $carrier['disallowsCod'],
-                    $carrier['maxWeight']
+                    $carrier['maxWeight'],
+                    $carrier['available']
                 )
             ) {
                 return false;

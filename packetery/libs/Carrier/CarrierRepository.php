@@ -144,7 +144,12 @@ class CarrierRepository
         $carrierId = (int) $carrierId;
 
         return $this->dbTools->getRow('
-            SELECT `c`.`id_carrier`, `name`, `id_branch`, `is_cod`, `address_validation`, `allowed_vendors`
+            SELECT `c`.`id_carrier`,
+               `name`,
+               `id_branch`,
+               `is_cod`,
+               `address_validation`,
+               `allowed_vendors`
             FROM `' . _DB_PREFIX_ . 'carrier` `c`
             LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` USING(`id_carrier`)
             WHERE `c`.`id_carrier` = ' . $carrierId);

@@ -53,6 +53,9 @@ function upgrade_module_3_4_0(Packetery $module): bool
              ADD `point_city` varchar(70) NULL AFTER `point_zip`',
     ];
 
+    $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_carriers`
+        ADD `available` tinyint(1) NOT NULL DEFAULT 1;';
+
     $dbTools = $module->diContainer->get(DbTools::class);
     $executeResult = $dbTools->executeQueries(
         $sql,

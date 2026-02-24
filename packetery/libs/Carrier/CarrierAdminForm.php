@@ -66,6 +66,39 @@ class CarrierAdminForm
         $this->messageManager = $this->module->diContainer->get(MessageManager::class);
     }
 
+    private function getDisabledCarrierIds(array $carriers): array
+    {
+        $disabledIds = [];
+        foreach ($carriers as $carrier) {
+            if (!isset($carrier['disabled'], $carrier['id'])) {
+                continue;
+            }
+
+            if ($carrier['disabled'] === true) {
+                $disabledIds[] = $carrier['id'];
+            }
+        }
+
+        return $disabledIds;
+    }
+
+    /**
+     * Render JavaScript template for disabling carrier options
+     *
+     * @param array $carriers Array of carrier data
+     *
+     * @return string Rendered JavaScript code
+     *
+     * @throws \SmartyException
+     */
+    private function renderDisableCarriersScript(array $carriers): string
+    {
+        $smarty = \Context::getContext()->smarty;
+        $smarty->assign('disabledCarriers', $this->getDisabledCarrierIds($carriers));
+
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/disableCarrierOptions.tpl');
+    }
+
     /**
      * Tested versions:
      * 1.6.0.6 - malformed form action
@@ -94,8 +127,14 @@ class CarrierAdminForm
             return null;
         }
 
+        $carrierNotValidAnymoreMessage = $this->module->l('This carrier can no longer be selected. Packeta does not support delivery via this carrier anymore.', 'carrieradminform');
         if (\Tools::isSubmit('submitCarrierForm')) {
             $carrierData['id_branch'] = \Tools::getValue('id_branch');
+            if ($this->apiRepository->isPacketaCarrierEnabled($carrierData['id_branch']) === false) {
+                $this->error = $carrierNotValidAnymoreMessage;
+
+                return null;
+            }
             $this->saveCarrier($carrierData);
         }
 
@@ -103,7 +142,21 @@ class CarrierAdminForm
             $carrierData['name'] = CarrierTools::getCarrierNameFromShopName();
         }
 
-        list($availableCarriers, $warning) = $this->getAvailableCarriers($carrierData);
+        [$carriersByCountries, $warning] = $this->getAvailableCarriers($carrierData);
+
+        $availableCarriers = [];
+        foreach ($carriersByCountries as $carrierRow) {
+            $carrierId = $carrierRow['id'];
+            $enabled = $this->apiRepository->isPacketaCarrierEnabled($carrierId);
+
+            if ($carrierId === null || $enabled === true || $carrierId === $carrierData['id_branch']) {
+                $availableCarriers[] = [
+                    'id' => $carrierId,
+                    'name' => $carrierRow['name'],
+                    'disabled' => !$enabled,
+                ];
+            }
+        }
 
         $helper = new \HelperForm();
         $form = [
@@ -125,6 +178,11 @@ class CarrierAdminForm
                                 'name' => 'name',
                             ],
                         ],
+                        [
+                            'type' => 'html',
+                            'name' => 'disable_options_script',
+                            'html_content' => $this->renderDisableCarriersScript($availableCarriers),
+                        ],
                     ],
                     'buttons' => [
                         $this->getBackButton(),
@@ -134,7 +192,9 @@ class CarrierAdminForm
                         'class' => 'btn btn-default pull-right',
                         'name' => 'submitCarrierForm',
                     ],
-                    'warning' => $warning,
+                    'warning' => $this->apiRepository->isPacketaCarrierEnabled($carrierData['id_branch']) === false
+                        ? $carrierNotValidAnymoreMessage
+                        : $warning,
                 ],
             ],
         ];
@@ -209,7 +269,7 @@ class CarrierAdminForm
                     ],
                 ];
             }
-        } elseif (!empty($possibleVendors)) {
+        } elseif (count($possibleVendors) > 0) {
             $formInputs[] = [
                 'name' => 'allowed_vendors',
                 'label' => $this->module->l('Allowed pickup point types', 'carrieradminform'),
@@ -479,7 +539,10 @@ class CarrierAdminForm
             $warning = sprintf($this->module->l('The Packeta carrier selected for method "%s" does not deliver to any of its active countries.', 'carrieradminform'), $carrierData['name']);
             $orphanData = $this->apiRepository->getById($carrierData['id_branch']);
             if ($orphanData) {
-                $availableCarriers[] = $orphanData;
+                $availableCarriers[] = [
+                    'id' => $orphanData['id'],
+                    'name' => $orphanData['name'],
+                ];
             }
         }
 
@@ -619,11 +682,9 @@ class CarrierAdminForm
      * @param array $carrierData
      * @param array|null $apiCarrier
      *
-     * @return string
-     *
      * @throws DatabaseException
      */
-    public function getDefaultAllowedVendors(array $carrierData, $apiCarrier)
+    public function getDefaultAllowedVendors(array $carrierData, $apiCarrier): ?string
     {
         $allowedVendorsJson = null;
         if ($carrierData['id_branch'] === \Packetery::ZPOINT || $carrierData['id_branch'] === \Packetery::PP_ALL) {
