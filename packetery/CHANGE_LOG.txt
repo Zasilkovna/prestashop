@@ -2,10 +2,10 @@
 v3.4
        - Updated: Make compatible with feed v5
        - Updated: Add available flag to import Packeta carriers from the feed (manual/cron), do not include not available or deleted carriers in lists.
-       - Updated: When Packeta pick-up point selected using widget, save and display proper information about place, street, city, zip (front/admin)
-       - Updated: Display proper information in Packeta Orders administration list and detail
+       - Updated: Adjusted the display of selected pick-up point information in checkout, order list, and order detail.
        - Updated: If Packeta pick-up point list is not loaded correctly in administration Order detail, log error and do not display button for choose pick-up point/change address.
-       - Added: Information about the selected pickup point to emails for e-shop owner.
+       - Added: Support for the ps_emailalerts module – selected pickup point information is now included in e-mails sent to the e-shop owner.
+       - Added: Option to set a custom label note in plugin settings with support for placeholders {{order-id}} and {{order-reference}}.
        - Updated: Loading the widget javascript library only on the checkout page.
        - Updated: Multiple issues form PrestaShop validator resolved.
        - Updated: Added company to shipment submission via API.
