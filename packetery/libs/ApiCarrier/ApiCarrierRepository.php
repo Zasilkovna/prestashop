@@ -61,6 +61,11 @@ class ApiCarrierRepository
         'currency' => ['defaultPPValue' => ''],
         'max_weight' => ['defaultPPValue' => 10],
         'deleted' => ['defaultPPValue' => false],
+        'available' => [
+            'apiName' => 'available',
+            'type' => 'bool',
+            'defaultPPValue' => true,
+        ],
     ];
 
     /** @var DbTools */
@@ -81,7 +86,7 @@ class ApiCarrierRepository
         $this->dbTools = $dbTools;
     }
 
-    private function getPrefixedTableName()
+    private function getPrefixedTableName(): string
     {
         return _DB_PREFIX_ . self::$tableName;
     }
@@ -161,7 +166,7 @@ class ApiCarrierRepository
         $this->setOthersAsDeleted($carriersInFeed);
     }
 
-    public function getCreateTableSql()
+    public function getCreateTableSql(): string
     {
         return 'CREATE TABLE `' . $this->getPrefixedTableName() . '` (
             `id` varchar(255) NOT NULL,
@@ -178,11 +183,12 @@ class ApiCarrierRepository
             `currency` varchar(255) NOT NULL,
             `max_weight` float NOT NULL,
             `deleted` boolean NOT NULL,
+            `available` tinyint(1) NOT NULL DEFAULT 1,
             UNIQUE (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
     }
 
-    public function getDropTableSql()
+    public function getDropTableSql(): string
     {
         return 'DROP TABLE IF EXISTS `' . $this->getPrefixedTableName() . '`;';
     }
@@ -210,11 +216,16 @@ class ApiCarrierRepository
     }
 
     /**
+     * Gets all carriers ids, including deleted and non-available
+     *
      * @throws DatabaseException
      */
     public function getCarrierIds()
     {
-        return $this->dbTools->getRows('SELECT `id` FROM `' . $this->getPrefixedTableName() . '`');
+        return $this->dbTools->getRows(
+            'SELECT `id`
+            FROM `' . $this->getPrefixedTableName() . '`'
+        );
     }
 
     /**
@@ -231,50 +242,22 @@ class ApiCarrierRepository
     }
 
     /**
-     * @return int
-     *
      * @throws DatabaseException
      */
-    public function getAdAndExternalCount()
+    public function getAdAndExternalCount(): int
     {
-        $result = $this->dbTools->getValue('SELECT COUNT(*) FROM `' . $this->getPrefixedTableName() . '`');
+        $result = $this->dbTools->getValue(
+            'SELECT COUNT(*)
+            FROM `' . $this->getPrefixedTableName() . '`
+            WHERE `deleted` = 0
+            AND `available` = 1'
+        );
+
         if ($result > 0) {
             return (int) $result;
         }
 
         return 0;
-    }
-
-    /**
-     * @return array
-     *
-     * @throws DatabaseException
-     */
-    public function getAdAndExternalCarriers()
-    {
-        $sql = 'SELECT `id`, `name`, `country`, `currency`, `is_pickup_points`
-                FROM `' . $this->getPrefixedTableName() . '`
-                WHERE `deleted` = 0
-                ORDER BY `country`, `name`';
-        $result = $this->dbTools->getRows($sql);
-        $carriers = [];
-        if ($result) {
-            foreach ($result as $carrier) {
-                if ($carrier['id'] === \Packetery::ZPOINT) {
-                    $pickupPointType = 'internal';
-                } else {
-                    $pickupPointType = ($carrier['is_pickup_points'] ? 'external' : null);
-                }
-                $carriers[] = [
-                    'id_branch' => $carrier['id'],
-                    'name' => $carrier['name'],
-                    'currency' => $carrier['currency'],
-                    'pickup_point_type' => $pickupPointType,
-                ];
-            }
-        }
-
-        return $carriers;
     }
 
     /**
@@ -288,10 +271,12 @@ class ApiCarrierRepository
     {
         $countryIsoCodesSql = '"' . implode('","', $countryIsoCodes) . '"';
 
-        return $this->dbTools->getRows('SELECT `id`, `name`
+        return $this->dbTools->getRows(
+            'SELECT `id`, `name`
             FROM `' . $this->getPrefixedTableName() . '`
-            WHERE `country` IN (' . $countryIsoCodesSql . ') OR `country` = ""
-            ORDER BY `country`, `name`');
+            WHERE (`country` IN (' . $countryIsoCodesSql . ') OR `country` = "")
+            ORDER BY `country`, `name`'
+        );
     }
 
     /**
@@ -303,9 +288,17 @@ class ApiCarrierRepository
      */
     public function getById($id)
     {
-        return $this->dbTools->getRow('SELECT `id`, `name`, `currency`, `is_pickup_points`, `country`, `disallows_cod`, `requires_size`
+        return $this->dbTools->getRow(
+            'SELECT `id`,
+                `name`,
+                `currency`,
+                `is_pickup_points`,
+                `country`,
+                `disallows_cod`,
+                `requires_size`
             FROM `' . $this->getPrefixedTableName() . '`
-            WHERE `id` = "' . $this->dbTools->db->escape($id) . '"');
+            WHERE `id` = "' . $this->dbTools->db->escape($id) . '"'
+        );
     }
 
     /**
@@ -316,8 +309,12 @@ class ApiCarrierRepository
     public function getExternalPickupPointCountries()
     {
         $result = $this->dbTools->getRows(
-            'SELECT `country` FROM `' . $this->getPrefixedTableName() . '`
-            WHERE `deleted` = 0 AND `is_pickup_points` = 1 AND `country` != ""
+            'SELECT `country`
+            FROM `' . $this->getPrefixedTableName() . '`
+            WHERE `is_pickup_points` = 1
+            AND `country` != ""
+            AND `deleted` = 0
+            AND `available` = 1
             GROUP BY `country`'
         );
 
@@ -330,7 +327,37 @@ class ApiCarrierRepository
     public function isExternalPickupPointCarrier(int $carrierId): bool
     {
         $result = $this->dbTools->getValue(
-            'SELECT 1 FROM `' . $this->getPrefixedTableName() . '` WHERE `is_pickup_points` = 1 AND `id` = "' . $this->dbTools->db->escape($carrierId) . '"'
+            'SELECT 1
+            FROM `' . $this->getPrefixedTableName() . '`
+            WHERE `is_pickup_points` = 1
+            AND `id` = "' . $this->dbTools->db->escape($carrierId) . '"'
+        );
+
+        return (int) $result === 1;
+    }
+
+    /**
+     * Check if Packeta carrier is enabled (available and not deleted)
+     * Empty/null means no carrier is selected yet - this is a valid state
+     *
+     * @param int|string|null $carrierId Carrier ID to check
+     *
+     * @return bool Returns true if enabled or Empty/null
+     *
+     * @throws DatabaseException
+     */
+    public function isPacketaCarrierEnabled($carrierId): bool
+    {
+        if ($carrierId === '' || $carrierId === null) {
+            return true;
+        }
+
+        $result = $this->dbTools->getValue(
+            'SELECT 1
+            FROM `' . $this->getPrefixedTableName() . '`
+            WHERE `id` = "' . $this->dbTools->db->escape((string) $carrierId) . '"
+            AND `available` = 1
+            AND `deleted` = 0'
         );
 
         return (int) $result === 1;
