@@ -1,15 +1,13 @@
-
-v3.4
-       - Updated: Make compatible with feed v5
-       - Updated: Add available flag to import Packeta carriers from the feed (manual/cron), do not include not available or deleted carriers in lists.
+3.4.0  - Updated: Made compatible with feed v5.
+       - Updated: Add `available` flag to import Packeta carriers from the feed (manual/cron), do not include not available or deleted carriers in lists.
        - Updated: Adjusted the display of selected pick-up point information in checkout, order list, and order detail.
-       - Updated: If Packeta pick-up point list is not loaded correctly in administration Order detail, log error and do not display button for choose pick-up point/change address.
-       - Added: Support for the ps_emailalerts module – selected pickup point information is now included in e-mails sent to the e-shop owner.
+       - Updated: If the Packeta pick-up point list is not loaded correctly in the administration Order detail, log the error and do not display the button for choosing a pick-up point or to change the address.
+       - Added: Support for the ps_emailalerts module – selected pick-up point information is now included in e-mails sent to the e-shop owner.
        - Added: Option to set a custom label note in plugin settings with support for placeholders {{order-id}} and {{order-reference}}.
-       - Updated: Loading the widget javascript library only on the checkout page.
-       - Updated: Multiple issues form PrestaShop validator resolved.
+       - Updated: Loading the widget JavaScript library only on the checkout page.
+       - Updated: Multiple issues from PrestaShop validator resolved.
        - Updated: Added company to shipment submission via API.
-       - Updated: Removed czech language from slovak translations.
+       - Updated: Removed Czech language from Slovak translations.
 3.3.0  - Added: Support for PrestaShop 9.
        - Added: The option to enable API validation of the pickup location in the cart.
        - Added: The ability to cancel a shipment before it has been shipped.
