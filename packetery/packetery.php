@@ -526,7 +526,7 @@ class Packetery extends CarrierModule
                 'title' => $this->l('Carrier label note'),
                 'required' => false,
                 'desc' => sprintf(
-                    $this->l('You can enter the packet note. At %s is described carriers support list and maximal note length. You can use {{order-id}} as order id and {{order-reference}} as order code.'),
+                    $this->l('Here you can enter a note for the shipping label. A list of carriers that support label notes is available at %s. You can use {{order-id}} for the order number and {{order-reference}} for the order code.'),
                     '<a href="https://docs.packeta.com/docs/label-printing/carrier-label">Packeta API Documentation</a>'
                 ),
                 'cols' => 8,
@@ -1771,7 +1771,7 @@ class Packetery extends CarrierModule
     private function getValidWidgetOptions(array $widgetOptions, int $orderId): ?string
     {
         $logMessage = sprintf(
-            $this->l('Can not change delivery place in administration detail for order id %d, please copy this log to %s.'),
+            $this->l('The pickup point could not be changed in the order details for order ID %d. Please send us this error to email: %s.'),
             $orderId,
             self::PACKETA_SUPPORT_EMAIL
         );
