@@ -1,3 +1,4 @@
+       - Fixed: Fix error during the export of Packeta order list.
        - Update: Packetery configuration section divided into two tabs.
        - Added: Log Packeta widget parameters to the developers console.
 3.4.0  - Updated: Made compatible with feed v5.
