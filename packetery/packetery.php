@@ -28,6 +28,8 @@ class Packetery extends CarrierModule
 
     private const PACKETA_SUPPORT_EMAIL = 'e-commerce.support@packeta.com';
 
+    public const MODULE_SLUG = 'packetery';
+
     protected $config_form = false;
 
     /** @var Packetery\DI\Container */
@@ -35,7 +37,7 @@ class Packetery extends CarrierModule
 
     public function __construct()
     {
-        $this->name = 'packetery';
+        $this->name = self::MODULE_SLUG;
         $this->tab = 'shipping_logistics';
         $this->version = '3.4.0';
         $this->author = 'Packeta s.r.o.';
@@ -783,8 +785,8 @@ class Packetery extends CarrierModule
             $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
             $this->context->smarty->assign('packeta_api_key', $configHelper->getApiKey());
         }
-        if (isset($params['packetery']['template'])) {
-            $template = $params['packetery']['template'];
+        if (isset($params[self::MODULE_SLUG]['template'])) {
+            $template = $params[self::MODULE_SLUG]['template'];
         }
         $this->context->smarty->assign('localPath', $this->local_path);
 
@@ -831,6 +833,23 @@ class Packetery extends CarrierModule
 
         /** @var Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
+
+        $checkoutControllerPath = null;
+        /** @var \Packetery\Tools\CheckoutControllerUrlProvider $checkoutControllerUrlProvider */
+        $checkoutControllerUrlProvider = $this->diContainer->get(\Packetery\Tools\CheckoutControllerUrlProvider::class);
+        try {
+            $checkoutControllerPath = $checkoutControllerUrlProvider->getPath();
+        } catch (\Packetery\Exceptions\CheckoutControllerUrlException $contextUnavailableException) {
+            PrestaShopLogger::addLog(
+                $contextUnavailableException->getMessage(),
+                PrestaShopLoggerCore::LOG_SEVERITY_LEVEL_ERROR,
+                null,
+                null,
+                null,
+                true
+            );
+        }
+
         $this->context->smarty->assign('packetaModuleConfig', json_encode([
             'baseUri' => Packetery\Module\Helper::getBaseUri(),
             'apiKey' => $configHelper->getApiKey(),
@@ -841,6 +860,7 @@ class Packetery extends CarrierModule
             'shopLanguage' => $shopLanguage,
             'customerCountry' => $customerCountry,
             'deliveryPointCarrierIds' => $deliveryPointCarrierIds,
+            'checkoutControllerPath' => $checkoutControllerPath,
 
             /*
              * PS 1.6 OPC re-creates the list of shipping methods, throwing out extra content in the process.
