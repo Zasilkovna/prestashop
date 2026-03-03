@@ -829,6 +829,22 @@ class Packetery extends CarrierModule
         $cartService = $this->diContainer->get(Packetery\Cart\CartService::class);
         $isAgeVerificationRequired = $cartService->isAgeVerificationRequired($cart);
 
+        $checkoutControllerPath = null;
+        /** @var \Packetery\Tools\CheckoutControllerUrlProvider $checkoutControllerUrlProvider */
+        $checkoutControllerUrlProvider = $this->diContainer->get(\Packetery\Tools\CheckoutControllerUrlProvider::class);
+        try {
+            $checkoutControllerPath = $checkoutControllerUrlProvider->getPath();
+        } catch (\Packetery\Exceptions\CheckoutControllerUrlException $contextUnavailableException) {
+            PrestaShopLogger::addLog(
+                $contextUnavailableException->getMessage(),
+                PrestaShopLoggerCore::LOG_SEVERITY_LEVEL_ERROR,
+                null,
+                null,
+                null,
+                true
+            );
+        }
+
         /** @var Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
         $this->context->smarty->assign('packetaModuleConfig', json_encode([
@@ -841,6 +857,7 @@ class Packetery extends CarrierModule
             'shopLanguage' => $shopLanguage,
             'customerCountry' => $customerCountry,
             'deliveryPointCarrierIds' => $deliveryPointCarrierIds,
+            'checkoutControllerPath' => $checkoutControllerPath,
 
             /*
              * PS 1.6 OPC re-creates the list of shipping methods, throwing out extra content in the process.

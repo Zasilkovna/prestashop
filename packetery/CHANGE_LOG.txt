@@ -1,4 +1,5 @@
-3.4.0  - Updated: Made compatible with feed v5.
+3.4.0  - Fixed: Correct Ajax behavior in checkout if friendly URLs are not enabled.
+       - Updated: Made compatible with feed v5.
        - Updated: Add `available` flag to import Packeta carriers from the feed (manual/cron), do not include not available or deleted carriers in lists.
        - Updated: Adjusted the display of selected pick-up point information in checkout, order list, and order detail.
        - Updated: If the Packeta pick-up point list is not loaded correctly in the administration Order detail, log the error and do not display the button for choosing a pick-up point or to change the address.
