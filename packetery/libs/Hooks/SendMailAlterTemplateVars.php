@@ -50,7 +50,7 @@ class SendMailAlterTemplateVars
 
     private function isOrderPage(array $params): bool
     {
-        return isset($params['template']) && str_contains((string) $params['template'], 'order');
+        return isset($params['template']) && strpos((string) $params['template'], 'order') !== false;
     }
 
     private function hasCarrier(array $params): bool
