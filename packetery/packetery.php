@@ -61,7 +61,6 @@ class Packetery extends CarrierModule
 
         parent::__construct();
 
-        $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
         $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
         $desc .= $this->l('Export orders to Packeta system.');
 
