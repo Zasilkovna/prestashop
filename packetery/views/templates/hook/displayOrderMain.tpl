@@ -28,7 +28,7 @@
                         <br>
                         {if $pointOrderAddressName}
                             {$pointOrderAddressName}
-                            {if pointOrderAddress}
+                            {if $pointOrderAddress}
                                 <br>
                                 {$pointOrderAddress}
                             {/if}
@@ -68,7 +68,7 @@
                     <strong class="picked-delivery-place">
                         {if $pointOrderAddressName}
                             {$pointOrderAddressName}
-                            {if pointOrderAddress}
+                            {if $pointOrderAddress}
                                 <br>
                                 {$pointOrderAddress}
                             {/if}
