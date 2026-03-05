@@ -998,12 +998,27 @@ class Packetery extends CarrierModule
         /** @var Packetery\Carrier\CarrierRepository $carrierRepository */
         $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int) $packeteryOrder['id_carrier']);
+
         if ((bool) $packeteryCarrier === false) {
             $oldCarrier = new Carrier($packeteryOrder['id_carrier']);
             $newCarrier = Carrier::getCarrierByReference($oldCarrier->id_reference);
             if ($newCarrier) {
                 $packeteryCarrier = $carrierRepository->getPacketeryCarrierById($newCarrier->id);
             }
+        }
+
+        $originalCarrierIdBranch = (int)$packeteryOrder['id_branch'];
+        if ($originalCarrierIdBranch !== (int)$packeteryCarrier['id_branch']) {
+            /** @var Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
+            $apiCarrierRepository = $this->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
+            $originalPacketeryCarrier = $apiCarrierRepository->getById($originalCarrierIdBranch);
+
+            $packeteryCarrier['id_carrier'] = (int)$originalPacketeryCarrier['id'];
+            $packeteryCarrier['id_branch'] = $originalCarrierIdBranch;
+            $packeteryCarrier['name_branch'] = $originalPacketeryCarrier['name'];
+            $packeteryCarrier['currency_branch'] = $originalPacketeryCarrier['currency'];
+            $packeteryCarrier['pickup_point_type'] = $originalPacketeryCarrier['is_pickup_points'] ? 'external' : 'internal';
+            $packeteryCarrier['is_cod'] = (int)$originalPacketeryCarrier['disallows_cod'] === 1 ? 0 : 1;
         }
 
         /** @var Packetery\Order\OrderDetailView $orderDetailView */
@@ -1654,7 +1669,7 @@ class Packetery extends CarrierModule
                 if ($carrier['name'] === '0') {
                     $carrier['name'] = Packetery\Carrier\CarrierTools::getCarrierNameFromShopName();
                 }
-                list($carrierZones, $carrierCountries) = $carrierTools->getZonesAndCountries(
+                [$carrierZones, $carrierCountries] = $carrierTools->getZonesAndCountries(
                     $carrier['id_carrier']
                 );
                 $carrier['zones'] = implode(', ', array_column($carrierZones, 'name'));
