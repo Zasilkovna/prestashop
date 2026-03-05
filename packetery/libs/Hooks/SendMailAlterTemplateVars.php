@@ -11,6 +11,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use Packetery\ApiCarrier\ApiCarrierRepository;
+use Packetery\Carrier\CarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Order\OrderRepository;
 
@@ -19,10 +21,20 @@ class SendMailAlterTemplateVars
     /** @var OrderRepository */
     private $orderRepository;
 
+    /** @var CarrierRepository */
+    private $carrierRepository;
+
+    /** @var ApiCarrierRepository */
+    private $apiCarrierRepository;
+
     public function __construct(
-        OrderRepository $orderRepository
+        OrderRepository $orderRepository,
+        CarrierRepository $carrierRepository,
+        ApiCarrierRepository $apiCarrierRepository
     ) {
         $this->orderRepository = $orderRepository;
+        $this->carrierRepository = $carrierRepository;
+        $this->apiCarrierRepository = $apiCarrierRepository;
     }
 
     /**
@@ -42,10 +54,24 @@ class SendMailAlterTemplateVars
         }
 
         $orderData = $this->getOrderData($params);
-        if ($orderData !== null) {
-            $additionalCarrierData = $this->getAdditionalCarrierInfo($orderData);
-            $params['template_vars']['{carrier}'] .= $additionalCarrierData;
+        if ($orderData === null) {
+            return;
         }
+
+        $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int) $orderData['id_carrier']);
+        if (
+            (int) $orderData['is_ad'] === 0
+            && (int) $orderData['is_carrier'] === 1
+            && isset($packeteryCarrier['id_branch'])
+            && $packeteryCarrier['id_branch'] !== $orderData['id_branch']
+        ) {
+            $originalPacketeryCarrier = $this->apiCarrierRepository->getById($orderData['id_branch']);
+            if ($originalPacketeryCarrier) {
+                $params['template_vars']['{carrier}'] = $originalPacketeryCarrier['name'];
+            }
+        }
+
+        $params['template_vars']['{carrier}'] .= $this->getAdditionalCarrierInfo($orderData);
     }
 
     private function isOrderPage(array $params): bool

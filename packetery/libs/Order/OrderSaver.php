@@ -80,32 +80,33 @@ class OrderSaver
         }
     }
 
-    /**
-     * @param PrestaShopOrder $order
-     * @param array $packeteryCarrier
-     * @param bool $overwritePickupPoint
-     */
-    public function save(PrestaShopOrder $order, array $packeteryCarrier, $overwritePickupPoint = false)
+    public function save(PrestaShopOrder $order, array $packeteryCarrier, bool $overwritePickupPoint = false): void
     {
         $data = [
             'id_cart' => (int) $order->id_cart,
             'id_order' => (int) $order->id,
             'id_carrier' => $packeteryCarrier['id_carrier'],
         ];
+
+        $existingOrder = $this->orderRepository->getByCart((int) $order->id_cart);
         if ($packeteryCarrier['pickup_point_type'] === null) {
-            $data['id_branch'] = ($packeteryCarrier['id_branch'] ?: null);
-            $data['name_branch'] = $packeteryCarrier['name_branch'];
-            $data['currency_branch'] = $packeteryCarrier['currency_branch'];
-            $data['is_ad'] = 1;
-        } else {
-            $isPacketeryOrder = $this->orderRepository->existsByCart($data['id_cart']);
-            if (!$isPacketeryOrder || $overwritePickupPoint) {
-                $data['id_branch'] = null;
-                $data['name_branch'] = null;
-                $data['currency_branch'] = '';
-                $data['is_ad'] = 0;
+            $hasExistingSameCarrier = $existingOrder && (int) $existingOrder['id_carrier'] === (int) $packeteryCarrier['id_carrier'];
+            if (
+                !$hasExistingSameCarrier
+                || ((int) $existingOrder['is_ad'] !== 0 && (int) $existingOrder['id_branch'] === (int) $packeteryCarrier['id_branch'])
+            ) {
+                $data['id_branch'] = $packeteryCarrier['id_branch'] ?: null;
+                $data['name_branch'] = $packeteryCarrier['name_branch'];
+                $data['currency_branch'] = $packeteryCarrier['currency_branch'];
+                $data['is_ad'] = 1;
             }
+        } elseif (!$existingOrder || $overwritePickupPoint) {
+            $data['id_branch'] = null;
+            $data['name_branch'] = null;
+            $data['currency_branch'] = '';
+            $data['is_ad'] = 0;
         }
+
         if ($overwritePickupPoint) {
             $data['is_carrier'] = 0;
             $data['carrier_pickup_point'] = null;

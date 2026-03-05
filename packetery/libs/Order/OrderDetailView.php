@@ -63,29 +63,17 @@ class OrderDetailView
     }
 
     /**
-     * @param array $packeteryOrder
-     * @param bool $isCarrier
-     * @param bool $isAddressDelivery
-     * @param string|null $packeteryCarrierNameBranch
-     *
      * @return array<int, string|null>
      */
     public function getPickupPointOrDeliveryAddress(
         array $packeteryOrder,
-        bool $isCarrier,
         bool $isAddressDelivery,
-        ?string $packeteryCarrierNameBranch
+        ?string $fallbackCarrierNameBranch
     ): array {
-        $pointOrderAddressName = $packeteryCarrierNameBranch ?? $packeteryOrder['name_branch'];
+        $pointOrderAddressName = $packeteryOrder['name_branch'];
         $pointOrderAddress = null;
 
-        if ($isCarrier === true && $isAddressDelivery === false) {
-            $pointOrderAddressName = $packeteryCarrierNameBranch;
-            $pointOrderAddress = $packeteryOrder['name_branch'];
-        }
-
-        if ($isCarrier === false && $isAddressDelivery === false) {
-            $pointOrderAddressName = $packeteryOrder['name_branch'];
+        if ($isAddressDelivery === false) {
             if ($packeteryOrder['point_place']) {
                 $pointOrderAddressName = $packeteryOrder['point_place'];
             }
@@ -99,6 +87,11 @@ class OrderDetailView
                 $pointOrderAddress .= ($packeteryOrder['point_city'] ? $packeteryOrder['point_city'] . ' ' : '');
                 $pointOrderAddress .= ($packeteryOrder['point_zip'] ? $packeteryOrder['point_zip'] . ' ' : '');
             }
+        }
+
+        if ($pointOrderAddress === null && $fallbackCarrierNameBranch !== null) {
+            $pointOrderAddress = $pointOrderAddressName;
+            $pointOrderAddressName = $fallbackCarrierNameBranch;
         }
 
         return [$pointOrderAddressName, $pointOrderAddress];
