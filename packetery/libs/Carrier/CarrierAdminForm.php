@@ -1,14 +1,19 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Carrier;
 
-use Country;
-use HelperForm;
-use Packetery;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\MessageManager;
-use Tools;
 
 class CarrierAdminForm
 {
@@ -18,27 +23,27 @@ class CarrierAdminForm
     private $error;
 
     /**
-     * @var CarrierVendors $vendors
+     * @var CarrierVendors
      */
     private $vendors;
 
     /**
-     * @var CarrierRepository $repository
+     * @var CarrierRepository
      */
     private $repository;
 
     /**
-     * @var ApiCarrierRepository $apiRepository
+     * @var ApiCarrierRepository
      */
     private $apiRepository;
 
     /**
-     * @var CarrierTools $tools
+     * @var CarrierTools
      */
     private $tools;
 
     /**
-     * @var MessageManager $messageManager
+     * @var MessageManager
      */
     private $messageManager;
 
@@ -48,7 +53,7 @@ class CarrierAdminForm
      * CarrierAdminForm constructor.
      *
      * @param int $carrierId
-     * @param Packetery $module
+     * @param \Packetery $module
      */
     public function __construct($carrierId, $module)
     {
@@ -59,6 +64,39 @@ class CarrierAdminForm
         $this->apiRepository = $this->module->diContainer->get(ApiCarrierRepository::class);
         $this->tools = $this->module->diContainer->get(CarrierTools::class);
         $this->messageManager = $this->module->diContainer->get(MessageManager::class);
+    }
+
+    private function getDisabledCarrierIds(array $carriers): array
+    {
+        $disabledIds = [];
+        foreach ($carriers as $carrier) {
+            if (!isset($carrier['disabled'], $carrier['id'])) {
+                continue;
+            }
+
+            if ($carrier['disabled'] === true) {
+                $disabledIds[] = $carrier['id'];
+            }
+        }
+
+        return $disabledIds;
+    }
+
+    /**
+     * Render JavaScript template for disabling carrier options
+     *
+     * @param array $carriers Array of carrier data
+     *
+     * @return string Rendered JavaScript code
+     *
+     * @throws \SmartyException
+     */
+    private function renderDisableCarriersScript(array $carriers): string
+    {
+        $smarty = \Context::getContext()->smarty;
+        $smarty->assign('disabledCarriers', $this->getDisabledCarrierIds($carriers));
+
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/disableCarrierOptions.tpl');
     }
 
     /**
@@ -77,6 +115,7 @@ class CarrierAdminForm
 
     /**
      * @return string|null
+     *
      * @throws DatabaseException
      */
     public function buildCarrierForm()
@@ -84,11 +123,18 @@ class CarrierAdminForm
         $carrierData = $this->repository->getById($this->carrierId);
         if (!$carrierData) {
             $this->error = $this->module->l('Failed to load carrier.', 'carrieradminform');
+
             return null;
         }
 
-        if (Tools::isSubmit('submitCarrierForm')) {
-            $carrierData['id_branch'] = Tools::getValue('id_branch');
+        $carrierNotValidAnymoreMessage = $this->module->l('This carrier can no longer be selected. Packeta does not support delivery via this carrier anymore.', 'carrieradminform');
+        if (\Tools::isSubmit('submitCarrierForm')) {
+            $carrierData['id_branch'] = \Tools::getValue('id_branch');
+            if ($this->apiRepository->isPacketaCarrierEnabled($carrierData['id_branch']) === false) {
+                $this->error = $carrierNotValidAnymoreMessage;
+
+                return null;
+            }
             $this->saveCarrier($carrierData);
         }
 
@@ -96,9 +142,23 @@ class CarrierAdminForm
             $carrierData['name'] = CarrierTools::getCarrierNameFromShopName();
         }
 
-        list($availableCarriers, $warning) = $this->getAvailableCarriers($carrierData);
+        [$carriersByCountries, $warning] = $this->getAvailableCarriers($carrierData);
 
-        $helper = new HelperForm();
+        $availableCarriers = [];
+        foreach ($carriersByCountries as $carrierRow) {
+            $carrierId = $carrierRow['id'];
+            $enabled = $this->apiRepository->isPacketaCarrierEnabled($carrierId);
+
+            if ($carrierId === null || $enabled === true || $carrierId === $carrierData['id_branch']) {
+                $availableCarriers[] = [
+                    'id' => $carrierId,
+                    'name' => $carrierRow['name'],
+                    'disabled' => !$enabled,
+                ];
+            }
+        }
+
+        $helper = new \HelperForm();
         $form = [
             [
                 'form' => [
@@ -118,6 +178,11 @@ class CarrierAdminForm
                                 'name' => 'name',
                             ],
                         ],
+                        [
+                            'type' => 'html',
+                            'name' => 'disable_options_script',
+                            'html_content' => $this->renderDisableCarriersScript($availableCarriers),
+                        ],
                     ],
                     'buttons' => [
                         $this->getBackButton(),
@@ -127,7 +192,9 @@ class CarrierAdminForm
                         'class' => 'btn btn-default pull-right',
                         'name' => 'submitCarrierForm',
                     ],
-                    'warning' => $warning,
+                    'warning' => $this->apiRepository->isPacketaCarrierEnabled($carrierData['id_branch']) === false
+                        ? $carrierNotValidAnymoreMessage
+                        : $warning,
                 ],
             ],
         ];
@@ -138,6 +205,7 @@ class CarrierAdminForm
 
     /**
      * @return string|null
+     *
      * @throws DatabaseException
      */
     public function buildCarrierOptionsForm()
@@ -145,6 +213,7 @@ class CarrierAdminForm
         $carrierData = $this->repository->getById($this->carrierId);
         if (!$carrierData) {
             $this->error = $this->module->l('Failed to load carrier.', 'carrieradminform');
+
             return null;
         }
 
@@ -157,14 +226,14 @@ class CarrierAdminForm
             $carrierData['name'] = CarrierTools::getCarrierNameFromShopName();
         }
 
-        if (Tools::isSubmit('submitCarrierOptionsForm')) {
+        if (\Tools::isSubmit('submitCarrierOptionsForm')) {
             $this->saveCarrierOptions($carrierData, $apiCarrier);
         }
 
         $possibleVendors = $this->getPossibleVendors($carrierData);
         $formInputs = [];
 
-        if ((bool)$apiCarrier['is_pickup_points'] === false) {
+        if ((bool) $apiCarrier['is_pickup_points'] === false) {
             $validationPossible = false;
             // It would be better to follow the country of the carrier, but we don't want to find it out from the name.
             // There is another check on the frontend.
@@ -200,7 +269,7 @@ class CarrierAdminForm
                     ],
                 ];
             }
-        } elseif (!empty($possibleVendors)) {
+        } elseif (count($possibleVendors) > 0) {
             $formInputs[] = [
                 'name' => 'allowed_vendors',
                 'label' => $this->module->l('Allowed pickup point types', 'carrieradminform'),
@@ -212,7 +281,7 @@ class CarrierAdminForm
             ];
         }
 
-        if ((bool)$apiCarrier['disallows_cod'] === false && (bool)$carrierData['is_cod'] === true) {
+        if ((bool) $apiCarrier['disallows_cod'] === false && (bool) $carrierData['is_cod'] === true) {
             $formInputs[] = [
                 'type' => 'radio',
                 'label' => $this->module->l('Is COD?', 'carrieradminform'),
@@ -262,7 +331,7 @@ class CarrierAdminForm
             ],
         ];
 
-        $helper = new HelperForm();
+        $helper = new \HelperForm();
         $helper->fields_value['is_cod'] = $carrierData['is_cod'];
         if ($carrierData['address_validation']) {
             $helper->fields_value['address_validation'] = $carrierData['address_validation'];
@@ -275,7 +344,9 @@ class CarrierAdminForm
 
     /**
      * @param array $carrierData
+     *
      * @return void
+     *
      * @throws DatabaseException
      */
     public function saveCarrier(array $carrierData)
@@ -284,7 +355,7 @@ class CarrierAdminForm
         if (!$apiCarrier) {
             $this->repository->deleteById($this->carrierId);
             $this->messageManager->setMessage('info', $this->module->l('Carrier has been saved.', 'carrieradminform'));
-            Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
+            \Tools::redirectAdmin($this->tools->getEditLink($this->carrierId));
         }
 
         $pickupPointType = $this->getPickupPointType($apiCarrier, $carrierData['id_branch']);
@@ -293,14 +364,14 @@ class CarrierAdminForm
         $addressValidation = null;
         $allowedVendorsJson = $this->getDefaultAllowedVendors($carrierData, $apiCarrier);
         if ($carrierData) {
-            $isCod = (bool)$carrierData['is_cod'];
+            $isCod = (bool) $carrierData['is_cod'];
             $addressValidation = $carrierData['address_validation'];
             if ($carrierData['allowed_vendors'] !== null) {
                 $allowedVendorsJson = $carrierData['allowed_vendors'];
             }
         }
 
-        if ((string)$carrierData['id_branch'] === '') {
+        if ((string) $carrierData['id_branch'] === '') {
             $this->repository->deleteById($this->carrierId);
         } else {
             $this->repository->setPacketeryCarrier(
@@ -316,28 +387,30 @@ class CarrierAdminForm
         }
 
         $this->messageManager->setMessage('info', $this->module->l('Carrier has been saved.', 'carrieradminform'));
-        Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
+        \Tools::redirectAdmin($this->tools->getEditLink($this->carrierId));
     }
 
     /**
      * @param array $carrierData
      * @param array $apiCarrier
+     *
      * @return void
+     *
      * @throws DatabaseException
      */
     public function saveCarrierOptions(array $carrierData, array $apiCarrier)
     {
-        $formData = Tools::getAllValues();
+        $formData = \Tools::getAllValues();
         $pickupPointType = $this->getPickupPointType($apiCarrier, $carrierData['id_branch']);
 
         $allowedVendors = null;
-        if ($carrierData['id_branch'] === Packetery::ZPOINT || $carrierData['id_branch'] === Packetery::PP_ALL) {
+        if ($carrierData['id_branch'] === \Packetery::ZPOINT || $carrierData['id_branch'] === \Packetery::PP_ALL) {
             $allowedVendors = $this->getAllowedVendorsFromForm($formData, $carrierData);
         }
 
         if (isset($allowedVendors['error'])) {
             $this->messageManager->setMessage('warning', $allowedVendors['error']);
-            Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
+            \Tools::redirectAdmin($this->tools->getEditLink($this->carrierId));
         }
 
         $this->repository->setPacketeryCarrier(
@@ -346,13 +419,13 @@ class CarrierAdminForm
             $apiCarrier['name'],
             $apiCarrier['currency'],
             $pickupPointType,
-            Tools::getValue('is_cod'),
-            Tools::getValue('address_validation'),
-            ($allowedVendors !== null ? json_encode($allowedVendors) : null)
+            \Tools::getValue('is_cod'),
+            \Tools::getValue('address_validation'),
+            $allowedVendors !== null ? json_encode($allowedVendors) : null
         );
 
         $this->messageManager->setMessage('info', $this->module->l('Carrier settings were saved.', 'carrieradminform'));
-        Tools::redirectAdmin(CarrierTools::getEditLink($this->carrierId));
+        \Tools::redirectAdmin($this->tools->getEditLink($this->carrierId));
     }
 
     public function getError()
@@ -375,8 +448,8 @@ class CarrierAdminForm
         $vendorsData = [];
 
         foreach ($possibleVendors as $countryCode => $vendorGroups) {
-            $countryId = Country::getByIso($countryCode);
-            $countryName = Country::getNameById($this->module->getContext()->language->id, $countryId);
+            $countryId = \Country::getByIso($countryCode);
+            $countryName = \Country::getNameById($this->module->getContext()->language->id, $countryId);
             $vendorsData[$countryCode]['countryName'] = $countryName;
 
             foreach ($vendorGroups as $vendorGroup) {
@@ -395,11 +468,13 @@ class CarrierAdminForm
 
         $smarty = new \Smarty();
         $smarty->assign('vendorsData', $vendorsData);
+
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/vendors.tpl');
     }
 
     /**
      * @param array $carrierCountries
+     *
      * @return bool
      */
     private function hasInternalCountry(array $carrierCountries)
@@ -415,6 +490,7 @@ class CarrierAdminForm
 
     /**
      * @param array $carrierCountries
+     *
      * @return bool
      */
     private function hasPickupPointCountry(array $carrierCountries)
@@ -432,7 +508,9 @@ class CarrierAdminForm
 
     /**
      * @param array $carrierData
+     *
      * @return array
+     *
      * @throws DatabaseException
      */
     public function getAvailableCarriers(array $carrierData)
@@ -449,9 +527,9 @@ class CarrierAdminForm
         $hasPickupPointCountry = $this->hasPickupPointCountry($carrierCountries);
         if (!$hasInternalCountry) {
             foreach ($availableCarriers as $index => $carrier) {
-                if ($carrier['id'] === Packetery::ZPOINT) {
+                if ($carrier['id'] === \Packetery::ZPOINT) {
                     unset($availableCarriers[$index]);
-                } elseif (!$hasPickupPointCountry && $carrier['id'] === Packetery::PP_ALL) {
+                } elseif (!$hasPickupPointCountry && $carrier['id'] === \Packetery::PP_ALL) {
                     unset($availableCarriers[$index]);
                 }
             }
@@ -461,7 +539,10 @@ class CarrierAdminForm
             $warning = sprintf($this->module->l('The Packeta carrier selected for method "%s" does not deliver to any of its active countries.', 'carrieradminform'), $carrierData['name']);
             $orphanData = $this->apiRepository->getById($carrierData['id_branch']);
             if ($orphanData) {
-                $availableCarriers[] = $orphanData;
+                $availableCarriers[] = [
+                    'id' => $orphanData['id'],
+                    'name' => $orphanData['name'],
+                ];
             }
         }
 
@@ -476,7 +557,9 @@ class CarrierAdminForm
 
     /**
      * @param array $carrierData
+     *
      * @return array|null
+     *
      * @throws DatabaseException
      */
     public function getCarrierWarning(array $carrierData)
@@ -489,12 +572,13 @@ class CarrierAdminForm
     /**
      * @param array $apiCarrier
      * @param int $idBranch
+     *
      * @return string|null
      */
     private function getPickupPointType(array $apiCarrier, $idBranch)
     {
         $pickupPointType = null;
-        if ($apiCarrier['is_pickup_points'] && $idBranch === Packetery::ZPOINT) {
+        if ($apiCarrier['is_pickup_points'] && $idBranch === \Packetery::ZPOINT) {
             $pickupPointType = 'internal';
         } elseif ($apiCarrier['is_pickup_points']) {
             $pickupPointType = 'external';
@@ -505,6 +589,7 @@ class CarrierAdminForm
 
     /**
      * @param string|null $json
+     *
      * @return array
      */
     private function getAllowedVendorsFromJson($json)
@@ -520,7 +605,9 @@ class CarrierAdminForm
     /**
      * @param array $formData
      * @param array|bool|object|null $carrierData
+     *
      * @return array|null
+     *
      * @throws DatabaseException
      */
     private function getAllowedVendorsFromForm(array $formData, $carrierData)
@@ -556,7 +643,9 @@ class CarrierAdminForm
     /**
      * @param array $carrierData
      * @param array|bool|object|null $apiCarrier
+     *
      * @return array
+     *
      * @throws DatabaseException
      */
     private function getPossibleVendors(array $carrierData, $apiCarrier = null)
@@ -568,7 +657,7 @@ class CarrierAdminForm
             $apiCarrier = $this->apiRepository->getById($carrierData['id_branch']);
         }
 
-        if ($apiCarrier['id'] === Packetery::PP_ALL || $apiCarrier['id'] === Packetery::ZPOINT) {
+        if ($apiCarrier['id'] === \Packetery::PP_ALL || $apiCarrier['id'] === \Packetery::ZPOINT) {
             $countries = $this->tools->getCountries($this->carrierId, 'iso_code');
         } else {
             $countries = [$apiCarrier['country']];
@@ -592,13 +681,13 @@ class CarrierAdminForm
     /**
      * @param array $carrierData
      * @param array|null $apiCarrier
-     * @return string
+     *
      * @throws DatabaseException
      */
-    public function getDefaultAllowedVendors(array $carrierData, $apiCarrier)
+    public function getDefaultAllowedVendors(array $carrierData, $apiCarrier): ?string
     {
         $allowedVendorsJson = null;
-        if ($carrierData['id_branch'] === Packetery::ZPOINT || $carrierData['id_branch'] === Packetery::PP_ALL) {
+        if ($carrierData['id_branch'] === \Packetery::ZPOINT || $carrierData['id_branch'] === \Packetery::PP_ALL) {
             $possibleVendors = $this->getPossibleVendors($carrierData, $apiCarrier);
             $allowedVendorsArray = [];
             // Allow all by default.
@@ -607,6 +696,7 @@ class CarrierAdminForm
             }
             $allowedVendorsJson = json_encode($allowedVendorsArray);
         }
+
         return $allowedVendorsJson;
     }
 }

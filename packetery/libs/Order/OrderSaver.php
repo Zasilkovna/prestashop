@@ -1,16 +1,23 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Order;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use CartCore as Cart;
-use Context;
 use OrderCore as PrestaShopOrder;
 use Packetery\Carrier\CarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Tools\Logger;
 use Packetery\Weight\Calculator;
-use Tools;
 
 class OrderSaver
 {
@@ -29,6 +36,9 @@ class OrderSaver
     /** @var Calculator */
     private $weightCalculator;
 
+    /** @var \Packetery */
+    private $module;
+
     /**
      * TODO: later inherit from some Base class
      *
@@ -43,13 +53,15 @@ class OrderSaver
         PaymentRepository $paymentRepository,
         Logger $logger,
         CarrierRepository $carrierRepository,
-        Calculator $weightCalculator
+        Calculator $weightCalculator,
+        \Packetery $module
     ) {
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
         $this->logger = $logger;
         $this->carrierRepository = $carrierRepository;
         $this->weightCalculator = $weightCalculator;
+        $this->module = $module;
     }
 
     /**
@@ -60,7 +72,7 @@ class OrderSaver
      */
     public function saveNewOrder(Cart $cart, PrestaShopOrder $order)
     {
-        $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int)$order->id_carrier);
+        $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int) $order->id_carrier);
         if ($packeteryCarrier) {
             $this->save($order, $packeteryCarrier);
         } else {
@@ -76,8 +88,8 @@ class OrderSaver
     public function save(PrestaShopOrder $order, array $packeteryCarrier, $overwritePickupPoint = false)
     {
         $data = [
-            'id_cart' => (int)$order->id_cart,
-            'id_order' => (int)$order->id,
+            'id_cart' => (int) $order->id_cart,
+            'id_order' => (int) $order->id,
             'id_carrier' => $packeteryCarrier['id_carrier'],
         ];
         if ($packeteryCarrier['pickup_point_type'] === null) {
@@ -101,7 +113,7 @@ class OrderSaver
 
         // Determine if is COD
         if ($order->module) {
-            $carrierIsCod = ((int)$packeteryCarrier['is_cod'] === 1);
+            $carrierIsCod = ((int) $packeteryCarrier['is_cod'] === 1);
             $paymentIsCod = $this->paymentRepository->isCod($order->module);
             $data['is_cod'] = ($carrierIsCod || $paymentIsCod);
         }
@@ -116,37 +128,42 @@ class OrderSaver
 
     /**
      * @return array with result and message
+     *
      * @throws DatabaseException
      */
     private function savePickupPointInCart()
     {
-        $cartId = Context::getContext()->cart->id;
+        $cartId = $this->module->getContext()->cart->id;
 
         if (
-            !isset($cartId) ||
-            !Tools::getIsset('id_branch') ||
-            !Tools::getIsset('name_branch') ||
-            !Tools::getIsset('currency_branch') ||
-            !Tools::getIsset('prestashop_carrier_id')
+            !isset($cartId)
+            || !\Tools::getIsset('id_branch')
+            || !\Tools::getIsset('name_branch')
+            || !\Tools::getIsset('currency_branch')
+            || !\Tools::getIsset('prestashop_carrier_id')
         ) {
             return [
                 'result' => false,
-                'message' => 'Cart id, carrier id or pickup point details are not set: ' . serialize([
-                        'cartId' => $cartId,
-                        'POST' => $_POST,
-                    ]),
+                'message' => 'Cart id, carrier id or pickup point details are not set: ' . json_encode([
+                    'cartId' => $cartId,
+                    'POST' => $_POST,
+                ]),
             ];
         }
 
-        $branchId = Tools::getValue('id_branch');
-        $branchName = Tools::getValue('name_branch');
-        $branchCurrency = Tools::getValue('currency_branch');
-        $prestashopCarrierId = Tools::getValue('prestashop_carrier_id');
-        $pickupPointType = (Tools::getIsset('pickup_point_type') ? Tools::getValue('pickup_point_type') : 'internal');
-        $widgetCarrierId = (Tools::getIsset('widget_carrier_id') ? Tools::getValue('widget_carrier_id') : null);
-        $carrierPickupPointId = (Tools::getIsset('carrier_pickup_point_id') ? Tools::getValue('carrier_pickup_point_id') : null);
+        $branchId = \Tools::getValue('id_branch');
+        $branchName = \Tools::getValue('name_branch');
+        $branchCurrency = \Tools::getValue('currency_branch');
+        $prestashopCarrierId = \Tools::getValue('prestashop_carrier_id');
+        $pickupPointType = (\Tools::getIsset('pickup_point_type') ? \Tools::getValue('pickup_point_type') : 'internal');
+        $widgetCarrierId = (\Tools::getIsset('widget_carrier_id') ? \Tools::getValue('widget_carrier_id') : null);
+        $carrierPickupPointId = (\Tools::getIsset('carrier_pickup_point_id') ? \Tools::getValue('carrier_pickup_point_id') : null);
+        $pointPlace = (\Tools::getIsset('point_place') ? \Tools::getValue('point_place') : null);
+        $pointStreet = (\Tools::getIsset('point_street') ? \Tools::getValue('point_street') : null);
+        $pointCity = (\Tools::getIsset('point_city') ? \Tools::getValue('point_city') : null);
+        $pointZip = (\Tools::getIsset('point_zip') ? \Tools::getValue('point_zip') : null);
 
-        $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int)$prestashopCarrierId);
+        $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int) $prestashopCarrierId);
         $isCod = $packeteryCarrier['is_cod'];
         if (!isset($branchCurrency, $isCod)) {
             return [
@@ -156,11 +173,11 @@ class OrderSaver
         }
 
         $packeteryOrderFields = [
-            'id_branch' => (int)$branchId,
+            'id_branch' => (int) $branchId,
             'name_branch' => $this->orderRepository->db->escape($branchName),
             'currency_branch' => $this->orderRepository->db->escape($branchCurrency),
-            'id_carrier' => (int)$prestashopCarrierId,
-            'is_cod' => (int)$isCod,
+            'id_carrier' => (int) $prestashopCarrierId,
+            'is_cod' => (int) $isCod,
             'is_ad' => 0,
             'country' => null,
             'county' => null,
@@ -170,10 +187,15 @@ class OrderSaver
             'house_number' => null,
             'latitude' => null,
             'longitude' => null,
+            'point_place' => $pointPlace !== null ? $this->orderRepository->db->escape($pointPlace) : null,
+            'point_street' => $pointStreet !== null ? $this->orderRepository->db->escape($pointStreet) : null,
+            'point_city' => $pointCity !== null ? $this->orderRepository->db->escape($pointCity) : null,
+            'point_zip' => $pointZip !== null ? $this->orderRepository->db->escape($pointZip) : null,
         ];
+
         if ($pickupPointType === 'external') {
             $packeteryOrderFields['is_carrier'] = 1;
-            $packeteryOrderFields['id_branch'] = (int)$widgetCarrierId;
+            $packeteryOrderFields['id_branch'] = (int) $widgetCarrierId;
             $packeteryOrderFields['carrier_pickup_point'] = $this->orderRepository->db->escape($carrierPickupPointId);
         } elseif ($pickupPointType === 'internal') {
             $packeteryOrderFields['is_carrier'] = 0;
@@ -181,9 +203,9 @@ class OrderSaver
 
         $isOrderSaved = $this->orderRepository->existsByCart($cartId);
         if ($isOrderSaved) {
-            $result = $this->orderRepository->updateByCart($packeteryOrderFields, (int)$cartId, true);
+            $result = $this->orderRepository->updateByCart($packeteryOrderFields, (int) $cartId, true);
         } else {
-            $packeteryOrderFields['id_cart'] = ((int)$cartId);
+            $packeteryOrderFields['id_cart'] = ((int) $cartId);
             $result = $this->orderRepository->insert($packeteryOrderFields, true);
         }
 

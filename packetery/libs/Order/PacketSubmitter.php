@@ -1,10 +1,16 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Order;
 
-use Order;
-use OrderCarrier;
-use Packetery;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\Exceptions\AggregatedException;
 use Packetery\Exceptions\ApiClientException;
 use Packetery\Exceptions\DatabaseException;
@@ -13,24 +19,17 @@ use Packetery\Log\LogRepository;
 use Packetery\LogWrapper\PrestashopLogWrapper;
 use Packetery\Module\SoapApi;
 use Packetery\Tools\ConfigHelper;
-use PrestaShopDatabaseException;
-use PrestaShopException;
-use ReflectionException;
-use RuntimeException;
-use SoapClient;
-use SoapFault;
-use Tools;
 
 class PacketSubmitter
 {
     /** @var string */
-    const AFFILIATE_ID = '26d07661f147af2f';
+    public const AFFILIATE_ID = '26d07661f147af2f';
 
     /** @var OrderRepository */
     private $orderRepository;
     /** @var LogRepository */
     private $logRepository;
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
     /** @var ConfigHelper */
     private $configHelper;
@@ -38,10 +37,10 @@ class PacketSubmitter
     /**
      * @param OrderRepository $orderRepository
      * @param LogRepository $logRepository
-     * @param Packetery $module
+     * @param \Packetery $module
      * @param ConfigHelper $configHelper
      */
-    public function __construct(OrderRepository $orderRepository, LogRepository $logRepository, Packetery $module, ConfigHelper $configHelper)
+    public function __construct(OrderRepository $orderRepository, LogRepository $logRepository, \Packetery $module, ConfigHelper $configHelper)
     {
         $this->orderRepository = $orderRepository;
         $this->logRepository = $logRepository;
@@ -50,13 +49,15 @@ class PacketSubmitter
     }
 
     /**
-     * @param Order $order
+     * @param \Order $order
+     *
      * @return string
-     * @throws ReflectionException
+     *
+     * @throws \ReflectionException
      * @throws ExportException
      * @throws ApiClientException
      */
-    private function createPacket(Order $order)
+    private function createPacket(\Order $order)
     {
         /** @var OrderExporter $orderExporter */
         $orderExporter = $this->module->diContainer->get(OrderExporter::class);
@@ -76,7 +77,12 @@ class PacketSubmitter
             'weight' => $exportData['weight'],
             'adultContent' => $exportData['adultContent'],
             'affiliateId' => self::AFFILIATE_ID,
+            'note' => $exportData['note'],
         ];
+
+        if ($exportData['company'] !== '') {
+            $packetAttributes['company'] = $exportData['company'];
+        }
 
         if (count($exportData['size']) > 0) {
             $packetAttributes['size'] = $exportData['size'];
@@ -120,21 +126,19 @@ class PacketSubmitter
 
     /**
      * @param array $orderIds Comma separated integers
+     *
      * @return array|false
+     *
      * @throws DatabaseException
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     * @throws ReflectionException
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
+     * @throws \ReflectionException
      * @throws AggregatedException
      */
     public function ordersExport(array $orderIds)
     {
         if (!$orderIds) {
-            throw new AggregatedException(
-                [
-                    new RuntimeException($this->module->l('Please choose orders first.', 'packetsubmitter')),
-                ]
-            );
+            throw new AggregatedException([new \RuntimeException($this->module->l('Please choose orders first.', 'packetsubmitter'))]);
         }
 
         $errors = [];
@@ -147,7 +151,7 @@ class PacketSubmitter
                 continue;
             }
 
-            $order = new Order($orderId);
+            $order = new \Order($orderId);
             try {
                 $trackingNumber = $this->createPacket($order);
                 $trackingUpdate = $packeteryTracking->updateOrderTrackingNumber($orderId, $trackingNumber);
@@ -156,7 +160,7 @@ class PacketSubmitter
                     $orderCarrier = $order->getIdOrderCarrier();
                     if ($orderCarrier !== 0) {
                         try {
-                            $carrier = new OrderCarrier($orderCarrier);
+                            $carrier = new \OrderCarrier($orderCarrier);
                             $carrier->tracking_number = $trackingNumber;
                             $carrier->update();
                         } catch (\Exception $exception) {
@@ -183,34 +187,32 @@ class PacketSubmitter
 
     /**
      * @param array<string, string> $packetAttributes
+     *
      * @return string
+     *
      * @throws ApiClientException
      */
     private function createPacketSoap(array $packetAttributes)
     {
-        $client = new SoapClient(SoapApi::WSDL_URL);
+        $client = new \SoapClient(SoapApi::WSDL_URL);
         try {
             $trackingNumber = $client->createPacket($this->configHelper->getApiPass(), $packetAttributes);
-            if (isset($trackingNumber->id) && is_string($trackingNumber->id) && Tools::strlen($trackingNumber->id) > 0) {
+            if (isset($trackingNumber->id) && is_string($trackingNumber->id) && \Tools::strlen($trackingNumber->id) > 0) {
                 return $trackingNumber->id;
             }
 
-            throw new ApiClientException(
-                sprintf(
-                    $this->module->l('Tracking number not returned for order %s', 'packetsubmitter'),
-                    $packetAttributes['number']
-                )
-            );
-        } catch (SoapFault $e) {
+            throw new ApiClientException(sprintf($this->module->l('Tracking number not returned for order %s', 'packetsubmitter'), $packetAttributes['number']));
+        } catch (\SoapFault $e) {
             throw new ApiClientException($this->getErrorMessage($e));
         }
     }
 
     /**
-     * @param SoapFault $e
+     * @param \SoapFault $e
+     *
      * @return string
      */
-    private function getErrorMessage(SoapFault $e)
+    private function getErrorMessage(\SoapFault $e)
     {
         $errorMessage = '';
         if (isset($e->faultstring)) {
@@ -218,8 +220,8 @@ class PacketSubmitter
         }
         if (isset($e->detail->PacketAttributesFault->attributes->fault)) {
             if (
-                is_array($e->detail->PacketAttributesFault->attributes->fault) &&
-                count($e->detail->PacketAttributesFault->attributes->fault) > 1
+                is_array($e->detail->PacketAttributesFault->attributes->fault)
+                && count($e->detail->PacketAttributesFault->attributes->fault) > 1
             ) {
                 foreach ($e->detail->PacketAttributesFault->attributes->fault as $fault) {
                     $errorMessage .= "\n" . $fault->name . ': ' . $fault->fault;
@@ -229,6 +231,7 @@ class PacketSubmitter
                 $errorMessage .= "\n" . $fault->name . ': ' . $fault->fault;
             }
         }
+
         return $errorMessage;
     }
 }

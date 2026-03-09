@@ -1,6 +1,15 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Order;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 use Packetery;
 use Packetery\Carrier\CarrierTools;
@@ -8,7 +17,7 @@ use Packetery\Tools\Tools;
 
 class OrderDetailsUpdater
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /**
@@ -17,10 +26,10 @@ class OrderDetailsUpdater
     private $orderRepository;
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
      * @param OrderRepository $orderRepository
      */
-    public function __construct(Packetery $module, OrderRepository $orderRepository)
+    public function __construct(\Packetery $module, OrderRepository $orderRepository)
     {
         $this->module = $module;
         $this->orderRepository = $orderRepository;
@@ -28,9 +37,11 @@ class OrderDetailsUpdater
 
     /**
      * @param array $messages
-     * @param array|bool|null|object $packeteryOrder
+     * @param array|bool|object|null $packeteryOrder
      * @param int $orderId
-     * @return array|bool|null|object
+     *
+     * @return array|bool|object|null
+     *
      * @throws Packetery\Exceptions\DatabaseException
      */
     public function orderUpdate(&$messages, $packeteryOrder, $orderId)
@@ -44,7 +55,7 @@ class OrderDetailsUpdater
         }
 
         $fieldsToUpdate = [];
-        if (! $packeteryOrder['is_ad']) {
+        if (!$packeteryOrder['is_ad']) {
             $this->processPickupPointChange($fieldsToUpdate);
         } else {
             $countryDiffersMessage = $this->module->l('The selected delivery address is in a country other than the country of delivery of the order.', 'orderdetailsupdater');
@@ -56,8 +67,8 @@ class OrderDetailsUpdater
         $this->processDimensionsAndPricesChange($messages, $fieldsToUpdate);
         if ($fieldsToUpdate !== []) {
             if (
-                !isset($fieldsToUpdate['age_verification_required']) &&
-                CarrierTools::orderSupportsAgeVerification($packeteryOrder)
+                !isset($fieldsToUpdate['age_verification_required'])
+                && CarrierTools::orderSupportsAgeVerification($packeteryOrder)
             ) {
                 $fieldsToUpdate['age_verification_required'] = 0;
             }
@@ -88,7 +99,7 @@ class OrderDetailsUpdater
             }
         }
 
-        if ((bool)$packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
+        if ((bool) $packeteryOrder['is_ad'] === false && $packeteryOrder['id_branch'] === null) {
             $messages[] = [
                 'text' => $this->module->l(
                     'No pickup point selected for the order. It will not be possible to export the order to Packeta.',
@@ -160,8 +171,8 @@ class OrderDetailsUpdater
             $value = null;
             $isValid = false;
             if ($config['validation'] === 'int') {
-                if (is_numeric($rawValue) && (string)(int)$rawValue === (string)$rawValue) {
-                    $value = (int)$rawValue;
+                if (is_numeric($rawValue) && (string) (int) $rawValue === (string) $rawValue) {
+                    $value = (int) $rawValue;
                     $isValid = $value > 0;
                 }
 
@@ -172,7 +183,7 @@ class OrderDetailsUpdater
                 $rawValue = Tools::sanitizeFloatValue($rawValue);
                 if (is_numeric($rawValue)) {
                     // Compatibility with decimal(20,6).
-                    $value = round((float)$rawValue, 6);
+                    $value = round((float) $rawValue, 6);
 
                     $isValid = $value > 0;
                 }
@@ -215,16 +226,16 @@ class OrderDetailsUpdater
         $fieldsToUpdate = array_merge($fieldsToUpdate, $newFieldsToUpdate);
     }
 
-
     /**
      * @param array $fieldsToUpdate
+     *
      * @return void
      */
     public function processPickupPointChange(array &$fieldsToUpdate)
     {
         if (
-            !Tools::getIsset('pickup_point') ||
-            Tools::getValue('pickup_point') === ''
+            !Tools::getIsset('pickup_point')
+            || Tools::getValue('pickup_point') === ''
         ) {
             return;
         }
@@ -235,31 +246,39 @@ class OrderDetailsUpdater
             return;
         }
 
-        $fieldsToUpdate = array_merge($fieldsToUpdate, [
-            'id_branch' => (int)$pickupPoint->id,
-            'name_branch' => $pickupPoint->name,
-            'currency_branch' => $pickupPoint->currency,
-        ]);
+        $fieldsToUpdate = array_merge(
+            $fieldsToUpdate,
+            [
+                'id_branch' => (int) $pickupPoint->id,
+                'name_branch' => $pickupPoint->name,
+                'currency_branch' => $pickupPoint->currency,
+                'point_place' => $pickupPoint->place,
+                'point_street' => $pickupPoint->street,
+                'point_city' => $pickupPoint->city,
+                'point_zip' => $pickupPoint->zip,
+            ]
+        );
 
         if ($pickupPoint->pickupPointType === 'external') {
             $fieldsToUpdate['is_carrier'] = 1;
-            $fieldsToUpdate['id_branch'] = (int)$pickupPoint->carrierId;
+            $fieldsToUpdate['id_branch'] = (int) $pickupPoint->carrierId;
             $fieldsToUpdate['carrier_pickup_point'] = $pickupPoint->carrierPickupPointId;
         }
     }
 
     /**
-     * @param array  $messages
-     * @param array  $fieldsToUpdate
-     * @param array  $packeteryOrder
+     * @param array $messages
+     * @param array $fieldsToUpdate
+     * @param array $packeteryOrder
      * @param string $countryDiffersMessage
+     *
      * @return void
      */
     public function processAddressChange(array &$messages, array &$fieldsToUpdate, array $packeteryOrder, $countryDiffersMessage)
     {
         if (
-            !Tools::getIsset('address') ||
-            Tools::getValue('address') === ''
+            !Tools::getIsset('address')
+            || Tools::getValue('address') === ''
         ) {
             return;
         }
@@ -275,6 +294,7 @@ class OrderDetailsUpdater
                 'text' => $countryDiffersMessage,
                 'class' => 'danger',
             ];
+
             return;
         }
 

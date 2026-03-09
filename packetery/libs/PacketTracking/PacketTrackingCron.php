@@ -1,22 +1,25 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\PacketTracking;
 
-use DateTimeImmutable;
-use Order;
-use OrderState;
-use Packetery;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\Log\LogRepository;
-use Packetery\Module\Helper;
 use Packetery\Module\SoapApi;
 use Packetery\Order\OrderRepository;
 use Packetery\Tools\ConfigHelper;
 use PrestaShop\PrestaShop\Adapter\Validate;
-use stdClass;
 
 class PacketTrackingCron
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var OrderRepository */
@@ -38,7 +41,7 @@ class PacketTrackingCron
     private $packetStatusFactory;
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
      * @param OrderRepository $orderRepository
      * @param SoapApi $soapApi
      * @param PacketTrackingRepository $packetTrackingRepository
@@ -47,7 +50,7 @@ class PacketTrackingCron
      * @param PacketStatusFactory $packetStatusFactory
      */
     public function __construct(
-        Packetery $module,
+        \Packetery $module,
         OrderRepository $orderRepository,
         SoapApi $soapApi,
         PacketTrackingRepository $packetTrackingRepository,
@@ -75,7 +78,7 @@ class PacketTrackingCron
         }
 
         $configOrderStatuses = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_ORDER_STATES');
-        $orderStatuses = Helper::unserialize($configOrderStatuses);
+        $orderStatuses = json_decode($configOrderStatuses, true);
         if (!is_array($orderStatuses)) {
             return $this->getNoOrderStatusesMessage();
         }
@@ -86,14 +89,13 @@ class PacketTrackingCron
         }
 
         $configPacketStatuses = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_PACKET_STATUSES');
-        $packetStatuses = Helper::unserialize($configPacketStatuses);
-
+        $packetStatuses = json_decode($configPacketStatuses, true);
         if (!is_array($packetStatuses)) {
             $packetStatuses = [];
         }
 
         $maxOrderAgeDays = ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_MAX_ORDER_AGE_DAYS');
-        $oldestOrderDate = new DateTimeImmutable("-{$maxOrderAgeDays} days");
+        $oldestOrderDate = new \DateTimeImmutable("-{$maxOrderAgeDays} days");
 
         $finalStatusIds = $this->getFinalStatusIds();
         $orders = $this->orderRepository->getOrdersByStateAndLastUpdate(
@@ -108,13 +110,13 @@ class PacketTrackingCron
             $statusRecordsOrErrorMessage = $this->soapApi->getPacketTracking($order['tracking_number']);
 
             if (!is_string($statusRecordsOrErrorMessage)) {
-                /** @var stdClass $statusRecords */
+                /** @var \stdClass $statusRecords */
                 $statusRecords = $statusRecordsOrErrorMessage;
 
                 $this->logRepository->insertRow(
                     LogRepository::ACTION_PACKET_TRACKING,
                     [
-                        'response' => (array)$statusRecords,
+                        'response' => (array) $statusRecords,
                     ],
                     LogRepository::STATUS_SUCCESS,
                     $order['id_order']
@@ -131,7 +133,7 @@ class PacketTrackingCron
                 continue;
             }
 
-            if ((is_array($statusRecords->record) && count($statusRecords->record) === 0)) {
+            if (is_array($statusRecords->record) && count($statusRecords->record) === 0) {
                 continue;
             }
 
@@ -142,8 +144,8 @@ class PacketTrackingCron
             }
 
             if (
-                !in_array($lastRecord->statusCode, $finalStatusIds, true) &&
-                !in_array($lastRecord->statusCode, array_keys($packetStatuses, 'on', true), false)
+                !in_array($lastRecord->statusCode, $finalStatusIds, true)
+                && !in_array($lastRecord->statusCode, array_keys($packetStatuses, 'on', true), false)
             ) {
                 continue;
             }
@@ -192,7 +194,7 @@ class PacketTrackingCron
                 $this->updateOrderStatus($lastRecord, $order['id_order']);
             }
 
-            $this->orderRepository->setLastUpdateTrackingStatus(new DateTimeImmutable('now'), $order['id_order']);
+            $this->orderRepository->setLastUpdateTrackingStatus(new \DateTimeImmutable('now'), $order['id_order']);
         }
 
         return [
@@ -202,8 +204,9 @@ class PacketTrackingCron
     }
 
     /**
-     * @param stdClass $lastRecord
+     * @param \stdClass $lastRecord
      * @param int $orderId
+     *
      * @return void
      */
     private function updateOrderStatus($lastRecord, $orderId)
@@ -211,19 +214,19 @@ class PacketTrackingCron
         $lastStatusCode = $lastRecord->statusCode;
         $newOrderStatus = ConfigHelper::get('PACKETERY_ORDER_STATUS_CHANGE_' . $lastStatusCode);
 
-        $order = new Order($orderId);
+        $order = new \Order($orderId);
         $isOrderExists = Validate::isLoadedObject($order);
         if ($isOrderExists === false) {
             return;
         }
 
-        $orderState = new OrderState($newOrderStatus);
+        $orderState = new \OrderState($newOrderStatus);
         $isOrderStateExists = Validate::isLoadedObject($orderState);
         if ($isOrderStateExists === false) {
             return;
         }
 
-        $order->setCurrentState((int)$newOrderStatus);
+        $order->setCurrentState((int) $newOrderStatus);
     }
 
     /**

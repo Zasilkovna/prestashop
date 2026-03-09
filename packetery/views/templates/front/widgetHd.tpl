@@ -1,3 +1,8 @@
+{**
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *}
+
 <div id="packetery-carrier-{$carrier_id|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerStreet" name="customerStreet" value="{$customerStreet|escape:'htmlall':'UTF-8'}">
     <input type="hidden" id="customerHouseNumber" name="customerHouseNumber" value="{$customerHouseNumber|escape:'htmlall':'UTF-8'}">
@@ -15,12 +20,7 @@
                     <ul>
                         <li>{l s='Selected delivery address' mod='packetery'}:
                             <span class="picked-delivery-place">
-                                {assign var=addressInfo value=[]}
-                                {if $customerStreet}{$addressInfo[]=$customerStreet}{/if}
-                                {if $customerHouseNumber}{$addressInfo[]=$customerHouseNumber}{/if}
-                                {if $customerCity}{$addressInfo[]=$customerCity}{/if}
-                                {if $customerZip}{$addressInfo[]=$customerZip}{/if}
-                                {', '|implode:$addressInfo}
+                                {$addressInfo}
                             </span>
                             <br>
                             <span class="address-validation-result{if $addressValidated} address-validated{/if}">

@@ -1,3 +1,8 @@
+{**
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *}
+
 <div class="packetery-panel panel col-lg-12">
 	<div class="panel-heading">
 		{l s='Packeta carriers update' mod='packetery'}

@@ -1,10 +1,16 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Order;
 
-use Address;
-use Currency;
-use Order;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery;
 use Packetery\Address\AddressTools;
 use Packetery\Carrier\CarrierTools;
@@ -12,44 +18,41 @@ use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\ExportException;
 use Packetery\Payment\PaymentRepository;
 use Packetery\Tools\ConfigHelper;
-use ReflectionException;
-use Tools;
 
 class OrderExporter
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var Packetery\Weight\Calculator */
     private $weightCalculator;
 
-    public function __construct(Packetery $module, Packetery\Weight\Calculator $weightCalculator)
+    public function __construct(\Packetery $module, Packetery\Weight\Calculator $weightCalculator)
     {
         $this->module = $module;
         $this->weightCalculator = $weightCalculator;
     }
 
     /**
-     * @param Order $order
+     * @param \Order $order
+     *
      * @return array
+     *
      * @throws ExportException
      * @throws DatabaseException
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
-    public function prepareData(Order $order)
+    public function prepareData(\Order $order)
     {
         /** @var OrderRepository $orderRepository */
         $orderRepository = $this->module->diContainer->get(OrderRepository::class);
         $packeteryOrder = $orderRepository->getWithShopById($order->id);
 
         if (empty($packeteryOrder) || empty($packeteryOrder['id_branch'])) {
-            throw new ExportException(
-                $this->module->l('Unable to load information required to export order', 'orderexporter') .
-                ' ' . $order->id
-            );
+            throw new ExportException($this->module->l('Unable to load information required to export order', 'orderexporter') . ' ' . $order->id);
         }
 
-        list($exportCurrency, $total) = $this->getCurrencyAndTotalValue($order, $packeteryOrder);
+        [$exportCurrency, $total] = $this->getCurrencyAndTotalValue($order, $packeteryOrder);
 
         $isCod = $packeteryOrder['is_cod'];
         if ($isCod) {
@@ -70,40 +73,49 @@ class OrderExporter
             $codValue = 0;
         }
 
-        $address = new Address($order->id_address_delivery);
+        $address = new \Address($order->id_address_delivery);
         $phone = '';
-        if (Tools::strlen($address->phone)) {
+        if (\Tools::strlen($address->phone)) {
             $phone = trim($address->phone);
         }
-        if (Tools::strlen($address->phone_mobile)) {
+        if (\Tools::strlen($address->phone_mobile)) {
             $phone = trim($address->phone_mobile);
         }
 
         $weight = $this->weightCalculator->getFinalWeight($packeteryOrder);
         $weight = (!$weight ? '' : $weight);
 
-        $number = (string)(Packetery::ID_PREF_REF === ConfigHelper::get('PACKETERY_ID_PREFERENCE') ? $order->reference : $order->id);
-        $senderLabel = (ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $packeteryOrder['id_shop']) ?: '');
+        $number = (string) (\Packetery::ID_PREF_REF === ConfigHelper::get('PACKETERY_ID_PREFERENCE') ? $order->reference : $order->id);
+        $idShop = ((string) $packeteryOrder['id_shop'] !== '') ? $packeteryOrder['id_shop'] : '';
+        $senderLabel = (string) ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $idShop);
         $customer = $order->getCustomer();
 
         $size = [];
         $dimensions = ['length', 'height', 'width'];
         foreach ($dimensions as $dimension) {
             if (isset($packeteryOrder[$dimension])) {
-                $size[$dimension] = (int)$packeteryOrder[$dimension];
+                $size[$dimension] = (int) $packeteryOrder[$dimension];
             }
         }
 
         if ($packeteryOrder['age_verification_required'] === null) {
             $adultContent = $orderRepository->isOrderForAdults($order->id);
         } else {
-            $adultContent = (bool)$packeteryOrder['age_verification_required'];
+            $adultContent = (bool) $packeteryOrder['age_verification_required'];
         }
         if ($adultContent === true && CarrierTools::orderSupportsAgeVerification($packeteryOrder) === false) {
-            throw new ExportException(
-                sprintf($this->module->l('Order %s contains product only for adults, but the carrier does not support age verification.', 'orderexporter'), $order->id)
-            );
+            throw new ExportException(sprintf($this->module->l('Order %s contains product only for adults, but the carrier does not support age verification.', 'orderexporter'), $order->id));
         }
+
+        $company = ($address->company === '') ? $customer->company : $address->company;
+
+        $note = strtr(
+            (string) ConfigHelper::get('PACKETERY_LABEL_NOTE'),
+            [
+                '{{order-id}}' => (string) $order->id,
+                '{{order-reference}}' => $order->reference,
+            ]
+        );
 
         $data = [
             'number' => $number,
@@ -117,12 +129,13 @@ class OrderExporter
             'pickupPointOrCarrier' => $packeteryOrder['id_branch'],
             'carrierPickupPoint' => $packeteryOrder['carrier_pickup_point'],
 
-            'firstName' => ($address->firstname ?: $customer->firstname),
-            'lastName' => ($address->lastname ?: $customer->lastname),
-            'company' => $customer->company,
+            'firstName' => $address->firstname === '' ? $customer->firstname : $address->firstname,
+            'lastName' => $address->lastname === '' ? $customer->lastname : $address->lastname,
+            'company' => ($company ?? ''),
             'phone' => $phone,
             'email' => $customer->email,
             'adultContent' => $adultContent,
+            'note' => $note,
         ];
 
         if ($packeteryOrder['is_ad']) {
@@ -146,6 +159,7 @@ class OrderExporter
      *
      * @param float|int $n
      * @param int $x
+     *
      * @return float|int
      */
     public function roundUpMultiples($n, $x = 5)
@@ -154,11 +168,12 @@ class OrderExporter
     }
 
     /**
-     * @param Order $order
-     * @param array<string, mixed> $packeteryOrder Data from database.
+     * @param \Order $order
+     * @param array<string, mixed> $packeteryOrder data from database
+     *
      * @return PriceConversionParameters
      */
-    private function getDataForTotalPriceConversion(Order $order, array $packeteryOrder): PriceConversionParameters
+    private function getDataForTotalPriceConversion(\Order $order, array $packeteryOrder): PriceConversionParameters
     {
         if ($packeteryOrder['price_total'] === null) {
             $totalPrice = $order->total_paid;
@@ -170,7 +185,7 @@ class OrderExporter
             $totalPrice = $packeteryOrder['price_total'];
         }
 
-        $orderCurrency = new Currency($order->id_currency);
+        $orderCurrency = new \Currency($order->id_currency);
 
         return new PriceConversionParameters(
             $packeteryOrder['currency_branch'],
@@ -180,11 +195,13 @@ class OrderExporter
     }
 
     /**
-     * @param array<string, mixed> $packeteryOrder Data from database.
+     * @param array<string, mixed> $packeteryOrder data from database
+     *
      * @return array<int, string|float>
+     *
      * @throws ExportException
      */
-    private function getCurrencyAndTotalValue(Order $order, array $packeteryOrder): array
+    private function getCurrencyAndTotalValue(\Order $order, array $packeteryOrder): array
     {
         $priceConversionParameters = $this->getDataForTotalPriceConversion($order, $packeteryOrder);
         $packeteryCurrency = $priceConversionParameters->getPacketeryCurrency();
@@ -193,16 +210,11 @@ class OrderExporter
         $totalPrice = $priceConversionParameters->getTotalPrice();
 
         if ($packeteryCurrency === null) {
-            throw new ExportException(
-                $this->module->l(
-                    'Can\'t find currency of pickup point, order',
-                    'orderexporter'
-                ) . ' - ' . $order->id
-            );
+            throw new ExportException($this->module->l('Can\'t find currency of pickup point, order', 'orderexporter') . ' - ' . $order->id);
         }
         if (
-            $orderCurrency->iso_code !== $packeteryCurrency &&
-            (bool)ConfigHelper::get(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION) === true
+            $orderCurrency->iso_code !== $packeteryCurrency
+            && (bool) ConfigHelper::get(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION) === true
         ) {
             $exportCurrency = $packeteryCurrency;
 
@@ -214,12 +226,7 @@ class OrderExporter
                     $totalPrice
                 );
                 if ($totalPrice === null) {
-                    throw new ExportException(
-                        $this->module->l(
-                            'Unable to find the exchange rate in the PrestaShop currency settings for the destination country of the order',
-                            'orderexporter'
-                        ) . ': ' . $order->id
-                    );
+                    throw new ExportException($this->module->l('Unable to find the exchange rate in the PrestaShop currency settings for the destination country of the order', 'orderexporter') . ': ' . $order->id);
                 }
             }
         }
@@ -230,21 +237,22 @@ class OrderExporter
     /**
      * Can return currency loaded from PS order instead of from packetery order. Total value is not converted in this case.
      *
-     * @param array<string, mixed> $packeteryOrder Data from database.
+     * @param array<string, mixed> $packeteryOrder data from database
+     *
      * @return array<int, string|float>
      */
-    public function findCurrencyAndTotalValue(Order $order, array $packeteryOrder): array
+    public function findCurrencyAndTotalValue(\Order $order, array $packeteryOrder): array
     {
-        $priceConversionParameters =  $this->getDataForTotalPriceConversion($order, $packeteryOrder);
+        $priceConversionParameters = $this->getDataForTotalPriceConversion($order, $packeteryOrder);
         $packeteryCurrency = $priceConversionParameters->getPacketeryCurrency();
         $orderCurrency = $priceConversionParameters->getOrderCurrency();
         $exportCurrency = $orderCurrency->iso_code;
         $totalPrice = $priceConversionParameters->getTotalPrice();
 
         if (
-            $packeteryCurrency !== null &&
-            $orderCurrency->iso_code !== $packeteryCurrency &&
-            (bool)ConfigHelper::get(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION) === true
+            $packeteryCurrency !== null
+            && $orderCurrency->iso_code !== $packeteryCurrency
+            && (bool) ConfigHelper::get(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION) === true
         ) {
             $exportCurrency = $packeteryCurrency;
             if ($packeteryOrder['price_total'] === null) {

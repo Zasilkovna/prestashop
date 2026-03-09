@@ -1,8 +1,15 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Cron\Tasks;
 
-use ReflectionClass;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 abstract class Base
 {
@@ -11,7 +18,8 @@ abstract class Base
      */
     public static function getTaskName()
     {
-        $reflectionClass = new ReflectionClass(static::class);
+        $reflectionClass = new \ReflectionClass(static::class);
+
         return $reflectionClass->getShortName();
     }
 }

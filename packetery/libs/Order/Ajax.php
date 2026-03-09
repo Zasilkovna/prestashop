@@ -1,6 +1,15 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Order;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 use Packetery\Carrier\CarrierRepository;
 use Packetery\Exceptions\DatabaseException;
@@ -13,16 +22,17 @@ class Ajax
     /** @var CarrierRepository */
     private $carrierRepository;
 
-    /**
-     * Ajax constructor.
-     *
-     * @param OrderRepository $orderRepository
-     * @param CarrierRepository $carrierRepository
-     */
-    public function __construct(OrderRepository $orderRepository, CarrierRepository $carrierRepository)
-    {
+    /** @var \Packetery */
+    private $module;
+
+    public function __construct(
+        OrderRepository $orderRepository,
+        CarrierRepository $carrierRepository,
+        \Packetery $module
+    ) {
         $this->orderRepository = $orderRepository;
         $this->carrierRepository = $carrierRepository;
+        $this->module = $module;
     }
 
     /**
@@ -30,7 +40,7 @@ class Ajax
      */
     public function saveAddressInCart()
     {
-        $cart = \Context::getContext()->cart;
+        $cart = $this->module->getContext()->cart;
         $cartId = $cart->id;
 
         if (!isset($cartId) || !\Tools::getIsset('address')) {
@@ -38,7 +48,7 @@ class Ajax
         }
 
         $address = \Tools::getValue('address');
-        $carrierId = (int)$cart->id_carrier;
+        $carrierId = (int) $cart->id_carrier;
         $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById($carrierId);
         $packeteryOrderFields = [
             'is_ad' => 1,
@@ -60,7 +70,7 @@ class Ajax
         if ($isOrderSaved) {
             $this->orderRepository->updateByCart($packeteryOrderFields, $cartId);
         } else {
-            $packeteryOrderFields['id_cart'] = ((int)$cartId);
+            $packeteryOrderFields['id_cart'] = ((int) $cartId);
             $this->orderRepository->insert($packeteryOrderFields);
         }
     }
