@@ -19,12 +19,6 @@ parameters:
 			path: ../packetery/controllers/admin/PacketeryLogGridController.php
 
 		-
-			message: '#^Static method ToolsCore\:\:displayDate\(\) invoked with 3 parameters, 1\-2 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: ../packetery/controllers/admin/PacketeryLogGridController.php
-
-		-
 			message: '#^Access to property \$id on an unknown class InstallLanguage\.$#'
 			identifier: class.notFound
 			count: 2
@@ -55,18 +49,6 @@ parameters:
 			path: ../packetery/controllers/admin/PacketeryOrderGridController.php
 
 		-
-			message: '#^Variable \$orderRepo in PHPDoc tag @var does not match assigned variable \$orderRepository\.$#'
-			identifier: varTag.differentVariable
-			count: 2
-			path: ../packetery/controllers/admin/PacketeryOrderGridController.php
-
-		-
-			message: '#^Call to an undefined method Module\:\:getAdminLink\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../packetery/controllers/admin/PacketerySettingController.php
-
-		-
 			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
 			identifier: booleanNot.exprNotBoolean
 			count: 1
@@ -88,12 +70,6 @@ parameters:
 			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
 			identifier: function.strict
 			count: 2
-			path: ../packetery/libs/Carrier/CarrierAdminForm.php
-
-		-
-			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
-			identifier: empty.notAllowed
-			count: 1
 			path: ../packetery/libs/Carrier/CarrierAdminForm.php
 
 		-
@@ -178,12 +154,6 @@ parameters:
 			message: '#^Only booleans are allowed in a negated boolean, float\|null given\.$#'
 			identifier: booleanNot.exprNotBoolean
 			count: 1
-			path: ../packetery/libs/Order/OrderExporter.php
-
-		-
-			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
-			identifier: ternary.shortNotAllowed
-			count: 3
 			path: ../packetery/libs/Order/OrderExporter.php
 
 		-
@@ -337,21 +307,9 @@ parameters:
 			path: ../packetery/packetery.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$params with type array\|null is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: ../packetery/packetery.php
-
-		-
 			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
 			identifier: ternary.shortNotAllowed
 			count: 4
-			path: ../packetery/packetery.php
-
-		-
-			message: '#^Variable \$have_curl might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
 			path: ../packetery/packetery.php
 
 		-

@@ -1,26 +1,30 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Order;
 
-use Packetery;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\AbstractFormService;
 use Packetery\Module\Options;
 use Packetery\PacketTracking\PacketStatusFactory;
 
 class OrderStatusChangeFormService extends AbstractFormService
 {
-    const SUBMIT_ACTION_KEY = 'submitOrderStatusChangeSubmit';
-
-    /** @var Packetery */
-    private $module;
+    public const SUBMIT_ACTION_KEY = 'submitOrderStatusChangeSubmit';
 
     /** @var PacketStatusFactory */
     private $packetStatusFactory;
 
-    public function __construct(Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
+    public function __construct(\Packetery $module, PacketStatusFactory $packetStatusFactory, Options $options)
     {
-        parent::__construct($options);
-        $this->module = $module;
+        parent::__construct($options, $module);
         $this->packetStatusFactory = $packetStatusFactory;
     }
 

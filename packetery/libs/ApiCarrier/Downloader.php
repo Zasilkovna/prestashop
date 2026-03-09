@@ -1,8 +1,16 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\ApiCarrier;
 
-use Packetery;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\DownloadException;
 use Packetery\Tools\ConfigHelper;
@@ -10,9 +18,9 @@ use Packetery\Tools\HttpClientWrapper;
 
 class Downloader
 {
-    const API_URL = 'https://www.zasilkovna.cz/api/v4/%s/branch.json?address-delivery';
+    private const API_URL = 'https://pickup-point.api.packeta.com/v5/%s/carrier/json';
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     /** @var ApiCarrierRepository */
@@ -25,7 +33,7 @@ class Downloader
     private $httpClient;
 
     public function __construct(
-        Packetery $module,
+        \Packetery $module,
         ApiCarrierRepository $apiCarrierRepository,
         ConfigHelper $configHelper,
         HttpClientWrapper $httpClient
@@ -40,6 +48,7 @@ class Downloader
      * Runs update and returns result.
      *
      * @return array
+     *
      * @throws DatabaseException
      */
     public function run()
@@ -74,6 +83,7 @@ class Downloader
                 'class' => 'danger',
             ];
         }
+
         $this->apiCarrierRepository->save($carriers, $this->module);
         ConfigHelper::update('PACKETERY_LAST_CARRIERS_UPDATE', time());
 
@@ -87,7 +97,8 @@ class Downloader
      * Downloads carriers and returns in array.
      *
      * @return array|null
-     * @throws DownloadException DownloadException.
+     *
+     * @throws DownloadException downloadException
      */
     private function fetchAsArray()
     {
@@ -100,6 +111,7 @@ class Downloader
      * Downloads carriers in JSON.
      *
      * @return string
+     *
      * @throws DownloadException
      */
     private function downloadJson()
@@ -115,21 +127,22 @@ class Downloader
 
     /**
      * Converts JSON to array.
-     *
-     * @param string $json JSON.
-     * @return array|null
      */
-    private function getFromJson($json)
+    private function getFromJson(string $json): ?array
     {
-        $carriers_data = json_decode($json, true);
+        $carriersData = json_decode($json, true);
+        if (is_array($carriersData)) {
+            return $carriersData;
+        }
 
-        return (isset($carriers_data['carriers']) ? $carriers_data['carriers'] : null);
+        return null;
     }
 
     /**
      * Validates data from API.
      *
-     * @param array $carriers Data retrieved from API.
+     * @param array $carriers data retrieved from API
+     *
      * @return bool
      */
     public function validateCarrierData(array $carriers)
@@ -149,7 +162,8 @@ class Downloader
                     $carrier['requiresPhone'],
                     $carrier['requiresSize'],
                     $carrier['disallowsCod'],
-                    $carrier['maxWeight']
+                    $carrier['maxWeight'],
+                    $carrier['available']
                 )
             ) {
                 return false;

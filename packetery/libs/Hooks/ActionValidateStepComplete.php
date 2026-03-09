@@ -1,9 +1,16 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Hooks;
 
-use CartCore;
-use Packetery;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\Address\AddressTools;
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Carrier\CarrierRepository;
@@ -11,7 +18,6 @@ use Packetery\Exceptions\DatabaseException;
 use Packetery\Order\OrderRepository;
 use Packetery\PickupPointValidate\PickupPointValidator;
 use Packetery\Tools\ConfigHelper;
-use PrestaShopLogger;
 
 class ActionValidateStepComplete
 {
@@ -27,7 +33,7 @@ class ActionValidateStepComplete
     /** @var PickupPointValidator */
     private $pickupPointValidator;
 
-    /** @var Packetery */
+    /** @var \Packetery */
     private $module;
 
     public function __construct(
@@ -35,7 +41,7 @@ class ActionValidateStepComplete
         OrderRepository $orderRepository,
         ApiCarrierRepository $apiCarrierRepository,
         PickupPointValidator $pickupPointValidator,
-        Packetery $module
+        \Packetery $module
     ) {
         $this->carrierRepository = $carrierRepository;
         $this->orderRepository = $orderRepository;
@@ -50,19 +56,20 @@ class ActionValidateStepComplete
     public function execute(array &$params): ?string
     {
         if (empty($params['cart'])) {
-            PrestaShopLogger::addLog('Cart is not present in hook parameters.', 3, null, null, null, true);
+            \PrestaShopLogger::addLog('Cart is not present in hook parameters.', 3, null, null, null, true);
             $params['completed'] = false;
+
             return $this->module->l('Order validation failed, shop owner can find more information in log.', 'ordervalidatestepcomplete');
         }
 
-        /** @var CartCore $cart */
+        /** @var \CartCore $cart */
         $cart = $params['cart'];
-        $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int)$cart->id_carrier);
+        $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int) $cart->id_carrier);
 
-        $orderData = $this->orderRepository->getByCart((int)$cart->id);
+        $orderData = $this->orderRepository->getByCart((int) $cart->id);
 
-        $isExternalPickupPointCarrier = $this->apiCarrierRepository->isExternalPickupPointCarrier((int)$packeteryCarrier['id_branch']);
-        $isPickupPointCarrier = $this->isPickupPointCarrier($isExternalPickupPointCarrier, (string)$packeteryCarrier['id_branch']);
+        $isExternalPickupPointCarrier = $this->apiCarrierRepository->isExternalPickupPointCarrier((int) $packeteryCarrier['id_branch']);
+        $isPickupPointCarrier = $this->isPickupPointCarrier($isExternalPickupPointCarrier, (string) $packeteryCarrier['id_branch']);
 
         if ($isPickupPointCarrier === true && empty($orderData['id_branch'])) {
             $params['completed'] = false;
@@ -72,11 +79,11 @@ class ActionValidateStepComplete
 
         $isApiWidgetValidationModeEnabled = ConfigHelper::isApiWidgetValidationModeEnabled();
         if (
-            $isPickupPointCarrier &&
-            $isApiWidgetValidationModeEnabled === true &&
-            is_array($orderData) === true &&
-            $orderData !== [] &&
-            (bool)$orderData['is_ad'] === false
+            $isPickupPointCarrier
+            && $isApiWidgetValidationModeEnabled === true
+            && is_array($orderData) === true
+            && $orderData !== []
+            && (bool) $orderData['is_ad'] === false
         ) {
             $pickupPointValidationResponse = $this->pickupPointValidator->validate(
                 $this->pickupPointValidator->createPickupPointValidateRequest($orderData, $cart, $packeteryCarrier)
@@ -108,6 +115,6 @@ class ActionValidateStepComplete
 
     public function isPickupPointCarrier(bool $isExternalPickupPointCarrier, string $idBranch): bool
     {
-        return ($isExternalPickupPointCarrier === true || $idBranch === Packetery::PP_ALL || $idBranch === Packetery::ZPOINT);
+        return $isExternalPickupPointCarrier === true || $idBranch === \Packetery::PP_ALL || $idBranch === \Packetery::ZPOINT;
     }
 }

@@ -1,3 +1,8 @@
+/**
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+
 $(document).ready(function () {
     var $widgetHdButton = $('.open-packeta-hd-widget');
     if ($widgetHdButton.length === 1) {
@@ -66,7 +71,11 @@ $(document).ready(function () {
             Packeta.Widget.pick(widgetOptionsData['apiKey'], function (pickupPoint) {
                 if (pickupPoint !== null) {
                     $('.packetery form input[name="pickup_point"]').val(JSON.stringify(pickupPoint));
-                    $('.picked-delivery-place').text(pickupPoint.name);
+                    $('.picked-delivery-place')
+                        .empty()
+                        .append(document.createTextNode(pickupPoint.place))
+                        .append(document.createElement('br'))
+                        .append(document.createTextNode(pickupPoint.street + ', ' + pickupPoint.city + ' ' + pickupPoint.zip));
                 }
             }, widgetOptions);
         });

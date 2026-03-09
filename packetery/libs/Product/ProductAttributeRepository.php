@@ -1,6 +1,15 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Product;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\DbTools;
@@ -24,6 +33,7 @@ class ProductAttributeRepository
 
     /**
      * @param int $productId
+     *
      * @return ProductAttributes|null
      */
     public function findByProductId($productId)
@@ -38,7 +48,9 @@ class ProductAttributeRepository
 
     /**
      * @param int $idProduct
+     *
      * @return array|false
+     *
      * @throws DatabaseException
      */
     public function getRow($idProduct)
@@ -53,12 +65,15 @@ class ProductAttributeRepository
         if (is_array($getRow)) {
             return $getRow;
         }
+
         return false;
     }
 
     /**
      * @param array $data
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function insert(array $data)
@@ -72,7 +87,9 @@ class ProductAttributeRepository
     /**
      * @param array $data
      * @param int $idProduct
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function update($idProduct, array $data)
@@ -86,7 +103,9 @@ class ProductAttributeRepository
 
     /**
      * @param int $idProduct
+     *
      * @return bool
+     *
      * @throws DatabaseException
      */
     public function delete($idProduct)

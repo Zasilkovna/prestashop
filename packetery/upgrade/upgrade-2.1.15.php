@@ -1,26 +1,32 @@
 <?php
-
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 /**
  * @param Packetery $module
+ *
  * @return bool
+ *
  * @throws PrestaShopDatabaseException
  * @throws PrestaShopException
  */
 function upgrade_module_2_1_15(Packetery $module)
 {
     $result = (
-        Configuration::updateValue('PACKETERY_ADDRESS_VALIDATION', 'none') &&
-        $module->registerHook('actionValidateStepComplete')
+        Configuration::updateValue('PACKETERY_ADDRESS_VALIDATION', 'none')
+        && $module->registerHook('actionValidateStepComplete')
     );
     if ($result === false) {
         return false;
     }
 
-    $dbTools = $module->diContainer->get(\Packetery\Tools\DbTools::class);
+    $dbTools = $module->diContainer->get(Packetery\Tools\DbTools::class);
     $addressCarriers = $dbTools->getRows(
         'SELECT `id_carrier` FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` WHERE `pickup_point_type` IS NULL'
     );
@@ -29,7 +35,7 @@ function upgrade_module_2_1_15(Packetery $module)
             $result = $dbTools->update(
                 'carrier',
                 ['is_module' => 1, 'external_module_name' => 'packetery', 'need_range' => 1],
-                '`id_carrier` = ' . (int)$addressCarrier['id_carrier']
+                '`id_carrier` = ' . (int) $addressCarrier['id_carrier']
             );
             if ($result === false) {
                 return false;

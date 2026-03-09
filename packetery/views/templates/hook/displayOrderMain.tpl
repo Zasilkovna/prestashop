@@ -1,3 +1,8 @@
+{**
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *}
+
 <div class="card mt-2 packetery panel" id="packetaPickupPointChange">
     <div class="card-header">
         <h3 class="card-header-title">
@@ -20,8 +25,13 @@
                 <p>
                     {l s='Carrier' mod='packetery'}:
                     <strong class="picked-delivery-place" data-validated="{$isAddressValidated}">
-                        {if $pickupPointOrAddressDeliveryName}
-                            {$pickupPointOrAddressDeliveryName}
+                        <br>
+                        {if $pointOrderAddressName}
+                            {$pointOrderAddressName}
+                            {if pointOrderAddress}
+                                <br>
+                                {$pointOrderAddress}
+                            {/if}
                         {else}
                             {l s='Please select shipment method again' mod='packetery'}
                         {/if}
@@ -40,7 +50,7 @@
                 {if isset($widgetOptions) && !$isExported}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-hd-widget"
-                           data-widget-options="{$widgetOptions|@json_encode|escape}">
+                           data-widget-options="{$widgetOptions}">
                             {if isset($validatedAddress) && $validatedAddress['zip']}
                                 {l s='Change validated delivery address' mod='packetery'}
                             {else}
@@ -54,9 +64,14 @@
                 {/if}
             {else}
                 <p>{l s='Pickup point' mod='packetery'}:
+                    <br>
                     <strong class="picked-delivery-place">
-                        {if $pickupPointOrAddressDeliveryName}
-                            {$pickupPointOrAddressDeliveryName}
+                        {if $pointOrderAddressName}
+                            {$pointOrderAddressName}
+                            {if pointOrderAddress}
+                                <br>
+                                {$pointOrderAddress}
+                            {/if}
                         {else}
                             {l s='Please select pickup point' mod='packetery'}
                         {/if}
@@ -65,7 +80,7 @@
                 {if $pickupPointChangeAllowed && !$isExported}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-widget"
-                           data-widget-options="{$widgetOptions|@json_encode|escape}">{l s='Change pickup point' mod='packetery'}</a>
+                           data-widget-options="{$widgetOptions}">{l s='Change pickup point' mod='packetery'}</a>
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="pickup_point">
                     </p>
@@ -241,7 +256,7 @@
         {/if}
         {if isset($messages)}
             {foreach from=$messages item=message}
-                <div class="alert alert-{$message.class}">{$message.text|nl2br}</div>
+                <div class="alert alert-{$message.class}">{$message.text}</div>
             {/foreach}
         {/if}
     </div>

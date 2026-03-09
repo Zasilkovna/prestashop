@@ -1,22 +1,24 @@
 <?php
-
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 declare(strict_types=1);
 
 namespace Packetery\Tools;
 
-use Link;
-use Packetery;
 use Packetery\Exceptions\CheckoutControllerUrlException;
 
 class CheckoutControllerUrlProvider
 {
-    /** @var Packetery */
+    /** @var \Packetery */
     public $module;
 
     /**
-     * @param Packetery $module
+     * @param \Packetery $module
      */
-    public function __construct(Packetery $module)
+    public function __construct(\Packetery $module)
     {
         $this->module = $module;
     }
@@ -27,11 +29,11 @@ class CheckoutControllerUrlProvider
     private function getUrl(): string
     {
         $context = $this->module->getContext();
-        if (!isset($context->link) || !$context->link instanceof Link) {
+        if (!isset($context->link) || !$context->link instanceof \Link) {
             throw new CheckoutControllerUrlException('Packetery: property link of Context is not set.');
         }
 
-        $controllerUrl = $context->link->getModuleLink(Packetery::MODULE_SLUG, 'checkout');
+        $controllerUrl = $context->link->getModuleLink(\Packetery::MODULE_SLUG, 'checkout');
         if ($controllerUrl === '') {
             throw new CheckoutControllerUrlException('Packetery: getModuleLink returned empty string.');
         }

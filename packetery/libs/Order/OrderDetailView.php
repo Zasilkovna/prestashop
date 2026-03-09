@@ -1,10 +1,18 @@
 <?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
 
 namespace Packetery\Order;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Packetery\PacketTracking\PacketStatusFactory;
 use Packetery\PacketTracking\PacketTrackingRepository;
-use Smarty;
 
 class OrderDetailView
 {
@@ -27,11 +35,12 @@ class OrderDetailView
     }
 
     /**
-     * @param Smarty $smarty
+     * @param \Smarty $smarty
      * @param array $packeteryOrder
+     *
      * @return void
      */
-    public function addPacketStatus(Smarty $smarty, array $packeteryOrder)
+    public function addPacketStatus(\Smarty $smarty, array $packeteryOrder)
     {
         if (!$packeteryOrder['tracking_number']) {
             return;
@@ -51,5 +60,47 @@ class OrderDetailView
             }
             // else TODO: after adding a new column code_text to the db, return the value from the db
         }
+    }
+
+    /**
+     * @param array $packeteryOrder
+     * @param bool $isCarrier
+     * @param bool $isAddressDelivery
+     * @param string|null $packeteryCarrierNameBranch
+     *
+     * @return array<int, string|null>
+     */
+    public function getPickupPointOrDeliveryAddress(
+        array $packeteryOrder,
+        bool $isCarrier,
+        bool $isAddressDelivery,
+        ?string $packeteryCarrierNameBranch
+    ): array {
+        $pointOrderAddressName = $packeteryCarrierNameBranch ?? $packeteryOrder['name_branch'];
+        $pointOrderAddress = null;
+
+        if ($isCarrier === true && $isAddressDelivery === false) {
+            $pointOrderAddressName = $packeteryCarrierNameBranch;
+            $pointOrderAddress = $packeteryOrder['name_branch'];
+        }
+
+        if ($isCarrier === false && $isAddressDelivery === false) {
+            $pointOrderAddressName = $packeteryOrder['name_branch'];
+            if ($packeteryOrder['point_place']) {
+                $pointOrderAddressName = $packeteryOrder['point_place'];
+            }
+
+            if (
+                $packeteryOrder['point_street']
+                || $packeteryOrder['point_city']
+                || $packeteryOrder['point_zip']
+            ) {
+                $pointOrderAddress = ($packeteryOrder['point_street'] ? $packeteryOrder['point_street'] . ', ' : '');
+                $pointOrderAddress .= ($packeteryOrder['point_city'] ? $packeteryOrder['point_city'] . ' ' : '');
+                $pointOrderAddress .= ($packeteryOrder['point_zip'] ? $packeteryOrder['point_zip'] . ' ' : '');
+            }
+        }
+
+        return [$pointOrderAddressName, $pointOrderAddress];
     }
 }

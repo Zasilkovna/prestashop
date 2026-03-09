@@ -1,0 +1,35 @@
+name: PHP-CS-Fixer Check
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+
+jobs:
+    php-cs-fixer:
+        runs-on: ubuntu-24.04
+
+        strategy:
+            matrix:
+                php-version: [ '8.1' ]
+
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php-version }}
+                    extensions: mbstring, intl
+                    coverage: none
+
+            -   name: php version
+                run: php -v
+
+            -   name: Install Composer dependencies
+                run: composer install --no-interaction --no-progress
+
+            -   name: Run PHP-CS-Fixer
+                run: composer run check:phpcsfixer
+

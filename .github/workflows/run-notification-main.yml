@@ -1,0 +1,13 @@
+name: run notifications
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  call-reusable-workflow:
+    uses: ./.github/workflows/send-notification-reusable.yml
+    with:
+      action_name: Released to main
+    secrets:
+      webhook_url: ${{ secrets.DEPLOYMENT_WEBHOOK_URL_PROD }}
