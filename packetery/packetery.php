@@ -897,6 +897,7 @@ class Packetery extends CarrierModule
         }
         $jsList = [
             'front.js',
+            'stringifyOptions.js',
         ];
         $iterator = new GlobIterator(__DIR__ . '/views/js/checkout-modules/*.js', FilesystemIterator::CURRENT_AS_FILEINFO);
         foreach ($iterator as $entry) {
@@ -1367,6 +1368,7 @@ class Packetery extends CarrierModule
         }
 
         $this->context->controller->addCSS($this->_path . 'views/css/back.css' . $suffix, 'all', null, false);
+        $this->context->controller->addJS($this->_path . 'views/js/stringyfyOptions.js' . $suffix);
         $this->context->controller->addJS($this->_path . 'views/js/back.js' . $suffix);
 
         /** @var Packetery\Module\VersionChecker $versionChecker */
