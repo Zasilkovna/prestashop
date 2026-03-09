@@ -105,7 +105,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             $this->_where = ' AND `a`.`id_shop` = ' . $shopId . ' ';
         }
 
-        $this->_orderBy = 'id_order';
+        $this->_orderBy = 'id';
         $this->_orderWay = 'DESC';
         $this->_use_found_rows = true;
         // $this->_pagination = [20, 50, 100, 300, 1000];
