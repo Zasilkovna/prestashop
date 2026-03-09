@@ -93,9 +93,10 @@ class CarrierAdminForm
      */
     private function renderDisableCarriersScript(array $carriers): string
     {
-        $this->module->getContext()->smarty->assign('disabledCarriers', $this->getDisabledCarrierIds($carriers));
+        $smarty = $this->module->getContext()->smarty;
+        $smarty->assign('disabledCarriers', $this->getDisabledCarrierIds($carriers));
 
-        return $this->module->getContext()->smarty->fetch(__DIR__ . '/../../views/templates/admin/disableCarrierOptions.tpl');
+        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/disableCarrierOptions.tpl');
     }
 
     /**
