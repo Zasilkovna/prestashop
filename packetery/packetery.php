@@ -195,6 +195,7 @@ class Packetery extends CarrierModule
         /** @var Packetery\ApiCarrier\ApiCarrierRepository $apiCarrierRepository */
         $apiCarrierRepository = $this->diContainer->get(Packetery\ApiCarrier\ApiCarrierRepository::class);
         $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
+
         if (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') {
             $downloader = $this->diContainer->get(Packetery\ApiCarrier\Downloader::class);
             Tools::redirectAdmin($this->getAdminLink('PacketeryCarrierGrid', ['messages' => [$downloader->run()]]));
@@ -230,17 +231,14 @@ class Packetery extends CarrierModule
     /**
      * Load the configuration form
      *
-     * @return string
-     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
      * @throws Packetery\Exceptions\DatabaseException
      */
-    public function getContent()
+    public function getContent(): string
     {
         $output = '';
-
         if (!extension_loaded('soap')) {
             $output .= $this->displayError($this->l('Soap is disabled. You have to enable Soap on your server'));
         }
@@ -260,11 +258,15 @@ class Packetery extends CarrierModule
 
         $error = false;
         $isSubmit = false;
+        $isStatusSubmitted = false;
+
         /** @var Packetery\Order\OrderStatusChangeFormService $orderStatusChangeFormService */
         $orderStatusChangeFormService = $this->diContainer->get(Packetery\Order\OrderStatusChangeFormService::class);
+
         try {
             if (Tools::isSubmit($orderStatusChangeFormService->getSubmitActionKey())) {
                 $isSubmit = true;
+                $isStatusSubmitted = true;
                 $orderStatusChangeFormService->handleSubmit();
             }
         } catch (Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
@@ -277,6 +279,7 @@ class Packetery extends CarrierModule
         try {
             if (Tools::isSubmit($packetStatusTrackingFormService->getSubmitActionKey())) {
                 $isSubmit = true;
+                $isStatusSubmitted = true;
                 $packetStatusTrackingFormService->handleSubmit();
             }
         } catch (Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
@@ -300,6 +303,7 @@ class Packetery extends CarrierModule
                     Packetery\Tools\ConfigHelper::update($option, $configValue);
                 }
             }
+
             $paymentRepository = $this->diContainer->get(Packetery\Payment\PaymentRepository::class);
             $paymentList = $paymentRepository->getListPayments();
             if ($paymentList) {
@@ -317,7 +321,7 @@ class Packetery extends CarrierModule
             $output .= $this->displayConfirmation($this->l('Settings updated'));
         }
 
-        $output .= $this->displayForm();
+        $output .= $this->displayForm($isStatusSubmitted);
 
         return $output;
     }
@@ -325,13 +329,11 @@ class Packetery extends CarrierModule
     /**
      * Builds the configuration form
      *
-     * @return string HTML code
-     *
      * @throws PrestaShopException
      * @throws ReflectionException
      * @throws Packetery\Exceptions\DatabaseException
      */
-    public function displayForm()
+    public function displayForm(bool $isStatusSubmitted): string
     {
         $formInputs = [];
         $confOptions = $this->getConfigurationOptions();
@@ -392,7 +394,7 @@ class Packetery extends CarrierModule
         $form = [
             'form' => [
                 'legend' => [
-                    'title' => $this->l('Packeta settings'),
+                    'title' => $this->l('Settings'),
                 ],
                 'input' => $formInputs,
                 'submit' => [
@@ -415,6 +417,7 @@ class Packetery extends CarrierModule
         foreach ($confOptions as $option => $optionConf) {
             $helper->fields_value[$option] = Tools::getValue($option, $packeterySettings[$option]);
         }
+
         if ($paymentList) {
             foreach ($paymentList as $payment) {
                 if ((bool) $payment['is_cod'] === true) {
@@ -426,20 +429,29 @@ class Packetery extends CarrierModule
         $packetStatusTrackingFormService = $this->diContainer->get(Packetery\PacketTracking\PacketStatusTrackingFormService::class);
         $orderStatusChangeFormService = $this->diContainer->get(Packetery\Order\OrderStatusChangeFormService::class);
 
-        return $helper->generateForm([$form]) .
-            $packetStatusTrackingFormService->generateForm(
-                $this->name,
-                $this->table,
-                $this->l('Packet status tracking'),
-                $this->l('Save')
-            ) .
+        $generalTabContent = $helper->generateForm([$form]) . $this->generateCronInfoBlock();
+        $packetStatusTrackingTabContent = $packetStatusTrackingFormService->generateForm(
+            $this->name,
+            $this->table,
+            $this->l('Packet status tracking'),
+            $this->l('Save')
+        ) .
             $orderStatusChangeFormService->generateForm(
                 $this->name,
                 $this->table,
                 $this->l('Order status change'),
                 $this->l('Save')
-            ) .
-            $this->generateCronInfoBlock();
+            );
+
+        $contents = $this->context->smarty->assign(
+            [
+                'isStatusSubmitted' => $isStatusSubmitted,
+                'generalTabContent' => $generalTabContent,
+                'packetStatusTrackingTabContent' => $packetStatusTrackingTabContent,
+            ]
+        );
+
+        return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configurationTabs.tpl', $contents);
     }
 
     /**
@@ -447,7 +459,7 @@ class Packetery extends CarrierModule
      *
      * @throws SmartyException
      */
-    private function generateCronInfoBlock()
+    private function generateCronInfoBlock(): string
     {
         $token = Packetery\Tools\ConfigHelper::get('PACKETERY_CRON_TOKEN');
         $link = new Link();
@@ -495,7 +507,7 @@ class Packetery extends CarrierModule
         return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/generateCronInfoBlock.tpl');
     }
 
-    private function getConfigurationOptions()
+    private function getConfigurationOptions(): array
     {
         return [
             Packetery\Tools\ConfigHelper::KEY_APIPASS => [
