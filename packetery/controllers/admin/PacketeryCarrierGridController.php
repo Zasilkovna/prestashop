@@ -195,7 +195,7 @@ class PacketeryCarrierGridController extends ModuleAdminController
      */
     public function getIconForBoolean($booleanValue)
     {
-        $smarty = new Smarty();
+        $smarty = $this->getModule()->getContext()->smarty;
         $smarty->assign('value', $booleanValue);
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/booleanIcon.tpl');
@@ -229,8 +229,8 @@ class PacketeryCarrierGridController extends ModuleAdminController
         /** @var CarrierTools $carrierTools */
         $carrierTools = $module->diContainer->get(CarrierTools::class);
 
-        $smarty = new Smarty();
-        $smarty->assign('link', $carrierTools->getEditLink($carrierId));
+        $smarty = $this->getModule()->getContext()->smarty;
+        $smarty->assign('linkUrl', $carrierTools->getEditLink($carrierId));
         $smarty->assign('title', $this->module->l('Edit', 'packeterycarriergridcontroller'));
         $smarty->assign('class', 'edit btn btn-default');
         $smarty->assign('icon', 'icon-pencil');

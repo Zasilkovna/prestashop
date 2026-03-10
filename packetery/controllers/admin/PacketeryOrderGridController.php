@@ -600,7 +600,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         if (empty($trackingNumber)) {
             return '';
         }
-        $smarty = new Smarty();
+        $smarty = $this->getModule()->getContext()->smarty;
         $smarty->assign('trackingNumber', $trackingNumber);
         $smarty->assign('trackingUrl', Packetery\Module\Helper::getTrackingUrl($trackingNumber));
 
@@ -655,9 +655,9 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function getColumnLink($link, $columnValue)
     {
-        $smarty = new Smarty();
+        $smarty = $this->getModule()->getContext()->smarty;
         $smarty->assign([
-            'link' => $link,
+            'linkUrl' => $link,
             'columnValue' => $columnValue,
         ]);
 
@@ -673,7 +673,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function getIconForBoolean($booleanValue)
     {
-        $smarty = new Smarty();
+        $smarty = $this->getModule()->getContext()->smarty;
         $smarty->assign('value', $booleanValue);
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/booleanIcon.tpl');
@@ -689,7 +689,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function getWeightEditable($weight, array $row)
     {
-        $smarty = new Smarty();
+        $smarty = $this->getModule()->getContext()->smarty;
         $smarty->assign('weight', $weight);
         $smarty->assign('orderId', $row['id_order']);
         $smarty->assign('disabled', $row['tracking_number']);
@@ -770,8 +770,8 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         $href = $this->getModule()->getAdminLink('PacketeryOrderGrid', ['id_order' => $orderId, 'action' => $action]);
 
-        $smarty = new Smarty();
-        $smarty->assign('link', $href);
+        $smarty = $this->getModule()->getContext()->smarty;
+        $smarty->assign('linkUrl', $href);
         $smarty->assign('title', $title);
         $smarty->assign('icon', $iconClass);
         $smarty->assign('class', 'btn btn-sm label-tooltip');

@@ -155,9 +155,9 @@ class PacketeryLogGridController extends ModuleAdminController
      */
     public function getColumnLink($link, $columnValue)
     {
-        $smarty = new Smarty();
+        $smarty = $this->getModule()->getContext()->smarty;
         $smarty->assign([
-            'link' => $link,
+            'linkUrl' => $link,
             'columnValue' => $columnValue,
         ]);
 
