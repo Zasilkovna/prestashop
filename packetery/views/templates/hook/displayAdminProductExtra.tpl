@@ -23,7 +23,7 @@
                             type="checkbox"
                             id="packetery_age_verification"
                             name="packetery_age_verification"
-                            value="{$packeteryAgeVerification}" {if $packeteryAgeVerification}checked="checked"{/if}>
+                            value="{$packeteryAgeVerification|escape:'htmlall':'UTF-8'}" {if $packeteryAgeVerification}checked="checked"{/if}>
                     {l s='This product is for adults only and needs to be age verified upon delivery.' mod='packetery'}
                 </label>
             </div>
@@ -31,7 +31,7 @@
     </div>
     {if $isPrestaShop16}
         <div class="panel-footer">
-            <a href="{$adminProductUrl}" class="btn btn-default"><i
+            <a href="{$adminProductUrl|escape:'htmlall':'UTF-8'}" class="btn btn-default"><i
                         class="process-icon-cancel"></i> {l s='Cancel' mod='packetery'}</a>
             <button type="submit" name="submitAddproduct" class="btn btn-default pull-right"><i
                         class="process-icon-save"></i> {l s='Save' mod='packetery'}</button>

@@ -4,5 +4,5 @@
  *}
 
 <section class="box">
-    <p>{$pickupPointLabel}: <strong>{$pickupPointName}</strong></p>
+    <p>{$pickupPointLabel|escape:'htmlall':'UTF-8'}: <strong>{$pickupPointName|escape:'htmlall':'UTF-8'}</strong></p>
 </section>

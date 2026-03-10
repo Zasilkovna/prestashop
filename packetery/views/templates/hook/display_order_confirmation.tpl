@@ -3,4 +3,4 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *}
 
-<p>{$pickupPointLabel}: <strong>{$pickupPointName}</strong></p>
+<p>{$pickupPointLabel|escape:'htmlall':'UTF-8'}: <strong>{$pickupPointName|escape:'htmlall':'UTF-8'}</strong></p>

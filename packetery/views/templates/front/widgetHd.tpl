@@ -20,7 +20,7 @@
                     <ul>
                         <li>{l s='Selected delivery address' mod='packetery'}:
                             <span class="picked-delivery-place">
-                                {$addressInfo}
+                                {$addressInfo|escape:'htmlall':'UTF-8'}
                             </span>
                             <br>
                             <span class="address-validation-result{if $addressValidated} address-validated{/if}">

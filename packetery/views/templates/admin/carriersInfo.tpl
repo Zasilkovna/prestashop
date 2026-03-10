@@ -12,7 +12,7 @@
 		{if isset($messages)}
 			<div class="col-lg-12">
 				{foreach from=$messages item=message}
-					<div class="alert alert-{$message.class}">{$message.text}</div>
+ 				<div class="alert alert-{$message.class|escape:'htmlall':'UTF-8'}">{$message.text|escape:'htmlall':'UTF-8'}</div>
 				{/foreach}
 			</div>
 		{/if}
@@ -45,7 +45,7 @@
 			<label class="control-label col-lg-3"></label>
 			<div class="packetery-carriers-right-column packetery-button-container">
 				<img src="{$module_dir|escape:'html':'UTF-8'}/logo.png" alt="Packeta" />
-				<a href="{$updateCarriersLink}" class="btn btn-default btn-block"><i class="icon-arrow-down"></i> {l s='Manually update the list of carriers' mod='packetery'}</a>
+ 			<a href="{$updateCarriersLink|escape:'htmlall':'UTF-8'}" class="btn btn-default btn-block"><i class="icon-arrow-down"></i> {l s='Manually update the list of carriers' mod='packetery'}</a>
 			</div>
 		</div>
 	{else}

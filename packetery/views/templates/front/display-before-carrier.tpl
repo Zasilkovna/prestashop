@@ -8,7 +8,7 @@
  * PS 1.6: OPC - twice! order-opc.js inserts this html first along with all carrier html and then again, separately only this html
  * PS 1.7
 *}
-<span class="hidden" id="packetaModuleConfig" data-packetaModuleConfig="{$packetaModuleConfig}"></span>
+<span class="hidden" id="packetaModuleConfig" data-packetaModuleConfig="{$packetaModuleConfig|escape:'htmlall':'UTF-8'}"></span>
 <script type="text/javascript">
     PacketaModule = window.PacketaModule || { };
 

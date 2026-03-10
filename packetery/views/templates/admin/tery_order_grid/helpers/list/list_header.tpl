@@ -7,22 +7,22 @@
 
 {block name=leadin}
 {if isset($versionUpdateMessageHtml)}
-	{$versionUpdateMessageHtml}
+	{$versionUpdateMessageHtml nofilter}
 {/if}
 {if isset($prepareLabelsMode) && $prepareLabelsMode}
 <div class="panel">
 	<div class="panel-heading">
-		{$translations['labelPrinting']}
+		{$translations['labelPrinting']|escape:'htmlall':'UTF-8'}
 	</div>
-	<form action="{$REQUEST_URI}" method="post">
+	<form action="{$REQUEST_URI|escape:'htmlall':'UTF-8'}" method="post">
 		<div class="radio">
 			<label for="offset">
 				<select id="offset" name="offset">
 					{for $var=0 to $max_offset}
 						{if $var === 0}
-							<option value="{$var|intval}">{$translations['doNotSkipAnyFields']}</option>
+ 						<option value="{$var|intval}">{$translations['doNotSkipAnyFields']|escape:'htmlall':'UTF-8'}</option>
 						{elseif $var === 1}
-							<option value="{$var|intval}">{$translations['skipOneField']}</option>
+ 						<option value="{$var|intval}">{$translations['skipOneField']|escape:'htmlall':'UTF-8'}</option>
 						{else}
 							{* We do not fix range 2-4 - PrestaShop has no support: https://github.com/PrestaShop/PrestaShop/issues/15870 *}
 							<option value="{$var|intval}">{$translations['skipNFields']|sprintf:$var}</option>
@@ -45,11 +45,11 @@
 		<div class="panel-footer">
 			<button type="submit" class="btn btn-default" name="cancelOffsetSelection">
 				<i class="icon-remove"></i>
-				{$translations['cancel']}
+				{$translations['cancel']|escape:'htmlall':'UTF-8'}
 			</button>
 			<button type="submit" class="btn btn-default" name="submitPrepareLabels">
 				<i class="icon-check"></i>
-				{$translations['execute']}
+				{$translations['execute']|escape:'htmlall':'UTF-8'}
 			</button>
 		</div>
 	</form>

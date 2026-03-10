@@ -5,12 +5,12 @@
 
 {l s='A new version of the Packeta module is available: %newVersion% (current version: %currentVersion%).' sprintf=['%newVersion%'=>$newVersion,'%currentVersion%'=>$currentVersion] mod='packetery'}
 {if $downloadUrl}
-    {l s='Download it' mod='packetery'} <a href="{$downloadUrl}" target="_blank">{l s='here' mod='packetery'}</a>.
+    {l s='Download it' mod='packetery'} <a href="{$downloadUrl|escape:'htmlall':'UTF-8'}" target="_blank">{l s='here' mod='packetery'}</a>.
 {/if}
 <br>
 {if $releaseNotes}
     {l s='Change log:' mod='packetery'}<br>
-    {$releaseNotes}
+    {$releaseNotes nofilter}
     {if $showReadMoreLink === true}
         … <a target="_blank" href="https://github.com/Zasilkovna/prestashop/releases">{l s='Read more' mod='packetery'}</a>
     {/if}
