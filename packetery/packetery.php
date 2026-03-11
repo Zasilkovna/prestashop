@@ -48,10 +48,10 @@ class Packetery extends CarrierModule
 
         $moduleId = Module::getModuleIdByName($this->name);
         if ($moduleId > 0) {
-            $errors = [];
-            $this->configurationErrors($errors);
-            foreach ($errors as $error) {
-                $this->warning .= $error;
+            $errors = $this->getConfigurationErrors();
+            if ($errors !== []) {
+                // This will ensure that the module is displayed in the module manager, Alerts tab.
+                $this->warning = implode(' | ', $errors);
             }
         }
 
@@ -61,8 +61,6 @@ class Packetery extends CarrierModule
         parent::__construct();
 
         $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
-        $desc = $this->l('Get your customers access to pick-up point in Packeta delivery network.');
-        $desc .= $this->l('Export orders to Packeta system.');
 
         $this->displayName = $this->l('Packeta');
         $this->description = $this->l('Packeta pick-up points, orders export, and print shipping labels');
@@ -129,6 +127,9 @@ class Packetery extends CarrierModule
         }
     }
 
+    /**
+     * @return false|string
+     */
     private static function transportMethod()
     {
         $have_curl = false;
@@ -150,37 +151,35 @@ class Packetery extends CarrierModule
         return false;
     }
 
-    public function configurationErrors(&$error = null)
+    public function getConfigurationErrors(): array
     {
-        $error = [];
-        $have_error = false;
+        $errors = [];
 
-        $fn = _PS_MODULE_DIR_ . 'packetery/views/js/write-test.js';
-        @touch($fn);
-        if (!is_writable($fn)) {
-            $error[] = $this->l(
-                'The Packeta module folder must be writable for the pickup point selection to work properly.'
-            );
-            $have_error = true;
+        /** @var Packetery\Tools\Logger $logger */
+        $logger = $this->diContainer->get(Packetery\Tools\Logger::class);
+        if ($logger->isWritable() === false) {
+            $errors[] = $this->l('The Packeta module folder has to be writable.');
         }
 
-        if (!self::transportMethod()) {
-            $error[] = $this->l(
+        if (self::transportMethod() === false) {
+            $errors[] = $this->l(
                 'No way to access Packeta API is available on the web server: please allow CURL module or allow_url_fopen setting.'
             );
-            $have_error = true;
         }
 
         /** @var Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
         $apiPass = $configHelper->getApiPass();
-
-        if (empty($apiPass)) {
-            $error[] = $this->l('Packeta API password is not set.');
-            $have_error = true;
+        if ($apiPass === false || $apiPass === '') {
+            $errors[] = $this->l('Packeta API password is not set.');
         }
 
-        return $have_error;
+        $senderLabel = Packetery\Tools\ConfigHelper::get(Packetery\Tools\ConfigHelper::KEY_ESHOP_ID);
+        if ($senderLabel === false || $senderLabel === '') {
+            $errors[] = $this->l('Sender indication is not set.');
+        }
+
+        return $errors;
     }
 
     /**

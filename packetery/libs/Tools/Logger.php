@@ -28,10 +28,7 @@ class Logger
      */
     public function logToFile($message)
     {
-        if (
-            (file_exists($this->errorLogFilePath) && !is_writable($this->errorLogFilePath))
-            || (!file_exists($this->errorLogFilePath) && !is_writable(dirname($this->errorLogFilePath)))
-        ) {
+        if ($this->isWritable() === false) {
             return false;
         }
 
@@ -46,5 +43,14 @@ class Logger
         fclose($fileHandle);
 
         return true;
+    }
+
+    public function isWritable(): bool
+    {
+        if (file_exists($this->errorLogFilePath)) {
+            return is_writable($this->errorLogFilePath);
+        }
+
+        return is_writable(dirname($this->errorLogFilePath));
     }
 }
