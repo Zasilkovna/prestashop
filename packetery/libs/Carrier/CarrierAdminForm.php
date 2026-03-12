@@ -466,7 +466,7 @@ class CarrierAdminForm
             }
         }
 
-        $smarty = new \Smarty();
+        $smarty = $this->module->getContext()->smarty;
         $smarty->assign('vendorsData', $vendorsData);
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/vendors.tpl');
