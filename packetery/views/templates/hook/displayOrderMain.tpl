@@ -28,7 +28,7 @@
                         <br>
                         {if $pointOrderAddressName}
                             {$pointOrderAddressName|escape:'htmlall':'UTF-8'}
-                            {if pointOrderAddress}
+                            {if $pointOrderAddress}
                                 <br>
                                 {$pointOrderAddress|escape:'htmlall':'UTF-8'}
                             {/if}
@@ -68,7 +68,7 @@
                     <strong class="picked-delivery-place">
                         {if $pointOrderAddressName}
                             {$pointOrderAddressName|escape:'htmlall':'UTF-8'}
-                            {if pointOrderAddress}
+                            {if $pointOrderAddress}
                                 <br>
                                 {$pointOrderAddress|escape:'htmlall':'UTF-8'}
                             {/if}
