@@ -1023,9 +1023,8 @@ class Packetery extends CarrierModule
         $orderDetailView = $this->diContainer->get(Packetery\Order\OrderDetailView::class);
         [$pointOrderAddressName, $pointOrderAddress] = $orderDetailView->getPickupPointOrDeliveryAddress(
             $packeteryOrder,
-            $isCarrier,
             $isAddressDelivery,
-            $packeteryCarrier['name_branch']
+            $packeteryCarrier['name_branch'] ?? null
         );
 
         $this->context->smarty->assign('pointOrderAddressName', $pointOrderAddressName);

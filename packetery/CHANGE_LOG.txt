@@ -1,3 +1,4 @@
+       - Fixed: If customer change PP to HD before confirmation order, save and display correct information in confirmation page/e-mail/administration and allow to consign packet.
        - Fixed: Fix error during the export of Packeta order list.
        - Update: Packetery configuration section divided into two tabs.
        - Added: Log Packeta widget parameters to the developers console.
