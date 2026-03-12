@@ -7,6 +7,6 @@
 
 {block name=leadin}
 {if isset($versionUpdateMessageHtml)}
-	{$versionUpdateMessageHtml}
+	{$versionUpdateMessageHtml nofilter}
 {/if}
 {/block}

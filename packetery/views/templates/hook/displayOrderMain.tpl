@@ -12,25 +12,25 @@
     <div class="card-body">
         {if isset($packetStatusTranslatedCode)}
             <p>
-                <span class="packetery-order-status {$statusCssClass}">{$packetStatusTranslatedCode}</span>
+                <span class="packetery-order-status {$statusCssClass|escape:'htmlall':'UTF-8'}">{$packetStatusTranslatedCode|escape:'htmlall':'UTF-8'}</span>
             </p>
         {/if}
 
         {if isset($logLink)}
-            <a href="{$logLink}">{l s='Show log' mod='packetery'}</a>
+            <a href="{$logLink|escape:'htmlall':'UTF-8'}">{l s='Show log' mod='packetery'}</a>
         {/if}
 
-        <form action="{$returnUrl}" method="post">
+        <form action="{$returnUrl|escape:'htmlall':'UTF-8'}" method="post">
             {if $isAddressDelivery}
                 <p>
                     {l s='Carrier' mod='packetery'}:
-                    <strong class="picked-delivery-place" data-validated="{$isAddressValidated}">
+                    <strong class="picked-delivery-place" data-validated="{$isAddressValidated|escape:'htmlall':'UTF-8'}">
                         <br>
                         {if $pointOrderAddressName}
-                            {$pointOrderAddressName}
+                            {$pointOrderAddressName|escape:'htmlall':'UTF-8'}
                             {if pointOrderAddress}
                                 <br>
-                                {$pointOrderAddress}
+                                {$pointOrderAddress|escape:'htmlall':'UTF-8'}
                             {/if}
                         {else}
                             {l s='Please select shipment method again' mod='packetery'}
@@ -40,17 +40,17 @@
                 {if $isAddressValidated && isset($validatedAddress)}
                     <p class="validatedAddress">
                         {l s='Delivery address verified for order' mod='packetery'}:<br>
-                        {l s='Street' mod='packetery'}: <strong class="packetery-street">{$validatedAddress['street']} {$validatedAddress['houseNumber']}</strong><br>
-                        {l s='City' mod='packetery'}: <strong class="packetery-city">{$validatedAddress['city']}</strong><br>
-                        {l s='Zip' mod='packetery'}: <strong class="packetery-zip">{$validatedAddress['zip']}</strong><br>
-                        {l s='County' mod='packetery'}: <strong class="packetery-county">{$validatedAddress['county']}</strong><br>
-                        {l s='GPS' mod='packetery'}: <strong class="packetery-gps">{$validatedAddress['latitude']}, {$validatedAddress['longitude']}</strong><br>
+                        {l s='Street' mod='packetery'}: <strong class="packetery-street">{$validatedAddress['street']|escape:'htmlall':'UTF-8'} {$validatedAddress['houseNumber']|escape:'htmlall':'UTF-8'}</strong><br>
+                        {l s='City' mod='packetery'}: <strong class="packetery-city">{$validatedAddress['city']|escape:'htmlall':'UTF-8'}</strong><br>
+                        {l s='Zip' mod='packetery'}: <strong class="packetery-zip">{$validatedAddress['zip']|escape:'htmlall':'UTF-8'}</strong><br>
+                        {l s='County' mod='packetery'}: <strong class="packetery-county">{$validatedAddress['county']|escape:'htmlall':'UTF-8'}</strong><br>
+                        {l s='GPS' mod='packetery'}: <strong class="packetery-gps">{$validatedAddress['latitude']|escape:'htmlall':'UTF-8'}, {$validatedAddress['longitude']|escape:'htmlall':'UTF-8'}</strong><br>
                     </p>
                 {/if}
                 {if isset($widgetOptions) && !$isExported}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-hd-widget"
-                           data-widget-options="{$widgetOptions}">
+                           data-widget-options="{$widgetOptions|escape:'htmlall':'UTF-8'}">
                             {if isset($validatedAddress) && $validatedAddress['zip']}
                                 {l s='Change validated delivery address' mod='packetery'}
                             {else}
@@ -67,10 +67,10 @@
                     <br>
                     <strong class="picked-delivery-place">
                         {if $pointOrderAddressName}
-                            {$pointOrderAddressName}
+                            {$pointOrderAddressName|escape:'htmlall':'UTF-8'}
                             {if pointOrderAddress}
                                 <br>
-                                {$pointOrderAddress}
+                                {$pointOrderAddress|escape:'htmlall':'UTF-8'}
                             {/if}
                         {else}
                             {l s='Please select pickup point' mod='packetery'}
@@ -80,7 +80,7 @@
                 {if $pickupPointChangeAllowed && !$isExported}
                     <p>
                         <a href="" class="btn btn-outline-secondary btn-default open-packeta-widget"
-                           data-widget-options="{$widgetOptions}">{l s='Change pickup point' mod='packetery'}</a>
+                           data-widget-options="{$widgetOptions|escape:'htmlall':'UTF-8'}">{l s='Change pickup point' mod='packetery'}</a>
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
                         <input type="hidden" name="pickup_point">
                     </p>
@@ -88,7 +88,7 @@
             {/if}
 
             {if $showCancelButton}
-                <form action="{$returnUrl}" method="post">
+                <form action="{$returnUrl|escape:'htmlall':'UTF-8'}" method="post">
                     <p>
                         <button class="btn btn-outline-secondary btn-default"
                                 type="submit"
@@ -99,7 +99,7 @@
                             {l s='Cancel packet' mod='packetery'}
                         </button>
                         <input type="hidden" name="order_id" value="{$orderId|intval}">
-                        <input type="hidden" name="tracking_number" value="{$trackingNumber}">
+                        <input type="hidden" name="tracking_number" value="{$trackingNumber|escape:'htmlall':'UTF-8'}">
                     </p>
                 </form>
             {/if}
@@ -117,7 +117,7 @@
                                         name="weight"
                                         id="weight"
                                         class="form-control"
-                                        value="{$orderWeight}"
+                                        value="{$orderWeight|escape:'htmlall':'UTF-8'}"
                                 >
                                 <div class="input-group-append">
                                     <span class="input-group-text">kg</span>
@@ -134,19 +134,19 @@
                                 <label>{l s='Size (L x W x H):' mod='packetery'}</label>
                             </div>
                             <div class="col-sm-2 my-1">
-                                <input class="form-control" name="length" value="{$orderDetails['length']}" placeholder="{l s='Length' mod='packetery'}">
+                                <input class="form-control" name="length" value="{$orderDetails['length']|escape:'htmlall':'UTF-8'}" placeholder="{l s='Length' mod='packetery'}">
                             </div>
                             <div class="col-auto my-1">
                                 x
                             </div>
                             <div class="col-sm-2 my-1">
-                                <input class="form-control" name="width" value="{$orderDetails['width']}" placeholder="{l s='Width' mod='packetery'}">
+                                <input class="form-control" name="width" value="{$orderDetails['width']|escape:'htmlall':'UTF-8'}" placeholder="{l s='Width' mod='packetery'}">
                             </div>
                             <div class="col-auto my-1">
                                 x
                             </div>
                             <div class="col-sm-2 my-1">
-                                <input class="form-control" name="height" value="{$orderDetails['height']}" placeholder="{l s='Height' mod='packetery'}">
+                                <input class="form-control" name="height" value="{$orderDetails['height']|escape:'htmlall':'UTF-8'}" placeholder="{l s='Height' mod='packetery'}">
                             </div>
                             <div class="col-auto my-1">
                                 (mm)
@@ -168,10 +168,10 @@
                                             name="price_total"
                                             id="price_total"
                                             class="form-control"
-                                            value="{$total}"
+                                            value="{$total|escape:'htmlall':'UTF-8'}"
                                     >
                                     <div class="input-group-append">
-                                        <span class="input-group-text">{$exportCurrency}</span>
+                                        <span class="input-group-text">{$exportCurrency|escape:'htmlall':'UTF-8'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -191,10 +191,10 @@
                                                 name="price_cod"
                                                 id="price_cod"
                                                 class="form-control"
-                                                value="{$cod}"
+                                                value="{$cod|escape:'htmlall':'UTF-8'}"
                                         >
                                         <div class="input-group-append">
-                                            <span class="input-group-text">{$exportCurrency}</span>
+                                            <span class="input-group-text">{$exportCurrency|escape:'htmlall':'UTF-8'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -230,7 +230,7 @@
                 {/if}
 
                 <div class="text-right">
-                    <button class="btn btn-primary" name="{$submitButton}">{l s='Save' mod='packetery'}</button>
+                    <button class="btn btn-primary" name="{$submitButton|escape:'htmlall':'UTF-8'}">{l s='Save' mod='packetery'}</button>
                 </div>
             {/if}
         </form>
@@ -240,7 +240,7 @@
             <hr />
         {/if}
         {if $postParcelButtonAllowed}
-            <form action="{$returnUrl}" method="post">
+            <form action="{$returnUrl|escape:'htmlall':'UTF-8'}" method="post">
                 <p>
                     <button class="btn btn-outline-secondary btn-default"
                             type="submit"
@@ -256,7 +256,7 @@
         {/if}
         {if isset($messages)}
             {foreach from=$messages item=message}
-                <div class="alert alert-{$message.class}">{$message.text}</div>
+                <div class="alert alert-{$message.class|escape:'htmlall':'UTF-8'}">{$message.text|escape:'htmlall':'UTF-8'}</div>
             {/foreach}
         {/if}
     </div>

@@ -10,6 +10,6 @@
 
 {block name=override_tpl}
     {if isset($carrierHelper)}
-        {$carrierHelper}
+        {$carrierHelper nofilter}
     {/if}
 {/block}

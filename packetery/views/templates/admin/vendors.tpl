@@ -5,17 +5,17 @@
 
 {foreach $vendorsData as $countryCode => $country}
     <div class="form-group">
-        <label class="control-label" for="country_{$countryCode}"><strong>{$country['countryName']}</strong></label>
+        <label class="control-label" for="country_{$countryCode|escape:'htmlall':'UTF-8'}"><strong>{$country['countryName']|escape:'htmlall':'UTF-8'}</strong></label>
 
         <fieldset>
             {foreach $country['groups'] as $vendorGroup}
                 <div class="checkbox">
-                    <label for="allowed_vendors_{$vendorGroup.id}">
+                    <label for="allowed_vendors_{$vendorGroup.id|escape:'htmlall':'UTF-8'}">
                         <input type="checkbox"
-                               name="allowed_vendors[{$countryCode}][{$vendorGroup.name}]"
-                               id="allowed_vendors_{$vendorGroup.id}"
+                               name="allowed_vendors[{$countryCode|escape:'htmlall':'UTF-8'}][{$vendorGroup.name|escape:'htmlall':'UTF-8'}]"
+                               id="allowed_vendors_{$vendorGroup.id|escape:'htmlall':'UTF-8'}"
                                {if $vendorGroup.checked}checked="checked"{/if}>
-                        {$vendorGroup.label}
+                        {$vendorGroup.label|escape:'htmlall':'UTF-8'}
                     </label>
                 </div>
             {/foreach}

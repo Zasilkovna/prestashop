@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AFL-3.0
  *}
 <div id="packetery-carrier-{$carrier_id|escape:'htmlall':'UTF-8'}">
-    <input type="hidden" id="widget_vendors" name="widget_vendors" value='{$widget_vendors}'>
+    <input type="hidden" id="widget_vendors" name="widget_vendors" value='{$widget_vendors|escape:'htmlall':'UTF-8'}'>
     <!--Packetery widget-->
     <div id="packetery-widget" class="clearfix">
         <div class="widget-left">
@@ -18,38 +18,38 @@
                             <br>
                             <span id="picked-delivery-place" class="picked-delivery-place">
                                 {if $pickup_point_type === 'external'}
-                                    {$name_branch}
+                                    {$name_branch|escape:'htmlall':'UTF-8'}
                                 {else}
-                                    {$point_place}<br>
+                                    {$point_place|escape:'htmlall':'UTF-8'}<br>
                                     {if $point_street}
-                                        {$point_street},
+                                        {$point_street|escape:'htmlall':'UTF-8'},
                                     {/if}
-                                    {$point_city}
-                                    {$point_zip}
+                                    {$point_city|escape:'htmlall':'UTF-8'}
+                                    {$point_zip|escape:'htmlall':'UTF-8'}
                                 {/if}
                             </span>
                         </li>
                     </ul>
                     <input type="hidden" id="packeta-branch-id" class="packeta-branch-id" name="packeta-branch-id"
-                           value="{$id_branch}">
+                           value="{$id_branch|escape:'htmlall':'UTF-8'}">
                     <input type="hidden" id="packeta-branch-name" class="packeta-branch-name" name="packeta-branch-name"
-                           value="{$name_branch}">
+                           value="{$name_branch|escape:'htmlall':'UTF-8'}">
                     <input type="hidden" id="packeta-branch-currency" class="packeta-branch-currency" name="packeta-branch-currency"
-                           value="{$currency_branch}">
+                           value="{$currency_branch|escape:'htmlall':'UTF-8'}">
                     <input type="hidden" id="packeta-pickup-point-type" class="packeta-pickup-point-type" name="packeta-pickup-point-type"
-                           value="{$pickup_point_type}">
+                           value="{$pickup_point_type|escape:'htmlall':'UTF-8'}">
                     <input type="hidden" id="packeta-carrier-id" class="packeta-carrier-id" name="packeta-carrier-id"
-                           value="{$packeta_carrier_id}">
+                           value="{$packeta_carrier_id|escape:'htmlall':'UTF-8'}">
                     <input type="hidden" id="packeta-carrier-pickup-point-id" class="packeta-carrier-pickup-point-id" name="packeta-carrier-pickup-point-id"
-                           value="{$carrier_pickup_point_id}">
+                           value="{$carrier_pickup_point_id|escape:'htmlall':'UTF-8'}">
                     <input type="hidden" id="packeta-point-place" class="packeta-point-place" name="packeta-point-place"
-                           value="{$point_place}">
+                           value="{$point_place|escape:'htmlall':'UTF-8'}">
                     <input type="hidden" id="packeta-point-street" class="packeta-point-street" name="packeta-point-street"
-                           value="{$point_street}">
+                           value="{$point_street|escape:'htmlall':'UTF-8'}">
                     <input type="hidden" id="packeta-point-city" class="packeta-point-city" name="packeta-point-city"
-                           value="{$point_city}">
+                           value="{$point_city|escape:'htmlall':'UTF-8'}">
                     <input type="hidden" id="packeta-point-zip" class="packeta-point-zip" name="packeta-point-zip"
-                           value="{$point_zip}">
+                           value="{$point_zip|escape:'htmlall':'UTF-8'}">
                 </div>
             </div>
         </div>

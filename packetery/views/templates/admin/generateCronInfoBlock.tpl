@@ -18,7 +18,7 @@
                 {l s='To delete the PDF labels automatically, you need to call this URL via CRON jobs.' mod='packetery'}
             </p>
             <p>
-                <a href="{$deleteLabelsUrl}" target="_blank">{$deleteLabelsUrl}</a>
+                <a href="{$deleteLabelsUrl|escape:'htmlall':'UTF-8'}" target="_blank">{$deleteLabelsUrl|escape:'htmlall':'UTF-8'}</a>
             </p>
             <p>
                 {l s='Extended options are also available to modify the functionality using parameters.' mod='packetery'}
@@ -61,7 +61,7 @@
                         {l s='Link to update Packeta carriers using CRON' mod='packetery'}:
                     </p>
                     <p>
-                        <a href="{$updateCarriersUrl}" target="_blank">{$updateCarriersUrl}</a>
+                        <a href="{$updateCarriersUrl|escape:'htmlall':'UTF-8'}" target="_blank">{$updateCarriersUrl|escape:'htmlall':'UTF-8'}</a>
                     </p>
                 {else}
                     <p>
@@ -83,7 +83,7 @@
                         {l s='To automatically update packet statuses regularly, you need to call this URL via CRON jobs.' mod='packetery'}
                     </p>
                     <p>
-                        <a href="{$updatePacketStatusesUrl}" target="_blank">{$updatePacketStatusesUrl}</a>
+                        <a href="{$updatePacketStatusesUrl|escape:'htmlall':'UTF-8'}" target="_blank">{$updatePacketStatusesUrl|escape:'htmlall':'UTF-8'}</a>
                     </p>
                 {else}
                     <p>
