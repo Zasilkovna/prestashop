@@ -64,7 +64,11 @@ class CarrierRepository
     public function getPacketeryCarriersList()
     {
         return $this->dbTools->getRows('
-            SELECT `c`.`id_carrier`, `c`.`name`, `pad`.`id_branch`, `pad`.`name_branch`, `pad`.`is_cod`, `pad`.`pickup_point_type` 
+            SELECT `c`.`id_carrier`,
+                `c`.`name`,
+                `pad`.`id_branch`,
+                `pad`.`name_branch`,
+                `pad`.`pickup_point_type`
             FROM `' . _DB_PREFIX_ . 'carrier` `c`
             LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad` USING(`id_carrier`)
             LEFT JOIN `' . _DB_PREFIX_ . ApiCarrierRepository::$tableName . '` `ac` ON `ac`.`id` = `pad`.`id_branch` 
@@ -114,8 +118,13 @@ class CarrierRepository
         $carrierId = (int) $carrierId;
 
         return $this->dbTools->getRow('
-            SELECT `id_carrier`, `id_branch`, `name_branch`, `currency_branch`, `pickup_point_type`, `is_cod`, 
-                   `address_validation`, `allowed_vendors`
+            SELECT `id_carrier`,
+                   `id_branch`,
+                   `name_branch`,
+                   `currency_branch`,
+                   `pickup_point_type`,
+                   `address_validation`,
+                   `allowed_vendors`
             FROM `' . _DB_PREFIX_ . 'packetery_address_delivery`
             WHERE `id_carrier` = ' . $carrierId);
     }
@@ -147,7 +156,6 @@ class CarrierRepository
             SELECT `c`.`id_carrier`,
                `name`,
                `id_branch`,
-               `is_cod`,
                `address_validation`,
                `allowed_vendors`
             FROM `' . _DB_PREFIX_ . 'carrier` `c`
@@ -229,7 +237,6 @@ class CarrierRepository
      * @param string $branchName
      * @param string|null $branchCurrency
      * @param string|null $pickupPointType
-     * @param bool $isCod
      * @param string|null $addressValidation
      *
      * @return bool
@@ -242,14 +249,12 @@ class CarrierRepository
         $branchName,
         $branchCurrency,
         $pickupPointType,
-        $isCod,
         $addressValidation,
         $allowedVendors
     ) {
         $carrierId = (int) $carrierId;
         $branchId = (string) $branchId;
         $branchName = (string) $branchName;
-        $isCod = (bool) $isCod;
 
         $isPacketeryCarrier = $this->existsById($carrierId);
         if ($branchId === '' && $isPacketeryCarrier) {
@@ -265,7 +270,6 @@ class CarrierRepository
                 'pickup_point_type' => $pickupPointType,
                 'id_branch' => $this->db->escape($branchId),
                 'name_branch' => $this->db->escape($branchName),
-                'is_cod' => $isCod,
                 'allowed_vendors' => $allowedVendors,
             ];
             if ($pickupPointType === null) {

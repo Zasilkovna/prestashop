@@ -281,32 +281,6 @@ class CarrierAdminForm
             ];
         }
 
-        if ((bool) $apiCarrier['disallows_cod'] === false && (bool) $carrierData['is_cod'] === true) {
-            $formInputs[] = [
-                'type' => 'radio',
-                'label' => $this->module->l('Is COD?', 'carrieradminform'),
-                'name' => 'is_cod',
-                'required' => true,
-                'desc' => sprintf(
-                    '%s %s',
-                    $this->module->l('YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.', 'carrieradminform'),
-                    $this->module->l('The option to set cash on delivery according to the carrier is already obsolete, and we recommend not using it. It will be completely removed soon.', 'carrieradminform')
-                ),
-                'values' => [
-                    [
-                        'id' => 'is_cod_0',
-                        'value' => 0,
-                        'label' => $this->module->l('No', 'carrieradminform'),
-                    ],
-                    [
-                        'id' => 'is_cod_1',
-                        'value' => 1,
-                        'label' => $this->module->l('Yes', 'carrieradminform'),
-                    ],
-                ],
-            ];
-        }
-
         if ($formInputs === []) {
             return null;
         }
@@ -332,7 +306,6 @@ class CarrierAdminForm
         ];
 
         $helper = new \HelperForm();
-        $helper->fields_value['is_cod'] = $carrierData['is_cod'];
         if ($carrierData['address_validation']) {
             $helper->fields_value['address_validation'] = $carrierData['address_validation'];
         } else {
@@ -360,11 +333,9 @@ class CarrierAdminForm
 
         $pickupPointType = $this->getPickupPointType($apiCarrier, $carrierData['id_branch']);
 
-        $isCod = false;
         $addressValidation = null;
         $allowedVendorsJson = $this->getDefaultAllowedVendors($carrierData, $apiCarrier);
         if ($carrierData) {
-            $isCod = (bool) $carrierData['is_cod'];
             $addressValidation = $carrierData['address_validation'];
             if ($carrierData['allowed_vendors'] !== null) {
                 $allowedVendorsJson = $carrierData['allowed_vendors'];
@@ -380,7 +351,6 @@ class CarrierAdminForm
                 $apiCarrier['name'],
                 $apiCarrier['currency'],
                 $pickupPointType,
-                $isCod,
                 $addressValidation,
                 $allowedVendorsJson
             );
@@ -419,7 +389,6 @@ class CarrierAdminForm
             $apiCarrier['name'],
             $apiCarrier['currency'],
             $pickupPointType,
-            \Tools::getValue('is_cod'),
             \Tools::getValue('address_validation'),
             $allowedVendors !== null ? json_encode($allowedVendors) : null
         );
