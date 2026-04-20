@@ -55,4 +55,11 @@ class Tools extends \ToolsCore
     {
         return str_replace([',', ' '], ['.', ''], $value);
     }
+
+    public static function getStringValueOrNull(string $key): ?string
+    {
+        $value = static::getValue($key);
+
+        return $value !== false ? (string) $value : null;
+    }
 }

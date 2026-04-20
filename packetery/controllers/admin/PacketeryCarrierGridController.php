@@ -37,8 +37,10 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $this->identifier = 'id_carrier';
 
         $this->_select = '
-            `a`.`id_carrier`, `a`.`active` AS `is_active`,
-            `pc`.`id_branch`, `pc`.`is_cod`, `pc`.`pickup_point_type`
+            `a`.`id_carrier`,
+            `a`.`active` AS `is_active`,
+            `pc`.`id_branch`,
+            `pc`.`pickup_point_type`
         ';
         $this->_join = '
             LEFT JOIN `' . _DB_PREFIX_ . 'packetery_address_delivery` `pc` ON `pc`.`id_carrier` = `a`.`id_carrier`
@@ -102,12 +104,6 @@ class PacketeryCarrierGridController extends ModuleAdminController
                 'title' => $this->module->l('Active', 'packeterycarriergridcontroller'),
                 'type' => 'bool',
                 'filter_key' => 'active',
-                'align' => 'center',
-                'callback' => 'getIconForBoolean',
-            ],
-            'is_cod' => [
-                'title' => $this->module->l('Is COD', 'packeterycarriergridcontroller'),
-                'type' => 'bool',
                 'align' => 'center',
                 'callback' => 'getIconForBoolean',
             ],

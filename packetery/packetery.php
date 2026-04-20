@@ -25,7 +25,6 @@ class Packetery extends CarrierModule
     public const PP_ALL = 'pp_all';
     public const LOCAL = 'local';
     public const REMOTE = 'remote';
-
     private const PACKETA_SUPPORT_EMAIL = 'e-commerce.support@packeta.com';
 
     public const MODULE_SLUG = 'packetery';
@@ -39,7 +38,7 @@ class Packetery extends CarrierModule
     {
         $this->name = self::MODULE_SLUG;
         $this->tab = 'shipping_logistics';
-        $this->version = '3.4.0';
+        $this->version = '3.5.0';
         $this->author = 'Packeta s.r.o.';
         $this->need_instance = 0;
         $this->is_configurable = 1;

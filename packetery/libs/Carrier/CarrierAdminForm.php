@@ -14,6 +14,7 @@ if (!defined('_PS_VERSION_')) {
 use Packetery\ApiCarrier\ApiCarrierRepository;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Tools\MessageManager;
+use Packetery\Tools\Tools;
 
 class CarrierAdminForm
 {
@@ -21,6 +22,10 @@ class CarrierAdminForm
     private $module;
     private $formHtml;
     private $error;
+
+    private const ADDRESS_VALIDATION_NONE = 'none';
+    private const ADDRESS_VALIDATION_REQUIRED = 'required';
+    private const ADDRESS_VALIDATION_OPTIONAL = 'optional';
 
     /**
      * @var CarrierVendors
@@ -203,6 +208,19 @@ class CarrierAdminForm
         return '<div class="packetery">' . PHP_EOL . $helper->generateForm($form) . PHP_EOL . '</div>';
     }
 
+    private function resolveAddressValidation(string $country, bool $isPickupPoints, ?string $addressValidation): ?string
+    {
+        if ($isPickupPoints === true) {
+            return null;
+        }
+
+        if ($this->supportsAddressValidation($country)) {
+            return null;
+        }
+
+        return $addressValidation;
+    }
+
     /**
      * @return string|null
      *
@@ -232,38 +250,26 @@ class CarrierAdminForm
 
         $possibleVendors = $this->getPossibleVendors($carrierData);
         $formInputs = [];
-
         if ((bool) $apiCarrier['is_pickup_points'] === false) {
-            $validationPossible = false;
-            // It would be better to follow the country of the carrier, but we don't want to find it out from the name.
-            // There is another check on the frontend.
-            $carrierCountries = $this->tools->getCountries($this->carrierId, 'iso_code');
-            foreach (CarrierRepository::ADDRESS_VALIDATION_COUNTRIES as $country) {
-                if (in_array($country, $carrierCountries, true)) {
-                    $validationPossible = true;
-                    break;
-                }
-            }
-            if ($validationPossible) {
+            if ($this->supportsAddressValidation($apiCarrier['country'])) {
                 $formInputs[] = [
                     'type' => 'radio',
                     'label' => $this->module->l('Validate address using widget?', 'carrieradminform'),
                     'name' => 'address_validation',
-                    'desc' => $this->module->l('Applicable only in case of CZ and SK home delivery carrier.', 'carrieradminform'),
                     'values' => [
                         [
                             'id' => 'address_validation_0',
-                            'value' => 'none',
+                            'value' => self::ADDRESS_VALIDATION_NONE,
                             'label' => $this->module->l('No', 'carrieradminform'),
                         ],
                         [
                             'id' => 'address_validation_1',
-                            'value' => 'required',
+                            'value' => self::ADDRESS_VALIDATION_REQUIRED,
                             'label' => $this->module->l('Yes', 'carrieradminform'),
                         ],
                         [
                             'id' => 'address_validation_2',
-                            'value' => 'optional',
+                            'value' => self::ADDRESS_VALIDATION_OPTIONAL,
                             'label' => $this->module->l('Optionally', 'carrieradminform'),
                         ],
                     ],
@@ -278,32 +284,6 @@ class CarrierAdminForm
                     $possibleVendors,
                     $this->getAllowedVendorsFromJson($carrierData['allowed_vendors'])
                 ),
-            ];
-        }
-
-        if ((bool) $apiCarrier['disallows_cod'] === false && (bool) $carrierData['is_cod'] === true) {
-            $formInputs[] = [
-                'type' => 'radio',
-                'label' => $this->module->l('Is COD?', 'carrieradminform'),
-                'name' => 'is_cod',
-                'required' => true,
-                'desc' => sprintf(
-                    '%s %s',
-                    $this->module->l('YES - all orders of this carrier will be exported to Packeta as cash on delivery, NO - cash on delivery settings will follow the cash on delivery settings for the payment method.', 'carrieradminform'),
-                    $this->module->l('The option to set cash on delivery according to the carrier is already obsolete, and we recommend not using it. It will be completely removed soon.', 'carrieradminform')
-                ),
-                'values' => [
-                    [
-                        'id' => 'is_cod_0',
-                        'value' => 0,
-                        'label' => $this->module->l('No', 'carrieradminform'),
-                    ],
-                    [
-                        'id' => 'is_cod_1',
-                        'value' => 1,
-                        'label' => $this->module->l('Yes', 'carrieradminform'),
-                    ],
-                ],
             ];
         }
 
@@ -332,11 +312,8 @@ class CarrierAdminForm
         ];
 
         $helper = new \HelperForm();
-        $helper->fields_value['is_cod'] = $carrierData['is_cod'];
-        if ($carrierData['address_validation']) {
-            $helper->fields_value['address_validation'] = $carrierData['address_validation'];
-        } else {
-            $helper->fields_value['address_validation'] = 'none';
+        if ((bool) $apiCarrier['is_pickup_points'] === false && $this->supportsAddressValidation($apiCarrier['country'])) {
+            $helper->fields_value['address_validation'] = $carrierData['address_validation'] ?? self::ADDRESS_VALIDATION_NONE;
         }
 
         return '<div class="packetery">' . PHP_EOL . $helper->generateForm($form) . PHP_EOL . '</div>';
@@ -360,11 +337,9 @@ class CarrierAdminForm
 
         $pickupPointType = $this->getPickupPointType($apiCarrier, $carrierData['id_branch']);
 
-        $isCod = false;
         $addressValidation = null;
         $allowedVendorsJson = $this->getDefaultAllowedVendors($carrierData, $apiCarrier);
         if ($carrierData) {
-            $isCod = (bool) $carrierData['is_cod'];
             $addressValidation = $carrierData['address_validation'];
             if ($carrierData['allowed_vendors'] !== null) {
                 $allowedVendorsJson = $carrierData['allowed_vendors'];
@@ -380,8 +355,7 @@ class CarrierAdminForm
                 $apiCarrier['name'],
                 $apiCarrier['currency'],
                 $pickupPointType,
-                $isCod,
-                $addressValidation,
+                $this->resolveAddressValidation($apiCarrier['country'], (bool) $apiCarrier['is_pickup_points'], $addressValidation),
                 $allowedVendorsJson
             );
         }
@@ -413,14 +387,14 @@ class CarrierAdminForm
             \Tools::redirectAdmin($this->tools->getEditLink($this->carrierId));
         }
 
+        $addressValidation = Tools::getStringValueOrNull('address_validation');
         $this->repository->setPacketeryCarrier(
             $this->carrierId,
             $carrierData['id_branch'],
             $apiCarrier['name'],
             $apiCarrier['currency'],
             $pickupPointType,
-            \Tools::getValue('is_cod'),
-            \Tools::getValue('address_validation'),
+            $this->resolveAddressValidation($apiCarrier['country'], (bool) $apiCarrier['is_pickup_points'], $addressValidation),
             $allowedVendors !== null ? json_encode($allowedVendors) : null
         );
 
@@ -698,5 +672,10 @@ class CarrierAdminForm
         }
 
         return $allowedVendorsJson;
+    }
+
+    private function supportsAddressValidation(string $country): bool
+    {
+        return in_array(strtoupper($country), CarrierRepository::ADDRESS_VALIDATION_COUNTRIES, true);
     }
 }

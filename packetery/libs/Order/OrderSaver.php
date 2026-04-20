@@ -112,11 +112,8 @@ class OrderSaver
             $data['carrier_pickup_point'] = null;
         }
 
-        // Determine if is COD
         if ($order->module) {
-            $carrierIsCod = ((int) $packeteryCarrier['is_cod'] === 1);
-            $paymentIsCod = $this->paymentRepository->isCod($order->module);
-            $data['is_cod'] = ($carrierIsCod || $paymentIsCod);
+            $data['is_cod'] = $this->paymentRepository->isCod($order->module);
         }
 
         $packeteryWeight = $this->weightCalculator->getComputedOrDefaultWeight($order);
@@ -164,21 +161,11 @@ class OrderSaver
         $pointCity = (\Tools::getIsset('point_city') ? \Tools::getValue('point_city') : null);
         $pointZip = (\Tools::getIsset('point_zip') ? \Tools::getValue('point_zip') : null);
 
-        $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int) $prestashopCarrierId);
-        $isCod = $packeteryCarrier['is_cod'];
-        if (!isset($branchCurrency, $isCod)) {
-            return [
-                'result' => false,
-                'message' => 'COD setting could not be obtained.',
-            ];
-        }
-
         $packeteryOrderFields = [
             'id_branch' => (int) $branchId,
             'name_branch' => $this->orderRepository->db->escape($branchName),
             'currency_branch' => $this->orderRepository->db->escape($branchCurrency),
             'id_carrier' => (int) $prestashopCarrierId,
-            'is_cod' => (int) $isCod,
             'is_ad' => 0,
             'country' => null,
             'county' => null,
