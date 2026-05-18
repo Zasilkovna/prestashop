@@ -313,4 +313,42 @@ class SoapApi
 
         return $response;
     }
+
+    public function createShipment(array $packetIds): Packetery\Response\CreateShipmentResponse
+    {
+        $response = new Packetery\Response\CreateShipmentResponse();
+
+        try {
+            $soapClient = new \SoapClient(self::WSDL_URL);
+            $result = $soapClient->createShipment($this->configHelper->getApiPass(), $packetIds);
+        } catch (\SoapFault $exception) {
+            $response->setFault($this->getFaultIdentifier($exception));
+            $response->setFaultString($exception->faultstring);
+
+            return $response;
+        }
+
+        $response->setBarcode($result->barcode);
+
+        return $response;
+    }
+
+    public function barcodePng(string $barcode): Packetery\Response\BarcodePngResponse
+    {
+        $response = new Packetery\Response\BarcodePngResponse();
+
+        try {
+            $soapClient = new \SoapClient(self::WSDL_URL);
+            $imageData = $soapClient->barcodePng($this->configHelper->getApiPass(), $barcode);
+        } catch (\SoapFault $exception) {
+            $response->setFault($this->getFaultIdentifier($exception));
+            $response->setFaultString($exception->faultstring);
+
+            return $response;
+        }
+
+        $response->setImage($imageData);
+
+        return $response;
+    }
 }

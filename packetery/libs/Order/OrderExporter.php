@@ -54,24 +54,12 @@ class OrderExporter
 
         [$exportCurrency, $total] = $this->getCurrencyAndTotalValue($order, $packeteryOrder);
 
-        $isCod = $packeteryOrder['is_cod'];
-        if ($isCod) {
-            if ($packeteryOrder['price_cod'] === null) {
-                $codValue = $total;
-            } else {
-                $codValue = $packeteryOrder['price_cod'];
-            }
-
-            if ($exportCurrency === 'CZK') {
-                $codValue = ceil($codValue);
-            } elseif ($exportCurrency === 'HUF') {
-                $codValue = $this->roundUpMultiples($codValue);
-            } else {
-                $codValue = round($codValue, 2);
-            }
-        } else {
-            $codValue = 0;
-        }
+        /** @var CodResolver $codResolver */
+        $codResolver = $this->module->diContainer->get(CodResolver::class);
+        $codValue = $codResolver->roundCodByCurrency(
+            $codResolver->resolveCodValue($packeteryOrder, (float) $total),
+            $exportCurrency
+        );
 
         $address = new \Address($order->id_address_delivery);
         $phone = '';
@@ -85,7 +73,9 @@ class OrderExporter
         $weight = $this->weightCalculator->getFinalWeight($packeteryOrder);
         $weight = (!$weight ? '' : $weight);
 
-        $number = (string) (\Packetery::ID_PREF_REF === ConfigHelper::get('PACKETERY_ID_PREFERENCE') ? $order->reference : $order->id);
+        /** @var OrderNumberResolver $orderNumberResolver */
+        $orderNumberResolver = $this->module->diContainer->get(OrderNumberResolver::class);
+        $number = $orderNumberResolver->getPreferredOrderNumber($order);
         $idShop = ((string) $packeteryOrder['id_shop'] !== '') ? $packeteryOrder['id_shop'] : '';
         $senderLabel = (string) ConfigHelper::get('PACKETERY_ESHOP_ID', $packeteryOrder['id_shop_group'], $idShop);
         $customer = $order->getCustomer();
@@ -152,19 +142,6 @@ class OrderExporter
         }
 
         return $data;
-    }
-
-    /**
-     * Gets a value divisible by $x.
-     *
-     * @param float|int $n
-     * @param int $x
-     *
-     * @return float|int
-     */
-    public function roundUpMultiples($n, $x = 5)
-    {
-        return (ceil($n) % $x === 0) ? ceil($n) : round(($n + $x / 2) / $x) * $x;
     }
 
     /**

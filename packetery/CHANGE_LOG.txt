@@ -8,6 +8,7 @@
        - Updated: Multiple issues from PrestaShop validator resolved.
        - Updated: Added company to shipment submission via API.
        - Updated: Removed Czech language from Slovak translations.
+       - Added: Bill of delivery print to group actions of the Packetery order grid.
        - Fixed: Some Czech and Slovak texts were incorrectly displayed in English.
        - Fixed: Correct Ajax behavior in checkout if friendly URLs are not enabled.
 3.3.0  - Added: Support for PrestaShop 9.
