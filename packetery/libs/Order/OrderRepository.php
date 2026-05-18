@@ -291,10 +291,10 @@ class OrderRepository
             SELECT
                    `id_branch`,
                    `name_branch`,
-                   `id_carrier`, 
-                   `is_cod`, 
+                   `id_carrier`,
+                   `is_cod`,
                    `is_ad`,
-                   `currency_branch`, 
+                   `currency_branch`,
                    `is_carrier`,
                    `carrier_pickup_point`,
                    `tracking_number`,
@@ -307,8 +307,55 @@ class OrderRepository
                    `city`,
                    `street`,
                    `house_number`
-            FROM `' . _DB_PREFIX_ . 'packetery_order` 
+            FROM `' . _DB_PREFIX_ . 'packetery_order`
             WHERE `id_order` = ' . $orderId);
+    }
+
+    /**
+     * @param int[] $orderIds
+     *
+     * @return array<int, array<string, mixed>>
+     *
+     * @throws DatabaseException
+     */
+    public function getByIds(array $orderIds): array
+    {
+        if ($orderIds === []) {
+            return [];
+        }
+
+        $idList = implode(',', array_map('intval', $orderIds));
+        $rows = $this->dbTools->getRows('
+            SELECT
+                   `id_order`,
+                   `id_branch`,
+                   `name_branch`,
+                   `id_carrier`,
+                   `is_cod`,
+                   `price_total`,
+                   `price_cod`,
+                   `is_ad`,
+                   `currency_branch`,
+                   `is_carrier`,
+                   `carrier_pickup_point`,
+                   `tracking_number`,
+                   `weight`,
+                   `length`,
+                   `height`,
+                   `width`,
+                   `zip`,
+                   `city`,
+                   `street`,
+                   `house_number`
+            FROM `' . _DB_PREFIX_ . 'packetery_order`
+            WHERE `id_order` IN (' . $idList . ')');
+
+        $byId = [];
+        foreach ($rows as $row) {
+            $byId[(int) $row['id_order']] = $row;
+        }
+
+        return $byId;
     }
 
     /**

@@ -23,6 +23,7 @@ class ConfigHelper
     public const KEY_LAST_RELEASE_NOTES = 'PACKETERY_LAST_RELEASE_NOTES';
     public const KEY_USE_PS_CURRENCY_CONVERSION = 'PACKETERY_USE_PS_CURRENCY_CONVERSION';
     public const KEY_WIDGET_VALIDATION_MODE = 'PACKETERY_WIDGET_VALIDATION_MODE';
+    public const KEY_ID_PREFERENCE = 'PACKETERY_ID_PREFERENCE';
 
     private const BEHAVIOR_ALL = 'all'; // default
     private const BEHAVIOR_SEPARATE = 'separate';
@@ -151,6 +152,11 @@ class ConfigHelper
         }
 
         return self::BEHAVIOR_ALL;
+    }
+
+    public static function isOrderNumberByReference(): bool
+    {
+        return self::get(self::KEY_ID_PREFERENCE) === \Packetery::ID_PREF_REF;
     }
 
     public static function isApiWidgetValidationModeEnabled(): bool

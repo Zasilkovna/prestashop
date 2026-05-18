@@ -9,10 +9,12 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use Packetery\Exceptions\AggregatedException;
+use Packetery\Exceptions\CollectionPrintException;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\LabelPrintException;
 use Packetery\Module\SoapApi;
 use Packetery\Module\VersionChecker;
+use Packetery\Order\CollectionPrintHandler;
 use Packetery\Order\CsvExporter;
 use Packetery\Order\Labels;
 use Packetery\Order\OrderRepository;
@@ -28,6 +30,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 {
     public const ACTION_BULK_LABEL_PDF = 'bulkLabelPdf';
     public const ACTION_BULK_CARRIER_LABEL_PDF = 'bulkCarrierLabelPdf';
+    public const ACTION_BULK_COLLECTION_PRINT = 'bulkCollectionPrint';
 
     /** @var array */
     protected $statuses_array = [];
@@ -201,6 +204,10 @@ class PacketeryOrderGridController extends ModuleAdminController
                 'text' => $this->module->l('CSV export', 'packeteryordergridcontroller'),
                 'icon' => 'icon-download',
             ],
+            'CollectionPrint' => [
+                'text' => $this->module->l('Print bill of delivery', 'packeteryordergridcontroller'),
+                'icon' => 'icon-print',
+            ],
         ];
 
         $title = $this->module->l('Packeta Orders', 'packeteryordergridcontroller');
@@ -208,6 +215,14 @@ class PacketeryOrderGridController extends ModuleAdminController
         $this->toolbar_title = $title;
 
         $this->hasBulkLabelPrintingError = false;
+    }
+
+    public function setMedia($isNewTheme = false): void
+    {
+        parent::setMedia($isNewTheme);
+
+        $this->addJS($this->getModule()->getPathUri() . 'views/js/collectionPrintBulkAction.js');
+        $this->addCSS($this->getModule()->getPathUri() . 'views/css/collectionPrintForm.css');
     }
 
     /**
@@ -469,6 +484,36 @@ class PacketeryOrderGridController extends ModuleAdminController
         exit;
     }
 
+    /**
+     * @throws ReflectionException
+     */
+    public function processBulkCollectionPrint(): void
+    {
+        /** @var CollectionPrintHandler $handler */
+        $handler = $this->getModule()->diContainer->get(CollectionPrintHandler::class);
+
+        $orderIds = array_map('intval', $this->boxes ?? []);
+        $templateVariables = $handler->handleBulkAction($orderIds);
+        foreach ($templateVariables as $key => $value) {
+            $this->tpl_list_vars[$key] = $value;
+        }
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function processShowCollectionPrint(): void
+    {
+        /** @var CollectionPrintHandler $handler */
+        $handler = $this->getModule()->diContainer->get(CollectionPrintHandler::class);
+
+        try {
+            $handler->renderPrint((string) Tools::getValue('packetery_order_ids', ''));
+        } catch (CollectionPrintException $exception) {
+            $this->errors[] = $exception->getMessage();
+        }
+    }
+
     public function renderList()
     {
         if ($this->action === self::ACTION_BULK_LABEL_PDF || $this->action === self::ACTION_BULK_CARRIER_LABEL_PDF) {
@@ -561,7 +606,9 @@ class PacketeryOrderGridController extends ModuleAdminController
     {
         // values are saved even before bulk actions
         if (
-            $this->action !== self::ACTION_BULK_LABEL_PDF && $this->action !== self::ACTION_BULK_CARRIER_LABEL_PDF
+            $this->action !== self::ACTION_BULK_LABEL_PDF
+            && $this->action !== self::ACTION_BULK_CARRIER_LABEL_PDF
+            && $this->action !== self::ACTION_BULK_COLLECTION_PRINT
         ) {
             $change = false;
             /** @var OrderRepository $orderRepo */
