@@ -25,7 +25,41 @@ class Packetery extends CarrierModule
     public const PP_ALL = 'pp_all';
     public const LOCAL = 'local';
     public const REMOTE = 'remote';
+
     private const PACKETA_SUPPORT_EMAIL = 'e-commerce.support@packeta.com';
+
+    public const PACKETA_ADDRESS = [
+        'CZ' => [
+            'company' => 'Zásilkovna s.r.o.',
+            'street' => 'Českomoravská 2408/1a',
+            'zip' => '190 00',
+            'city' => 'Praha 9',
+        ],
+        'SK' => [
+            'company' => 'Packeta Slovakia s. r. o.',
+            'street' => 'Sliačska 1E',
+            'zip' => '831 02',
+            'city' => 'Bratislava',
+        ],
+        'HU' => [
+            'company' => 'Packeta Hungary Kft.',
+            'street' => 'Ezred utca 1-3. B2/11',
+            'zip' => '1044',
+            'city' => 'Budapest',
+        ],
+        'RO' => [
+            'company' => 'Packeta Romania s.r.l.',
+            'street' => 'Strada Călușei 21A, parter',
+            'zip' => '021351',
+            'city' => 'București, Sector 2',
+        ],
+        'PL' => [
+            'company' => 'Packeta Poland Sp. z o.o.',
+            'street' => 'ul. Postępu 14',
+            'zip' => '02-676',
+            'city' => 'Warszawa',
+        ],
+    ];
 
     public const MODULE_SLUG = 'packetery';
 

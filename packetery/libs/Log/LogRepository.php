@@ -26,6 +26,7 @@ class LogRepository
     public const ACTION_CARRIER_TRACKING_NUMBER = 'carrier-tracking-number';
     public const ACTION_PACKET_CANCELLING = 'packet-cancelling';
     public const ACTION_PICKUP_POINT_VALIDATE = 'pickup-point-validate';
+    public const ACTION_COLLECTION_PRINT = 'collection-print';
 
     /** @var DbTools */
     private $dbTools;
@@ -73,6 +74,7 @@ class LogRepository
             self::ACTION_CARRIER_TRACKING_NUMBER => $this->module->l('Carrier tracking number', 'logrepository'),
             self::ACTION_PACKET_CANCELLING => $this->module->l('Packet cancelling', 'logrepository'),
             self::ACTION_PICKUP_POINT_VALIDATE => $this->module->l('Pickup point validation', 'logrepository'),
+            self::ACTION_COLLECTION_PRINT => $this->module->l('Print bill of delivery', 'logrepository'),
         ];
     }
 

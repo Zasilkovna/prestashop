@@ -9,6 +9,9 @@
 {if isset($versionUpdateMessageHtml)}
 	{$versionUpdateMessageHtml nofilter}
 {/if}
+{if isset($collectionPrintFormPath)}
+    {include file=$collectionPrintFormPath}
+{/if}
 {if isset($prepareLabelsMode) && $prepareLabelsMode}
 <div class="panel">
 	<div class="panel-heading">
