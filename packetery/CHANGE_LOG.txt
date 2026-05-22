@@ -3,7 +3,8 @@
        - Fixed: Fix error during the export of Packeta order list.
        - Update: Packetery configuration section divided into two tabs.
        - Added: Log Packeta widget parameters to the developers console.
-3.5.0  - Updated: Add bill of delivery print to group actions of Packetery order grid
+3.5.0  - Added: Option to display the Z-BOX consign password in the order detail. The password is retrieved either immediately when the packet is submitted, or in bulk via a cron task.
+       - Updated: Add bill of delivery print to group actions of Packetery order grid
        - Fixed: Let Widget Validation option only for CZ/SK carriers in carrier administration
        - Updated: Removed displaying "is COD" flag.
 3.4.0  - Updated: Made compatible with feed v5.

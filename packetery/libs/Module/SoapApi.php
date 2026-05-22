@@ -95,6 +95,10 @@ class SoapApi
                     $response->courierInfo->courierInfoItem->courierTrackingUrls->courierTrackingUrl
                 ));
             }
+
+            if (isset($response->consignPassword)) {
+                $packetInfo->setConsignPassword($response->consignPassword);
+            }
         } catch (\SoapFault $exception) {
             $packetInfo->setFault($this->getFaultIdentifier($exception));
             $packetInfo->setFaultString($exception->faultstring);

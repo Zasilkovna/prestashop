@@ -10,6 +10,7 @@ if (!defined('_PS_VERSION_')) {
 
 use Packetery\Cron\Tasks\DeleteLabels;
 use Packetery\Cron\Tasks\DownloadCarriers;
+use Packetery\Cron\Tasks\GetConsignPassword;
 use Packetery\Cron\Tasks\PurgeLogs;
 use Packetery\Cron\Tasks\UpdatePacketStatus;
 use Packetery\Tools\ConfigHelper;
@@ -64,6 +65,9 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
             case UpdatePacketStatus::getTaskName():
                 $taskName = $this->module->l('Packet tracking status update', 'cron');
                 break;
+            case GetConsignPassword::getTaskName():
+                $taskName = $this->module->l('Get consign password', 'cron');
+                break;
             default:
                 $taskName = $task;
         }
@@ -96,6 +100,16 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
                 $updatePacketStatus = $this->module->diContainer->get(UpdatePacketStatus::class);
                 $errors = $updatePacketStatus->execute();
                 $this->renderErrors($errors);
+                break;
+            case GetConsignPassword::getTaskName():
+                $getConsignPassword = $this->module->diContainer->get(GetConsignPassword::class);
+                $messages = $getConsignPassword->execute(
+                    (int) Tools::getValue('max_orders', GetConsignPassword::DEFAULT_MAX_ORDERS),
+                    (int) Tools::getValue('max_order_age_days', GetConsignPassword::DEFAULT_MAX_ORDER_AGE_DAYS)
+                );
+                foreach ($messages as $message) {
+                    $this->renderMessage($message);
+                }
                 break;
             default:
                 $this->renderError($this->module->l('Task was not found.', 'cron'));

@@ -36,6 +36,12 @@ function upgrade_module_3_5_0(Packetery $module): bool
         WHERE UPPER(pc.country) NOT IN (' . $countriesList . ')
         AND pad.address_validation IS NOT NULL';
 
+    $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
+        ADD `consign_password` VARCHAR(10) NULL AFTER `point_city`,
+        ADD `consign_password_processed` DATETIME NULL AFTER `consign_password`,
+        ADD KEY `idx_consign_tracking` (`tracking_number`, `consign_password`),
+        ADD KEY `idx_consign_processed` (`consign_password_processed`);';
+
     $executeResult = $dbTools->executeQueries(
         $sql,
         $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.5.0'),

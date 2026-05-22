@@ -33,19 +33,21 @@ class PacketSubmitter
     private $module;
     /** @var ConfigHelper */
     private $configHelper;
+    /** @var ConsignPasswordProvider */
+    private $consignPasswordProvider;
 
-    /**
-     * @param OrderRepository $orderRepository
-     * @param LogRepository $logRepository
-     * @param \Packetery $module
-     * @param ConfigHelper $configHelper
-     */
-    public function __construct(OrderRepository $orderRepository, LogRepository $logRepository, \Packetery $module, ConfigHelper $configHelper)
-    {
+    public function __construct(
+        OrderRepository $orderRepository,
+        LogRepository $logRepository,
+        \Packetery $module,
+        ConfigHelper $configHelper,
+        ConsignPasswordProvider $consignPasswordProvider
+    ) {
         $this->orderRepository = $orderRepository;
         $this->logRepository = $logRepository;
         $this->module = $module;
         $this->configHelper = $configHelper;
+        $this->consignPasswordProvider = $consignPasswordProvider;
     }
 
     /**
@@ -170,11 +172,13 @@ class PacketSubmitter
                             );
                         }
                     }
+
+                    $this->refreshConsignPasswordIfImmediate((int) $orderId, $trackingNumber);
                 }
-            } catch (ExportException $exportException) {
-                $errors[] = $exportException;
-            } catch (ApiClientException $apiClientException) {
-                $errors[] = $apiClientException;
+            } catch (ExportException $e) {
+                $errors[] = $e;
+            } catch (ApiClientException $e) {
+                $errors[] = $e;
             }
         }
 
@@ -233,5 +237,23 @@ class PacketSubmitter
         }
 
         return $errorMessage;
+    }
+
+    private function refreshConsignPasswordIfImmediate(int $orderId, string $packetId): void
+    {
+        if (ConsignPasswordSettings::fromConfig()->isImmediate() === false) {
+            return;
+        }
+
+        try {
+            $consignPassword = $this->consignPasswordProvider->fetchFromApi($orderId, $packetId);
+            if ($consignPassword !== null) {
+                $this->orderRepository->setConsignPassword($orderId, $consignPassword);
+            }
+        } catch (ApiClientException $e) {
+            return;
+        } catch (DatabaseException $e) {
+            return;
+        }
     }
 }
