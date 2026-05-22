@@ -93,5 +93,54 @@
             </div>
         </div>
     </div>
+    <div class="panel">
+        <div class="panel-heading">
+            {l s='Show consign password for Z-BOX via CRON' mod='packetery'}
+        </div>
+        <div class="clearfix">
+            <div class="col-lg-12">
+                {if isset($getConsignPasswordUrl)}
+                    <p>
+                        {l s='This URL provides functionality for retrieving consign passwords for packets in bulk via CRON.' mod='packetery'}
+                    </p>
+                    <p>
+                        {l s='It processes packets that meet the configured conditions and retrieves their consign passwords in the background.' mod='packetery'}
+                    </p>
+                    <p>
+                        {l s='To enable automatic processing, you need to call this URL via CRON jobs.' mod='packetery'}
+                    </p>
+                    <p>
+                        <a href="{$getConsignPasswordUrl|escape:'htmlall':'UTF-8'}" target="_blank">{$getConsignPasswordUrl|escape:'htmlall':'UTF-8'}</a>
+                    </p>
+                    <p>
+                        {l s='URL parameters available to modify the behavior:' mod='packetery'}
+                    </p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{l s='URL parameter' mod='packetery'}</th>
+                                <th>{l s='Description' mod='packetery'}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>max_orders</td>
+                                <td>
+                                    {l s='Limits how many orders are processed in one CRON execution. This helps reduce server load.' mod='packetery'}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>max_order_age_days</td>
+                                <td>
+                                    {l s='Defines how old packets (in days) can be to be included in processing. Example: 5 = only orders up to 5 days old will be processed.' mod='packetery'}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>{l s='* If the feature is disabled or set to immediate retrieval upon packet submission, this CRON call will not process any packets.' mod='packetery'}</p>
+                {/if}
+            </div>
+        </div>
+    </div>
 
 </div>

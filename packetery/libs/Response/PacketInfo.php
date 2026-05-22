@@ -25,6 +25,8 @@ class PacketInfo extends BaseResponse
      * @var string
      */
     private $trackingLink;
+    /** @var string|null */
+    private $consignPassword;
 
     /**
      * Sets packet carrier number.
@@ -64,5 +66,21 @@ class PacketInfo extends BaseResponse
     public function getTrackingLink()
     {
         return $this->trackingLink;
+    }
+
+    public function setConsignPassword(?string $consignPassword): void
+    {
+        if ($consignPassword === '') {
+            $this->consignPassword = null;
+
+            return;
+        }
+
+        $this->consignPassword = $consignPassword;
+    }
+
+    public function getConsignPassword(): ?string
+    {
+        return $this->consignPassword;
     }
 }

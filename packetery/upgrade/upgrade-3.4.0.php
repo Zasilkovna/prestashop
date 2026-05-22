@@ -56,6 +56,12 @@ function upgrade_module_3_4_0(Packetery $module): bool
     $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_carriers`
         ADD `available` tinyint(1) NOT NULL DEFAULT 1;';
 
+    $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
+        ADD `consign_password` VARCHAR(10) NULL AFTER `point_city`,
+        ADD `consign_password_processed` DATETIME NULL AFTER `consign_password`,
+        ADD KEY `idx_consign_tracking` (`tracking_number`, `consign_password`),
+        ADD KEY `idx_consign_processed` (`consign_password_processed`);';
+
     $dbTools = $module->diContainer->get(DbTools::class);
     $executeResult = $dbTools->executeQueries(
         $sql,

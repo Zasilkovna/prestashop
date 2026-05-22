@@ -185,8 +185,12 @@ class Installer
             `point_street` varchar(120) NULL,
             `point_zip` varchar(10) NULL,
             `point_city` varchar(70) NULL,
+            `consign_password` varchar(10) NULL,
+            `consign_password_processed` datetime NULL,
             UNIQUE(`id_order`),
-            UNIQUE(`id_cart`)
+            UNIQUE(`id_cart`),
+            KEY `idx_consign_tracking` (`tracking_number`, `consign_password`),
+            KEY `idx_consign_processed` (`consign_password_processed`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';
@@ -249,6 +253,8 @@ class Installer
             && ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION, $this->module->version)
             && ConfigHelper::update(ConfigHelper::KEY_LAST_VERSION_URL, '')
             && ConfigHelper::update(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION, 0)
+            && ConfigHelper::update(ConfigHelper::KEY_SHOW_CONSIGN_PASSWORD, 0)
+            && ConfigHelper::update(ConfigHelper::KEY_CONSIGN_PASSWORD_RETRIEVAL, \Packetery\Order\ConsignPasswordSettings::MODE_IMMEDIATE)
         ;
     }
 

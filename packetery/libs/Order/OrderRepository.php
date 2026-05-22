@@ -11,6 +11,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use Packetery\Exceptions\ConsignPasswordCleanupException;
 use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\TrackingNumberClearingException;
 use Packetery\Tools\DbTools;
@@ -267,6 +268,7 @@ class OrderRepository
                    `po`.`point_street`,
                    `po`.`point_city`,
                    `po`.`point_zip`,
+                   `po`.`consign_password`,
                    `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
@@ -618,5 +620,103 @@ class OrderRepository
         $orderId = (int) $orderId;
 
         return $this->dbTools->update('packetery_order', ['last_update_tracking_status' => $lastUpdateTrackingStatus->format('Y-m-d H:i:s')], '`id_order` = ' . $orderId);
+    }
+
+    /**
+     * @throws DatabaseException
+     */
+    public function setConsignPassword(int $orderId, string $consignPassword): bool
+    {
+        return $this->dbTools->update(
+            'packetery_order',
+            [
+                'consign_password' => $this->db->escape($consignPassword),
+                'consign_password_processed' => null,
+            ],
+            'id_order = ' . $orderId,
+            0,
+            true
+        );
+    }
+
+    /**
+     * @param int[] $orderIds
+     */
+    public function markConsignPasswordAttempts(array $orderIds): bool
+    {
+        $orderIds = array_values(array_unique($orderIds));
+        if ($orderIds === []) {
+            return true;
+        }
+
+        $idList = implode(',', $orderIds);
+
+        return $this->dbTools->update(
+            'packetery_order',
+            ['consign_password_processed' => (new \DateTimeImmutable('now'))->format('Y-m-d H:i:s')],
+            "id_order IN ({$idList})"
+        );
+    }
+
+    /**
+     * @throws ConsignPasswordCleanupException
+     */
+    public function clearConsignPassword(int $orderId): void
+    {
+        $messageBase = "Failed to clear consignment password for order {$orderId}";
+
+        try {
+            $result = $this->dbTools->update(
+                'packetery_order',
+                [
+                    'consign_password' => null,
+                    'consign_password_processed' => null,
+                ],
+                "`id_order` = {$orderId}",
+                1,
+                true
+            );
+        } catch (DatabaseException $e) {
+            throw new ConsignPasswordCleanupException($messageBase . ': ' . $e->getMessage());
+        }
+
+        if ($result === false) {
+            throw new ConsignPasswordCleanupException($messageBase);
+        }
+    }
+
+    /**
+     * Untried orders first, then oldest processed first (FIFO retry across runs).
+     *
+     * @return array<int, array{id_order:int, tracking_number:string}>
+     */
+    public function getOrdersMissingConsignPassword(int $maxOrders, int $maxOrderAgeDays): array
+    {
+        $oldestAllowed = (new \DateTimeImmutable('-' . $maxOrderAgeDays . ' days'))
+            ->format('Y-m-d H:i:s');
+
+        $sql = 'SELECT po.id_order, po.tracking_number
+                FROM ' . _DB_PREFIX_ . 'packetery_order po
+                JOIN ' . _DB_PREFIX_ . 'orders o ON o.id_order = po.id_order
+                WHERE po.tracking_number IS NOT NULL
+                  AND po.tracking_number != ""
+                  AND po.consign_password IS NULL
+                  AND o.date_add >= "' . $this->db->escape($oldestAllowed) . '"
+                ORDER BY po.consign_password_processed ASC,
+                         o.date_add ASC
+                LIMIT ' . $maxOrders;
+
+        $rows = $this->dbTools->getRows($sql);
+        if (!is_array($rows)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($rows as $row) {
+            $row['id_order'] = (int) $row['id_order'];
+            $result[] = $row;
+        }
+
+        return $result;
     }
 }
