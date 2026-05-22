@@ -12,6 +12,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use Packetery\Exceptions\ConsignPasswordCleanupException;
+use Packetery\Exceptions\TrackingNumberClearingException;
 use Packetery\Log\LogRepository;
 use Packetery\Module\SoapApi;
 use Packetery\Request\CancelPacketRequest;
@@ -70,9 +72,16 @@ class PacketCanceller
 
             try {
                 $this->orderRepository->clearTrackingNumber($orderId);
-            } catch (\Exception $e) {
+            } catch (TrackingNumberClearingException $e) {
                 $messages[] = $this->module->l('Unable to remove the tracking number from the order.', 'packetcanceller');
                 $cancellationResult = false;
+            }
+
+            try {
+                $this->orderRepository->clearConsignPassword($orderId);
+            } catch (ConsignPasswordCleanupException $e) {
+                // intentionally silent for the user — only logged; user-visible messages are reserved for tracking number cleanup
+                \PrestaShopLoggerCore::addLog($e->getMessage(), 3, null, 'PacketeryOrder', $orderId, true);
             }
         }
 

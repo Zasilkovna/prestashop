@@ -87,6 +87,13 @@
                 {/if}
             {/if}
 
+            {if isset($consignPassword) && $consignPassword}
+                <p>
+                    {l s='Consign password for Z-BOX' mod='packetery'}:
+                    <strong>{$consignPassword|escape:'htmlall':'UTF-8'}</strong>
+                </p>
+            {/if}
+
             {if $showCancelButton}
                 <form action="{$returnUrl|escape:'htmlall':'UTF-8'}" method="post">
                     <p>
