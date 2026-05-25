@@ -32,6 +32,7 @@ class CollectionPrintOrderViewFactory
      * @return array{
      *     index: int,
      *     trackingNumber: string,
+     *     consignPassword: string|null,
      *     orderNumber: string,
      *     customerName: string,
      *     pickupPoint: string,
@@ -56,6 +57,7 @@ class CollectionPrintOrderViewFactory
         return [
             'index' => $index,
             'trackingNumber' => (string) ($orderData['tracking_number'] ?? ''),
+            'consignPassword' => $orderData['consign_password'] ?? null,
             'orderNumber' => $orderNumber,
             'customerName' => trim(sprintf('%s %s', $address->firstname, $address->lastname)),
             'pickupPoint' => (string) ($orderData['name_branch'] ?? ''),

@@ -96,6 +96,7 @@ class CollectionPrintHandler
         $smarty->assign('barcodeImage', $barcodeData->barcodeImage);
         $smarty->assign('barcodeText', $barcodeData->barcodeText);
         $smarty->assign('orders', $ordersData['ordersForPrint']);
+        $smarty->assign('showConsignPassword', ConsignPasswordSettings::fromConfig()->isEnabled());
         $smarty->assign('orderCount', count($ordersData['ordersForPrint']));
         $smarty->assign('generatedAt', (new \DateTimeImmutable('now'))->format('d. m. Y'));
 

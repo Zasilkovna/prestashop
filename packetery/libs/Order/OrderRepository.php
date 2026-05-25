@@ -341,6 +341,7 @@ class OrderRepository
                    `is_carrier`,
                    `carrier_pickup_point`,
                    `tracking_number`,
+                   `consign_password`,
                    `weight`,
                    `length`,
                    `height`,

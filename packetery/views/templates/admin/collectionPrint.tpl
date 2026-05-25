@@ -14,7 +14,7 @@
 <table>
     <thead>
         <tr>
-            <td colspan="6">
+            <td colspan="{if $showConsignPassword}7{else}6{/if}">
                 <table>
                     <tbody>
                     <tr>
@@ -47,6 +47,7 @@
         <tr>
             <th>{l s='Order No.' mod='packetery'}</th>
             <th>{l s='Barcode' mod='packetery'}</th>
+            {if $showConsignPassword}<th>{l s='Z-BOX consign password' mod='packetery'}</th>{/if}
             <th>{l s='Created' mod='packetery'}</th>
             <th>{l s='Recipient full name' mod='packetery'}</th>
             <th>{l s='C.O.D.' mod='packetery'}</th>
@@ -58,6 +59,7 @@
         <tr class="{if $row.index % 2 == 0}even{else}odd{/if}">
             <td class="cell-nowrap">{$row.orderNumber|escape:'htmlall':'UTF-8'}</td>
             <td class="cell-nowrap cell-center">{$row.trackingNumber|escape:'htmlall':'UTF-8'}</td>
+            {if $showConsignPassword}<td class="cell-nowrap cell-center">{$row.consignPassword|default:''|escape:'htmlall':'UTF-8'}</td>{/if}
             <td class="cell-nowrap cell-center">{$row.created|escape:'htmlall':'UTF-8'}</td>
             <td class="cell-nowrap cell-center">{$row.customerName|escape:'htmlall':'UTF-8'}</td>
             <td class="cell-nowrap cell-right"><strong>{$row.cod|escape:'htmlall':'UTF-8'}&nbsp;{$row.codCurrency|escape:'htmlall':'UTF-8'}</strong></td>

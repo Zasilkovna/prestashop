@@ -10,6 +10,7 @@
        - Updated: Removed Czech language from Slovak translations.
        - Added: Bill of delivery print to group actions of the Packetery order grid.
        - Added: Option to display the Z-BOX consign password in the order detail. The password is retrieved either immediately when the packet is submitted, or in bulk via a cron task.
+       - Added: Z-BOX consign password column in the bill of delivery print, visible only when the "Show consign password for Z-BOX" option is enabled.
        - Fixed: Some Czech and Slovak texts were incorrectly displayed in English.
        - Fixed: Correct Ajax behavior in checkout if friendly URLs are not enabled.
 3.3.0  - Added: Support for PrestaShop 9.
