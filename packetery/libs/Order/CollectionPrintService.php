@@ -40,6 +40,7 @@ class CollectionPrintService
      *     ordersForPrint: array<int, array{
      *         index: int,
      *         trackingNumber: string,
+     *         consignPassword: string|null,
      *         orderNumber: string,
      *         customerName: string,
      *         pickupPoint: string,
