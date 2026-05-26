@@ -70,7 +70,8 @@ class Packetery extends CarrierModule
 
     public function __construct()
     {
-        $this->name = self::MODULE_SLUG;
+        // It is not possible to use self::MODULE_SLUG because the PS validator cannot correctly identify the module name.
+        $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
         $this->version = '3.5.0';
         $this->author = 'Packeta s.r.o.';
@@ -92,8 +93,6 @@ class Packetery extends CarrierModule
         $this->bootstrap = true;
 
         parent::__construct();
-
-        $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
 
         $this->displayName = $this->l('Packeta');
         $this->description = $this->l('Packeta pick-up points, orders export, and print shipping labels');
@@ -1195,11 +1194,6 @@ class Packetery extends CarrierModule
             $showActionButtonsDivider = true;
         }
 
-        foreach ($messages as $key => $message) {
-            if (isset($message['text'])) {
-                $messages[$key]['text'] = nl2br($message['text']);
-            }
-        }
         $this->context->smarty->assign('messages', $messages);
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
@@ -1700,7 +1694,6 @@ class Packetery extends CarrierModule
      *
      * @throws ReflectionException
      * @throws Packetery\Exceptions\DatabaseException
-     * @throws SmartyException tracking link related exception
      */
     private function processPostParcel(array &$messages)
     {
@@ -1718,20 +1711,17 @@ class Packetery extends CarrierModule
         try {
             $trackingNumbers = $packetSubmitter->ordersExport($orderIds);
             foreach ($trackingNumbers as $trackingNumber) {
-                $smarty = $this->getContext()->smarty;
-                $smarty->assign('trackingNumber', $trackingNumber);
-                $smarty->assign('trackingUrl', Packetery\Module\Helper::getTrackingUrl($trackingNumber));
-                $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
-
                 $messages[] = [
-                    'text' => $this->l('The shipment was successfully submitted under shipment number:') . ' ' . $packeteryTrackingLink,
+                    'text' => $this->l('The shipment was successfully submitted under shipment number:'),
+                    'trackingNumber' => $trackingNumber,
+                    'trackingUrl' => Packetery\Module\Helper::getTrackingUrl($trackingNumber),
                     'class' => 'success',
                 ];
             }
         } catch (Packetery\Exceptions\AggregatedException $aggregatedException) {
             foreach ($aggregatedException->getExceptions() as $exception) {
                 $messages[] = [
-                    'text' => $exception->getMessage(),
+                    'errors' => explode("\n", $exception->getMessage()),
                     'class' => 'danger',
                 ];
             }
