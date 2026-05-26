@@ -70,7 +70,8 @@ class Packetery extends CarrierModule
 
     public function __construct()
     {
-        $this->name = self::MODULE_SLUG;
+        // It is not possible to use self::MODULE_SLUG because the PS validator cannot correctly identify the module name.
+        $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
         $this->version = '3.5.0';
         $this->author = 'Packeta s.r.o.';
@@ -92,8 +93,6 @@ class Packetery extends CarrierModule
         $this->bootstrap = true;
 
         parent::__construct();
-
-        $this->module_key = '4e832ab2d3afff4e6e53553be1516634';
 
         $this->displayName = $this->l('Packeta');
         $this->description = $this->l('Packeta pick-up points, orders export, and print shipping labels');
