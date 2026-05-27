@@ -263,7 +263,14 @@
         {/if}
         {if isset($messages)}
             {foreach from=$messages item=message}
-                <div class="alert alert-{$message.class|escape:'htmlall':'UTF-8'}">{$message.text|escape:'htmlall':'UTF-8'}</div>
+                <div class="alert alert-{$message.class|escape:'htmlall':'UTF-8'}">
+                    {if isset($message.errors)}
+                        {foreach from=$message.errors item=error name=errorLoop}{$error|escape:'htmlall':'UTF-8'}{if !$smarty.foreach.errorLoop.last}<br />{/if}{/foreach}
+                    {/if}
+                    {if isset($message.text)}
+                        {$message.text|escape:'htmlall':'UTF-8'}{if isset($message.trackingNumber) && isset($message.trackingUrl)} {include file="module:packetery/views/templates/admin/trackingLink.tpl" trackingUrl=$message.trackingUrl trackingNumber=$message.trackingNumber}{/if}
+                    {/if}
+                </div>
             {/foreach}
         {/if}
     </div>

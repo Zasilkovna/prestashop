@@ -1194,11 +1194,6 @@ class Packetery extends CarrierModule
             $showActionButtonsDivider = true;
         }
 
-        foreach ($messages as $key => $message) {
-            if (isset($message['text'])) {
-                $messages[$key]['text'] = nl2br($message['text']);
-            }
-        }
         $this->context->smarty->assign('messages', $messages);
         $this->context->smarty->assign('pickupPointChangeAllowed', $pickupPointChangeAllowed);
         $this->context->smarty->assign('postParcelButtonAllowed', $postParcelButtonAllowed);
@@ -1699,7 +1694,6 @@ class Packetery extends CarrierModule
      *
      * @throws ReflectionException
      * @throws Packetery\Exceptions\DatabaseException
-     * @throws SmartyException tracking link related exception
      */
     private function processPostParcel(array &$messages)
     {
@@ -1717,20 +1711,17 @@ class Packetery extends CarrierModule
         try {
             $trackingNumbers = $packetSubmitter->ordersExport($orderIds);
             foreach ($trackingNumbers as $trackingNumber) {
-                $smarty = $this->getContext()->smarty;
-                $smarty->assign('trackingNumber', $trackingNumber);
-                $smarty->assign('trackingUrl', Packetery\Module\Helper::getTrackingUrl($trackingNumber));
-                $packeteryTrackingLink = $smarty->fetch(dirname(__FILE__) . '/views/templates/admin/trackingLink.tpl');
-
                 $messages[] = [
-                    'text' => $this->l('The shipment was successfully submitted under shipment number:') . ' ' . $packeteryTrackingLink,
+                    'text' => $this->l('The shipment was successfully submitted under shipment number:'),
+                    'trackingNumber' => $trackingNumber,
+                    'trackingUrl' => Packetery\Module\Helper::getTrackingUrl($trackingNumber),
                     'class' => 'success',
                 ];
             }
         } catch (Packetery\Exceptions\AggregatedException $aggregatedException) {
             foreach ($aggregatedException->getExceptions() as $exception) {
                 $messages[] = [
-                    'text' => $exception->getMessage(),
+                    'errors' => explode("\n", $exception->getMessage()),
                     'class' => 'danger',
                 ];
             }
