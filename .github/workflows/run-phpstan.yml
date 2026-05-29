@@ -30,5 +30,17 @@ jobs:
             -   name: Install Composer dependencies
                 run: composer install
 
+            -   name: Baseline nesmí růst
+                if: github.event_name == 'pull_request'
+                run: |
+                    git fetch origin "${{ github.base_ref }}" --depth=1
+                    BASE=$(git show "origin/${{ github.base_ref }}:phpstan/phpstan-baseline.neon" 2>/dev/null | grep -c 'message:' || echo 0)
+                    HEAD=$(grep -c 'message:' phpstan/phpstan-baseline.neon || echo 0)
+                    echo "baseline: base=$BASE head=$HEAD"
+                    if [ "$HEAD" -gt "$BASE" ]; then
+                      echo "::error::Baseline narostl ($BASE -> $HEAD). Oprav kód místo regenerace baseline, nebo jde o vědomý bump levelu (commitni zvlášť a popiš v PR)."
+                      exit 1
+                    fi
+
             -   name: Run PHPStan
                 run: composer run phpstan
