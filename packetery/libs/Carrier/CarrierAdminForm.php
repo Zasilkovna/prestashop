@@ -52,6 +52,9 @@ class CarrierAdminForm
      */
     private $messageManager;
 
+    /** @var CarrierFieldsResolver */
+    private $carrierFieldsResolver;
+
     private static $countriesWithInternalPickupPoints = ['CZ', 'SK', 'HU', 'RO'];
 
     /**
@@ -69,6 +72,7 @@ class CarrierAdminForm
         $this->apiRepository = $this->module->diContainer->get(ApiCarrierRepository::class);
         $this->tools = $this->module->diContainer->get(CarrierTools::class);
         $this->messageManager = $this->module->diContainer->get(MessageManager::class);
+        $this->carrierFieldsResolver = $this->module->diContainer->get(CarrierFieldsResolver::class);
     }
 
     private function getDisabledCarrierIds(array $carriers): array
@@ -208,19 +212,6 @@ class CarrierAdminForm
         return '<div class="packetery">' . PHP_EOL . $helper->generateForm($form) . PHP_EOL . '</div>';
     }
 
-    private function resolveAddressValidation(string $country, bool $isPickupPoints, ?string $addressValidation): ?string
-    {
-        if ($isPickupPoints === true) {
-            return null;
-        }
-
-        if ($this->supportsAddressValidation($country)) {
-            return null;
-        }
-
-        return $addressValidation;
-    }
-
     /**
      * @return string|null
      *
@@ -251,7 +242,7 @@ class CarrierAdminForm
         $possibleVendors = $this->getPossibleVendors($carrierData);
         $formInputs = [];
         if ((bool) $apiCarrier['is_pickup_points'] === false) {
-            if ($this->supportsAddressValidation($apiCarrier['country'])) {
+            if ($this->carrierFieldsResolver->supportsAddressValidation($apiCarrier['country'])) {
                 $formInputs[] = [
                     'type' => 'radio',
                     'label' => $this->module->l('Validate address using widget?', 'carrieradminform'),
@@ -312,7 +303,7 @@ class CarrierAdminForm
         ];
 
         $helper = new \HelperForm();
-        if ((bool) $apiCarrier['is_pickup_points'] === false && $this->supportsAddressValidation($apiCarrier['country'])) {
+        if ((bool) $apiCarrier['is_pickup_points'] === false && $this->carrierFieldsResolver->supportsAddressValidation($apiCarrier['country'])) {
             $helper->fields_value['address_validation'] = $carrierData['address_validation'] ?? self::ADDRESS_VALIDATION_NONE;
         }
 
@@ -335,7 +326,7 @@ class CarrierAdminForm
             \Tools::redirectAdmin($this->tools->getEditLink($this->carrierId));
         }
 
-        $pickupPointType = $this->getPickupPointType($apiCarrier, $carrierData['id_branch']);
+        $pickupPointType = $this->carrierFieldsResolver->getPickupPointType($apiCarrier, $carrierData['id_branch']);
 
         $addressValidation = null;
         $allowedVendorsJson = $this->getDefaultAllowedVendors($carrierData, $apiCarrier);
@@ -355,7 +346,7 @@ class CarrierAdminForm
                 $apiCarrier['name'],
                 $apiCarrier['currency'],
                 $pickupPointType,
-                $this->resolveAddressValidation($apiCarrier['country'], (bool) $apiCarrier['is_pickup_points'], $addressValidation),
+                $this->carrierFieldsResolver->resolveAddressValidation($apiCarrier['country'], (bool) $apiCarrier['is_pickup_points'], $addressValidation),
                 $allowedVendorsJson
             );
         }
@@ -375,7 +366,7 @@ class CarrierAdminForm
     public function saveCarrierOptions(array $carrierData, array $apiCarrier)
     {
         $formData = \Tools::getAllValues();
-        $pickupPointType = $this->getPickupPointType($apiCarrier, $carrierData['id_branch']);
+        $pickupPointType = $this->carrierFieldsResolver->getPickupPointType($apiCarrier, $carrierData['id_branch']);
 
         $allowedVendors = null;
         if ($carrierData['id_branch'] === \Packetery::ZPOINT || $carrierData['id_branch'] === \Packetery::PP_ALL) {
@@ -394,7 +385,7 @@ class CarrierAdminForm
             $apiCarrier['name'],
             $apiCarrier['currency'],
             $pickupPointType,
-            $this->resolveAddressValidation($apiCarrier['country'], (bool) $apiCarrier['is_pickup_points'], $addressValidation),
+            $this->carrierFieldsResolver->resolveAddressValidation($apiCarrier['country'], (bool) $apiCarrier['is_pickup_points'], $addressValidation),
             $allowedVendors !== null ? json_encode($allowedVendors) : null
         );
 
@@ -544,24 +535,6 @@ class CarrierAdminForm
     }
 
     /**
-     * @param array $apiCarrier
-     * @param int $idBranch
-     *
-     * @return string|null
-     */
-    private function getPickupPointType(array $apiCarrier, $idBranch)
-    {
-        $pickupPointType = null;
-        if ($apiCarrier['is_pickup_points'] && $idBranch === \Packetery::ZPOINT) {
-            $pickupPointType = 'internal';
-        } elseif ($apiCarrier['is_pickup_points']) {
-            $pickupPointType = 'external';
-        }
-
-        return $pickupPointType;
-    }
-
-    /**
      * @param string|null $json
      *
      * @return array
@@ -672,10 +645,5 @@ class CarrierAdminForm
         }
 
         return $allowedVendorsJson;
-    }
-
-    private function supportsAddressValidation(string $country): bool
-    {
-        return in_array(strtoupper($country), CarrierRepository::ADDRESS_VALIDATION_COUNTRIES, true);
     }
 }
