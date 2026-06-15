@@ -49,6 +49,12 @@ parameters:
 			path: ../packetery/controllers/admin/PacketeryOrderGridController.php
 
 		-
+			message: '#^Parameter \#1 \$page of static method ToolsCore\:\:getToken\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../packetery/controllers/front/checkout.php
+
+		-
 			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
 			identifier: booleanNot.exprNotBoolean
 			count: 1
@@ -65,6 +71,12 @@ parameters:
 			identifier: method.notFound
 			count: 2
 			path: ../packetery/libs/AbstractFormService.php
+
+		-
+			message: '#^Parameter \#1 \$string of method DbCore\:\:escape\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../packetery/libs/ApiCarrier/ApiCarrierRepository.php
 
 		-
 			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
@@ -85,6 +97,18 @@ parameters:
 			path: ../packetery/libs/Carrier/CarrierRepository.php
 
 		-
+			message: '#^Parameter \#3 \$nullValues of method Packetery\\Tools\\DbTools\:\:insert\(\) expects false, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../packetery/libs/Carrier/CarrierRepository.php
+
+		-
+			message: '#^Parameter \#5 \$nullValues of method Packetery\\Tools\\DbTools\:\:update\(\) expects false, true given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../packetery/libs/Carrier/CarrierRepository.php
+
+		-
 			message: '#^Call to an undefined static method Carrier\:\:getCarrierNameFromShopName\(\)\.$#'
 			identifier: staticMethod.notFound
 			count: 1
@@ -93,6 +117,12 @@ parameters:
 		-
 			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
 			identifier: function.strict
+			count: 1
+			path: ../packetery/libs/Carrier/CarrierTools.php
+
+		-
+			message: '#^Parameter \#2 \$idLang of static method CountryCore\:\:getCountriesByZoneId\(\) expects int, string\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: ../packetery/libs/Carrier/CarrierTools.php
 
@@ -127,6 +157,12 @@ parameters:
 			path: ../packetery/libs/Module/Installer.php
 
 		-
+			message: '#^Parameter \#1 \$float of static method ValidateCore\:\:isFloat\(\) expects float, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../packetery/libs/Module/Options.php
+
+		-
 			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
 			identifier: empty.notAllowed
 			count: 1
@@ -137,6 +173,18 @@ parameters:
 			identifier: booleanNot.exprNotBoolean
 			count: 1
 			path: ../packetery/libs/Module/VersionChecker.php
+
+		-
+			message: '#^Parameter \#3 \$offset of method Packetery\\Module\\SoapApi\:\:getPacketsCourierLabelsPdf\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../packetery/libs/Order/Labels.php
+
+		-
+			message: '#^Parameter \#3 \$offset of method Packetery\\Module\\SoapApi\:\:getPacketsLabelsPdf\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../packetery/libs/Order/Labels.php
 
 		-
 			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
@@ -155,6 +203,30 @@ parameters:
 			identifier: booleanNot.exprNotBoolean
 			count: 1
 			path: ../packetery/libs/Order/OrderExporter.php
+
+		-
+			message: '#^Parameter \#3 \$nullValues of method Packetery\\Tools\\DbTools\:\:insert\(\) expects false, bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../packetery/libs/Order/OrderRepository.php
+
+		-
+			message: '#^Parameter \#3 \$nullValues of method Packetery\\Tools\\DbTools\:\:insert\(\) expects false, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../packetery/libs/Order/OrderRepository.php
+
+		-
+			message: '#^Parameter \#5 \$nullValues of method Packetery\\Tools\\DbTools\:\:update\(\) expects false, bool given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../packetery/libs/Order/OrderRepository.php
+
+		-
+			message: '#^Parameter \#5 \$nullValues of method Packetery\\Tools\\DbTools\:\:update\(\) expects false, true given\.$#'
+			identifier: argument.type
+			count: 4
+			path: ../packetery/libs/Order/OrderRepository.php
 
 		-
 			message: '#^Only booleans are allowed in an if condition, string given\.$#'
@@ -189,6 +261,18 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var with type stdClass is not subtype of type array\.$#'
 			identifier: varTag.type
+			count: 1
+			path: ../packetery/libs/PacketTracking/PacketTrackingCron.php
+
+		-
+			message: '#^Parameter \#1 \$id of class OrderState constructor expects int\|null, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../packetery/libs/PacketTracking/PacketTrackingCron.php
+
+		-
+			message: '#^Parameter \#3 \$maxProcessedOrdersLimit of method Packetery\\Order\\OrderRepository\:\:getOrdersByStateAndLastUpdate\(\) expects int, string\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: ../packetery/libs/PacketTracking/PacketTrackingCron.php
 
@@ -304,6 +388,18 @@ parameters:
 			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
 			identifier: if.condNotBoolean
 			count: 4
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Parameter \#1 \$page of static method ToolsCore\:\:getToken\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../packetery/packetery.php
+
+		-
+			message: '#^Parameter \#1 \$widgetOptions of method Packetery\:\:getValidWidgetOptions\(\) expects array\<string, int\|string\>, array\<string, array\|string\|false\> given\.$#'
+			identifier: argument.type
+			count: 1
 			path: ../packetery/packetery.php
 
 		-

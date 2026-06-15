@@ -6,7 +6,7 @@ parameters:
 		max: 80100
 	fileExtensions:
 		- php
-	level: 4
+	level: 5
 	strictRules:
 		allRules: true
 	treatPhpDocTypesAsCertain: false
