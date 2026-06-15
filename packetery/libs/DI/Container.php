@@ -81,19 +81,11 @@ class Container
         $instances = [];
         $params = $constructorReflection->getParameters();
         foreach ($params as $param) {
-            if (PHP_VERSION_ID >= 70100) {
-                $paramType = $param->getType();
-                if (!$paramType instanceof \ReflectionNamedType || $paramType->isBuiltin()) {
-                    throw new \Exception(self::EXCEPTION_MESSAGE);
-                }
-                $className = $paramType->getName();
-            } else {
-                $paramClass = $param->getClass();
-                if ($paramClass === null) {
-                    throw new \Exception(self::EXCEPTION_MESSAGE);
-                }
-                $className = $paramClass->name;
+            $paramType = $param->getType();
+            if (!$paramType instanceof \ReflectionNamedType || $paramType->isBuiltin()) {
+                throw new \Exception(self::EXCEPTION_MESSAGE);
             }
+            $className = $paramType->getName();
 
             $instances[] = $this->get($className);
         }

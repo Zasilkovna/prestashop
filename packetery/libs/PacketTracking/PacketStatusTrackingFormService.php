@@ -106,7 +106,7 @@ class PacketStatusTrackingFormService extends AbstractFormService
     }
 
     /**
-     * @return array<int, array<string, string>>
+     * @return list<array{id: int, name: string}>
      */
     private function getPacketStatusChoices()
     {

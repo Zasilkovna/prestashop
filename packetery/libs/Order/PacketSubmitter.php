@@ -182,7 +182,7 @@ class PacketSubmitter
             }
         }
 
-        if (is_array($errors) && $errors !== []) {
+        if ($errors !== []) {
             throw new AggregatedException($errors);
         }
 
@@ -218,10 +218,7 @@ class PacketSubmitter
      */
     private function getErrorMessage(\SoapFault $e)
     {
-        $errorMessage = '';
-        if (isset($e->faultstring)) {
-            $errorMessage = $e->faultstring;
-        }
+        $errorMessage = $e->faultstring;
         if (isset($e->detail->PacketAttributesFault->attributes->fault)) {
             if (
                 is_array($e->detail->PacketAttributesFault->attributes->fault)

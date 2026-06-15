@@ -32,7 +32,7 @@ class PickupPointValidateRequest
     }
 
     /**
-     * @return array<string, string|bool|float|null>
+     * @return array<string, array<string, string|bool|float|null>>
      */
     public function getSubmittableData(): array
     {

@@ -492,7 +492,7 @@ class PacketeryOrderGridController extends ModuleAdminController
         /** @var CollectionPrintHandler $handler */
         $handler = $this->getModule()->diContainer->get(CollectionPrintHandler::class);
 
-        $orderIds = array_map('intval', $this->boxes ?? []);
+        $orderIds = array_map('intval', $this->boxes);
         $templateVariables = $handler->handleBulkAction($orderIds);
         foreach ($templateVariables as $key => $value) {
             $this->tpl_list_vars[$key] = $value;

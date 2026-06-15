@@ -6,11 +6,21 @@ parameters:
 		max: 80100
 	fileExtensions:
 		- php
-	level: 2
+	level: 4
 	strictRules:
 		allRules: true
 	treatPhpDocTypesAsCertain: false
+	dynamicConstantNames:
+		- _PS_MODE_DEV_
+		- _PACKETERY_DEBUG_LOG_
 	ignoreErrors:
+		# Stub inaccuracy: our display(): void overrides FrontController::display(), declared @return bool in the stub.
+		# Cannot be fixed in code — the PS Validator forbids returning a value from display().
+		-
+			identifier: method.childReturnType
+			paths:
+				- ../packetery/controllers/front/checkout.php
+				- ../packetery/controllers/front/cron.php
 	bootstrapFiles:
 	paths:
 		- ../packetery
