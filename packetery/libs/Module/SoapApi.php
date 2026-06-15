@@ -221,7 +221,7 @@ class SoapApi
      *
      * @param \SoapFault $exception
      *
-     * @return int|string
+     * @return string
      */
     private function getFaultIdentifier(\SoapFault $exception)
     {

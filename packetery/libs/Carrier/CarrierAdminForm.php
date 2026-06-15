@@ -553,7 +553,7 @@ class CarrierAdminForm
      * @param array $formData
      * @param array|bool|object|null $carrierData
      *
-     * @return array|null
+     * @return array
      *
      * @throws DatabaseException
      */

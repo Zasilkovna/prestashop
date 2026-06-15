@@ -1566,7 +1566,7 @@ class Packetery extends CarrierModule
         /** @var Cart $cart */
         $cart = $params['cart'];
         $oldCart = new CartCore($cart->id);
-        if (!is_object($oldCart)) {
+        if (!Validate::isLoadedObject($oldCart)) {
             return;
         }
 
