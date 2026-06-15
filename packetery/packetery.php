@@ -645,7 +645,7 @@ class Packetery extends CarrierModule
                 'desc' => $this->l('Enter the default weight of the packaging in kg if the order weight is non-zero'),
             ],
             Packetery\Tools\ConfigHelper::KEY_SHOW_CONSIGN_PASSWORD => [
-                'title' => $this->l('Show consign password for Z-BOX'),
+                'title' => $this->l('Show consignment code'),
                 'options' => [
                     1 => $this->l('Yes'),
                     0 => $this->l('No'),
@@ -653,7 +653,7 @@ class Packetery extends CarrierModule
                 'required' => false,
             ],
             Packetery\Tools\ConfigHelper::KEY_CONSIGN_PASSWORD_RETRIEVAL => [
-                'title' => $this->l('When should the consign password be retrieved'),
+                'title' => $this->l('When should the consignment code be retrieved'),
                 'inputType' => 'select',
                 'options' => [
                     Packetery\Order\ConsignPasswordSettings::MODE_IMMEDIATE => $this->l('Immediately upon packet submission'),

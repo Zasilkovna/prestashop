@@ -95,16 +95,16 @@
     </div>
     <div class="panel">
         <div class="panel-heading">
-            {l s='Show consign password for Z-BOX via CRON' mod='packetery'}
+            {l s='Show consignment code via CRON' mod='packetery'}
         </div>
         <div class="clearfix">
             <div class="col-lg-12">
                 {if isset($getConsignPasswordUrl)}
                     <p>
-                        {l s='This URL provides functionality for retrieving consign passwords for packets in bulk via CRON.' mod='packetery'}
+                        {l s='This URL provides functionality for retrieving consignment codes for packets in bulk via CRON.' mod='packetery'}
                     </p>
                     <p>
-                        {l s='It processes packets that meet the configured conditions and retrieves their consign passwords in the background.' mod='packetery'}
+                        {l s='It processes packets that meet the configured conditions and retrieves their consignment codes in the background.' mod='packetery'}
                     </p>
                     <p>
                         {l s='To enable automatic processing, you need to call this URL via CRON jobs.' mod='packetery'}

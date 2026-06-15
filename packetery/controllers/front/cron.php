@@ -66,7 +66,7 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
                 $taskName = $this->module->l('Packet tracking status update', 'cron');
                 break;
             case GetConsignPassword::getTaskName():
-                $taskName = $this->module->l('Get consign password', 'cron');
+                $taskName = $this->module->l('Get consignment code', 'cron');
                 break;
             default:
                 $taskName = $task;

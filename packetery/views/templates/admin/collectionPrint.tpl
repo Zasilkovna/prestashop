@@ -47,7 +47,7 @@
         <tr>
             <th>{l s='Order No.' mod='packetery'}</th>
             <th>{l s='Barcode' mod='packetery'}</th>
-            {if $showConsignPassword}<th>{l s='Z-BOX consign password' mod='packetery'}</th>{/if}
+            {if $showConsignPassword}<th>{l s='Consignment code' mod='packetery'}</th>{/if}
             <th>{l s='Created' mod='packetery'}</th>
             <th>{l s='Recipient full name' mod='packetery'}</th>
             <th>{l s='C.O.D.' mod='packetery'}</th>

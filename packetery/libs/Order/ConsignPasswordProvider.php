@@ -32,7 +32,7 @@ class ConsignPasswordProvider
     }
 
     /**
-     * Returns the consign password for the given packet from Packeta API.
+     * Returns the consignment code for the given packet from Packeta API.
      * On API fault the failure is logged into the Packeta API log and an ApiClientException is thrown.
      *
      * @throws ApiClientException when the SOAP request fails
