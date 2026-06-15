@@ -50,7 +50,7 @@ class GetConsignPassword extends Base
         if (ConsignPasswordSettings::fromConfig()->isCron() === false) {
             return [
                 $this->module->l(
-                    'No packets were processed. This may be because the feature is disabled or consign passwords are retrieved immediately when a packet is submitted.',
+                    'No packets were processed. This may be because the feature is disabled or consignment codes are retrieved immediately when a packet is submitted.',
                     'getconsignpassword'
                 ),
             ];
