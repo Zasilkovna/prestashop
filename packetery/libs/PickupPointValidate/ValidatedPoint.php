@@ -20,7 +20,7 @@ class ValidatedPoint
     /** @var string|null */
     private $carrierId;
 
-    /** @var bool|null */
+    /** @var string|null */
     private $carrierPickupPointId;
 
     public function __construct(

@@ -20,9 +20,6 @@ class PacketeryCheckoutModuleFrontController extends ModuleFrontController
     /** @var bool */
     public $ajax = true;
 
-    /** @var Packetery */
-    public $module;
-
     public function display(): void
     {
         $token = Tools::getValue('token');
@@ -33,18 +30,29 @@ class PacketeryCheckoutModuleFrontController extends ModuleFrontController
 
         switch (Tools::getValue('action')) {
             case 'savePickupPointInCart':
-                $orderSaver = $this->module->diContainer->get(OrderSaver::class);
+                $orderSaver = $this->getModule()->diContainer->get(OrderSaver::class);
                 header('Content-Type: application/json');
                 echo $orderSaver->savePickupPointInCartGetJson();
                 break;
             case 'fetchExtraContent':
-                $packeteryCart = $this->module->diContainer->get(Cart::class);
+                $packeteryCart = $this->getModule()->diContainer->get(Cart::class);
                 echo $packeteryCart->packeteryCreateExtraContent();
                 break;
             case 'saveAddressInCart':
-                $orderAjax = $this->module->diContainer->get(Ajax::class);
+                $orderAjax = $this->getModule()->diContainer->get(Ajax::class);
                 $orderAjax->saveAddressInCart();
                 break;
         }
+    }
+
+    /**
+     * @return Packetery
+     */
+    private function getModule()
+    {
+        /** @var Packetery $module */
+        $module = $this->module;
+
+        return $module;
     }
 }

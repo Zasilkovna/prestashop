@@ -26,19 +26,14 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
     /** @var bool */
     private $hasError = false;
 
-    /** @var Packetery */
-    public $module;
-
     /**
-     * @return void
-     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
      * @throws Packetery\Exceptions\DatabaseException
      * @throws SmartyException
      */
-    public function display()
+    public function display(): void
     {
         ignore_user_abort(true); // Ignore connection-closing by the client/user
 
@@ -82,27 +77,27 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
         switch ($task) {
             case DeleteLabels::getTaskName():
-                $deleteLabels = $this->module->diContainer->get(DeleteLabels::class);
+                $deleteLabels = $this->getModule()->diContainer->get(DeleteLabels::class);
                 $errors = $deleteLabels->execute();
                 $this->renderErrors($errors);
                 break;
             case DownloadCarriers::getTaskName():
-                $downloadCarriers = $this->module->diContainer->get(DownloadCarriers::class);
+                $downloadCarriers = $this->getModule()->diContainer->get(DownloadCarriers::class);
                 $errors = $downloadCarriers->execute();
                 $this->renderErrors($errors);
                 break;
             case PurgeLogs::getTaskName():
-                $purgeLogs = $this->module->diContainer->get(PurgeLogs::class);
+                $purgeLogs = $this->getModule()->diContainer->get(PurgeLogs::class);
                 $errors = $purgeLogs->execute();
                 $this->renderErrors($errors);
                 break;
             case UpdatePacketStatus::getTaskName():
-                $updatePacketStatus = $this->module->diContainer->get(UpdatePacketStatus::class);
+                $updatePacketStatus = $this->getModule()->diContainer->get(UpdatePacketStatus::class);
                 $errors = $updatePacketStatus->execute();
                 $this->renderErrors($errors);
                 break;
             case GetConsignPassword::getTaskName():
-                $getConsignPassword = $this->module->diContainer->get(GetConsignPassword::class);
+                $getConsignPassword = $this->getModule()->diContainer->get(GetConsignPassword::class);
                 $messages = $getConsignPassword->execute(
                     (int) Tools::getValue('max_orders', GetConsignPassword::DEFAULT_MAX_ORDERS),
                     (int) Tools::getValue('max_order_age_days', GetConsignPassword::DEFAULT_MAX_ORDER_AGE_DAYS)
@@ -172,6 +167,17 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
         $this->hasError = true;
         $this->renderMessage('[' . $this->module->l('ERROR', 'cron') . ']: ' . $message);
         PrestaShopLogger::addLog('[packetery:cron]: ' . $message, 3, null, null, null, true);
+    }
+
+    /**
+     * @return Packetery
+     */
+    private function getModule()
+    {
+        /** @var Packetery $module */
+        $module = $this->module;
+
+        return $module;
     }
 
     /**

@@ -73,7 +73,7 @@ abstract class AbstractFormService
 
     /**
      * @param string $option
-     * @param array{type: string, values: array{query: array{id: string}}} $optionConfig
+     * @param array{type: string, values: array{query: list<array{id: string}>}} $optionConfig
      *
      * @return void
      *

@@ -175,7 +175,7 @@ class ConfigHelper
     {
         $apiPass = $this->getApiPass();
         if ($apiPass === false) {
-            return false;
+            throw InvalidApiKeyException::createFromMissingKey();
         }
 
         $apiKey = self::getApiKeyFromApiPass($apiPass);
