@@ -1120,15 +1120,6 @@ class Packetery extends CarrierModule
 
         $this->context->smarty->assign('isExported', $isExported);
 
-        /** @var Packetery\Carrier\CarrierRepository $carrierRepository */
-        $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
-        $packeteryCarrier = $carrierRepository->getPacketeryCarrierById((int) $packeteryOrder['id_carrier']);
-        if ((bool) $packeteryCarrier === false) {
-            $oldCarrier = new Carrier($packeteryOrder['id_carrier']);
-            $newCarrier = Carrier::getCarrierByReference($oldCarrier->id_reference);
-            $packeteryCarrier = $carrierRepository->getPacketeryCarrierById($newCarrier->id);
-        }
-
         /** @var Packetery\Tools\ConfigHelper $configHelper */
         $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
         $apiKey = $configHelper->getApiKey();
