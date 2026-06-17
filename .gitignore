@@ -1,6 +1,7 @@
 .idea/
 .DS_Store
 .phpcs-cache
+/.phpunit.cache/
 /vendor/
 /packetery/views/js/write-test.js
 /packetery/packetery_error.log

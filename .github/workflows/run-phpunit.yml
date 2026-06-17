@@ -1,4 +1,4 @@
-name: PHP-CS-Fixer Check
+name: PHPUnit tests
 
 on:
     push:
@@ -6,12 +6,12 @@ on:
     pull_request:
 
 jobs:
-    php-cs-fixer:
+    phpunit:
         runs-on: ubuntu-24.04
 
         strategy:
             matrix:
-                php-version: [ '8.3' ]
+                php-version: [ '8.3', '8.4', '8.5' ]
 
         steps:
             -   name: Checkout code
@@ -28,8 +28,7 @@ jobs:
                 run: php -v
 
             -   name: Install Composer dependencies
-                run: composer install --no-interaction --no-progress
+                run: composer install
 
-            -   name: Run PHP-CS-Fixer
-                run: composer run check:phpcsfixer
-
+            -   name: Run PHPUnit
+                run: composer test
