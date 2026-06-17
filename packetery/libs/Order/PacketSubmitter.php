@@ -35,19 +35,23 @@ class PacketSubmitter
     private $configHelper;
     /** @var ConsignPasswordProvider */
     private $consignPasswordProvider;
+    /** @var SoapApi */
+    private $soapApi;
 
     public function __construct(
         OrderRepository $orderRepository,
         LogRepository $logRepository,
         \Packetery $module,
         ConfigHelper $configHelper,
-        ConsignPasswordProvider $consignPasswordProvider
+        ConsignPasswordProvider $consignPasswordProvider,
+        SoapApi $soapApi
     ) {
         $this->orderRepository = $orderRepository;
         $this->logRepository = $logRepository;
         $this->module = $module;
         $this->configHelper = $configHelper;
         $this->consignPasswordProvider = $consignPasswordProvider;
+        $this->soapApi = $soapApi;
     }
 
     /**
@@ -198,7 +202,7 @@ class PacketSubmitter
      */
     private function createPacketSoap(array $packetAttributes)
     {
-        $client = new \SoapClient(SoapApi::WSDL_URL);
+        $client = new \SoapClient($this->soapApi->resolveWsdlUrl());
         try {
             $trackingNumber = $client->createPacket($this->configHelper->getApiPass(), $packetAttributes);
             if (isset($trackingNumber->id) && is_string($trackingNumber->id) && \Tools::strlen($trackingNumber->id) > 0) {
