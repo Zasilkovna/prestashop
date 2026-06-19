@@ -560,6 +560,10 @@ class Packetery extends CarrierModule
 
     private function getConfigurationOptions()
     {
+        /** @var Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
+        $backendLanguage = $configHelper->getBackendLanguage($this);
+
         return [
             Packetery\Tools\ConfigHelper::KEY_APIPASS => [
                 'title' => $this->l('API password'),
@@ -651,6 +655,10 @@ class Packetery extends CarrierModule
                     0 => $this->l('No'),
                 ],
                 'required' => false,
+                'desc' => sprintf(
+                    $this->l('For instructions on how to use this feature, see %s.'),
+                    '<a href="' . Packetery\Module\Helper::getBoxConsignmentGuideUrl($backendLanguage) . '" target="_blank" rel="noopener noreferrer">' . $this->l('this guide') . '</a>'
+                ),
             ],
             Packetery\Tools\ConfigHelper::KEY_CONSIGN_PASSWORD_RETRIEVAL => [
                 'title' => $this->l('When should the consignment code be retrieved'),
