@@ -664,7 +664,7 @@ class OrderRepository
      */
     public function clearConsignPassword(int $orderId): void
     {
-        $messageBase = "Failed to clear consignment password for order {$orderId}";
+        $messageBase = "Failed to clear consignment code for order {$orderId}";
 
         try {
             $result = $this->dbTools->update(

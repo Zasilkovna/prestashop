@@ -89,7 +89,7 @@
 
             {if isset($consignPassword) && $consignPassword}
                 <p>
-                    {l s='Consign password for Z-BOX' mod='packetery'}:
+                    {l s='Consignment code' mod='packetery'}:
                     <strong>{$consignPassword|escape:'htmlall':'UTF-8'}</strong>
                 </p>
             {/if}

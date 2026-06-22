@@ -18,6 +18,9 @@ class Helper
 {
     public const TRACKING_URL = 'https://tracking.packeta.com/Z%s';
 
+    private const BOX_CONSIGNMENT_GUIDE_URL_CS = 'https://docs.packeta.com/cs/guides/box-consignment';
+    private const BOX_CONSIGNMENT_GUIDE_URL_EN = 'https://docs.packeta.com/guides/box-consignment';
+
     /**
      * @param string $packetId
      *
@@ -26,6 +29,22 @@ class Helper
     public static function getTrackingUrl($packetId)
     {
         return sprintf(self::TRACKING_URL, rawurlencode($packetId));
+    }
+
+    /**
+     * Get the box consignment guide URL based on language
+     *
+     * @param string|false $language Language ISO code (or false if unavailable)
+     *
+     * @return string
+     */
+    public static function getBoxConsignmentGuideUrl($language): string
+    {
+        if ($language === 'cs') {
+            return self::BOX_CONSIGNMENT_GUIDE_URL_CS;
+        }
+
+        return self::BOX_CONSIGNMENT_GUIDE_URL_EN;
     }
 
     /**
