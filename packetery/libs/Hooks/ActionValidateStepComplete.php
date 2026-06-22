@@ -59,7 +59,7 @@ class ActionValidateStepComplete
             \PrestaShopLogger::addLog('Cart is not present in hook parameters.', 3, null, null, null, true);
             $params['completed'] = false;
 
-            return $this->module->l('Order validation failed, shop owner can find more information in log.', 'ordervalidatestepcomplete');
+            return $this->module->l('Order validation failed, shop owner can find more information in log.', 'actionvalidatestepcomplete');
         }
 
         /** @var \CartCore $cart */
@@ -74,7 +74,7 @@ class ActionValidateStepComplete
         if ($isPickupPointCarrier === true && empty($orderData['id_branch'])) {
             $params['completed'] = false;
 
-            return $this->module->l('Please select pickup point.', 'ordervalidatestepcomplete');
+            return $this->module->l('Please select pickup point.', 'actionvalidatestepcomplete');
         }
 
         $isApiWidgetValidationModeEnabled = ConfigHelper::isApiWidgetValidationModeEnabled();
@@ -92,7 +92,7 @@ class ActionValidateStepComplete
             if ($pickupPointValidationResponse->isValid() === false) {
                 $params['completed'] = false;
 
-                return $this->module->l('The selected Packeta pickup point could not be validated. Please select another.', 'ordervalidatestepcomplete');
+                return $this->module->l('The selected Packeta pickup point could not be validated. Please select another.', 'actionvalidatestepcomplete');
             }
         }
 
@@ -105,7 +105,7 @@ class ActionValidateStepComplete
         if (!$orderData || !AddressTools::hasValidatedAddress($orderData)) {
             $params['completed'] = false;
 
-            return $this->module->l('Please use widget to validate address.', 'ordervalidatestepcomplete');
+            return $this->module->l('Please use widget to validate address.', 'actionvalidatestepcomplete');
         }
 
         $params['completed'] = true;
