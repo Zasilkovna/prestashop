@@ -162,7 +162,7 @@ $_MODULE['<{packetery}prestashop>packetstatustrackingformservice_6b17a131b80b204
 $_MODULE['<{packetery}prestashop>packetstatustrackingformservice_b51795a24e5c65a16613d55607ec55ff'] = 'Maximální stáří objednávky ve dnech';
 $_MODULE['<{packetery}prestashop>packetstatustrackingformservice_33af8066d3c83110d4bd897f687cedd2'] = 'Stavy objednávek';
 $_MODULE['<{packetery}prestashop>packetstatustrackingformservice_d704d40d0a7f722008b45ccdc05f2b22'] = 'Stavy zásilek';
-$_MODULE['<{packetery}prestashop>pickuppointvalidator_32deda9da06d6c3ef4c538f206914203'] = 'Přístupové údaje k API nejsou správně nastaveny.';
+$_MODULE['<{packetery}prestashop>pickuppointvalidator_7dddc4f5f5fc20c0379b666e361358bb'] = 'Přístupové údaje k API nejsou správně nastaveny.';
 $_MODULE['<{packetery}prestashop>downloader_ae4593859212da2371dd8db75461239d'] = 'Stažení dopravců selhalo: %s Zkuste to prosím později.';
 $_MODULE['<{packetery}prestashop>downloader_962437147c581d5b304392ee8f920ce5'] = 'Nepodařilo se získat seznam.';
 $_MODULE['<{packetery}prestashop>downloader_a2b5e89ee86d19550fccf24d694324ee'] = 'Neplatná odpověď API.';
