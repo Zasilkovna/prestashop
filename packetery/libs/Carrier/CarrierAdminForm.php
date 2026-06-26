@@ -28,11 +28,6 @@ class CarrierAdminForm
     private const ADDRESS_VALIDATION_OPTIONAL = 'optional';
 
     /**
-     * @var CarrierVendors
-     */
-    private $vendors;
-
-    /**
      * @var CarrierRepository
      */
     private $repository;
@@ -67,7 +62,6 @@ class CarrierAdminForm
     {
         $this->carrierId = $carrierId;
         $this->module = $module;
-        $this->vendors = $this->module->diContainer->get(CarrierVendors::class);
         $this->repository = $this->module->diContainer->get(CarrierRepository::class);
         $this->apiRepository = $this->module->diContainer->get(ApiCarrierRepository::class);
         $this->tools = $this->module->diContainer->get(CarrierTools::class);
@@ -239,7 +233,7 @@ class CarrierAdminForm
             $this->saveCarrierOptions($carrierData, $apiCarrier);
         }
 
-        $possibleVendors = $this->getPossibleVendors($carrierData);
+        $possibleVendors = $this->carrierFieldsResolver->getPossibleVendors($carrierData, $this->carrierId, $apiCarrier);
         $formInputs = [];
         if ((bool) $apiCarrier['is_pickup_points'] === false) {
             if ($this->carrierFieldsResolver->supportsAddressValidation($apiCarrier['country'])) {
@@ -559,7 +553,7 @@ class CarrierAdminForm
      */
     private function getAllowedVendorsFromForm(array $formData, $carrierData)
     {
-        $possibleVendors = $this->getPossibleVendors($carrierData);
+        $possibleVendors = $this->carrierFieldsResolver->getPossibleVendors($carrierData, $this->carrierId);
 
         if ($possibleVendors === [] || !isset($formData['allowed_vendors'])) {
             return ['error' => $this->module->l('You must select at least one vendor for each country.', 'carrieradminform')];
@@ -588,32 +582,6 @@ class CarrierAdminForm
     }
 
     /**
-     * @param array $carrierData
-     * @param array|bool|object|null $apiCarrier
-     *
-     * @return array
-     *
-     * @throws DatabaseException
-     */
-    private function getPossibleVendors(array $carrierData, $apiCarrier = null)
-    {
-        if (!isset($carrierData['id_branch'])) {
-            return [];
-        }
-        if ($apiCarrier === null) {
-            $apiCarrier = $this->apiRepository->getById($carrierData['id_branch']);
-        }
-
-        if ($apiCarrier['id'] === \Packetery::PP_ALL || $apiCarrier['id'] === \Packetery::ZPOINT) {
-            $countries = $this->tools->getCountries($this->carrierId, 'iso_code');
-        } else {
-            $countries = [$apiCarrier['country']];
-        }
-
-        return $this->vendors->getVendorsByCountries($countries);
-    }
-
-    /**
      * @return array
      */
     private function getBackButton()
@@ -627,23 +595,12 @@ class CarrierAdminForm
 
     /**
      * @param array $carrierData
-     * @param array|null $apiCarrier
+     * @param array $apiCarrier
      *
      * @throws DatabaseException
      */
     public function getDefaultAllowedVendors(array $carrierData, $apiCarrier): ?string
     {
-        $allowedVendorsJson = null;
-        if ($carrierData['id_branch'] === \Packetery::ZPOINT || $carrierData['id_branch'] === \Packetery::PP_ALL) {
-            $possibleVendors = $this->getPossibleVendors($carrierData, $apiCarrier);
-            $allowedVendorsArray = [];
-            // Allow all by default.
-            foreach ($possibleVendors as $country => $vendors) {
-                $allowedVendorsArray[$country] = array_column($vendors, 'group');
-            }
-            $allowedVendorsJson = json_encode($allowedVendorsArray);
-        }
-
-        return $allowedVendorsJson;
+        return $this->carrierFieldsResolver->getDefaultAllowedVendors($carrierData, $this->carrierId, $apiCarrier);
     }
 }
