@@ -70,7 +70,7 @@ class DbTools
             throw new DatabaseException($exception->getMessage() . ', see details in Packeta log');
         }
         $error = $this->db->getNumberError();
-        if ($error) {
+        if ($error !== 0) {
             $this->logger->logToFile($this->db->getMsgError() . ', query: ' . $query);
             throw new DatabaseException($this->db->getMsgError() . ', see details in Packeta log');
         }
@@ -85,6 +85,7 @@ class DbTools
      */
     public function getRows($sql)
     {
+        $result = null;
         try {
             $result = $this->db->executeS($sql);
         } catch (\PrestaShopException $exception) {
@@ -104,6 +105,7 @@ class DbTools
      */
     public function getRow($sql)
     {
+        $result = null;
         try {
             $result = $this->db->getRow($sql);
         } catch (\PrestaShopException $exception) {
@@ -143,6 +145,7 @@ class DbTools
      */
     public function execute($sql, $useCache = true)
     {
+        $result = false;
         try {
             $result = $this->db->execute($sql, $useCache);
         } catch (\PrestaShopException $exception) {
@@ -167,6 +170,7 @@ class DbTools
     public function delete($table, $where = '', $limit = 0, $useCache = true, $addPrefix = true)
     {
         $queryForLog = 'table ' . $table . '; where ' . $where;
+        $result = false;
         try {
             $result = $this->db->delete($table, $where, $limit, $useCache, $addPrefix);
         } catch (\PrestaShopException $exception) {
@@ -180,7 +184,7 @@ class DbTools
     /**
      * @param string $table
      * @param array $data
-     * @param false $nullValues
+     * @param bool $nullValues
      * @param bool $useCache
      * @param int $type
      * @param bool $addPrefix
@@ -192,6 +196,7 @@ class DbTools
     public function insert($table, $data, $nullValues = false, $useCache = true, $type = \Db::INSERT, $addPrefix = true)
     {
         $queryForLog = 'table ' . $table . '; data ' . json_encode($data);
+        $result = false;
         try {
             $result = $this->db->insert($table, $data, $nullValues, $useCache, $type, $addPrefix);
         } catch (\PrestaShopException $exception) {
@@ -207,7 +212,7 @@ class DbTools
      * @param array $data
      * @param string $where
      * @param int $limit
-     * @param false $nullValues
+     * @param bool $nullValues
      * @param bool $useCache
      * @param bool $addPrefix
      *
@@ -218,6 +223,7 @@ class DbTools
     public function update($table, $data, $where = '', $limit = 0, $nullValues = false, $useCache = true, $addPrefix = true)
     {
         $queryForLog = 'table ' . $table . '; data ' . json_encode($data) . '; where ' . $where;
+        $result = false;
         try {
             $result = $this->db->update($table, $data, $where, $limit, $nullValues, $useCache, $addPrefix);
         } catch (\PrestaShopException $exception) {

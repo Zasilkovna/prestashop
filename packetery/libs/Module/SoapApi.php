@@ -96,7 +96,7 @@ class SoapApi
             // get PacketInfoResult
             $response = $client->packetInfo($this->configHelper->getApiPass(), $packetId);
             if (
-                !empty($response->courierInfo)
+                isset($response->courierInfo)
                 && isset($response->courierInfo->courierInfoItem, $response->courierInfo->courierInfoItem->courierTrackingUrls)
             ) {
                 $packetInfo->setNumber($response->courierInfo->courierInfoItem->courierNumbers->courierNumber);

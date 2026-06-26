@@ -153,7 +153,7 @@ class Packetery extends CarrierModule
      */
     public function hookActionCarrierUpdate(array $params)
     {
-        if ($params['id_carrier'] != $params['carrier']->id) {
+        if ((int) $params['id_carrier'] !== (int) $params['carrier']->id) {
             $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
             $carrierRepository->swapId((int) $params['id_carrier'], (int) $params['carrier']->id);
         }
@@ -774,7 +774,7 @@ class Packetery extends CarrierModule
         $customerStreet = '';
         $customerCity = '';
         $customerZip = '';
-        if (isset($cart->id_address_delivery) && !empty($cart->id_address_delivery)) {
+        if ((int) ($cart->id_address_delivery ?? 0) !== 0) {
             $address = new AddressCore($cart->id_address_delivery);
             $customerStreet = trim($address->address1);
             $customerCity = trim($address->city);
@@ -798,7 +798,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('widget_vendors', json_encode($widgetVendors));
 
         $orderData = null;
-        if (!empty($cart) && ($packeteryCarrier['pickup_point_type'] !== null || $packeteryCarrier['address_validation'] !== 'none')) {
+        if ($cart !== null && ($packeteryCarrier['pickup_point_type'] !== null || $packeteryCarrier['address_validation'] !== 'none')) {
             $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
             $orderData = $orderRepository->getByCartAndCarrier((int) $cart->id, (int) $id_carrier);
         }
@@ -919,7 +919,7 @@ class Packetery extends CarrierModule
 
         /* Get language from cart, global $language updates weirdly */
         $language = new LanguageCore($cart->id_lang);
-        $shopLanguage = $language->iso_code ?: 'en';
+        $shopLanguage = ($language->iso_code === null || $language->iso_code === '') ? 'en' : $language->iso_code;
         $shopLanguage = strtolower($shopLanguage);
 
         $isPS16 = strpos(_PS_VERSION_, '1.6') === 0;
@@ -1118,10 +1118,13 @@ class Packetery extends CarrierModule
 
         $isExported = (bool) $packeteryOrder['exported'];
         if ($isExported === false) {
+            $submittedLength = Tools::getValue('length');
+            $submittedHeight = Tools::getValue('height');
+            $submittedWidth = Tools::getValue('width');
             $orderDetails = [
-                'length' => Tools::getValue('length') ?: $packeteryOrder['length'],
-                'height' => Tools::getValue('height') ?: $packeteryOrder['height'],
-                'width' => Tools::getValue('width') ?: $packeteryOrder['width'],
+                'length' => (bool) $submittedLength ? $submittedLength : $packeteryOrder['length'],
+                'height' => (bool) $submittedHeight ? $submittedHeight : $packeteryOrder['height'],
+                'width' => (bool) $submittedWidth ? $submittedWidth : $packeteryOrder['width'],
             ];
             $this->context->smarty->assign('orderDetails', $orderDetails);
         }
@@ -1347,12 +1350,12 @@ class Packetery extends CarrierModule
         $carrierRepository = $this->diContainer->get(Packetery\Carrier\CarrierRepository::class);
 
         $packeteryOrder = $orderRepository->getById($orderId);
-        if (empty($packeteryOrder)) {
+        if (!is_array($packeteryOrder) || $packeteryOrder === []) {
             return [];
         }
 
         $packeteryCarrier = $carrierRepository->getPacketeryCarrierById($packeteryOrder['id_carrier']);
-        if (empty($packeteryCarrier)) {
+        if (!is_array($packeteryCarrier) || $packeteryCarrier === []) {
             return [];
         }
 

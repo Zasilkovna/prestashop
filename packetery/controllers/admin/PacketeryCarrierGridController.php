@@ -64,9 +64,9 @@ class PacketeryCarrierGridController extends ModuleAdminController
         $packeteryCarriers = $carrierRepository->getPacketeryCarriersList();
         $this->availableCarriers = array_combine(array_column($packeteryCarriers, 'id_branch'), array_column($packeteryCarriers, 'name_branch'));
         foreach ($this->availableCarriers as $carrierId => $carrierName) {
-            if ($carrierId === Packetery::ZPOINT && empty($carrierName)) {
+            if ($carrierId === Packetery::ZPOINT && ($carrierName === null || $carrierName === '')) {
                 $this->availableCarriers[Packetery::ZPOINT] = $this->module->l('Packeta pickup points', 'packeterycarriergridcontroller');
-            } elseif ($carrierId === Packetery::PP_ALL && empty($carrierName)) {
+            } elseif ($carrierId === Packetery::PP_ALL && ($carrierName === null || $carrierName === '')) {
                 $this->availableCarriers[Packetery::PP_ALL] = $this->module->l('Packeta pickup points (Packeta + carriers)', 'packeterycarriergridcontroller');
             }
         }

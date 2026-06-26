@@ -31,7 +31,7 @@ class Tools extends \ToolsCore
         // otherwise, it's sometimes not possible to decode JSON got in POST
         if (PrestaShopTools::version_compare(_PS_VERSION_, '1.7.6', '<')) {
             // version from PrestaShop 1.7.6
-            if (empty($key) || !is_string($key)) {
+            if ($key === '' || $key === '0' || !is_string($key)) {
                 return false;
             }
 

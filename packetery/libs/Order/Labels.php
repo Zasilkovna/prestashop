@@ -59,13 +59,13 @@ class Labels
 
         if ($type === self::TYPE_CARRIER) {
             $format = ConfigHelper::get('PACKETERY_CARRIER_LABEL_FORMAT');
-            $response = $soapApi->getPacketsCourierLabelsPdf($packetsEnhanced, $format, $offset);
+            $response = $soapApi->getPacketsCourierLabelsPdf($packetsEnhanced, $format, (string) $offset);
             if ($fallbackToPacketaLabel === true && $response->hasFault()) {
-                $response = $soapApi->getPacketsLabelsPdf(array_values($packets), $format, $offset);
+                $response = $soapApi->getPacketsLabelsPdf(array_values($packets), $format, (string) $offset);
             }
         } else {
             $format = ConfigHelper::get('PACKETERY_LABEL_FORMAT');
-            $response = $soapApi->getPacketsLabelsPdf(array_values($packets), $format, $offset);
+            $response = $soapApi->getPacketsLabelsPdf(array_values($packets), $format, (string) $offset);
         }
 
         if ($response->hasFault()) {

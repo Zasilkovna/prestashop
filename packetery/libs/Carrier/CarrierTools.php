@@ -48,7 +48,7 @@ class CarrierTools
         foreach ($carrierZones as $carrierZone) {
             $zoneCountries = Country::getCountriesByZoneId(
                 $carrierZone['id_zone'],
-                Configuration::get('PS_LANG_DEFAULT')
+                (int) Configuration::get('PS_LANG_DEFAULT')
             );
             foreach ($zoneCountries as $zoneCountry) {
                 if ($zoneCountry['active']) {

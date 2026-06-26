@@ -95,7 +95,7 @@ class OrderSaver
                 !$hasExistingSameCarrier
                 || ((int) $existingOrder['is_ad'] !== 0 && (int) $existingOrder['id_branch'] === (int) $packeteryCarrier['id_branch'])
             ) {
-                $data['id_branch'] = $packeteryCarrier['id_branch'] ?: null;
+                $data['id_branch'] = (bool) $packeteryCarrier['id_branch'] ? $packeteryCarrier['id_branch'] : null;
                 $data['name_branch'] = $packeteryCarrier['name_branch'];
                 $data['currency_branch'] = $packeteryCarrier['currency_branch'];
                 $data['is_ad'] = 1;

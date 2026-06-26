@@ -55,7 +55,7 @@ class ActionValidateStepComplete
      */
     public function execute(array &$params): ?string
     {
-        if (empty($params['cart'])) {
+        if (!isset($params['cart'])) {
             \PrestaShopLogger::addLog('Cart is not present in hook parameters.', 3, null, null, null, true);
             $params['completed'] = false;
 
@@ -71,7 +71,7 @@ class ActionValidateStepComplete
         $isExternalPickupPointCarrier = $this->apiCarrierRepository->isExternalPickupPointCarrier((int) $packeteryCarrier['id_branch']);
         $isPickupPointCarrier = $this->isPickupPointCarrier($isExternalPickupPointCarrier, (string) $packeteryCarrier['id_branch']);
 
-        if ($isPickupPointCarrier === true && empty($orderData['id_branch'])) {
+        if ($isPickupPointCarrier === true && (int) ($orderData['id_branch'] ?? 0) === 0) {
             $params['completed'] = false;
 
             return $this->module->l('Please select pickup point.', 'actionvalidatestepcomplete');

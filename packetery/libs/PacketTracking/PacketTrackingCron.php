@@ -101,7 +101,7 @@ class PacketTrackingCron
         $orders = $this->orderRepository->getOrdersByStateAndLastUpdate(
             $enabledOrderStatuses,
             $finalStatusIds,
-            ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS'),
+            (int) ConfigHelper::get('PACKETERY_PACKET_STATUS_TRACKING_MAX_PROCESSED_ORDERS'),
             $oldestOrderDate
         );
 
@@ -220,7 +220,7 @@ class PacketTrackingCron
             return;
         }
 
-        $orderState = new \OrderState($newOrderStatus);
+        $orderState = new \OrderState((int) $newOrderStatus);
         $isOrderStateExists = Validate::isLoadedObject($orderState);
         if ($isOrderStateExists === false) {
             return;

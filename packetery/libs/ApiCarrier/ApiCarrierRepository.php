@@ -330,7 +330,7 @@ class ApiCarrierRepository
             'SELECT 1
             FROM `' . $this->getPrefixedTableName() . '`
             WHERE `is_pickup_points` = 1
-            AND `id` = "' . $this->dbTools->db->escape($carrierId) . '"'
+            AND `id` = "' . $this->dbTools->db->escape((string) $carrierId) . '"'
         );
 
         return (int) $result === 1;

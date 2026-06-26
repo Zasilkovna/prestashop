@@ -95,7 +95,7 @@ class PacketSubmitter
         }
 
         foreach (['carrierPickupPoint', 'street', 'houseNumber', 'city', 'zip'] as $key) {
-            if (!empty($exportData[$key])) {
+            if ((bool) ($exportData[$key] ?? null)) {
                 $packetAttributes[$key] = $exportData[$key];
             }
         }

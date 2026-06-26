@@ -48,7 +48,7 @@ class OrderExporter
         $orderRepository = $this->module->diContainer->get(OrderRepository::class);
         $packeteryOrder = $orderRepository->getWithShopById($order->id);
 
-        if (empty($packeteryOrder) || empty($packeteryOrder['id_branch'])) {
+        if (!is_array($packeteryOrder) || (int) ($packeteryOrder['id_branch'] ?? 0) === 0) {
             throw new ExportException($this->module->l('Unable to load information required to export order', 'orderexporter') . ' ' . $order->id);
         }
 

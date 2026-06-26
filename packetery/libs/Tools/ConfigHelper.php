@@ -139,7 +139,7 @@ class ConfigHelper
     {
         $employee = $module->getContext()->employee;
 
-        return \Language::getIsoById($employee ? $employee->id_lang : \Configuration::get('PS_LANG_DEFAULT'));
+        return \Language::getIsoById($employee !== null ? $employee->id_lang : \Configuration::get('PS_LANG_DEFAULT'));
     }
 
     /**

@@ -104,6 +104,7 @@ class Installer
             ],
         ];
 
+        $result = true;
         try {
             foreach ($menuConfig as $menuItem) {
                 $result = $this->addTab($menuItem['parentClass'], $menuItem['class'], $menuItem['name']);

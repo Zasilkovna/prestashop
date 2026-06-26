@@ -644,7 +644,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function getTrackingLink($trackingNumber)
     {
-        if (empty($trackingNumber)) {
+        if ($trackingNumber === null || $trackingNumber === '') {
             return '';
         }
         $smarty = $this->getModule()->getContext()->smarty;
@@ -665,7 +665,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function getReferenceColumnValue($columnValue, array $row)
     {
-        if (empty($row['id_order'])) {
+        if ((int) ($row['id_order'] ?? 0) === 0) {
             return $columnValue;
         }
         $orderLink = $this->getModule()->getAdminLink('AdminOrders', ['id_order' => $row['id_order'], 'vieworder' => true], '#packetaPickupPointChange');
@@ -684,7 +684,7 @@ class PacketeryOrderGridController extends ModuleAdminController
      */
     public function getCustomerColumnValue($customerName, array $row)
     {
-        if (empty($row['id_customer'])) {
+        if ((int) ($row['id_customer'] ?? 0) === 0) {
             return $customerName;
         }
         $customerLink = $this->getModule()->getAdminLink('AdminCustomers', ['id_customer' => $row['id_customer'], 'viewcustomer' => true]);
