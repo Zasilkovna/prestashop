@@ -33,19 +33,25 @@ class PacketSubmitter
     private $module;
     /** @var ConfigHelper */
     private $configHelper;
+    /** @var ConsignPasswordProvider */
+    private $consignPasswordProvider;
+    /** @var SoapApi */
+    private $soapApi;
 
-    /**
-     * @param OrderRepository $orderRepository
-     * @param LogRepository $logRepository
-     * @param \Packetery $module
-     * @param ConfigHelper $configHelper
-     */
-    public function __construct(OrderRepository $orderRepository, LogRepository $logRepository, \Packetery $module, ConfigHelper $configHelper)
-    {
+    public function __construct(
+        OrderRepository $orderRepository,
+        LogRepository $logRepository,
+        \Packetery $module,
+        ConfigHelper $configHelper,
+        ConsignPasswordProvider $consignPasswordProvider,
+        SoapApi $soapApi
+    ) {
         $this->orderRepository = $orderRepository;
         $this->logRepository = $logRepository;
         $this->module = $module;
         $this->configHelper = $configHelper;
+        $this->consignPasswordProvider = $consignPasswordProvider;
+        $this->soapApi = $soapApi;
     }
 
     /**
@@ -170,11 +176,13 @@ class PacketSubmitter
                             );
                         }
                     }
+
+                    $this->refreshConsignPasswordIfImmediate((int) $orderId, $trackingNumber);
                 }
-            } catch (ExportException $exportException) {
-                $errors[] = $exportException;
-            } catch (ApiClientException $apiClientException) {
-                $errors[] = $apiClientException;
+            } catch (ExportException $e) {
+                $errors[] = $e;
+            } catch (ApiClientException $e) {
+                $errors[] = $e;
             }
         }
 
@@ -194,7 +202,7 @@ class PacketSubmitter
      */
     private function createPacketSoap(array $packetAttributes)
     {
-        $client = new \SoapClient(SoapApi::WSDL_URL);
+        $client = new \SoapClient($this->soapApi->resolveWsdlUrl());
         try {
             $trackingNumber = $client->createPacket($this->configHelper->getApiPass(), $packetAttributes);
             if (isset($trackingNumber->id) && is_string($trackingNumber->id) && \Tools::strlen($trackingNumber->id) > 0) {
@@ -233,5 +241,23 @@ class PacketSubmitter
         }
 
         return $errorMessage;
+    }
+
+    private function refreshConsignPasswordIfImmediate(int $orderId, string $packetId): void
+    {
+        if (ConsignPasswordSettings::fromConfig()->isImmediate() === false) {
+            return;
+        }
+
+        try {
+            $consignPassword = $this->consignPasswordProvider->fetchFromApi($orderId, $packetId);
+            if ($consignPassword !== null) {
+                $this->orderRepository->setConsignPassword($orderId, $consignPassword);
+            }
+        } catch (ApiClientException $e) {
+            return;
+        } catch (DatabaseException $e) {
+            return;
+        }
     }
 }

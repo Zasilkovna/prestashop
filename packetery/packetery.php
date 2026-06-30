@@ -28,6 +28,39 @@ class Packetery extends CarrierModule
 
     private const PACKETA_SUPPORT_EMAIL = 'e-commerce.support@packeta.com';
 
+    public const PACKETA_ADDRESS = [
+        'CZ' => [
+            'company' => 'Zásilkovna s.r.o.',
+            'street' => 'Českomoravská 2408/1a',
+            'zip' => '190 00',
+            'city' => 'Praha 9',
+        ],
+        'SK' => [
+            'company' => 'Packeta Slovakia s. r. o.',
+            'street' => 'Sliačska 1E',
+            'zip' => '831 02',
+            'city' => 'Bratislava',
+        ],
+        'HU' => [
+            'company' => 'Packeta Hungary Kft.',
+            'street' => 'Ezred utca 1-3. B2/11',
+            'zip' => '1044',
+            'city' => 'Budapest',
+        ],
+        'RO' => [
+            'company' => 'Packeta Romania s.r.l.',
+            'street' => 'Strada Călușei 21A, parter',
+            'zip' => '021351',
+            'city' => 'București, Sector 2',
+        ],
+        'PL' => [
+            'company' => 'Packeta Poland Sp. z o.o.',
+            'street' => 'ul. Postępu 14',
+            'zip' => '02-676',
+            'city' => 'Warszawa',
+        ],
+    ];
+
     public const MODULE_SLUG = 'packetery';
 
     protected $config_form = false;
@@ -343,18 +376,35 @@ class Packetery extends CarrierModule
                 'name' => $option,
                 'required' => $optionConf['required'],
             ];
+
             if (isset($optionConf['options'])) {
-                $inputData['type'] = 'radio';
-                $inputData['size'] = count($optionConf['options']);
-                $options = [];
-                foreach ($optionConf['options'] as $id => $name) {
-                    $options[] = [
-                        'id' => $id,
-                        'value' => $id,
-                        'label' => $name,
+                if (isset($optionConf['inputType']) && $optionConf['inputType'] === 'select') {
+                    $query = [];
+                    foreach ($optionConf['options'] as $id => $name) {
+                        $query[] = [
+                            'id' => $id,
+                            'name' => $name,
+                        ];
+                    }
+                    $inputData['type'] = 'select';
+                    $inputData['options'] = [
+                        'query' => $query,
+                        'id' => 'id',
+                        'name' => 'name',
                     ];
+                } else {
+                    $values = [];
+                    foreach ($optionConf['options'] as $id => $name) {
+                        $values[] = [
+                            'id' => $id,
+                            'value' => $id,
+                            'label' => $name,
+                        ];
+                    }
+                    $inputData['type'] = 'radio';
+                    $inputData['size'] = count($optionConf['options']);
+                    $inputData['values'] = $values;
                 }
-                $inputData['values'] = $options;
             }
 
             foreach (['cols', 'rows', 'desc'] as $key) {
@@ -487,7 +537,20 @@ class Packetery extends CarrierModule
                 ]
             );
             $this->context->smarty->assign('updatePacketStatusesUrl', $updatePacketStatusesUrl);
+
+            $getConsignPasswordUrl = $link->getModuleLink(
+                $this->name,
+                'cron',
+                [
+                    'token' => $token,
+                    'task' => 'GetConsignPassword',
+                    'max_orders' => Packetery\Cron\Tasks\GetConsignPassword::DEFAULT_MAX_ORDERS,
+                    'max_order_age_days' => Packetery\Cron\Tasks\GetConsignPassword::DEFAULT_MAX_ORDER_AGE_DAYS,
+                ]
+            );
+            $this->context->smarty->assign('getConsignPasswordUrl', $getConsignPasswordUrl);
         }
+
         $this->context->smarty->assign('deleteLabelsUrl', $deleteLabelsUrl);
         $this->context->smarty->assign('numberOfDays', $numberOfDays);
         $this->context->smarty->assign('numberOfFiles', $numberOfFiles);
@@ -497,6 +560,10 @@ class Packetery extends CarrierModule
 
     private function getConfigurationOptions()
     {
+        /** @var Packetery\Tools\ConfigHelper $configHelper */
+        $configHelper = $this->diContainer->get(Packetery\Tools\ConfigHelper::class);
+        $backendLanguage = $configHelper->getBackendLanguage($this);
+
         return [
             Packetery\Tools\ConfigHelper::KEY_APIPASS => [
                 'title' => $this->l('API password'),
@@ -580,6 +647,27 @@ class Packetery extends CarrierModule
                 'title' => $this->l('Default packaging weight in kg'),
                 'required' => false,
                 'desc' => $this->l('Enter the default weight of the packaging in kg if the order weight is non-zero'),
+            ],
+            Packetery\Tools\ConfigHelper::KEY_SHOW_CONSIGN_PASSWORD => [
+                'title' => $this->l('Show consignment code'),
+                'options' => [
+                    1 => $this->l('Yes'),
+                    0 => $this->l('No'),
+                ],
+                'required' => false,
+                'desc' => sprintf(
+                    $this->l('For instructions on how to use this feature, see %s.'),
+                    '<a href="' . Packetery\Module\Helper::getBoxConsignmentGuideUrl($backendLanguage) . '" target="_blank" rel="noopener noreferrer">' . $this->l('this guide') . '</a>'
+                ),
+            ],
+            Packetery\Tools\ConfigHelper::KEY_CONSIGN_PASSWORD_RETRIEVAL => [
+                'title' => $this->l('When should the consignment code be retrieved'),
+                'inputType' => 'select',
+                'options' => [
+                    Packetery\Order\ConsignPasswordSettings::MODE_IMMEDIATE => $this->l('Immediately upon packet submission'),
+                    Packetery\Order\ConsignPasswordSettings::MODE_CRON => $this->l('Automatically via cron'),
+                ],
+                'required' => false,
             ],
         ];
     }
@@ -1165,6 +1253,13 @@ class Packetery extends CarrierModule
         }
         $this->context->smarty->assign('showCancelButton', $showCancelButton);
         $this->context->smarty->assign('trackingNumber', $packeteryOrder['tracking_number']);
+
+        $consignPassword = null;
+        if (Packetery\Order\ConsignPasswordSettings::fromConfig()->isEnabled()) {
+            $consignPassword = $packeteryOrder['consign_password'];
+        }
+
+        $this->context->smarty->assign('consignPassword', $consignPassword);
 
         return $this->display(__FILE__, 'displayOrderMain.tpl');
     }

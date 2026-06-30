@@ -61,7 +61,7 @@ class PickupPointValidator
             $pickupPointValidate = PickupPointValidate::createWithValidApiKey($apiKey, $this->httpClient);
         } catch (InvalidApiKeyException $exception) {
             $record = [
-                'errorMessage' => $this->module->l('API credentials are not set corretly.', 'pickuptointvalidate'),
+                'errorMessage' => $this->module->l('API credentials are not set correctly.', 'pickuppointvalidator'),
             ];
 
             $this->logRepository->insertRow(LogRepository::ACTION_PICKUP_POINT_VALIDATE, $record, 'error');

@@ -46,6 +46,15 @@ class SoapApi
         $this->configHelper = $configHelper;
     }
 
+    public function resolveWsdlUrl(): string
+    {
+        if (defined('_PACKETERY_SOAP_WSDL_URL_') && _PACKETERY_SOAP_WSDL_URL_ !== '') {
+            return _PACKETERY_SOAP_WSDL_URL_;
+        }
+
+        return self::WSDL_URL;
+    }
+
     /**
      * @param string $senderIndication
      * @param false|string $apiPassword
@@ -57,7 +66,7 @@ class SoapApi
      */
     public function senderGetReturnRouting($senderIndication, $apiPassword)
     {
-        $client = new \SoapClient(self::WSDL_URL);
+        $client = new \SoapClient($this->resolveWsdlUrl());
         try {
             $response = $client->senderGetReturnRouting($apiPassword, $senderIndication);
 
@@ -83,7 +92,7 @@ class SoapApi
     {
         $packetInfo = new PacketInfo();
         try {
-            $client = new \SoapClient(self::WSDL_URL);
+            $client = new \SoapClient($this->resolveWsdlUrl());
             // get PacketInfoResult
             $response = $client->packetInfo($this->configHelper->getApiPass(), $packetId);
             if (
@@ -94,6 +103,10 @@ class SoapApi
                 $packetInfo->setTrackingLink($this->getTrackingUrlInProperLanguage(
                     $response->courierInfo->courierInfoItem->courierTrackingUrls->courierTrackingUrl
                 ));
+            }
+
+            if (isset($response->consignPassword)) {
+                $packetInfo->setConsignPassword($response->consignPassword);
             }
         } catch (\SoapFault $exception) {
             $packetInfo->setFault($this->getFaultIdentifier($exception));
@@ -149,7 +162,7 @@ class SoapApi
     {
         $response = new PacketCarrierNumber();
         try {
-            $soapClient = new \SoapClient(self::WSDL_URL);
+            $soapClient = new \SoapClient($this->resolveWsdlUrl());
             $number = $soapClient->packetCourierNumber($this->configHelper->getApiPass(), $packetId);
             $response->setNumber($number);
         } catch (\SoapFault $exception) {
@@ -235,7 +248,7 @@ class SoapApi
      */
     public function getPacketTracking($packetId)
     {
-        $client = new \SoapClient(self::WSDL_URL);
+        $client = new \SoapClient($this->resolveWsdlUrl());
         try {
             $response = $client->packetTracking($this->configHelper->getApiPass(), $packetId);
         } catch (\SoapFault $exception) {
@@ -256,7 +269,7 @@ class SoapApi
     {
         $response = new Packetery\Response\PacketsLabelsPdfResponse();
         try {
-            $soapClient = new \SoapClient(self::WSDL_URL);
+            $soapClient = new \SoapClient($this->resolveWsdlUrl());
             $pdfContents = $soapClient->packetsLabelsPdf($this->configHelper->getApiPass(), $packets, $format, $offset);
             $response->setPdfContents($pdfContents);
         } catch (\SoapFault $exception) {
@@ -282,7 +295,7 @@ class SoapApi
     {
         $response = new Packetery\Response\PacketsCourierLabelsPdfResponse();
         try {
-            $soapClient = new \SoapClient(self::WSDL_URL);
+            $soapClient = new \SoapClient($this->resolveWsdlUrl());
             $pdfContents = $soapClient->packetsCourierLabelsPdf($this->configHelper->getApiPass(), $packetsEnhanced, $offset, $format);
             $response->setPdfContents($pdfContents);
         } catch (\SoapFault $exception) {
@@ -304,12 +317,50 @@ class SoapApi
     {
         $response = new CancelPacketResponse();
         try {
-            $soapClient = new \SoapClient(self::WSDL_URL);
+            $soapClient = new \SoapClient($this->resolveWsdlUrl());
             $soapClient->cancelPacket($this->configHelper->getApiPass(), $request->getPacketId());
         } catch (\SoapFault $exception) {
             $response->setFault($this->getFaultIdentifier($exception));
             $response->setFaultString($exception->faultstring);
         }
+
+        return $response;
+    }
+
+    public function createShipment(array $packetIds): Packetery\Response\CreateShipmentResponse
+    {
+        $response = new Packetery\Response\CreateShipmentResponse();
+
+        try {
+            $soapClient = new \SoapClient($this->resolveWsdlUrl());
+            $result = $soapClient->createShipment($this->configHelper->getApiPass(), $packetIds);
+        } catch (\SoapFault $exception) {
+            $response->setFault($this->getFaultIdentifier($exception));
+            $response->setFaultString($exception->faultstring);
+
+            return $response;
+        }
+
+        $response->setBarcode($result->barcode);
+
+        return $response;
+    }
+
+    public function barcodePng(string $barcode): Packetery\Response\BarcodePngResponse
+    {
+        $response = new Packetery\Response\BarcodePngResponse();
+
+        try {
+            $soapClient = new \SoapClient($this->resolveWsdlUrl());
+            $imageData = $soapClient->barcodePng($this->configHelper->getApiPass(), $barcode);
+        } catch (\SoapFault $exception) {
+            $response->setFault($this->getFaultIdentifier($exception));
+            $response->setFaultString($exception->faultstring);
+
+            return $response;
+        }
+
+        $response->setImage($imageData);
 
         return $response;
     }
