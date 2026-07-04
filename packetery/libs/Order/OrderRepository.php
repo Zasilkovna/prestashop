@@ -72,6 +72,32 @@ class OrderRepository
     }
 
     /**
+     * PS 9.1 (feature flag `improved_shipment` ON): orders.id_carrier is 0 and the carrier lives in the
+     * shipment entity. Returns the carrier ids of the order's shipments. Empty on older versions.
+     *
+     * @return int[]
+     *
+     * @throws DatabaseException
+     */
+    public function getShipmentCarrierIds(int $orderId): array
+    {
+        if (version_compare(_PS_VERSION_, '9.1.0', '<')) {
+            return [];
+        }
+
+        $rows = $this->dbTools->getRows(
+            'SELECT `id_carrier` FROM `' . _DB_PREFIX_ . 'shipment` WHERE `id_order` = ' . $orderId
+        );
+        if (!is_array($rows)) {
+            return [];
+        }
+
+        return array_map(static function ($row) {
+            return (int) $row['id_carrier'];
+        }, $rows);
+    }
+
+    /**
      * Tested versions:
      * 1.6.0.6 - Db::ON_DUPLICATE_KEY missing
      * 1.6.1.24 - ok

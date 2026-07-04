@@ -39,6 +39,9 @@ class OrderSaver
     /** @var \Packetery */
     private $module;
 
+    /** @var ShipmentCarrierResolver */
+    private $shipmentCarrierResolver;
+
     /**
      * TODO: later inherit from some Base class
      *
@@ -54,7 +57,8 @@ class OrderSaver
         Logger $logger,
         CarrierRepository $carrierRepository,
         Calculator $weightCalculator,
-        \Packetery $module
+        \Packetery $module,
+        ShipmentCarrierResolver $shipmentCarrierResolver
     ) {
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
@@ -62,6 +66,7 @@ class OrderSaver
         $this->carrierRepository = $carrierRepository;
         $this->weightCalculator = $weightCalculator;
         $this->module = $module;
+        $this->shipmentCarrierResolver = $shipmentCarrierResolver;
     }
 
     /**
@@ -73,6 +78,11 @@ class OrderSaver
     public function saveNewOrder(Cart $cart, PrestaShopOrder $order)
     {
         $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById((int) $order->id_carrier);
+        if (!$packeteryCarrier) {
+            // PS 9.1 with the `improved_shipment` flag ON: orders.id_carrier is 0 and the carrier lives
+            // in the shipment entity, so resolve the Packeta carrier from the order's shipments.
+            $packeteryCarrier = $this->shipmentCarrierResolver->resolveForOrder($order);
+        }
         if ($packeteryCarrier) {
             $this->save($order, $packeteryCarrier);
         } else {

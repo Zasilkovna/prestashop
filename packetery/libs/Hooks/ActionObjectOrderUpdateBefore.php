@@ -17,6 +17,7 @@ use Packetery\Carrier\CarrierRepository;
 use Packetery\Carrier\CarrierTools;
 use Packetery\Order\OrderRepository;
 use Packetery\Order\OrderSaver;
+use Packetery\Order\ShipmentCarrierResolver;
 
 class ActionObjectOrderUpdateBefore
 {
@@ -32,6 +33,9 @@ class ActionObjectOrderUpdateBefore
     /** @var CarrierRepository */
     private $carrierRepository;
 
+    /** @var ShipmentCarrierResolver */
+    private $shipmentCarrierResolver;
+
     /**
      * ActionObjectOrderUpdateBefore constructor.
      *
@@ -44,12 +48,14 @@ class ActionObjectOrderUpdateBefore
         OrderRepository $orderRepository,
         OrderSaver $orderSaver,
         CarrierTools $carrierTools,
-        CarrierRepository $carrierRepository
+        CarrierRepository $carrierRepository,
+        ShipmentCarrierResolver $shipmentCarrierResolver
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderSaver = $orderSaver;
         $this->carrierTools = $carrierTools;
         $this->carrierRepository = $carrierRepository;
+        $this->shipmentCarrierResolver = $shipmentCarrierResolver;
     }
 
     public function execute($params)
@@ -62,6 +68,14 @@ class ActionObjectOrderUpdateBefore
         $orderOldVersion = new Order($orderId);
 
         $packeteryCarrier = $this->carrierRepository->getPacketeryCarrierById($idCarrier);
+        if (!$packeteryCarrier) {
+            // PS 9.1 with the `improved_shipment` flag ON: orders.id_carrier is 0 and the carrier lives
+            // in the shipment entity, so resolve it from there and treat it as the order's carrier.
+            $packeteryCarrier = $this->shipmentCarrierResolver->resolveForOrder($params['object']);
+            if ($packeteryCarrier !== null) {
+                $idCarrier = (int) $packeteryCarrier['id_carrier'];
+            }
+        }
         $packeteryOrderData = $this->orderRepository->getById($orderId);
         if (!$packeteryOrderData) {
             if ($packeteryCarrier && $idCarrier !== (int) $orderOldVersion->id_carrier) {
