@@ -95,6 +95,11 @@ $(document).ready(function () {
             event.preventDefault();
         }
     });
+    $('#table-orders').on('click', 'a[data-confirm]', function (event) {
+        if (!confirm($(this).data('confirm'))) {
+            event.preventDefault();
+        }
+    });
 });
 
 //workaround for PS 1.6 BO product detail where PS BO product.js hides the packetery tab because it contains the word pack.

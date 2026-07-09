@@ -16,3 +16,6 @@ require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../packetery/autoload.php';
 require __DIR__ . '/stubs/Configuration.php';
 require __DIR__ . '/stubs/Packetery.php';
+require __DIR__ . '/stubs/Customer.php';
+require __DIR__ . '/stubs/Address.php';
+require __DIR__ . '/stubs/Order.php';

@@ -55,6 +55,10 @@
     white-space: nowrap;
 }
 
+.packeteryordergrid .packetery-claim-line {
+    white-space: nowrap;
+}
+
 .packeteryordergrid thead tr th .title_box {
     white-space: normal !important;
     text-align: left !important;
@@ -62,6 +66,12 @@
 
 .packeteryordergrid .column-weight input {
     padding: 8px;
+}
+
+#table-orders .btn-group.pull-right {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
 }
 
 .packeteryloggrid-success {

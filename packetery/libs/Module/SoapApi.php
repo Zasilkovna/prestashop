@@ -327,6 +327,30 @@ class SoapApi
         return $response;
     }
 
+    public function createPacketClaimWithPassword(
+        Packetery\Request\CreateClaimRequest $request
+    ): Packetery\Response\CreateClaimResponse {
+        $response = new Packetery\Response\CreateClaimResponse();
+
+        try {
+            $soapClient = new \SoapClient($this->resolveWsdlUrl());
+            $result = $soapClient->createPacketClaimWithPassword(
+                $this->configHelper->getApiPass(),
+                $request->getSubmittableData()
+            );
+        } catch (\SoapFault $exception) {
+            $response->setFault($this->getFaultIdentifier($exception));
+            $response->setFaultString($exception->faultstring);
+
+            return $response;
+        }
+
+        $response->setId(isset($result->id) ? (string) $result->id : null);
+        $response->setPassword(isset($result->password) ? (string) $result->password : null);
+
+        return $response;
+    }
+
     public function createShipment(array $packetIds): Packetery\Response\CreateShipmentResponse
     {
         $response = new Packetery\Response\CreateShipmentResponse();

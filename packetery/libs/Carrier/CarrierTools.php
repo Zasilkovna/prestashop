@@ -16,6 +16,14 @@ use CountryCore as Country;
 
 class CarrierTools
 {
+    /** Countries where Packeta has its own pickup points; a claim is posted there. */
+    public const COUNTRIES_WITH_INTERNAL_PICKUP_POINTS = [
+        'CZ',
+        'SK',
+        'HU',
+        'RO',
+    ];
+
     /**
      * Czech and Slovak Home Delivery.
      *

@@ -97,18 +97,6 @@ parameters:
 			path: ../packetery/libs/Carrier/CarrierRepository.php
 
 		-
-			message: '#^Parameter \#3 \$nullValues of method Packetery\\Tools\\DbTools\:\:insert\(\) expects false, true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../packetery/libs/Carrier/CarrierRepository.php
-
-		-
-			message: '#^Parameter \#5 \$nullValues of method Packetery\\Tools\\DbTools\:\:update\(\) expects false, true given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../packetery/libs/Carrier/CarrierRepository.php
-
-		-
 			message: '#^Call to an undefined static method Carrier\:\:getCarrierNameFromShopName\(\)\.$#'
 			identifier: staticMethod.notFound
 			count: 1
@@ -203,30 +191,6 @@ parameters:
 			identifier: booleanNot.exprNotBoolean
 			count: 1
 			path: ../packetery/libs/Order/OrderExporter.php
-
-		-
-			message: '#^Parameter \#3 \$nullValues of method Packetery\\Tools\\DbTools\:\:insert\(\) expects false, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../packetery/libs/Order/OrderRepository.php
-
-		-
-			message: '#^Parameter \#3 \$nullValues of method Packetery\\Tools\\DbTools\:\:insert\(\) expects false, true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../packetery/libs/Order/OrderRepository.php
-
-		-
-			message: '#^Parameter \#5 \$nullValues of method Packetery\\Tools\\DbTools\:\:update\(\) expects false, bool given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../packetery/libs/Order/OrderRepository.php
-
-		-
-			message: '#^Parameter \#5 \$nullValues of method Packetery\\Tools\\DbTools\:\:update\(\) expects false, true given\.$#'
-			identifier: argument.type
-			count: 4
-			path: ../packetery/libs/Order/OrderRepository.php
 
 		-
 			message: '#^Only booleans are allowed in an if condition, string given\.$#'

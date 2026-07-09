@@ -50,8 +50,6 @@ class CarrierAdminForm
     /** @var CarrierFieldsResolver */
     private $carrierFieldsResolver;
 
-    private static $countriesWithInternalPickupPoints = ['CZ', 'SK', 'HU', 'RO'];
-
     /**
      * CarrierAdminForm constructor.
      *
@@ -439,7 +437,7 @@ class CarrierAdminForm
     private function hasInternalCountry(array $carrierCountries)
     {
         foreach ($carrierCountries as $carrierCountry) {
-            if (in_array($carrierCountry, self::$countriesWithInternalPickupPoints, true)) {
+            if (in_array($carrierCountry, CarrierTools::COUNTRIES_WITH_INTERNAL_PICKUP_POINTS, true)) {
                 return true;
             }
         }

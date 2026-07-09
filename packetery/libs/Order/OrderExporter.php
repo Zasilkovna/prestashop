@@ -216,7 +216,7 @@ class OrderExporter
      *
      * @param array<string, mixed> $packeteryOrder data from database
      *
-     * @return array<int, string|float>
+     * @return array{0: string, 1: float|int|null} value is null when the exchange rate is missing
      */
     public function findCurrencyAndTotalValue(\Order $order, array $packeteryOrder): array
     {
