@@ -3,4 +3,4 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *}
 
-<a{if isset($class)} class="{$class|escape:'htmlall':'UTF-8'}"{/if} href="{$linkUrl|escape:'htmlall':'UTF-8'}" data-toggle="tooltip" data-original-title="{$title|escape:'htmlall':'UTF-8'}"><i class="{$icon|escape:'htmlall':'UTF-8'}"></i></a>
+<a{if isset($class)} class="{$class|escape:'htmlall':'UTF-8'}"{/if} href="{$linkUrl|escape:'htmlall':'UTF-8'}"{if isset($confirmMessage) && $confirmMessage} data-confirm="{$confirmMessage|escape:'htmlall':'UTF-8'}"{/if} data-toggle="tooltip" data-original-title="{$title|escape:'htmlall':'UTF-8'}"><i class="{$icon|escape:'htmlall':'UTF-8'}"></i></a>

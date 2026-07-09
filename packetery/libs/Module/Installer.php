@@ -187,10 +187,13 @@ class Installer
             `point_city` varchar(70) NULL,
             `consign_password` varchar(10) NULL,
             `consign_password_processed` datetime NULL,
+            `claim_id` varchar(15) NULL,
+            `claim_password` varchar(10) NULL,
             UNIQUE(`id_order`),
             UNIQUE(`id_cart`),
             KEY `idx_consign_tracking` (`tracking_number`, `consign_password`),
-            KEY `idx_consign_processed` (`consign_password_processed`)
+            KEY `idx_consign_processed` (`consign_password_processed`),
+            KEY `idx_claim_id` (`claim_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';

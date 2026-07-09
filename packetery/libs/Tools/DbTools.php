@@ -180,7 +180,7 @@ class DbTools
     /**
      * @param string $table
      * @param array $data
-     * @param false $nullValues
+     * @param bool $nullValues
      * @param bool $useCache
      * @param int $type
      * @param bool $addPrefix
@@ -207,7 +207,7 @@ class DbTools
      * @param array $data
      * @param string $where
      * @param int $limit
-     * @param false $nullValues
+     * @param bool $nullValues
      * @param bool $useCache
      * @param bool $addPrefix
      *

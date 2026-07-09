@@ -14,6 +14,10 @@ use Packetery\Exceptions\DatabaseException;
 use Packetery\Exceptions\LabelPrintException;
 use Packetery\Module\SoapApi;
 use Packetery\Module\VersionChecker;
+use Packetery\Order\ClaimCanceller;
+use Packetery\Order\ClaimEligibility;
+use Packetery\Order\ClaimFault;
+use Packetery\Order\ClaimSubmitter;
 use Packetery\Order\CollectionPrintHandler;
 use Packetery\Order\CsvExporter;
 use Packetery\Order\Labels;
@@ -31,6 +35,13 @@ class PacketeryOrderGridController extends ModuleAdminController
     public const ACTION_BULK_LABEL_PDF = 'bulkLabelPdf';
     public const ACTION_BULK_CARRIER_LABEL_PDF = 'bulkCarrierLabelPdf';
     public const ACTION_BULK_COLLECTION_PRINT = 'bulkCollectionPrint';
+    public const ACTION_CREATE_CLAIM = 'createClaim';
+    public const ACTION_CANCEL_CLAIM = 'cancelClaim';
+
+    /**
+     * Filter key of the "Tracking number" search box; the actual filtering happens in processFilter().
+     */
+    private const TRACKING_SEARCH_KEY = 'tracking_search';
 
     /** @var array */
     protected $statuses_array = [];
@@ -71,6 +82,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             `po`.`zip`,
             `po`.`exported`,
             IF(`po`.`tracking_number` IS NOT NULL, `po`.`tracking_number`, \'\') AS `tracking_number`,
+            `po`.`claim_id`,
             CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
             IF(`a`.`valid`, 1, 0) AS `badge_success`,
             CAST(`po`.`weight` AS DECIMAL(10,2)) AS `weight`,
@@ -169,7 +181,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             'tracking_number' => [
                 'title' => $this->module->l('Tracking number', 'packeteryordergridcontroller'),
                 'callback' => 'getTrackingLink',
-                'filter_key' => 'po!tracking_number',
+                'filter_key' => self::TRACKING_SEARCH_KEY,
                 'search' => true,
                 'orderby' => false,
             ],
@@ -464,6 +476,221 @@ class PacketeryOrderGridController extends ModuleAdminController
         }
     }
 
+    public function processCreateClaim(): void
+    {
+        $module = $this->getModule();
+        $orderId = (int) Tools::getValue('id_order');
+
+        /** @var OrderRepository $orderRepository */
+        $orderRepository = $module->diContainer->get(OrderRepository::class);
+        /** @var PacketTrackingRepository $packetTrackingRepository */
+        $packetTrackingRepository = $module->diContainer->get(PacketTrackingRepository::class);
+        /** @var ClaimEligibility $claimEligibility */
+        $claimEligibility = $module->diContainer->get(ClaimEligibility::class);
+
+        $orderData = $orderRepository->getOrderWithCountry($orderId);
+        $trackingNumber = $orderData['tracking_number'] ?? null;
+        $lastStatusCode = $trackingNumber !== null
+            ? $packetTrackingRepository->getLastStatusCodeByOrderAndPacketId($orderId, $trackingNumber)
+            : null;
+        $deliveryCountry = $orderData['ps_country'] ?? null;
+        $existingClaimId = $orderData['claim_id'] ?? null;
+
+        $errorMessage = $this->module->l('The return could not be created.', 'packeteryordergridcontroller');
+
+        if (
+            !$this->isOrderInShopContext($orderId)
+            || !$claimEligibility->canCreateClaim(
+                $trackingNumber,
+                $lastStatusCode,
+                $deliveryCountry,
+                $existingClaimId
+            )
+        ) {
+            // server-side gate: the icon is hidden in this state, so this is a forged/stale call
+            $this->errors[] = $errorMessage;
+
+            return;
+        }
+
+        /** @var ClaimSubmitter $claimSubmitter */
+        $claimSubmitter = $module->diContainer->get(ClaimSubmitter::class);
+        $response = $claimSubmitter->submit($orderId);
+
+        if (!$response->hasFault()) {
+            $this->informations[] = $this->module->l('The return was successfully created.', 'packeteryordergridcontroller');
+
+            return;
+        }
+
+        $this->addClaimFaultFlash(
+            $response->getFault(),
+            $response->getFaultString(),
+            $errorMessage,
+            $this->module->l('The return could not be created. More information can be found in the log.', 'packeteryordergridcontroller'),
+            $orderId
+        );
+    }
+
+    public function processCancelClaim(): void
+    {
+        $module = $this->getModule();
+        $orderId = (int) Tools::getValue('id_order');
+
+        /** @var OrderRepository $orderRepository */
+        $orderRepository = $module->diContainer->get(OrderRepository::class);
+        $orderData = $orderRepository->getById($orderId);
+
+        $existingClaimId = $orderData['claim_id'] ?? null;
+
+        /** @var ClaimEligibility $claimEligibility */
+        $claimEligibility = $module->diContainer->get(ClaimEligibility::class);
+
+        $errorMessage = sprintf(
+            $this->module->l('The return for order no.: %d could not be cancelled.', 'packeteryordergridcontroller'),
+            $orderId
+        );
+
+        if (
+            !$this->isOrderInShopContext($orderId)
+            || !$claimEligibility->canCancelClaim($existingClaimId)
+        ) {
+            // server-side gate: the icon is hidden in this state, so this is a forged/stale call
+            $this->errors[] = $errorMessage;
+
+            return;
+        }
+
+        /** @var ClaimCanceller $claimCanceller */
+        $claimCanceller = $module->diContainer->get(ClaimCanceller::class);
+        $response = $claimCanceller->cancel($orderId);
+
+        if (!$response->hasFault()) {
+            $this->informations[] = sprintf(
+                $this->module->l('The return for order no.: %d was successfully cancelled in Packeta.', 'packeteryordergridcontroller'),
+                $orderId
+            );
+
+            return;
+        }
+
+        $apiLogMessage = sprintf(
+            $this->module->l('The return for order no.: %d could not be cancelled. More information can be found in the log.', 'packeteryordergridcontroller'),
+            $orderId
+        );
+        $this->addClaimFaultFlash(
+            $response->getFault(),
+            $response->getFaultString(),
+            $errorMessage,
+            $apiLogMessage,
+            $orderId
+        );
+    }
+
+    /**
+     * Adds the right flash for a claim fault and logs it where the person who can act on it looks:
+     * a missing customer contact is fixable, so it gets a specific translated flash and no log;
+     * a DB write that failed after a successful API call gets a flash that says the action happened
+     * in Packeta plus a PrestaShop-log orphan trace;
+     * an API fault is already in the module API log, so the flash points there;
+     * the other pre-API faults are flash-only.
+     */
+    private function addClaimFaultFlash(
+        ?string $fault,
+        ?string $faultString,
+        string $genericMessage,
+        string $apiLogMessage,
+        int $orderId
+    ): void {
+        if ($fault === ClaimFault::EMAIL_MISSING || $fault === ClaimFault::PHONE_MISSING) {
+            $this->errors[] = $this->getMissingContactMessage($fault);
+
+            return;
+        }
+
+        if ($fault === ClaimFault::CLAIM_NOT_SAVED || $fault === ClaimFault::CLAIM_NOT_CLEARED) {
+            $this->logClaimFaultToPrestaShop($faultString, $orderId);
+            $this->errors[] = $this->getOrphanMessage($fault, $orderId);
+
+            return;
+        }
+
+        $flashOnlyFaults = [
+            ClaimFault::ORDER_NOT_FOUND,
+            ClaimFault::ESHOP_ID_MISSING,
+            ClaimFault::VALUE_UNRESOLVED,
+        ];
+
+        if (in_array($fault, $flashOnlyFaults, true)) {
+            $this->errors[] = $genericMessage;
+
+            return;
+        }
+
+        // NO_CLAIM_ID or a real API fault: already written to the module API log
+        $this->errors[] = $apiLogMessage;
+    }
+
+    /**
+     * Actionable flash for a return that the operator can fix by completing the order contact
+     */
+    private function getMissingContactMessage(string $fault): string
+    {
+        if ($fault === ClaimFault::EMAIL_MISSING) {
+            return $this->module->l('Customer email is missing. Add it to the order and try again.', 'packeteryordergridcontroller');
+        }
+
+        return $this->module->l('Customer phone is missing. Add it to the order and try again.', 'packeteryordergridcontroller');
+    }
+
+    /**
+     * Truthful flash for an orphaned return: the Packeta action succeeded, only the local write failed
+     */
+    private function getOrphanMessage(string $fault, int $orderId): string
+    {
+        if ($fault === ClaimFault::CLAIM_NOT_SAVED) {
+            return $this->module->l('The return was created in Packeta but could not be saved to the order. See the PrestaShop log.', 'packeteryordergridcontroller');
+        }
+
+        return sprintf(
+            $this->module->l('The return for order no.: %d was cancelled in Packeta but could not be cleared from the order. See the PrestaShop log.', 'packeteryordergridcontroller'),
+            $orderId
+        );
+    }
+
+    /**
+     * Records an orphaned-return claim fault in the PrestaShop log (linked to the order);
+     * mirrors PacketCanceller.
+     */
+    private function logClaimFaultToPrestaShop(?string $faultString, int $orderId): void
+    {
+        PrestaShopLogger::addLog((string) $faultString, 3, null, 'PacketeryOrder', $orderId, true);
+    }
+
+    /**
+     * Guards a forged id_order from another shop: a claim action may only touch an order the
+     * current shop context covers, mirroring the order grid shop scoping
+     */
+    private function isOrderInShopContext(int $orderId): bool
+    {
+        $order = new Order($orderId);
+        if (!Validate::isLoadedObject($order)) {
+            return false;
+        }
+
+        $shopId = Shop::getContextShopID(true);
+        if ($shopId !== null && (int) $order->id_shop !== (int) $shopId) {
+            return false;
+        }
+
+        $groupId = Shop::getContextShopGroupID(true);
+        if ($groupId !== null && (int) $order->id_shop_group !== (int) $groupId) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function processBulkCsvExport()
     {
         if ((int) Tools::getValue('submitFilterorders') === 1) {
@@ -602,6 +829,61 @@ class PacketeryOrderGridController extends ModuleAdminController
         unset($this->toolbar_btn['new']);
     }
 
+    /**
+     * Filters the "Tracking number" search across both base columns. The framework filters one
+     * column per filter_key, so the field is hidden from its filter building and a substring match
+     * over both columns is appended to the WHERE clause instead, keeping the framework's default
+     * `%value%` behaviour for the existing tracking-number search.
+     */
+    public function processFilter()
+    {
+        $field = $this->fields_list['tracking_number'] ?? null;
+        $hasFilterKey = is_array($field) && array_key_exists('filter_key', $field);
+        if ($hasFilterKey) {
+            unset($this->fields_list['tracking_number']['filter_key']);
+        }
+
+        parent::processFilter();
+
+        if ($hasFilterKey) {
+            $this->fields_list['tracking_number']['filter_key'] = $field['filter_key'];
+        }
+
+        $value = $this->getTrackingSearchValue();
+        if ($value === '') {
+            return;
+        }
+
+        $escaped = pSQL($value);
+        $this->_filter .= ' AND (`po`.`tracking_number` LIKE \'%' . $escaped . '%\''
+            . ' OR `po`.`claim_id` LIKE \'%' . $escaped . '%\') ';
+    }
+
+    /**
+     * Reads the submitted "Tracking number" search value from the request or the persisted filter
+     * cookie, mirroring how the framework resolves list filter values.
+     *
+     * @return string
+     */
+    private function getTrackingSearchValue(): string
+    {
+        $listId = $this->list_id ?? $this->table;
+        $name = $listId . 'Filter_' . self::TRACKING_SEARCH_KEY;
+
+        $value = Tools::getValue($name);
+        if ($value === false || $value === null || $value === '') {
+            $cookieKey = $this->getCookieFilterPrefix() . $name;
+            $cookie = $this->context->cookie;
+            $value = $cookie->__isset($cookieKey) ? $cookie->__get($cookieKey) : '';
+        }
+
+        if (!is_string($value)) {
+            return '';
+        }
+
+        return trim($value);
+    }
+
     public function postProcess()
     {
         // values are saved even before bulk actions
@@ -642,14 +924,26 @@ class PacketeryOrderGridController extends ModuleAdminController
      * @throws ReflectionException
      * @throws SmartyException
      */
-    public function getTrackingLink($trackingNumber)
+    public function getTrackingLink($trackingNumber, array $row = [])
     {
         if (empty($trackingNumber)) {
             return '';
         }
+        $claimNumber = (isset($row['claim_id']) && $row['claim_id'] !== '')
+            ? (string) $row['claim_id']
+            : null;
+
+        $claimUrl = '';
+        if ($claimNumber !== null) {
+            $claimUrl = Packetery\Module\Helper::getTrackingUrl($claimNumber);
+        }
+
         $smarty = $this->getModule()->getContext()->smarty;
         $smarty->assign('trackingNumber', $trackingNumber);
         $smarty->assign('trackingUrl', Packetery\Module\Helper::getTrackingUrl($trackingNumber));
+        $smarty->assign('claimNumber', $claimNumber);
+        $smarty->assign('claimUrl', $claimUrl);
+        $smarty->assign('claimLabel', $this->module->l('Return:', 'packeteryordergridcontroller'));
 
         return $smarty->fetch(__DIR__ . '/../../views/templates/admin/trackingLink.tpl');
     }
@@ -803,6 +1097,8 @@ class PacketeryOrderGridController extends ModuleAdminController
                 $title = $this->module->l('Cancel Packet', 'packeteryordergridcontroller');
                 $links[$action] = $this->getActionLinkHtml($orderId, $action, $title, $iconClass);
             }
+
+            $links += $this->getClaimActionLinks($orderId, $orderData, $lastStatusCode);
         } else {
             $action = 'submit';
             $iconClass = 'icon-send';
@@ -813,17 +1109,88 @@ class PacketeryOrderGridController extends ModuleAdminController
         return $links;
     }
 
-    private function getActionLinkHtml(int $orderId, string $action, string $title, string $iconClass): string
+    /**
+     * @param array $orderData packetery_order row
+     * @param int|null $lastStatusCode
+     *
+     * @return array
+     */
+    private function getClaimActionLinks(int $orderId, array $orderData, ?int $lastStatusCode): array
     {
+        $module = $this->getModule();
+
+        /** @var ClaimEligibility $claimEligibility */
+        $claimEligibility = $module->diContainer->get(ClaimEligibility::class);
+        $claimId = $orderData['claim_id'] ?? null;
+
+        if ($claimEligibility->canCancelClaim($claimId)) {
+            return [
+                self::ACTION_CANCEL_CLAIM => $this->getActionLinkHtml(
+                    $orderId,
+                    self::ACTION_CANCEL_CLAIM,
+                    $this->module->l('Cancel return', 'packeteryordergridcontroller'),
+                    'icon-ban',
+                    $this->module->l('Do you really wish to cancel the return?', 'packeteryordergridcontroller')
+                ),
+            ];
+        }
+
+        if ($lastStatusCode !== PacketStatus::DELIVERED) {
+            return [];
+        }
+
+        /** @var OrderRepository $orderRepository */
+        $orderRepository = $module->diContainer->get(OrderRepository::class);
+        $orderWithCountry = $orderRepository->getOrderWithCountry($orderId);
+        $deliveryCountry = $orderWithCountry['ps_country'] ?? null;
+
+        if (
+            $claimEligibility->canCreateClaim(
+                $orderData['tracking_number'],
+                $lastStatusCode,
+                $deliveryCountry,
+                $claimId
+            )
+        ) {
+            return [
+                self::ACTION_CREATE_CLAIM => $this->getActionLinkHtml(
+                    $orderId,
+                    self::ACTION_CREATE_CLAIM,
+                    $this->module->l('Create return', 'packeteryordergridcontroller'),
+                    'icon-reply',
+                    $this->module->l('Do you really wish to create the return? The customer will be notified by email.', 'packeteryordergridcontroller')
+                ),
+            ];
+        }
+
+        return [];
+    }
+
+    /**
+     * Renders a grid action link in an isolated Smarty scope so its variables do not leak into the page context
+     */
+    private function getActionLinkHtml(
+        int $orderId,
+        string $action,
+        string $title,
+        string $iconClass,
+        string $confirmMessage = ''
+    ): string {
         $href = $this->getModule()->getAdminLink('PacketeryOrderGrid', ['id_order' => $orderId, 'action' => $action]);
 
         $smarty = $this->getModule()->getContext()->smarty;
-        $smarty->assign('linkUrl', $href);
-        $smarty->assign('title', $title);
-        $smarty->assign('icon', $iconClass);
-        $smarty->assign('class', 'btn btn-sm label-tooltip');
+        $template = $smarty->createTemplate(
+            __DIR__ . '/../../views/templates/admin/grid/link.tpl',
+            [
+                'linkUrl' => $href,
+                'title' => $title,
+                'icon' => $iconClass,
+                'class' => 'btn btn-sm label-tooltip',
+                'confirmMessage' => $confirmMessage,
+            ]
+        );
 
-        return $smarty->fetch(__DIR__ . '/../../views/templates/admin/grid/link.tpl');
+        return $template->fetch();
     }
 
     /**

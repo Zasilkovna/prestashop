@@ -229,7 +229,7 @@ class OrderRepository
     /**
      * @param int $orderId
      *
-     * @return array|bool|object|null
+     * @return array|false
      *
      * @throws DatabaseException
      */
@@ -269,6 +269,7 @@ class OrderRepository
                    `po`.`point_city`,
                    `po`.`point_zip`,
                    `po`.`consign_password`,
+                   `po`.`claim_id`,
                    `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
@@ -281,7 +282,7 @@ class OrderRepository
     /**
      * @param int $orderId
      *
-     * @return array|bool|object|null
+     * @return array|false
      *
      * @throws DatabaseException
      */
@@ -308,7 +309,8 @@ class OrderRepository
                    `zip`,
                    `city`,
                    `street`,
-                   `house_number`
+                   `house_number`,
+                   `claim_id`
             FROM `' . _DB_PREFIX_ . 'packetery_order`
             WHERE `id_order` = ' . $orderId);
     }
@@ -349,7 +351,8 @@ class OrderRepository
                    `zip`,
                    `city`,
                    `street`,
-                   `house_number`
+                   `house_number`,
+                   `claim_id`
             FROM `' . _DB_PREFIX_ . 'packetery_order`
             WHERE `id_order` IN (' . $idList . ')');
 
@@ -635,6 +638,36 @@ class OrderRepository
                 'consign_password_processed' => null,
             ],
             'id_order = ' . $orderId,
+            0,
+            true
+        );
+    }
+
+    public function setClaim(int $orderId, string $claimId, ?string $claimPassword): bool
+    {
+        return $this->dbTools->update(
+            'packetery_order',
+            [
+                'claim_id' => $this->db->escape($claimId),
+                'claim_password' => $claimPassword === null
+                    ? null
+                    : $this->db->escape($claimPassword),
+            ],
+            '`id_order` = ' . $orderId,
+            0,
+            true
+        );
+    }
+
+    public function clearClaim(int $orderId): bool
+    {
+        return $this->dbTools->update(
+            'packetery_order',
+            [
+                'claim_id' => null,
+                'claim_password' => null,
+            ],
+            '`id_order` = ' . $orderId,
             0,
             true
         );

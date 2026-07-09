@@ -6,6 +6,7 @@
        - Updated: Removed a duplicate carrier lookup in the order detail.
 3.5.0  - Added: Consignment code column in the bill of delivery print, visible only when the "Show consignment code" option is enabled.
        - Added: Option to display the consignment code in the order detail. The code is retrieved either immediately when the packet is submitted, or in bulk via a cron task.
+       - Added: Option to create and cancel a return shipment directly from the Packeta order list.
        - Updated: Add bill of delivery print to group actions of Packetery order grid
        - Fixed: Let Widget Validation option only for CZ/SK carriers in carrier administration
        - Updated: Removed displaying "is COD" flag.
