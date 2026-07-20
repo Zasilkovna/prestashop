@@ -1,0 +1,114 @@
+<?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+declare(strict_types=1);
+
+namespace Packetery\Tests\Unit\Returns;
+
+use Packetery\Returns\ReturnEntity;
+use Packetery\Returns\ReturnRepository;
+use Packetery\Tools\DbTools;
+use PHPUnit\Framework\TestCase;
+
+class ReturnRepositoryTest extends TestCase
+{
+    public function testGetByOrderIdMapsRowsToEntities(): void
+    {
+        $dbTools = $this->createStub(DbTools::class);
+        $dbTools->method('getRows')->willReturn([
+            [
+                'id_return' => '1',
+                'id_order' => '42',
+                'claim_id' => 'C1',
+                'claim_password' => null,
+                'status' => 'created',
+                'source' => 'admin',
+                'date_add' => '2026-07-09 10:00:00',
+            ],
+            [
+                'id_return' => '2',
+                'id_order' => '42',
+                'claim_id' => 'C2',
+                'claim_password' => 'pw',
+                'status' => 'cancelled',
+                'source' => 'customer',
+                'date_add' => '2026-07-09 11:00:00',
+            ],
+        ]);
+
+        $returns = (new ReturnRepository($dbTools))->getByOrderId(42);
+
+        $this->assertCount(2, $returns);
+        $this->assertContainsOnlyInstancesOf(ReturnEntity::class, $returns);
+        $this->assertSame(1, $returns[0]->getIdReturn());
+        $this->assertSame('C2', $returns[1]->getClaimId());
+    }
+
+    public function testGetByOrderIdReturnsEmptyArrayWhenNoRows(): void
+    {
+        $dbTools = $this->createStub(DbTools::class);
+        $dbTools->method('getRows')->willReturn([]);
+
+        $this->assertSame([], (new ReturnRepository($dbTools))->getByOrderId(999));
+    }
+
+    public function testGetByIdReturnsEntityWhenRowFound(): void
+    {
+        $dbTools = $this->createStub(DbTools::class);
+        $dbTools->method('getRow')->willReturn([
+            'id_return' => '3',
+            'id_order' => '7',
+            'claim_id' => 'C3',
+            'claim_password' => null,
+            'status' => 'created',
+            'source' => 'admin',
+            'date_add' => '2026-07-09 12:00:00',
+        ]);
+
+        $return = (new ReturnRepository($dbTools))->getById(3);
+
+        $this->assertNotNull($return);
+        $this->assertSame(3, $return->getIdReturn());
+    }
+
+    public function testGetByIdReturnsNullWhenRowMissing(): void
+    {
+        $dbTools = $this->createStub(DbTools::class);
+        $dbTools->method('getRow')->willReturn(false);
+
+        $this->assertNull((new ReturnRepository($dbTools))->getById(999));
+    }
+
+    public function testGetActiveByOrderIdReturnsEntityWhenActiveReturnExists(): void
+    {
+        $dbTools = $this->createStub(DbTools::class);
+        $dbTools->db = new \Db();
+        $dbTools->method('getRow')->willReturn([
+            'id_return' => '8',
+            'id_order' => '42',
+            'claim_id' => 'C8',
+            'claim_password' => null,
+            'status' => 'created',
+            'source' => 'admin',
+            'date_add' => '2026-07-09 13:00:00',
+        ]);
+
+        $return = (new ReturnRepository($dbTools))->getActiveByOrderId(42);
+
+        $this->assertNotNull($return);
+        $this->assertSame(8, $return->getIdReturn());
+        $this->assertSame('created', $return->getStatus());
+    }
+
+    public function testGetActiveByOrderIdReturnsNullWhenNoActiveReturn(): void
+    {
+        $dbTools = $this->createStub(DbTools::class);
+        $dbTools->db = new \Db();
+        $dbTools->method('getRow')->willReturn(false);
+
+        $this->assertNull((new ReturnRepository($dbTools))->getActiveByOrderId(42));
+    }
+}

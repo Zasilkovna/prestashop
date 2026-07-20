@@ -6,37 +6,31 @@
  */
 declare(strict_types=1);
 
-class Address
+class Currency
 {
     /** @var array<int, array<string, mixed>> */
     private static array $fixtures = [];
 
     /** @var int */
     public $id = 0;
-    /** @var int */
-    public $id_country = 0;
     /** @var string */
-    public $phone_mobile = '';
-    /** @var string */
-    public $phone = '';
+    public $iso_code = '';
 
-    public function __construct($idAddress = null)
+    public function __construct($idCurrency = null)
     {
-        $key = (int) $idAddress;
+        $key = (int) $idCurrency;
         $data = self::$fixtures[$key] ?? [];
 
         $this->id = isset(self::$fixtures[$key]) ? $key : 0;
-        $this->id_country = $data['id_country'] ?? 0;
-        $this->phone_mobile = $data['phone_mobile'] ?? '';
-        $this->phone = $data['phone'] ?? '';
+        $this->iso_code = $data['iso_code'] ?? '';
     }
 
     /**
      * @param array<string, mixed> $data
      */
-    public static function loadFixture(int $idAddress, array $data): void
+    public static function loadFixture(int $idCurrency, array $data): void
     {
-        self::$fixtures[$idAddress] = $data;
+        self::$fixtures[$idCurrency] = $data;
     }
 
     public static function reset(): void

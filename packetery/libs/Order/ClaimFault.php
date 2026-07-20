@@ -18,7 +18,6 @@ class ClaimFault
     public const ESHOP_ID_MISSING = 'eshopIdMissing';
     public const VALUE_UNRESOLVED = 'valueUnresolved';
     public const EMAIL_MISSING = 'emailMissing';
-    public const PHONE_MISSING = 'phoneMissing';
     public const NO_CLAIM_ID = 'noClaimId';
     public const CLAIM_NOT_SAVED = 'claimNotSaved';
     public const CLAIM_NOT_CLEARED = 'claimNotCleared';

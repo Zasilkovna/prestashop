@@ -8,17 +8,14 @@ declare(strict_types=1);
 
 namespace Packetery\Tests\Unit\Order;
 
-use Packetery\Exceptions\ClaimRequestException;
 use Packetery\Exceptions\DatabaseException;
-use Packetery\Log\LogRepository;
-use Packetery\Module\SoapApi;
+use Packetery\Order\ClaimApiSender;
 use Packetery\Order\ClaimFault;
-use Packetery\Order\ClaimRequestFactory;
 use Packetery\Order\ClaimSubmitter;
-use Packetery\Order\OrderRepository;
-use Packetery\Request\CreateClaimRequest;
 use Packetery\Response\CreateClaimResponse;
-use PHPUnit\Framework\Attributes\DataProvider;
+use Packetery\Returns\ReturnApprovalPolicy;
+use Packetery\Returns\ReturnEntity;
+use Packetery\Returns\ReturnRepository;
 use PHPUnit\Framework\TestCase;
 
 class ClaimSubmitterTest extends TestCase
@@ -27,221 +24,143 @@ class ClaimSubmitterTest extends TestCase
     private const CLAIM_ID = 'Z9012';
     private const CLAIM_PASSWORD = 'secret';
 
-    #[DataProvider('provideIncompleteOrderData')]
-    public function testCreatingClaimIncompleteOrder(string $fault, string $faultString): void
+    public function testCustomerReturnNeedingApprovalIsStoredPendingWithoutApiCall(): void
     {
-        $requestFactory = $this->createStub(ClaimRequestFactory::class);
-        $requestFactory
-            ->method('create')
-            ->willThrowException(new ClaimRequestException($fault, $faultString));
+        $apiSender = $this->createMock(ClaimApiSender::class);
+        $apiSender->expects($this->never())->method('send');
 
-        $soapApi = $this->createMock(SoapApi::class);
-        $soapApi
-            ->expects($this->never())
-            ->method('createPacketClaimWithPassword');
+        // the contact entered in the form is stored on the pending return for later approval
+        $returnRepository = $this->createMock(ReturnRepository::class);
+        $returnRepository
+            ->expects($this->once())
+            ->method('insertPending')
+            ->with(self::ORDER_ID, ReturnEntity::SOURCE_CUSTOMER, 'buyer@example.com', '777888999')
+            ->willReturn(true);
+        $returnRepository->expects($this->never())->method('insert');
 
-        $orderRepository = $this->createMock(OrderRepository::class);
-        $orderRepository
-            ->expects($this->never())
-            ->method('setClaim');
+        $result = $this->submitter($apiSender, $returnRepository, $this->policy(true))
+            ->submit(self::ORDER_ID, ReturnEntity::SOURCE_CUSTOMER, 'buyer@example.com', '777888999');
 
-        // pre-API validation never reaches the API, so it must not be written to the API log
-        $logRepository = $this->createMock(LogRepository::class);
-        $logRepository
-            ->expects($this->never())
-            ->method('insertRow');
-
-        $response = $this->createSubmitter($requestFactory, $soapApi, $orderRepository, $logRepository)
-            ->submit(self::ORDER_ID);
-
-        $this->assertTrue($response->hasFault());
-        $this->assertSame($fault, $response->getFault());
-        $this->assertSame($faultString, $response->getFaultString());
+        $this->assertTrue($result->isPending());
     }
 
-    /**
-     * @return array<string, array{0: string, 1: string}>
-     */
-    public static function provideIncompleteOrderData(): array
+    public function testCustomerReturnIsCreatedWhenNoApprovalNeeded(): void
     {
-        return [
-            'order not found' => [ClaimFault::ORDER_NOT_FOUND, 'Packetery order not found.'],
-            'eshop id missing' => [ClaimFault::ESHOP_ID_MISSING, 'Packetery eShop ID is not configured.'],
-            'order value unresolved' => [ClaimFault::VALUE_UNRESOLVED, 'Order total value could not be resolved.'],
-            'email missing' => [ClaimFault::EMAIL_MISSING, 'Customer email is missing; the return cannot be created.'],
-            'phone missing' => [ClaimFault::PHONE_MISSING, 'Customer phone is missing; the return cannot be created.'],
-        ];
+        $apiSender = $this->createStub(ClaimApiSender::class);
+        $apiSender->method('send')->willReturn($this->successResponse());
+
+        // the source passed to submit() is the one persisted
+        $returnRepository = $this->createMock(ReturnRepository::class);
+        $returnRepository
+            ->expects($this->once())
+            ->method('insert')
+            ->with(
+                self::ORDER_ID,
+                self::CLAIM_ID,
+                self::CLAIM_PASSWORD,
+                ReturnEntity::STATUS_CREATED,
+                ReturnEntity::SOURCE_CUSTOMER
+            )
+            ->willReturn(true);
+        $returnRepository->expects($this->never())->method('insertPending');
+
+        $result = $this->submitter($apiSender, $returnRepository, $this->policy(false))
+            ->submit(self::ORDER_ID, ReturnEntity::SOURCE_CUSTOMER);
+
+        $this->assertTrue($result->isCreated());
     }
 
-    public function testCreatingClaimApiFault(): void
+    public function testAdminReturnAlwaysGoesStraightThroughWithoutConsultingThePolicy(): void
+    {
+        $apiSender = $this->createStub(ClaimApiSender::class);
+        $apiSender->method('send')->willReturn($this->successResponse());
+
+        $returnRepository = $this->createMock(ReturnRepository::class);
+        $returnRepository
+            ->expects($this->once())
+            ->method('insert')
+            ->with(
+                self::ORDER_ID,
+                self::CLAIM_ID,
+                self::CLAIM_PASSWORD,
+                ReturnEntity::STATUS_CREATED,
+                ReturnEntity::SOURCE_ADMIN
+            )
+            ->willReturn(true);
+        $returnRepository->expects($this->never())->method('insertPending');
+
+        // admin returns bypass approval entirely
+        $policy = $this->createMock(ReturnApprovalPolicy::class);
+        $policy->expects($this->never())->method('needsApproval');
+
+        $result = $this->submitter($apiSender, $returnRepository, $policy)
+            ->submit(self::ORDER_ID, ReturnEntity::SOURCE_ADMIN);
+
+        $this->assertTrue($result->isCreated());
+    }
+
+    public function testApiFaultReturnsErrorAndDoesNotPersist(): void
     {
         $faultyResponse = new CreateClaimResponse();
         $faultyResponse->setFault('PacketAttributesFault');
         $faultyResponse->setFaultString('Invalid value.');
 
-        $requestFactory = $this->createStub(ClaimRequestFactory::class);
-        $requestFactory
-            ->method('create')
-            ->willReturn($this->createStub(CreateClaimRequest::class));
+        $apiSender = $this->createStub(ClaimApiSender::class);
+        $apiSender->method('send')->willReturn($faultyResponse);
 
-        $soapApi = $this->createStub(SoapApi::class);
-        $soapApi
-            ->method('createPacketClaimWithPassword')
-            ->willReturn($faultyResponse);
+        $returnRepository = $this->createMock(ReturnRepository::class);
+        $returnRepository->expects($this->never())->method('insert');
 
-        $orderRepository = $this->createMock(OrderRepository::class);
-        $orderRepository
-            ->expects($this->never())
-            ->method('setClaim');
+        $result = $this->submitter($apiSender, $returnRepository, $this->policy(false))
+            ->submit(self::ORDER_ID, ReturnEntity::SOURCE_ADMIN);
 
-        $logRepository = $this->createMock(LogRepository::class);
-        $logRepository
-            ->expects($this->once())
-            ->method('insertRow')
-            ->with(
-                LogRepository::ACTION_CLAIM_CREATION,
-                [
-                    'fault' => 'PacketAttributesFault',
-                    'faultString' => 'Invalid value.',
-                ],
-                LogRepository::STATUS_ERROR,
-                self::ORDER_ID
-            );
-
-        $response = $this->createSubmitter($requestFactory, $soapApi, $orderRepository, $logRepository)
-            ->submit(self::ORDER_ID);
-
-        $this->assertTrue($response->hasFault());
+        $this->assertTrue($result->isError());
+        $this->assertNotNull($result->getResponse());
+        $this->assertTrue($result->getResponse()->hasFault());
     }
 
-    public function testCreatingClaimMissingClaimId(): void
+    public function testPersistFailureReportsClaimNotSavedOrphan(): void
     {
-        $requestFactory = $this->createStub(ClaimRequestFactory::class);
-        $requestFactory
-            ->method('create')
-            ->willReturn($this->createStub(CreateClaimRequest::class));
+        $apiSender = $this->createStub(ClaimApiSender::class);
+        $apiSender->method('send')->willReturn($this->successResponse());
 
-        $soapApi = $this->createStub(SoapApi::class);
-        $soapApi
-            ->method('createPacketClaimWithPassword')
-            ->willReturn(new CreateClaimResponse());
+        $returnRepository = $this->createStub(ReturnRepository::class);
+        $returnRepository->method('insert')->willThrowException(new DatabaseException('write failed'));
 
-        $orderRepository = $this->createMock(OrderRepository::class);
-        $orderRepository
-            ->expects($this->never())
-            ->method('setClaim');
+        $result = $this->submitter($apiSender, $returnRepository, $this->policy(false))
+            ->submit(self::ORDER_ID, ReturnEntity::SOURCE_ADMIN);
 
-        $logRepository = $this->createMock(LogRepository::class);
-        $logRepository
-            ->expects($this->once())
-            ->method('insertRow')
-            ->with(
-                LogRepository::ACTION_CLAIM_CREATION,
-                [
-                    'fault' => ClaimFault::NO_CLAIM_ID,
-                    'faultString' => 'Packeta API returned a response without a return number.',
-                ],
-                LogRepository::STATUS_ERROR,
-                self::ORDER_ID
-            );
-
-        $response = $this->createSubmitter($requestFactory, $soapApi, $orderRepository, $logRepository)
-            ->submit(self::ORDER_ID);
-
-        $this->assertTrue($response->hasFault());
-        $this->assertSame(ClaimFault::NO_CLAIM_ID, $response->getFault());
-    }
-
-    public function testCreatingClaimSuccess(): void
-    {
-        $successResponse = new CreateClaimResponse();
-        $successResponse->setId(self::CLAIM_ID);
-        $successResponse->setPassword(self::CLAIM_PASSWORD);
-
-        $requestFactory = $this->createStub(ClaimRequestFactory::class);
-        $requestFactory
-            ->method('create')
-            ->willReturn($this->createStub(CreateClaimRequest::class));
-
-        $soapApi = $this->createStub(SoapApi::class);
-        $soapApi
-            ->method('createPacketClaimWithPassword')
-            ->willReturn($successResponse);
-
-        $orderRepository = $this->createMock(OrderRepository::class);
-        $orderRepository
-            ->expects($this->once())
-            ->method('setClaim')
-            ->with(self::ORDER_ID, self::CLAIM_ID, self::CLAIM_PASSWORD)
-            ->willReturn(true);
-
-        $logRepository = $this->createMock(LogRepository::class);
-        $logRepository
-            ->expects($this->once())
-            ->method('insertRow')
-            ->with(
-                LogRepository::ACTION_CLAIM_CREATION,
-                ['packetClaimId' => self::CLAIM_ID],
-                LogRepository::STATUS_SUCCESS,
-                self::ORDER_ID
-            );
-
-        $response = $this->createSubmitter($requestFactory, $soapApi, $orderRepository, $logRepository)
-            ->submit(self::ORDER_ID);
-
-        $this->assertFalse($response->hasFault());
-    }
-
-    public function testCreatingClaimPersistFailure(): void
-    {
-        $successResponse = new CreateClaimResponse();
-        $successResponse->setId(self::CLAIM_ID);
-        $successResponse->setPassword(self::CLAIM_PASSWORD);
-
-        $requestFactory = $this->createStub(ClaimRequestFactory::class);
-        $requestFactory
-            ->method('create')
-            ->willReturn($this->createStub(CreateClaimRequest::class));
-
-        $soapApi = $this->createStub(SoapApi::class);
-        $soapApi
-            ->method('createPacketClaimWithPassword')
-            ->willReturn($successResponse);
-
-        $orderRepository = $this->createStub(OrderRepository::class);
-        $orderRepository
-            ->method('setClaim')
-            ->willThrowException(new DatabaseException('write failed'));
-
-        // the API created the return, so its number is logged before the failing DB write
-        $logRepository = $this->createMock(LogRepository::class);
-        $logRepository
-            ->expects($this->once())
-            ->method('insertRow')
-            ->with(
-                LogRepository::ACTION_CLAIM_CREATION,
-                ['packetClaimId' => self::CLAIM_ID],
-                LogRepository::STATUS_SUCCESS,
-                self::ORDER_ID
-            );
-
-        $response = $this->createSubmitter($requestFactory, $soapApi, $orderRepository, $logRepository)
-            ->submit(self::ORDER_ID);
-
-        $this->assertTrue($response->hasFault());
-        $this->assertSame(ClaimFault::CLAIM_NOT_SAVED, $response->getFault());
+        $this->assertTrue($result->isError());
+        $this->assertNotNull($result->getResponse());
+        $this->assertSame(ClaimFault::CLAIM_NOT_SAVED, $result->getResponse()->getFault());
         $this->assertSame(
             'Return ' . self::CLAIM_ID . ' was created in Packeta but could not be saved to the order.',
-            $response->getFaultString()
+            $result->getResponse()->getFaultString()
         );
     }
 
-    private function createSubmitter(
-        ClaimRequestFactory $requestFactory,
-        SoapApi $soapApi,
-        OrderRepository $orderRepository,
-        LogRepository $logRepository
+    private function successResponse(): CreateClaimResponse
+    {
+        $response = new CreateClaimResponse();
+        $response->setId(self::CLAIM_ID);
+        $response->setPassword(self::CLAIM_PASSWORD);
+
+        return $response;
+    }
+
+    private function policy(bool $needsApproval): ReturnApprovalPolicy
+    {
+        $policy = $this->createStub(ReturnApprovalPolicy::class);
+        $policy->method('needsApproval')->willReturn($needsApproval);
+
+        return $policy;
+    }
+
+    private function submitter(
+        ClaimApiSender $apiSender,
+        ReturnRepository $returnRepository,
+        ReturnApprovalPolicy $approvalPolicy
     ): ClaimSubmitter {
-        return new ClaimSubmitter($requestFactory, $soapApi, $orderRepository, $logRepository);
+        return new ClaimSubmitter($apiSender, $returnRepository, $approvalPolicy);
     }
 }

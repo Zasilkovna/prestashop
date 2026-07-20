@@ -14,6 +14,7 @@ if (!defined('_PS_VERSION_')) {
 use Packetery;
 use Packetery\Log\LogRepository;
 use Packetery\PacketTracking\PacketTrackingRepository;
+use Packetery\Returns\ReturnRepository;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\DbTools;
 
@@ -59,6 +60,7 @@ class Uninstaller
             && $this->deleteTab('PacketerySetting')
             && $this->deleteTab('PacketeryCarrierGrid')
             && $this->deleteTab('PacketeryOrderGrid')
+            && $this->deleteTab('PacketeryReturnGrid')
             && $this->deleteTab('PacketeryLogGrid');
     }
 
@@ -124,6 +126,9 @@ class Uninstaller
         $packetTrackingRepository = $this->module->diContainer->get(PacketTrackingRepository::class);
         $sql[] = $packetTrackingRepository->getDropTableSql();
 
+        $returnRepository = $this->module->diContainer->get(ReturnRepository::class);
+        $sql[] = $returnRepository->getDropTableSql();
+
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText())) {
             return false;
         }
@@ -177,6 +182,17 @@ class Uninstaller
             && \Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION)
             && \Configuration::deleteByName(ConfigHelper::KEY_LAST_VERSION_URL)
             && \Configuration::deleteByName(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION)
+            && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_ENABLED)
+            && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_ALLOW_UNREGISTERED)
+            && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_WINDOW_DAYS)
+            && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_EXCLUDED_CATEGORIES)
+            && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_EXCLUDE_VIRTUAL)
+            && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_MAX_ITEM_VALUE)
+            && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_MAX_ITEM_WEIGHT)
+            && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_ALLOWED_GROUPS)
+            && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_ALLOWED_CARRIERS)
+            && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_ALLOWED_COUNTRIES)
+            && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_APPROVE_FIRST)
         ;
     }
 

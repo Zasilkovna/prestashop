@@ -285,6 +285,8 @@ class ApiCarrierRepository
      * @return array|bool|object|null
      *
      * @throws DatabaseException
+     *
+     * @deprecated use getEntityById() which returns a typed ApiCarrierEntity instead of a raw row
      */
     public function getById($id)
     {
@@ -299,6 +301,30 @@ class ApiCarrierRepository
             FROM `' . $this->getPrefixedTableName() . '`
             WHERE `id` = "' . $this->dbTools->db->escape($id) . '"'
         );
+    }
+
+    /**
+     * @throws DatabaseException
+     */
+    public function getEntityById(string $id): ?ApiCarrierEntity
+    {
+        $row = $this->dbTools->getRow(
+            'SELECT `id`,
+                `name`,
+                `currency`,
+                `is_pickup_points`,
+                `country`,
+                `disallows_cod`,
+                `requires_size`
+            FROM `' . $this->getPrefixedTableName() . '`
+            WHERE `id` = "' . $this->dbTools->db->escape($id) . '"'
+        );
+
+        if (!is_array($row) || $row === []) {
+            return null;
+        }
+
+        return ApiCarrierEntity::fromDbRow($row);
     }
 
     /**

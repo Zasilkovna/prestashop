@@ -17,6 +17,8 @@ use Packetery\Log\LogRepository;
 use Packetery\Module\SoapApi;
 use Packetery\Request\CancelPacketRequest;
 use Packetery\Response\CancelPacketResponse;
+use Packetery\Returns\ReturnEntity;
+use Packetery\Returns\ReturnRepository;
 
 /**
  * Cancels a claim packet via SOAP.
@@ -27,32 +29,43 @@ class ClaimCanceller
 {
     /** @var SoapApi */
     private $soapApi;
-    /** @var OrderRepository */
-    private $orderRepository;
+    /** @var ReturnRepository */
+    private $returnRepository;
     /** @var LogRepository */
     private $logRepository;
 
     public function __construct(
         SoapApi $soapApi,
-        OrderRepository $orderRepository,
+        ReturnRepository $returnRepository,
         LogRepository $logRepository
     ) {
         $this->soapApi = $soapApi;
-        $this->orderRepository = $orderRepository;
+        $this->returnRepository = $returnRepository;
         $this->logRepository = $logRepository;
     }
 
     /**
-     * Cancels the return in Packeta, then clears the local claim id.
-     * The caller must pass an order with a non-empty claim id (the grid gate guarantees it);
-     * a DB clear failure after a successful cancel is reported as an orphan.
+     * Cancels the return in Packeta, then marks the local return cancelled. Only acts on a return that
+     * is still created (the grid action is shown only in that state, so any other state is treated as
+     * forged/stale and faulted without an API call); a DB write failure after a successful cancel is
+     * reported as an orphan.
      *
      * @throws DatabaseException
      */
-    public function cancel(int $orderId): CancelPacketResponse
+    public function cancel(int $idReturn): CancelPacketResponse
     {
-        $orderData = $this->orderRepository->getById($orderId);
-        $claimId = is_array($orderData) ? (string) ($orderData['claim_id'] ?? '') : '';
+        $return = $this->returnRepository->getById($idReturn);
+        if ($return === null || !$return->isCreated()) {
+            // forged/stale action: there is no created return to cancel, so never hit the API
+            $response = new CancelPacketResponse();
+            $response->setFault(ClaimFault::NO_CLAIM_ID);
+            $response->setFaultString("No created return to cancel for id {$idReturn}.");
+
+            return $response;
+        }
+
+        $claimId = $return->getClaimId();
+        $orderId = $return->getIdOrder();
 
         $response = $this->soapApi->cancelPacket(new CancelPacketRequest($claimId));
 
@@ -79,11 +92,11 @@ class ClaimCanceller
         );
 
         try {
-            $this->orderRepository->clearClaim($orderId);
+            $this->returnRepository->updateStatus($idReturn, ReturnEntity::STATUS_CANCELLED);
         } catch (DatabaseException $exception) {
             // the return was cancelled in Packeta but the local write failed; the caller logs the orphan
             $response->setFault(ClaimFault::CLAIM_NOT_CLEARED);
-            $response->setFaultString("Return {$claimId} was cancelled in Packeta but could not be cleared from the order.");
+            $response->setFaultString("Return {$claimId} was cancelled in Packeta but could not be updated locally.");
         }
 
         return $response;

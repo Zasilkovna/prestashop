@@ -16,6 +16,7 @@ use Packetery\Exceptions\DatabaseException;
 use Packetery\Log\LogRepository;
 use Packetery\PacketTracking\PacketTrackingRepository;
 use Packetery\Product\ProductAttributeRepository;
+use Packetery\Returns\ReturnRepository;
 use Packetery\Tools\ConfigHelper;
 use Packetery\Tools\DbTools;
 
@@ -69,9 +70,69 @@ class Installer
      */
     public function insertMenuItems()
     {
+        try {
+            $result = true;
+            foreach ($this->getMenuItems() as $menuItem) {
+                $result = $this->addTab($menuItem['parentClass'], $menuItem['class'], $menuItem['name']);
+                if ($result === false) {
+                    return false;
+                }
+            }
+
+            return $result;
+        } catch (\PrestaShopException $exception) {
+            \PrestaShopLogger::addLog($this->getExceptionRaisedText() . ' ' .
+                $exception->getMessage(), 3, null, null, null, true);
+
+            return false;
+        }
+    }
+
+    /**
+     * Refreshes already-registered menu tabs: per-language names (older installs reused the admin's
+     * current language) and the intended order of the Packeta submenu (a tab added on upgrade would
+     * otherwise land last). Missing tabs are skipped.
+     *
+     * @return bool
+     */
+    public function refreshMenuItems()
+    {
+        try {
+            $childPosition = 0;
+            foreach ($this->getMenuItems() as $menuItem) {
+                $idTab = (int) \Tab::getIdFromClassName($menuItem['class']);
+                if ($idTab <= 0) {
+                    continue;
+                }
+                $tab = new \Tab($idTab);
+                $tab->name = $this->createMultiLangField($menuItem['name']);
+                if ($menuItem['parentClass'] === 'Packetery') {
+                    $tab->position = $childPosition;
+                    ++$childPosition;
+                }
+                if ($tab->update() === false) {
+                    return false;
+                }
+            }
+
+            return true;
+        } catch (\PrestaShopException $exception) {
+            \PrestaShopLogger::addLog($this->getExceptionRaisedText() . ' ' .
+                $exception->getMessage(), 3, null, null, null, true);
+
+            return false;
+        }
+    }
+
+    /**
+     * @return array<int, array{parentClass: string, class: string, name: string, translatedName: string}>
+     */
+    private function getMenuItems()
+    {
         // https://devdocs.prestashop.com/1.7/modules/concepts/controllers/admin-controllers/tabs/#which-parent-to-choose
-        // first parameter in l method in translatedName cannot be string from variable and we must register the translation before adding tabs
-        $menuConfig = [
+        // translatedName is only here so the translation extractor registers these strings (the l() source
+        // cannot be a variable); the actual per-language tab name is built by createMultiLangField from 'name'
+        return [
             [
                 'parentClass' => 'SELL',
                 'class' => 'Packetery',
@@ -83,6 +144,12 @@ class Installer
                 'class' => 'PacketeryOrderGrid',
                 'name' => 'Packeta Orders',
                 'translatedName' => $this->module->l('Packeta Orders', 'installer'),
+            ],
+            [
+                'parentClass' => 'Packetery',
+                'class' => 'PacketeryReturnGrid',
+                'name' => 'Returns',
+                'translatedName' => $this->module->l('Returns', 'installer'),
             ],
             [
                 'parentClass' => 'Packetery',
@@ -103,22 +170,6 @@ class Installer
                 'translatedName' => $this->module->l('Log', 'installer'),
             ],
         ];
-
-        try {
-            foreach ($menuConfig as $menuItem) {
-                $result = $this->addTab($menuItem['parentClass'], $menuItem['class'], $menuItem['name']);
-                if ($result === false) {
-                    return false;
-                }
-            }
-
-            return $result;
-        } catch (\PrestaShopException $exception) {
-            \PrestaShopLogger::addLog($this->getExceptionRaisedText() . ' ' .
-                $exception->getMessage(), 3, null, null, null, true);
-
-            return false;
-        }
     }
 
     /**
@@ -133,9 +184,10 @@ class Installer
         $multiLangField = [];
         $languages = \Language::getLanguages();
         foreach ($languages as $language) {
-            // We check if we have translation for that language. l method never returns the original english string.
+            // Translate per language via the locale (e.g. sk-SK); language_code (sk-sk) does not match
+            // and would fall back to the current admin language. Untranslated languages keep the English key.
             $haveTranslation = in_array($language['iso_code'], self::TRANSLATED_LANGUAGES);
-            $multiLangField[$language['id_lang']] = $haveTranslation ? $this->module->l($translationKey, 'installer', $language['language_code']) : $translationKey;
+            $multiLangField[$language['id_lang']] = $haveTranslation ? $this->module->l($translationKey, 'installer', $language['locale']) : $translationKey;
         }
 
         return $multiLangField;
@@ -187,13 +239,10 @@ class Installer
             `point_city` varchar(70) NULL,
             `consign_password` varchar(10) NULL,
             `consign_password_processed` datetime NULL,
-            `claim_id` varchar(15) NULL,
-            `claim_password` varchar(10) NULL,
             UNIQUE(`id_order`),
             UNIQUE(`id_cart`),
             KEY `idx_consign_tracking` (`tracking_number`, `consign_password`),
-            KEY `idx_consign_processed` (`consign_password_processed`),
-            KEY `idx_claim_id` (`claim_id`)
+            KEY `idx_consign_processed` (`consign_password_processed`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'packetery_payment`';
@@ -230,6 +279,10 @@ class Installer
         $sql[] = $packetTrackingRepository->getDropTableSql();
         $sql[] = $packetTrackingRepository->getCreateTableSql();
 
+        $returnRepository = $this->module->diContainer->get(ReturnRepository::class);
+        $sql[] = $returnRepository->getDropTableSql();
+        $sql[] = $returnRepository->getCreateTableSql();
+
         if (!$this->dbTools->executeQueries($sql, $this->getExceptionRaisedText(), true)) {
             return false;
         }
@@ -258,6 +311,10 @@ class Installer
             && ConfigHelper::update(ConfigHelper::KEY_USE_PS_CURRENCY_CONVERSION, 0)
             && ConfigHelper::update(ConfigHelper::KEY_SHOW_CONSIGN_PASSWORD, 0)
             && ConfigHelper::update(ConfigHelper::KEY_CONSIGN_PASSWORD_RETRIEVAL, \Packetery\Order\ConsignPasswordSettings::MODE_IMMEDIATE)
+            && ConfigHelper::update(ConfigHelper::KEY_RETURNS_ENABLED, 0)
+            && ConfigHelper::update(ConfigHelper::KEY_RETURNS_ALLOW_UNREGISTERED, 0)
+            && ConfigHelper::update(ConfigHelper::KEY_RETURNS_WINDOW_DAYS, \Packetery\Returns\ReturnSettingsFactory::DEFAULT_WINDOW_DAYS)
+            && ConfigHelper::update(ConfigHelper::KEY_RETURNS_EXCLUDE_VIRTUAL, (int) \Packetery\Returns\ReturnSettingsFactory::DEFAULT_EXCLUDE_VIRTUAL)
         ;
     }
 
@@ -282,6 +339,12 @@ class Installer
      */
     private function addTab($parentClassName, $className, $name)
     {
+        // idempotent: on upgrade the tab may already exist, so adding a new menu item (e.g. Returns
+        // in 3.6.0) must not duplicate the tabs that are already registered
+        if ((int) \Tab::getIdFromClassName($className) > 0) {
+            return true;
+        }
+
         $tab = new \Tab();
         $parentId = \Tab::getIdFromClassName($parentClassName);
         // PrestaShop 1.6 without the SELL tab group.
