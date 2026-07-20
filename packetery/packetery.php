@@ -73,7 +73,7 @@ class Packetery extends CarrierModule
         // It is not possible to use self::MODULE_SLUG because the PS validator cannot correctly identify the module name.
         $this->name = 'packetery';
         $this->tab = 'shipping_logistics';
-        $this->version = '3.5.0';
+        $this->version = '3.6.0';
         $this->author = 'Packeta s.r.o.';
         $this->need_instance = 0;
         $this->is_configurable = 1;
@@ -290,6 +290,7 @@ class Packetery extends CarrierModule
         $error = false;
         $isSubmit = false;
         $isStatusSubmitted = false;
+        $isReturnsSubmitted = false;
 
         /** @var Packetery\Order\OrderStatusChangeFormService $orderStatusChangeFormService */
         $orderStatusChangeFormService = $this->diContainer->get(Packetery\Order\OrderStatusChangeFormService::class);
@@ -312,6 +313,19 @@ class Packetery extends CarrierModule
                 $isSubmit = true;
                 $isStatusSubmitted = true;
                 $packetStatusTrackingFormService->handleSubmit();
+            }
+        } catch (Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
+            $output .= $this->displayError($formDataPersistException->getMessage());
+            $error = true;
+        }
+
+        /** @var Packetery\Returns\ReturnSettingsFormService $returnSettingsFormService */
+        $returnSettingsFormService = $this->diContainer->get(Packetery\Returns\ReturnSettingsFormService::class);
+        try {
+            if (Tools::isSubmit($returnSettingsFormService->getSubmitActionKey())) {
+                $isSubmit = true;
+                $isReturnsSubmitted = true;
+                $returnSettingsFormService->handleSubmit();
             }
         } catch (Packetery\Exceptions\FormDataPersistException $formDataPersistException) {
             $output .= $this->displayError($formDataPersistException->getMessage());
@@ -352,7 +366,7 @@ class Packetery extends CarrierModule
             $output .= $this->displayConfirmation($this->l('Settings updated'));
         }
 
-        $output .= $this->displayForm($isStatusSubmitted);
+        $output .= $this->displayForm($isStatusSubmitted, $isReturnsSubmitted);
 
         return $output;
     }
@@ -362,9 +376,10 @@ class Packetery extends CarrierModule
      *
      * @throws PrestaShopException
      * @throws ReflectionException
+     * @throws SmartyException
      * @throws Packetery\Exceptions\DatabaseException
      */
-    public function displayForm(bool $isStatusSubmitted): string
+    public function displayForm(bool $isStatusSubmitted, bool $isReturnsSubmitted): string
     {
         $formInputs = [];
         $confOptions = $this->getConfigurationOptions();
@@ -491,11 +506,22 @@ class Packetery extends CarrierModule
                 $this->l('Save')
             );
 
+        /** @var Packetery\Returns\ReturnSettingsFormService $returnSettingsFormService */
+        $returnSettingsFormService = $this->diContainer->get(Packetery\Returns\ReturnSettingsFormService::class);
+        $returnsTabContent = $returnSettingsFormService->generateForm(
+            $this->name,
+            $this->table,
+            $this->l('Returns'),
+            $this->l('Save')
+        );
+
         $contents = $this->context->smarty->assign(
             [
                 'isStatusSubmitted' => $isStatusSubmitted,
+                'isReturnsSubmitted' => $isReturnsSubmitted,
                 'generalTabContent' => $generalTabContent,
                 'packetStatusTrackingTabContent' => $packetStatusTrackingTabContent,
+                'returnsTabContent' => $returnsTabContent,
             ]
         );
 
@@ -1076,11 +1102,24 @@ class Packetery extends CarrierModule
         $packetCanceller = $this->diContainer->get(Packetery\Order\PacketCanceller::class);
         $messages = $packetCanceller->processOrderDetail($messages);
 
+        /** @var Packetery\Returns\ReturnOrderDetailHandler $returnOrderDetailHandler */
+        $returnOrderDetailHandler = $this->diContainer->get(Packetery\Returns\ReturnOrderDetailHandler::class);
+        $messages = $returnOrderDetailHandler->processOrderDetail($messages);
+
         /** @var Packetery\Order\OrderRepository $orderRepository */
         $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
         $packeteryOrder = $orderRepository->getOrderWithCountry($orderId);
         if ((bool) $packeteryOrder === false) {
-            return;
+            // Order not shipped via Packeta: no Packeta shipping controls. Show only the returns
+            // section, and only when it has something to offer — an existing return (history) or a
+            // creatable one. A non-Packeta order with no returns that cannot be returned (feature off
+            // or not eligible) has nothing to do with Packeta, so the box is hidden entirely.
+            if (!$this->assignAdminReturnSection($orderId)) {
+                return;
+            }
+            $this->context->smarty->assign('messages', $messages);
+
+            return $this->display(__FILE__, 'displayOrderMainReturnsOnly.tpl');
         }
 
         $this->context->smarty->assign('submitButton', 'order_update');
@@ -1257,7 +1296,45 @@ class Packetery extends CarrierModule
 
         $this->context->smarty->assign('consignPassword', $consignPassword);
 
+        $this->assignAdminReturnSection($orderId);
+
         return $this->display(__FILE__, 'displayOrderMain.tpl');
+    }
+
+    /**
+     * Assigns the admin order-detail returns section: the order's returns (history) and whether the
+     * admin may create another one. Shared by the Packeta and non-Packeta order-detail renders.
+     *
+     * @param int $orderId
+     *
+     * @return bool whether the section has anything to show (an existing return or a creatable one);
+     *              the non-Packeta render uses this to hide the box when there is nothing Packeta-related
+     */
+    private function assignAdminReturnSection($orderId): bool
+    {
+        /** @var Packetery\Returns\ReturnRepository $returnRepository */
+        $returnRepository = $this->diContainer->get(Packetery\Returns\ReturnRepository::class);
+        $returnRows = [];
+        foreach ($returnRepository->getByOrderId((int) $orderId) as $return) {
+            $claimId = $return->getClaimId();
+            $returnRows[] = [
+                'id_return' => $return->getIdReturn(),
+                'claim_id' => $claimId,
+                'status' => $return->getStatus(),
+                'date_add' => $return->getDateAdd(),
+                'is_active' => $return->isCreated(),
+                'is_pending' => $return->isPending(),
+                'tracking_url' => $claimId !== '' ? Packetery\Module\Helper::getTrackingUrl($claimId) : '',
+            ];
+        }
+        $this->context->smarty->assign('returns', $returnRows);
+
+        /** @var Packetery\Returns\ReturnCreationGate $returnCreationGate */
+        $returnCreationGate = $this->diContainer->get(Packetery\Returns\ReturnCreationGate::class);
+        $returnCreationAllowed = $returnCreationGate->canCreate((int) $orderId);
+        $this->context->smarty->assign('returnCreationAllowed', $returnCreationAllowed);
+
+        return $returnRows !== [] || $returnCreationAllowed;
     }
 
     /**
@@ -1512,19 +1589,101 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayOrderDetail($params)
     {
-        if (!isset($params['order'])) {
+        // some themes (e.g. hummingbird on PS 9) render this hook without the order object,
+        // so fall back to the request id and verify the logged-in customer owns the order
+        $orderId = isset($params['order']) ? (int) $params['order']->id : (int) Tools::getValue('id_order');
+        if ($orderId <= 0) {
+            return;
+        }
+        $psOrder = new Order($orderId);
+        if (!Validate::isLoadedObject($psOrder) || (int) $psOrder->id_customer !== (int) $this->context->customer->id) {
             return;
         }
         $orderRepository = $this->diContainer->get(Packetery\Order\OrderRepository::class);
-        $orderData = $orderRepository->getById((int) $params['order']->id);
-        if (!$orderData) {
+        $orderData = $orderRepository->getById($orderId);
+        $isPacketaOrder = (bool) $orderData;
+
+        if ($isPacketaOrder) {
+            $this->context->smarty->assign('pickupPointLabel', $this->l('Selected Packeta pickup point'));
+            $this->context->smarty->assign('pickupPointName', $orderData['name_branch']);
+        }
+        $this->context->smarty->assign('isPacketaOrder', $isPacketaOrder);
+        $returnState = $this->assignReturnSection($orderId);
+
+        // non-Packeta orders have no pickup-point box, so render only when a return can be offered or shown
+        if (!$isPacketaOrder && $returnState === Packetery\Returns\CustomerReturnSectionProvider::STATE_NONE) {
             return;
         }
 
-        $this->context->smarty->assign('pickupPointLabel', $this->l('Selected Packeta pickup point'));
-        $this->context->smarty->assign('pickupPointName', $orderData['name_branch']);
-
         return $this->display(__FILE__, 'display_order_detail.tpl');
+    }
+
+    /**
+     * Assigns the customer return section for the account order detail: the create form when the
+     * order is eligible, or the confirmation once an active return exists (the form is then hidden;
+     * further returns need the e-shop's approval — phase 4).
+     *
+     * @param int $orderId
+     *
+     * @return string the resolved return state (CustomerReturnSectionProvider::STATE_*)
+     */
+    private function assignReturnSection($orderId): string
+    {
+        try {
+            /** @var Packetery\Returns\CustomerReturnSectionProvider $sectionProvider */
+            $sectionProvider = $this->diContainer->get(Packetery\Returns\CustomerReturnSectionProvider::class);
+            $sectionData = $sectionProvider->build((int) $orderId);
+        } catch (Exception $exception) {
+            $sectionData = [
+                'returnState' => Packetery\Returns\CustomerReturnSectionProvider::STATE_NONE,
+                'returnClaimId' => '',
+                'returnTrackingUrl' => '',
+                'returnHistory' => [],
+            ];
+        }
+
+        [$prefillEmail, $prefillPhone] = $this->getReturnContactPrefill((int) $orderId);
+
+        $flash = Tools::getValue('packetery_return');
+        $this->context->smarty->assign(array_merge($sectionData, [
+            'returnActionUrl' => $this->context->link->getModuleLink(self::MODULE_SLUG, 'return'),
+            'returnToken' => Tools::getToken(false),
+            'returnOrderId' => (int) $orderId,
+            'returnPrefillEmail' => $prefillEmail,
+            'returnPrefillPhone' => $prefillPhone,
+            'returnFlashCreated' => ($flash === 'created'),
+            'returnFlashPending' => ($flash === 'pending'),
+            'returnFlashError' => ($flash === 'error'),
+        ]));
+
+        return $sectionData['returnState'];
+    }
+
+    /**
+     * Prefill for the customer return form: the order's e-mail and phone, which the
+     * customer may edit or complete before submitting.
+     *
+     * @param int $orderId
+     *
+     * @return array{0: string, 1: string} [email, phone]
+     */
+    private function getReturnContactPrefill($orderId): array
+    {
+        $email = '';
+        $phone = '';
+
+        $psOrder = new Order((int) $orderId);
+        if (Validate::isLoadedObject($psOrder)) {
+            $customer = new Customer((int) $psOrder->id_customer);
+            $email = Validate::isLoadedObject($customer) ? (string) $customer->email : '';
+
+            $address = new Address((int) $psOrder->id_address_delivery);
+            if (Validate::isLoadedObject($address)) {
+                $phone = Packetery\Address\AddressTools::resolveContactPhone($address);
+            }
+        }
+
+        return [$email, $phone];
     }
 
     /**

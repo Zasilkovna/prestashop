@@ -65,9 +65,9 @@ class SendMailAlterTemplateVars
             && isset($packeteryCarrier['id_branch'])
             && $packeteryCarrier['id_branch'] !== $orderData['id_branch']
         ) {
-            $originalPacketeryCarrier = $this->apiCarrierRepository->getById($orderData['id_branch']);
-            if ($originalPacketeryCarrier) {
-                $params['template_vars']['{carrier}'] = $originalPacketeryCarrier['name'];
+            $originalPacketeryCarrier = $this->apiCarrierRepository->getEntityById((string) $orderData['id_branch']);
+            if ($originalPacketeryCarrier !== null) {
+                $params['template_vars']['{carrier}'] = $originalPacketeryCarrier->getName();
             }
         }
 
