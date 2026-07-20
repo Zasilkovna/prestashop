@@ -28,6 +28,8 @@ use Packetery\Order\Tracking;
 use Packetery\PacketTracking\PacketStatus;
 use Packetery\PacketTracking\PacketStatusFactory;
 use Packetery\PacketTracking\PacketTrackingRepository;
+use Packetery\Returns\ReturnEntity;
+use Packetery\Returns\ReturnRepository;
 use Packetery\Tools\ConfigHelper;
 
 class PacketeryOrderGridController extends ModuleAdminController
@@ -82,7 +84,7 @@ class PacketeryOrderGridController extends ModuleAdminController
             `po`.`zip`,
             `po`.`exported`,
             IF(`po`.`tracking_number` IS NOT NULL, `po`.`tracking_number`, \'\') AS `tracking_number`,
-            `po`.`claim_id`,
+            `pr`.`claim_id`,
             CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
             IF(`a`.`valid`, 1, 0) AS `badge_success`,
             CAST(`po`.`weight` AS DECIMAL(10,2)) AS `weight`,
@@ -108,6 +110,13 @@ class PacketeryOrderGridController extends ModuleAdminController
                     GROUP BY `id_order`, `packet_id`
                 )
             ) `ps` ON `ps`.`id_order` = `a`.`id_order` AND `ps`.`packet_id` = `po`.`tracking_number`
+            LEFT JOIN (
+                SELECT `id_order`, MAX(`id_return`) AS `id_return`
+                FROM `' . _DB_PREFIX_ . 'packetery_return`
+                WHERE `status` = "' . ReturnEntity::STATUS_CREATED . '"
+                GROUP BY `id_order`
+            ) `pr_active` ON `pr_active`.`id_order` = `a`.`id_order`
+            LEFT JOIN `' . _DB_PREFIX_ . 'packetery_return` `pr` ON `pr`.`id_return` = `pr_active`.`id_return`
         ';
 
         // Show and/or export only relevant orders from order list.
@@ -487,6 +496,8 @@ class PacketeryOrderGridController extends ModuleAdminController
         $packetTrackingRepository = $module->diContainer->get(PacketTrackingRepository::class);
         /** @var ClaimEligibility $claimEligibility */
         $claimEligibility = $module->diContainer->get(ClaimEligibility::class);
+        /** @var ReturnRepository $returnRepository */
+        $returnRepository = $module->diContainer->get(ReturnRepository::class);
 
         $orderData = $orderRepository->getOrderWithCountry($orderId);
         $trackingNumber = $orderData['tracking_number'] ?? null;
@@ -494,7 +505,8 @@ class PacketeryOrderGridController extends ModuleAdminController
             ? $packetTrackingRepository->getLastStatusCodeByOrderAndPacketId($orderId, $trackingNumber)
             : null;
         $deliveryCountry = $orderData['ps_country'] ?? null;
-        $existingClaimId = $orderData['claim_id'] ?? null;
+        $activeReturn = $returnRepository->getActiveByOrderId($orderId);
+        $existingClaimId = $activeReturn !== null ? $activeReturn->getClaimId() : null;
 
         $errorMessage = $this->module->l('The return could not be created.', 'packeteryordergridcontroller');
 
@@ -515,10 +527,18 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         /** @var ClaimSubmitter $claimSubmitter */
         $claimSubmitter = $module->diContainer->get(ClaimSubmitter::class);
-        $response = $claimSubmitter->submit($orderId);
+        // admin-created returns always go straight to Packeta (never pending), so only created/error apply
+        $result = $claimSubmitter->submit($orderId, ReturnEntity::SOURCE_ADMIN);
 
-        if (!$response->hasFault()) {
+        if ($result->isCreated()) {
             $this->informations[] = $this->module->l('The return was successfully created.', 'packeteryordergridcontroller');
+
+            return;
+        }
+
+        $response = $result->getResponse();
+        if ($response === null) {
+            $this->errors[] = $errorMessage;
 
             return;
         }
@@ -537,11 +557,10 @@ class PacketeryOrderGridController extends ModuleAdminController
         $module = $this->getModule();
         $orderId = (int) Tools::getValue('id_order');
 
-        /** @var OrderRepository $orderRepository */
-        $orderRepository = $module->diContainer->get(OrderRepository::class);
-        $orderData = $orderRepository->getById($orderId);
-
-        $existingClaimId = $orderData['claim_id'] ?? null;
+        /** @var ReturnRepository $returnRepository */
+        $returnRepository = $module->diContainer->get(ReturnRepository::class);
+        $activeReturn = $returnRepository->getActiveByOrderId($orderId);
+        $existingClaimId = $activeReturn !== null ? $activeReturn->getClaimId() : null;
 
         /** @var ClaimEligibility $claimEligibility */
         $claimEligibility = $module->diContainer->get(ClaimEligibility::class);
@@ -553,6 +572,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         if (
             !$this->isOrderInShopContext($orderId)
+            || $activeReturn === null
             || !$claimEligibility->canCancelClaim($existingClaimId)
         ) {
             // server-side gate: the icon is hidden in this state, so this is a forged/stale call
@@ -563,7 +583,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         /** @var ClaimCanceller $claimCanceller */
         $claimCanceller = $module->diContainer->get(ClaimCanceller::class);
-        $response = $claimCanceller->cancel($orderId);
+        $response = $claimCanceller->cancel($activeReturn->getIdReturn());
 
         if (!$response->hasFault()) {
             $this->informations[] = sprintf(
@@ -602,8 +622,9 @@ class PacketeryOrderGridController extends ModuleAdminController
         string $apiLogMessage,
         int $orderId
     ): void {
-        if ($fault === ClaimFault::EMAIL_MISSING || $fault === ClaimFault::PHONE_MISSING) {
-            $this->errors[] = $this->getMissingContactMessage($fault);
+        if ($fault === ClaimFault::EMAIL_MISSING) {
+            // actionable: the operator can fix it by completing the order contact (phone is optional)
+            $this->errors[] = $this->module->l('Customer email is missing. Add it to the order and try again.', 'packeteryordergridcontroller');
 
             return;
         }
@@ -629,18 +650,6 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         // NO_CLAIM_ID or a real API fault: already written to the module API log
         $this->errors[] = $apiLogMessage;
-    }
-
-    /**
-     * Actionable flash for a return that the operator can fix by completing the order contact
-     */
-    private function getMissingContactMessage(string $fault): string
-    {
-        if ($fault === ClaimFault::EMAIL_MISSING) {
-            return $this->module->l('Customer email is missing. Add it to the order and try again.', 'packeteryordergridcontroller');
-        }
-
-        return $this->module->l('Customer phone is missing. Add it to the order and try again.', 'packeteryordergridcontroller');
     }
 
     /**
@@ -856,7 +865,7 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         $escaped = pSQL($value);
         $this->_filter .= ' AND (`po`.`tracking_number` LIKE \'%' . $escaped . '%\''
-            . ' OR `po`.`claim_id` LIKE \'%' . $escaped . '%\') ';
+            . ' OR `pr`.`claim_id` LIKE \'%' . $escaped . '%\') ';
     }
 
     /**
@@ -1121,7 +1130,10 @@ class PacketeryOrderGridController extends ModuleAdminController
 
         /** @var ClaimEligibility $claimEligibility */
         $claimEligibility = $module->diContainer->get(ClaimEligibility::class);
-        $claimId = $orderData['claim_id'] ?? null;
+        /** @var ReturnRepository $returnRepository */
+        $returnRepository = $module->diContainer->get(ReturnRepository::class);
+        $activeReturn = $returnRepository->getActiveByOrderId($orderId);
+        $claimId = $activeReturn !== null ? $activeReturn->getClaimId() : null;
 
         if ($claimEligibility->canCancelClaim($claimId)) {
             return [

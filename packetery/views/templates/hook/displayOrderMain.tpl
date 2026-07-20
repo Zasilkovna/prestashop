@@ -261,6 +261,10 @@
                 </p>
             </form>
         {/if}
+
+        <hr />
+        {include file="module:packetery/views/templates/hook/displayOrderReturns.tpl"}
+
         {if isset($messages)}
             {foreach from=$messages item=message}
                 <div class="alert alert-{$message.class|escape:'htmlall':'UTF-8'}">

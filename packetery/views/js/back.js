@@ -95,7 +95,7 @@ $(document).ready(function () {
             event.preventDefault();
         }
     });
-    $('#table-orders').on('click', 'a[data-confirm]', function (event) {
+    $(document).on('click', 'a[data-confirm]', function (event) {
         if (!confirm($(this).data('confirm'))) {
             event.preventDefault();
         }
