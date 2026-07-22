@@ -1,10 +1,12 @@
-       - Fixed: If customer change PP to HD before confirmation order, save and display correct information in confirmation page/e-mail/administration and allow to consign packet.
+3.6.0  - Added: Customer returns via Packeta – configurable eligibility, registered and guest flows for Packeta and non-Packeta orders, and an admin returns page with an optional approval step.
+       - Fixed: Packeta admin menu items now display in each installed shop language instead of the current administrator's language.
+3.5.0  - Fixed: If customer change PP to HD before confirmation order, save and display correct information in confirmation page/e-mail/administration and allow to consign packet.
        - Updated: Modified validation and display of warnings in the module manager.
        - Fixed: Fix error during the export of Packeta order list.
        - Update: Packetery configuration section divided into two tabs.
        - Added: Log Packeta widget parameters to the developers console.
        - Updated: Removed a duplicate carrier lookup in the order detail.
-3.5.0  - Added: Consignment code column in the bill of delivery print, visible only when the "Show consignment code" option is enabled.
+       - Added: Consignment code column in the bill of delivery print, visible only when the "Show consignment code" option is enabled.
        - Added: Option to display the consignment code in the order detail. The code is retrieved either immediately when the packet is submitted, or in bulk via a cron task.
        - Added: Option to create and cancel a return shipment directly from the Packeta order list.
        - Updated: Add bill of delivery print to group actions of Packetery order grid

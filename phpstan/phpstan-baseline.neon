@@ -139,12 +139,6 @@ parameters:
 			path: ../packetery/libs/Module/Installer.php
 
 		-
-			message: '#^Variable \$result might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../packetery/libs/Module/Installer.php
-
-		-
 			message: '#^Parameter \#1 \$float of static method ValidateCore\:\:isFloat\(\) expects float, string given\.$#'
 			identifier: argument.type
 			count: 1

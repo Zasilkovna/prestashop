@@ -152,8 +152,8 @@ class PacketSubmitter
         /** @var Tracking $packeteryTracking */
         $packeteryTracking = $this->module->diContainer->get(Tracking::class);
         foreach ($orderIds as $orderId) {
-            $packeteryOrder = $this->orderRepository->getById($orderId);
-            if ($packeteryOrder && $packeteryOrder['tracking_number']) {
+            $packeteryOrder = $this->orderRepository->getEntityById((int) $orderId);
+            if ($packeteryOrder !== null && (string) $packeteryOrder->getTrackingNumber() !== '') {
                 continue;
             }
 

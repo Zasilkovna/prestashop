@@ -12,104 +12,63 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Packetery\Exceptions\ClaimRequestException;
 use Packetery\Exceptions\DatabaseException;
-use Packetery\Log\LogRepository;
-use Packetery\Module\SoapApi;
-use Packetery\Response\CreateClaimResponse;
+use Packetery\Returns\ReturnApprovalPolicy;
+use Packetery\Returns\ReturnEntity;
+use Packetery\Returns\ReturnRepository;
 
+/**
+ * Creates a return for an order. A customer return that needs e-shop approval (approval setting on,
+ * or it is not the order's first return) is stored as pending and NOT sent to Packeta; otherwise the
+ * return goes to Packeta right away. Admin-created returns always go straight through (the e-shop is
+ * creating them, so there is nothing to approve). Sending the claim to the API is delegated to
+ * ClaimApiSender; this class owns the approval decision and the local persistence.
+ */
 class ClaimSubmitter
 {
-    /** @var ClaimRequestFactory */
-    private $requestFactory;
-    /** @var SoapApi */
-    private $soapApi;
-    /** @var OrderRepository */
-    private $orderRepository;
-    /** @var LogRepository */
-    private $logRepository;
+    /** @var ClaimApiSender */
+    private $apiSender;
+    /** @var ReturnRepository */
+    private $returnRepository;
+    /** @var ReturnApprovalPolicy */
+    private $approvalPolicy;
 
     public function __construct(
-        ClaimRequestFactory $requestFactory,
-        SoapApi $soapApi,
-        OrderRepository $orderRepository,
-        LogRepository $logRepository
+        ClaimApiSender $apiSender,
+        ReturnRepository $returnRepository,
+        ReturnApprovalPolicy $approvalPolicy
     ) {
-        $this->requestFactory = $requestFactory;
-        $this->soapApi = $soapApi;
-        $this->orderRepository = $orderRepository;
-        $this->logRepository = $logRepository;
+        $this->apiSender = $apiSender;
+        $this->returnRepository = $returnRepository;
+        $this->approvalPolicy = $approvalPolicy;
     }
 
     /**
+     * @param string $source ReturnEntity::SOURCE_ADMIN or ReturnEntity::SOURCE_CUSTOMER
+     * @param string|null $email contact override from the customer return form (null = use the order)
+     * @param string|null $phone contact override from the customer return form (null = use the order)
+     *
      * @throws DatabaseException
      */
-    public function submit(int $orderId): CreateClaimResponse
+    public function submit(int $orderId, string $source, ?string $email = null, ?string $phone = null): ReturnSubmissionResult
     {
-        try {
-            $request = $this->requestFactory->create($orderId);
-        } catch (ClaimRequestException $exception) {
-            // pre-API validation: the call never reached the API, so this is not an API-log event
-            return $this->buildFaultResponse($exception->getFaultCode(), $exception->getMessage());
+        if ($source === ReturnEntity::SOURCE_CUSTOMER && $this->approvalPolicy->needsApproval($orderId)) {
+            // not sent to Packeta yet; keep the entered contact so approval can build the claim from it
+            $this->returnRepository->insertPending($orderId, $source, $email, $phone);
+
+            return ReturnSubmissionResult::pending();
         }
 
-        $response = $this->soapApi->createPacketClaimWithPassword($request);
+        $response = $this->apiSender->send($orderId, $email, $phone);
 
-        if ($response->hasFault()) {
-            $this->logApiError($orderId, $response->getFault(), $response->getFaultString());
-
-            return $response;
-        }
-
-        $claimId = $response->getId();
-        if ($claimId === null) {
-            // the API answered without a return number, which is an API-side error
-            $faultString = 'Packeta API returned a response without a return number.';
-            $this->logApiError($orderId, ClaimFault::NO_CLAIM_ID, $faultString);
-            $response->setFault(ClaimFault::NO_CLAIM_ID);
-            $response->setFaultString($faultString);
-
-            return $response;
-        }
-
-        // the API created the return; log it before the DB write so the number is never lost
-        $this->logRepository->insertRow(
-            LogRepository::ACTION_CLAIM_CREATION,
-            ['packetClaimId' => $claimId],
-            LogRepository::STATUS_SUCCESS,
-            $orderId
-        );
-
-        try {
-            $this->orderRepository->setClaim($orderId, $claimId, $response->getPassword());
-        } catch (DatabaseException $exception) {
-            // the return exists in Packeta but the local write failed; the caller logs the orphan
-            $response->setFault(ClaimFault::CLAIM_NOT_SAVED);
-            $response->setFaultString("Return {$claimId} was created in Packeta but could not be saved to the order.");
-        }
-
-        return $response;
-    }
-
-    private function logApiError(int $orderId, string $fault, string $faultString): void
-    {
-        $this->logRepository->insertRow(
-            LogRepository::ACTION_CLAIM_CREATION,
-            [
-                'fault' => $fault,
-                'faultString' => $faultString,
-            ],
-            LogRepository::STATUS_ERROR,
-            $orderId
-        );
-    }
-
-    private function buildFaultResponse(string $fault, string $faultString): CreateClaimResponse
-    {
-        $response = new CreateClaimResponse();
-        $response->setFault($fault);
-        $response->setFaultString($faultString);
-
-        return $response;
+        return ClaimApiSender::finalize($response, function () use ($orderId, $response, $source): void {
+            $this->returnRepository->insert(
+                $orderId,
+                (string) $response->getId(),
+                $response->getPassword(),
+                ReturnEntity::STATUS_CREATED,
+                $source
+            );
+        });
     }
 }

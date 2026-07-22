@@ -42,11 +42,6 @@ function upgrade_module_3_5_0(Packetery $module): bool
         ADD KEY `idx_consign_tracking` (`tracking_number`, `consign_password`),
         ADD KEY `idx_consign_processed` (`consign_password_processed`);';
 
-    $sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'packetery_order`
-        ADD `claim_id` VARCHAR(15) NULL AFTER `consign_password_processed`,
-        ADD `claim_password` VARCHAR(10) NULL AFTER `claim_id`,
-        ADD KEY `idx_claim_id` (`claim_id`);';
-
     $executeResult = $dbTools->executeQueries(
         $sql,
         $module->l('Exception raised during Packetery module upgrade:', 'upgrade-3.5.0'),

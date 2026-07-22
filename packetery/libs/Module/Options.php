@@ -139,6 +139,19 @@ class Options
                 }
 
                 return $this->module->l('Insert maximum order age in days', 'options');
+            case ConfigHelper::KEY_RETURNS_WINDOW_DAYS:
+                if ($value === '' || \Validate::isUnsignedInt($value)) {
+                    return false;
+                }
+
+                return $this->module->l('Enter the return window in days as a non-negative whole number.', 'options');
+            case ConfigHelper::KEY_RETURNS_MAX_ITEM_VALUE:
+            case ConfigHelper::KEY_RETURNS_MAX_ITEM_WEIGHT:
+                if ($value === '' || $this->isNonNegative($value)) {
+                    return false;
+                }
+
+                return $this->module->l('Enter a non-negative number, or leave empty for no limit.', 'options');
             default:
                 return false;
         }
@@ -157,6 +170,9 @@ class Options
             case 'PACKETERY_DEFAULT_PACKAGE_WEIGHT':
             case 'PACKETERY_DEFAULT_PACKAGING_WEIGHT':
                 return Tools::sanitizeFloatValue($value);
+            case ConfigHelper::KEY_RETURNS_MAX_ITEM_VALUE:
+            case ConfigHelper::KEY_RETURNS_MAX_ITEM_WEIGHT:
+                return $value === '' ? '' : Tools::sanitizeFloatValue($value);
             default:
                 return $value;
         }

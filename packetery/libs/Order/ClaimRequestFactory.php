@@ -12,6 +12,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use Packetery\Address\AddressTools;
 use Packetery\Exceptions\ClaimRequestException;
 use Packetery\Request\CreateClaimRequest;
 use Packetery\Tools\ConfigHelper;
@@ -41,15 +42,19 @@ class ClaimRequestFactory
     }
 
     /**
-     * Reads the order objects and delegates validation and mapping to buildValidatedRequest
+     * Reads the order objects and delegates validation and mapping to buildValidatedRequest.
+     * The customer return form may override the contact: a non-null $emailOverride
+     * / $phoneOverride replaces the order's e-mail / phone, otherwise the order address is used.
      *
      * @throws ClaimRequestException
      * @throws \Packetery\Exceptions\DatabaseException
      */
-    public function create(int $orderId): CreateClaimRequest
+    public function create(int $orderId, ?string $emailOverride = null, ?string $phoneOverride = null): CreateClaimRequest
     {
         $psOrder = new \Order($orderId);
-        $packeteryOrder = $this->orderRepository->getOrderWithCountry($orderId);
+        if (!\Validate::isLoadedObject($psOrder)) {
+            throw new ClaimRequestException(ClaimFault::ORDER_NOT_FOUND, 'Order not found.');
+        }
 
         $eshopId = (string) ConfigHelper::get(
             ConfigHelper::KEY_ESHOP_ID,
@@ -57,47 +62,65 @@ class ClaimRequestFactory
             (int) $psOrder->id_shop
         );
 
-        // The value is null when the exchange rate for the order currency cannot be resolved
-        [$currency, $value] = is_array($packeteryOrder)
-            ? $this->orderExporter->findCurrencyAndTotalValue($psOrder, $packeteryOrder)
-            : [null, null];
-
-        $customer = $psOrder->getCustomer();
         $address = new \Address((int) $psOrder->id_address_delivery);
+        $customer = $psOrder->getCustomer();
+
+        $packeteryOrder = $this->orderRepository->getOrderWithCountry($orderId);
+        if (is_array($packeteryOrder)) {
+            // The value is null when the exchange rate for the order currency cannot be resolved
+            [$currency, $value] = $this->orderExporter->findCurrencyAndTotalValue($psOrder, $packeteryOrder);
+            $consignCountry = (string) ($packeteryOrder['ps_country'] ?? '');
+        } else {
+            // non-Packeta order: the return still goes via Packeta, so build it from the PrestaShop order
+            $currency = $this->orderCurrencyIso($psOrder);
+            $value = (float) $psOrder->getTotalPaid();
+            $consignCountry = (string) AddressTools::getDeliveryCountryIso($psOrder);
+        }
+
+        $email = $emailOverride !== null ? $emailOverride : (string) $customer->email;
+        if ($phoneOverride !== null) {
+            $phoneMobile = $phoneOverride;
+            $phone = '';
+        } else {
+            $phoneMobile = (string) $address->phone_mobile;
+            $phone = (string) $address->phone;
+        }
 
         return $this->buildValidatedRequest(
-            $packeteryOrder,
             $eshopId,
             $value,
             $currency,
             $this->orderNumberResolver->getPreferredOrderNumber($psOrder),
-            (string) $customer->email,
-            (string) $address->phone_mobile,
-            (string) $address->phone
+            $email,
+            $phoneMobile,
+            $phone,
+            $consignCountry
         );
+    }
+
+    private function orderCurrencyIso(\Order $psOrder): ?string
+    {
+        $currency = new \Currency((int) $psOrder->id_currency);
+
+        return \Validate::isLoadedObject($currency) ? (string) $currency->iso_code : null;
     }
 
     /**
      * Validates the resolved order inputs and builds the claim request,
      * free of PrestaShop objects so the fault paths stay unit-testable
      *
-     * @param mixed $packeteryOrder repository row (array), or false/null when not found
-     *
      * @throws ClaimRequestException
      */
     public function buildValidatedRequest(
-        $packeteryOrder,
         string $eshopId,
         ?float $value,
         ?string $currency,
         string $orderNumber,
         string $email,
         string $phoneMobile,
-        string $phone
+        string $phone,
+        ?string $consignCountry
     ): CreateClaimRequest {
-        if (!is_array($packeteryOrder)) {
-            throw new ClaimRequestException(ClaimFault::ORDER_NOT_FOUND, 'Packetery order not found.');
-        }
         if ($eshopId === '') {
             throw new ClaimRequestException(ClaimFault::ESHOP_ID_MISSING, 'Packetery eShop ID is not configured.');
         }
@@ -107,11 +130,8 @@ class ClaimRequestFactory
         if ($email === '') {
             throw new ClaimRequestException(ClaimFault::EMAIL_MISSING, 'Customer email is missing; the return cannot be created.');
         }
-        if ($this->resolvePhone($phoneMobile, $phone) === null) {
-            throw new ClaimRequestException(ClaimFault::PHONE_MISSING, 'Customer phone is missing; the return cannot be created.');
-        }
-
-        $consignCountry = (string) ($packeteryOrder['ps_country'] ?? '');
+        // Phone is optional on the module side: it is sent as-is and the Packeta
+        // API decides. The customer/e-shop can add it in the form if the API rejects a claim without it.
 
         return $this->buildRequest(
             $orderNumber,
@@ -121,7 +141,7 @@ class ClaimRequestFactory
             $value,
             (string) $currency,
             $eshopId,
-            $consignCountry
+            $consignCountry !== null ? $consignCountry : ''
         );
     }
 

@@ -5,7 +5,7 @@
 
 <div class="tab-pane">
     <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item {if $isStatusSubmitted === false}active{/if}">
+        <li class="nav-item {if $isStatusSubmitted === false && $isReturnsSubmitted === false}active{/if}">
             <a href="#packetery_general" class="nav-link" role="tab" data-toggle="tab">
                 {l s='General' mod='packetery'}
             </a>
@@ -15,13 +15,21 @@
                 {l s='Packet status tracking' mod='packetery'}
             </a>
         </li>
+        <li class="nav-item {if $isReturnsSubmitted === true}active{/if}">
+            <a href="#packetery_returns" class="nav-link" role="tab" data-toggle="tab">
+                {l s='Returns' mod='packetery'}
+            </a>
+        </li>
     </ul>
 </div>
 <div class="tab-content">
-    <div class="tab-pane fade in {if $isStatusSubmitted === false}active{/if}" id="packetery_general">
+    <div class="tab-pane fade in {if $isStatusSubmitted === false && $isReturnsSubmitted === false}active{/if}" id="packetery_general">
         {$generalTabContent nofilter}
     </div>
     <div class="tab-pane fade in {if $isStatusSubmitted === true}active{/if}" id="packetery_packet_status_tracking">
         {$packetStatusTrackingTabContent nofilter}
+    </div>
+    <div class="tab-pane fade in {if $isReturnsSubmitted === true}active{/if}" id="packetery_returns">
+        {$returnsTabContent nofilter}
     </div>
 </div>

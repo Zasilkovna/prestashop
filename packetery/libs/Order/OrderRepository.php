@@ -269,7 +269,6 @@ class OrderRepository
                    `po`.`point_city`,
                    `po`.`point_zip`,
                    `po`.`consign_password`,
-                   `po`.`claim_id`,
                    `c`.`iso_code` AS `ps_country`
             FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
             JOIN `' . _DB_PREFIX_ . 'orders` `o` ON `o`.`id_order` = `po`.`id_order`
@@ -285,6 +284,8 @@ class OrderRepository
      * @return array|false
      *
      * @throws DatabaseException
+     *
+     * @deprecated use getEntityById() which returns a typed OrderEntity instead of a raw row
      */
     public function getById($orderId)
     {
@@ -309,10 +310,43 @@ class OrderRepository
                    `zip`,
                    `city`,
                    `street`,
-                   `house_number`,
-                   `claim_id`
+                   `house_number`
             FROM `' . _DB_PREFIX_ . 'packetery_order`
             WHERE `id_order` = ' . $orderId);
+    }
+
+    /**
+     * @throws DatabaseException
+     */
+    public function getEntityById(int $orderId): ?OrderEntity
+    {
+        $row = $this->dbTools->getRow('
+            SELECT
+                   `id_branch`,
+                   `name_branch`,
+                   `id_carrier`,
+                   `is_cod`,
+                   `is_ad`,
+                   `currency_branch`,
+                   `is_carrier`,
+                   `carrier_pickup_point`,
+                   `tracking_number`,
+                   `weight`,
+                   `length`,
+                   `height`,
+                   `width`,
+                   `zip`,
+                   `city`,
+                   `street`,
+                   `house_number`
+            FROM `' . _DB_PREFIX_ . 'packetery_order`
+            WHERE `id_order` = ' . $orderId);
+
+        if (!is_array($row) || $row === []) {
+            return null;
+        }
+
+        return OrderEntity::fromDbRow($row);
     }
 
     /**
@@ -351,8 +385,7 @@ class OrderRepository
                    `zip`,
                    `city`,
                    `street`,
-                   `house_number`,
-                   `claim_id`
+                   `house_number`
             FROM `' . _DB_PREFIX_ . 'packetery_order`
             WHERE `id_order` IN (' . $idList . ')');
 
@@ -638,36 +671,6 @@ class OrderRepository
                 'consign_password_processed' => null,
             ],
             'id_order = ' . $orderId,
-            0,
-            true
-        );
-    }
-
-    public function setClaim(int $orderId, string $claimId, ?string $claimPassword): bool
-    {
-        return $this->dbTools->update(
-            'packetery_order',
-            [
-                'claim_id' => $this->db->escape($claimId),
-                'claim_password' => $claimPassword === null
-                    ? null
-                    : $this->db->escape($claimPassword),
-            ],
-            '`id_order` = ' . $orderId,
-            0,
-            true
-        );
-    }
-
-    public function clearClaim(int $orderId): bool
-    {
-        return $this->dbTools->update(
-            'packetery_order',
-            [
-                'claim_id' => null,
-                'claim_password' => null,
-            ],
-            '`id_order` = ' . $orderId,
             0,
             true
         );

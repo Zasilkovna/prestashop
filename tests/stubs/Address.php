@@ -11,6 +11,10 @@ class Address
     /** @var array<int, array<string, mixed>> */
     private static array $fixtures = [];
 
+    /** @var int */
+    public $id = 0;
+    /** @var int */
+    public $id_country = 0;
     /** @var string */
     public $phone_mobile = '';
     /** @var string */
@@ -18,8 +22,11 @@ class Address
 
     public function __construct($idAddress = null)
     {
-        $data = self::$fixtures[(int) $idAddress] ?? [];
+        $key = (int) $idAddress;
+        $data = self::$fixtures[$key] ?? [];
 
+        $this->id = isset(self::$fixtures[$key]) ? $key : 0;
+        $this->id_country = $data['id_country'] ?? 0;
         $this->phone_mobile = $data['phone_mobile'] ?? '';
         $this->phone = $data['phone'] ?? '';
     }
