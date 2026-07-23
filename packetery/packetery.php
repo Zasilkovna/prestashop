@@ -1526,21 +1526,14 @@ class Packetery extends CarrierModule
 
     /**
      * hook used everywhere in administration
+     *
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookActionAdminControllerSetMedia()
     {
-        $suffix = '?v=' . $this->version;
-        if (Tools::version_compare(_PS_VERSION_, '1.7.0.0', '<')) {
-            $suffix = '';
-        }
-
-        $this->context->controller->addCSS($this->_path . 'views/css/back.css' . $suffix, 'all', null, false);
-        $this->context->controller->addJS($this->_path . 'views/js/stringyfyOptions.js' . $suffix);
-        $this->context->controller->addJS($this->_path . 'views/js/back.js' . $suffix);
-
-        /** @var Packetery\Module\VersionChecker $versionChecker */
-        $versionChecker = $this->diContainer->get(Packetery\Module\VersionChecker::class);
-        $versionChecker->checkForUpdate();
+        /** @var Packetery\Hooks\ActionAdminControllerSetMedia $handler */
+        $handler = $this->diContainer->get(Packetery\Hooks\ActionAdminControllerSetMedia::class);
+        $handler->execute();
     }
 
     /**
