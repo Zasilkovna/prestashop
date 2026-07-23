@@ -19,6 +19,7 @@ class CustomerReturnSectionProviderTest extends TestCase
 {
     private const ORDER_ID = 64;
     private const CLAIM_ID = '2850999578';
+    private const CLAIM_PASSWORD = 'pwD12345';
 
     public function testBuildReturnsConfirmationWhenActiveReturnExists(): void
     {
@@ -85,6 +86,19 @@ class CustomerReturnSectionProviderTest extends TestCase
         $this->assertNotSame('', $data['returnHistory'][0]['trackingUrl']);
         $this->assertSame(ReturnEntity::STATUS_REJECTED, $data['returnHistory'][1]['status']);
         $this->assertSame('', $data['returnHistory'][1]['trackingUrl']);
+    }
+
+    public function testHistoryCarriesClaimPassword(): void
+    {
+        $returnRepository = $this->createStub(ReturnRepository::class);
+        $returnRepository->method('getActiveByOrderId')->willReturn(null);
+        $returnRepository->method('getByOrderId')->willReturn([
+            new ReturnEntity(1, self::ORDER_ID, self::CLAIM_ID, ReturnEntity::STATUS_CREATED, ReturnEntity::SOURCE_CUSTOMER, '2026-07-10 10:00:00', null, null, self::CLAIM_PASSWORD),
+        ]);
+
+        $data = (new CustomerReturnSectionProvider($returnRepository, $this->createStub(ReturnCreationGate::class)))->build(self::ORDER_ID);
+
+        $this->assertSame(self::CLAIM_PASSWORD, $data['returnHistory'][0]['claimPassword']);
     }
 
     public function testBuildReturnsPendingWhenReturnAwaitsApproval(): void

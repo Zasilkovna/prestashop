@@ -1320,6 +1320,7 @@ class Packetery extends CarrierModule
             $returnRows[] = [
                 'id_return' => $return->getIdReturn(),
                 'claim_id' => $claimId,
+                'claim_password' => $return->getClaimPassword(),
                 'status' => $return->getStatus(),
                 'date_add' => $return->getDateAdd(),
                 'is_active' => $return->isCreated(),

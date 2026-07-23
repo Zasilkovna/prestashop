@@ -71,6 +71,11 @@ class PacketeryReturnGridController extends ModuleAdminController
                 'callback' => 'getTrackingLink',
                 'filter_key' => 'a!claim_id',
             ],
+            'claim_password' => [
+                'title' => $this->module->l('Return password', 'packeteryreturngridcontroller'),
+                'callback' => 'getReturnPassword',
+                'search' => false,
+            ],
             'status' => [
                 'title' => $this->module->l('Status', 'packeteryreturngridcontroller'),
                 'type' => 'select',
@@ -227,6 +232,21 @@ class PacketeryReturnGridController extends ModuleAdminController
         }
 
         return $this->renderTargetBlankLink(Helper::getTrackingUrl($value), $value);
+    }
+
+    /**
+     * @param string|null $value return password (null/empty for a return not yet sent to Packeta)
+     * @param array<string, string> $row
+     *
+     * @return string
+     */
+    public function getReturnPassword($value, array $row): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
 
     /**

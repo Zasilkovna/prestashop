@@ -32,6 +32,9 @@
                             <strong>{$historyItem.claimId|escape:'htmlall':'UTF-8'}</strong>
                         {/if}
                     {/if}
+                    {if $historyItem.claimPassword}
+                        &mdash; {l s='Password' mod='packetery'}: <strong>{$historyItem.claimPassword|escape:'htmlall':'UTF-8'}</strong>
+                    {/if}
                 </li>
             {/foreach}
         </ul>

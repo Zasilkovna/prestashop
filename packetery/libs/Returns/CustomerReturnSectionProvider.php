@@ -80,7 +80,7 @@ class CustomerReturnSectionProvider
      * All returns of the order shown to the customer as history (newest first), each with its claim
      * number and tracking link when it has one (a pending/rejected return has none).
      *
-     * @return list<array{claimId: string, status: string, trackingUrl: string, dateAdd: string}>
+     * @return list<array{claimId: string, claimPassword: string|null, status: string, trackingUrl: string, dateAdd: string}>
      *
      * @throws \Packetery\Exceptions\DatabaseException
      */
@@ -91,6 +91,7 @@ class CustomerReturnSectionProvider
             $claimId = $return->getClaimId();
             $history[] = [
                 'claimId' => $claimId,
+                'claimPassword' => $return->getClaimPassword(),
                 'status' => $return->getStatus(),
                 'trackingUrl' => $claimId !== '' ? Helper::getTrackingUrl($claimId) : '',
                 'dateAdd' => $return->getDateAdd(),

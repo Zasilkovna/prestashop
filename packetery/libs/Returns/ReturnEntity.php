@@ -30,6 +30,8 @@ class ReturnEntity
     private $idOrder;
     /** @var string */
     private $claimId;
+    /** @var string|null */
+    private $claimPassword;
     /** @var string */
     private $status;
     /** @var string */
@@ -49,7 +51,8 @@ class ReturnEntity
         string $source,
         string $dateAdd,
         ?string $email = null,
-        ?string $phone = null
+        ?string $phone = null,
+        ?string $claimPassword = null
     ) {
         $this->idReturn = $idReturn;
         $this->idOrder = $idOrder;
@@ -59,6 +62,7 @@ class ReturnEntity
         $this->dateAdd = $dateAdd;
         $this->email = $email;
         $this->phone = $phone;
+        $this->claimPassword = $claimPassword;
     }
 
     /**
@@ -76,7 +80,8 @@ class ReturnEntity
             (string) $row['source'],
             (string) $row['date_add'],
             isset($row['email']) ? (string) $row['email'] : null,
-            isset($row['phone']) ? (string) $row['phone'] : null
+            isset($row['phone']) ? (string) $row['phone'] : null,
+            isset($row['claim_password']) ? (string) $row['claim_password'] : null
         );
     }
 
@@ -93,6 +98,15 @@ class ReturnEntity
     public function getClaimId(): string
     {
         return $this->claimId;
+    }
+
+    /**
+     * Password to the return shipment returned by Packeta alongside the claim id. Shown as a fallback
+     * when the customer misses Packeta's e-mail. Null on a pending return (not sent to Packeta yet).
+     */
+    public function getClaimPassword(): ?string
+    {
+        return $this->claimPassword;
     }
 
     public function getStatus(): string
