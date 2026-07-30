@@ -14,7 +14,7 @@
             <thead>
                 <tr>
                     <th>{l s='Return number' mod='packetery'}</th>
-                    <th>{l s='Password' mod='packetery'}</th>
+                    <th>{l s='Consignment code' mod='packetery'}</th>
                     <th>{l s='Status' mod='packetery'}</th>
                     <th>{l s='Created' mod='packetery'}</th>
                     <th></th>

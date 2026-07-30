@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Packetery\Tests\Unit\Returns;
 
-use Packetery\Module\Helper;
 use Packetery\Returns\CustomerReturnSectionProvider;
 use Packetery\Returns\ReturnCreationGate;
 use Packetery\Returns\ReturnEntity;
@@ -35,8 +34,6 @@ class CustomerReturnSectionProviderTest extends TestCase
         $data = (new CustomerReturnSectionProvider($returnRepository, $creationGate))->build(self::ORDER_ID);
 
         $this->assertSame(CustomerReturnSectionProvider::STATE_CREATED, $data['returnState']);
-        $this->assertSame(self::CLAIM_ID, $data['returnClaimId']);
-        $this->assertSame(Helper::getTrackingUrl(self::CLAIM_ID), $data['returnTrackingUrl']);
     }
 
     public function testBuildReturnsFormWhenEligibleAndNoActiveReturn(): void
@@ -50,7 +47,6 @@ class CustomerReturnSectionProviderTest extends TestCase
         $data = (new CustomerReturnSectionProvider($returnRepository, $creationGate))->build(self::ORDER_ID);
 
         $this->assertSame(CustomerReturnSectionProvider::STATE_FORM, $data['returnState']);
-        $this->assertSame('', $data['returnClaimId']);
     }
 
     public function testBuildReturnsNoneWhenNotEligible(): void
@@ -117,6 +113,5 @@ class CustomerReturnSectionProviderTest extends TestCase
         $data = (new CustomerReturnSectionProvider($returnRepository, $creationGate))->build(self::ORDER_ID);
 
         $this->assertSame(CustomerReturnSectionProvider::STATE_PENDING, $data['returnState']);
-        $this->assertSame('', $data['returnClaimId']);
     }
 }

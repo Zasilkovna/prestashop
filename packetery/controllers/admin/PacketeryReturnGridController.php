@@ -72,7 +72,7 @@ class PacketeryReturnGridController extends ModuleAdminController
                 'filter_key' => 'a!claim_id',
             ],
             'claim_password' => [
-                'title' => $this->module->l('Return password', 'packeteryreturngridcontroller'),
+                'title' => $this->module->l('Consignment code', 'packeteryreturngridcontroller'),
                 'callback' => 'getReturnPassword',
                 'search' => false,
             ],

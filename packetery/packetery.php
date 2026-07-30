@@ -1644,8 +1644,6 @@ class Packetery extends CarrierModule
         } catch (Exception $exception) {
             $sectionData = [
                 'returnState' => Packetery\Returns\CustomerReturnSectionProvider::STATE_NONE,
-                'returnClaimId' => '',
-                'returnTrackingUrl' => '',
                 'returnHistory' => [],
             ];
         }
