@@ -1015,10 +1015,20 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayHeader()
     {
-        // @phpstan-ignore class.notFound
-        if ($this->context->controller->php_self !== 'order') {
+        /** @var FrontController $controller */
+        $controller = $this->context->controller;
+
+        /** @var Packetery\Tools\FrontAssetPolicy $assetPolicy */
+        $assetPolicy = $this->diContainer->get(Packetery\Tools\FrontAssetPolicy::class);
+
+        if ($assetPolicy->needsStylesheet($controller->php_self, $controller->getPageName())) {
+            $this->registerFrontStylesheet();
+        }
+
+        if (!$assetPolicy->needsCheckoutAssets($controller->php_self)) {
             return;
         }
+
         $jsList = [
             'front.js',
             'stringifyOptions.js',
@@ -1044,7 +1054,10 @@ class Packetery extends CarrierModule
             $uri = $this->_path . 'views/js/' . $file;
             $controllerWrapper->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => $jsServer]);
         }
+    }
 
+    private function registerFrontStylesheet(): void
+    {
         $cssServer = self::LOCAL;
         $cssPath = $this->_path . 'views/css/front.css';
         if (!Configuration::get('PS_CSS_THEME_CACHE')) {
@@ -1052,6 +1065,7 @@ class Packetery extends CarrierModule
             $cssServer = self::REMOTE;
         }
 
+        $controllerWrapper = $this->diContainer->get(Packetery\Tools\ControllerWrapper::class);
         $controllerWrapper->registerStylesheet('packetery-front', $cssPath, ['server' => $cssServer, 'media' => 'all']);
     }
 
@@ -1647,6 +1661,7 @@ class Packetery extends CarrierModule
             'returnPrefillPhone' => $prefillPhone,
             'returnFlashCreated' => ($flash === 'created'),
             'returnFlashPending' => ($flash === 'pending'),
+            'returnFlashExists' => ($flash === 'exists'),
             'returnFlashError' => ($flash === 'error'),
         ]));
 

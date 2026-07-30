@@ -10,6 +10,7 @@ class Packetery
 {
     public const ZPOINT = 'zpoint';
     public const PP_ALL = 'pp_all';
+    public const MODULE_SLUG = 'packetery';
 
     public function l(string $string, ...$arguments): string
     {
