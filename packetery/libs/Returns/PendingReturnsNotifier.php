@@ -18,7 +18,7 @@ if (!defined('_PS_VERSION_')) {
  */
 class PendingReturnsNotifier
 {
-    private const RETURNS_CONTROLLER = 'PacketeryReturnGrid';
+    public const RETURNS_CONTROLLER = 'PacketeryReturnGrid';
 
     /** @var ReturnRepository */
     private $returnRepository;

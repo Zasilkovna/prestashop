@@ -15,11 +15,6 @@ if (!defined('_PS_VERSION_')) {
 use Packetery\Module\VersionChecker;
 use Packetery\Returns\PendingReturnsNotifier;
 
-/**
- * Runs on every admin page: loads the module's back-office assets, checks for a new module version
- * and surfaces the "returns awaiting approval" notice. Extracted from packetery.php to keep the
- * module class from growing with each new feature.
- */
 class ActionAdminControllerSetMedia
 {
     /** @var \Packetery */
@@ -30,6 +25,9 @@ class ActionAdminControllerSetMedia
 
     /** @var PendingReturnsNotifier */
     private $pendingReturnsNotifier;
+
+    /** @var string|null */
+    private $renderedNotice;
 
     public function __construct(
         \Packetery $module,
@@ -42,6 +40,9 @@ class ActionAdminControllerSetMedia
     }
 
     /**
+     * PrestaShop 9 fires this hook twice per admin page - before the page action and again while the
+     * page is rendered - so everything here has to survive being called repeatedly.
+     *
      * @throws \Packetery\Exceptions\DatabaseException
      */
     public function execute(): void
@@ -51,8 +52,8 @@ class ActionAdminControllerSetMedia
             $suffix = '';
         }
 
-        // The controller on the module context is a union incl. LegacyControllerBridgeInterface, which does
-        // not model the legacy addCSS/addJS/$warnings API; on this admin hook it is always an admin controller.
+        // On PrestaShop 9 the controller is an AdminController on legacy pages but a LegacyControllerContext
+        // on migrated ones; both carry the addCSS/addJS/$warnings API, so never type-hint against either.
         /** @var \AdminController $controller */
         $controller = $this->module->getContext()->controller;
 
@@ -63,16 +64,41 @@ class ActionAdminControllerSetMedia
 
         $this->versionChecker->checkForUpdate();
 
-        $notice = $this->pendingReturnsNotifier->getNotice((string) \Tools::getValue('controller'));
-        if ($notice !== null) {
-            $smarty = $this->module->getContext()->smarty;
-            $smarty->assign([
-                'pendingReturnsCount' => $notice->getPendingCount(),
-                'pendingReturnsLink' => $notice->hasLink() ? $this->module->getAdminLink('PacketeryReturnGrid') : null,
-            ]);
-            $controller->warnings[] = $smarty->fetch(
-                __DIR__ . '/../../views/templates/admin/pendingReturnsNotice.tpl'
-            );
+        $this->refreshPendingReturnsNotice($controller);
+    }
+
+    /**
+     * @param \AdminController $controller on pages migrated to Symfony it is a LegacyControllerContext instead
+     *
+     * @throws \Packetery\Exceptions\DatabaseException
+     */
+    private function refreshPendingReturnsNotice($controller): void
+    {
+        // the notice from the first call still counts the return approved by the page action meanwhile
+        if ($this->renderedNotice !== null) {
+            $stale = $this->renderedNotice;
+            $controller->warnings = array_values(array_filter(
+                $controller->warnings,
+                static function ($warning) use ($stale) {
+                    return $warning !== $stale;
+                }
+            ));
+            $this->renderedNotice = null;
         }
+
+        $notice = $this->pendingReturnsNotifier->getNotice((string) \Tools::getValue('controller'));
+        if ($notice === null) {
+            return;
+        }
+
+        $smarty = $this->module->getContext()->smarty;
+        $smarty->assign([
+            'pendingReturnsCount' => $notice->getPendingCount(),
+            'pendingReturnsLink' => $notice->hasLink() ? $this->module->getAdminLink(PendingReturnsNotifier::RETURNS_CONTROLLER) : null,
+        ]);
+        $this->renderedNotice = $smarty->fetch(
+            __DIR__ . '/../../views/templates/admin/pendingReturnsNotice.tpl'
+        );
+        $controller->warnings[] = $this->renderedNotice;
     }
 }

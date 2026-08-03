@@ -12,8 +12,26 @@ class Packetery
     public const PP_ALL = 'pp_all';
     public const MODULE_SLUG = 'packetery';
 
+    /** @var string */
+    public $version = '3.6.0';
+
     public function l(string $string, ...$arguments): string
     {
         return $string;
+    }
+
+    public function getContext(): object
+    {
+        return new stdClass();
+    }
+
+    public function getPathUri(): string
+    {
+        return '/modules/packetery/';
+    }
+
+    public function getAdminLink(string $controller): string
+    {
+        return "/admin/{$controller}";
     }
 }
