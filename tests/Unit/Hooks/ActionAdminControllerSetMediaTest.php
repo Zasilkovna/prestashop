@@ -82,11 +82,12 @@ class ActionAdminControllerSetMediaTest extends TestCase
         $this->assertSame([self::FOREIGN_WARNING, self::NOTICE_HTML_UPDATED], $controller->warnings);
     }
 
-    public function testRegistersTheModuleAssetsOnEveryRun(): void
+    public function testRegistersTheModuleAssetsOnlyOnceAcrossRepeatedRuns(): void
     {
         $controller = $this->createController();
-        $hook = $this->createHook($controller, [], [null]);
+        $hook = $this->createHook($controller, [], [null, null]);
 
+        $hook->execute();
         $hook->execute();
 
         $this->assertCount(1, $controller->cssFiles);

@@ -29,6 +29,9 @@ class ActionAdminControllerSetMedia
     /** @var string|null */
     private $renderedNotice;
 
+    /** @var bool */
+    private $mediaAdded = false;
+
     public function __construct(
         \Packetery $module,
         VersionChecker $versionChecker,
@@ -41,30 +44,44 @@ class ActionAdminControllerSetMedia
 
     /**
      * PrestaShop 9 fires this hook twice per admin page - before the page action and again while the
-     * page is rendered - so everything here has to survive being called repeatedly.
+     * page is rendered. Assets must be added once (see addMedia), the notice must refresh on every call.
      *
      * @throws \Packetery\Exceptions\DatabaseException
      */
     public function execute(): void
     {
-        $suffix = "?v={$this->module->version}";
-        if (\Tools::version_compare(_PS_VERSION_, '1.7.0.0', '<') === true) {
-            $suffix = '';
-        }
-
         // On PrestaShop 9 the controller is an AdminController on legacy pages but a LegacyControllerContext
         // on migrated ones; both carry the addCSS/addJS/$warnings API, so never type-hint against either.
         /** @var \AdminController $controller */
         $controller = $this->module->getContext()->controller;
 
+        $this->addMedia($controller);
+        $this->versionChecker->checkForUpdate();
+        $this->refreshPendingReturnsNotice($controller);
+    }
+
+    /**
+     * On the second call addCSS would deduplicate by its versioned uri but addJS would not, so back.js
+     * would load twice and bind the a[data-confirm] handler twice (double confirm dialog) - hence the guard.
+     *
+     * @param \AdminController $controller on pages migrated to Symfony it is a LegacyControllerContext instead
+     */
+    private function addMedia($controller): void
+    {
+        if ($this->mediaAdded === true) {
+            return;
+        }
+        $this->mediaAdded = true;
+
+        $suffix = "?v={$this->module->version}";
+        if (\Tools::version_compare(_PS_VERSION_, '1.7.0.0', '<') === true) {
+            $suffix = '';
+        }
+
         $pathUri = $this->module->getPathUri();
         $controller->addCSS("{$pathUri}views/css/back.css{$suffix}", 'all', null, false);
         $controller->addJS("{$pathUri}views/js/stringyfyOptions.js{$suffix}");
         $controller->addJS("{$pathUri}views/js/back.js{$suffix}");
-
-        $this->versionChecker->checkForUpdate();
-
-        $this->refreshPendingReturnsNotice($controller);
     }
 
     /**
