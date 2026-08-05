@@ -65,6 +65,9 @@ class Packetery extends CarrierModule
 
     protected $config_form = false;
 
+    /** @var bool guards hookActionAdminControllerSetMedia against a second run in the same request */
+    private static $adminMediaAdded = false;
+
     /** @var Packetery\DI\Container */
     public $diContainer;
 
@@ -1449,9 +1452,23 @@ class Packetery extends CarrierModule
 
     /**
      * hook used everywhere in administration
+     *
+     * PS 9 runs this hook twice on legacy controllers: once from AdminController::setMedia(),
+     * once from the HeadTag Twig component
      */
     public function hookActionAdminControllerSetMedia()
     {
+        $this->addAdminMediaOnce();
+    }
+
+    private function addAdminMediaOnce(): void
+    {
+        if (self::$adminMediaAdded === true) {
+            return;
+        }
+
+        self::$adminMediaAdded = true;
+
         $suffix = '?v=' . $this->version;
         if (Tools::version_compare(_PS_VERSION_, '1.7.0.0', '<')) {
             $suffix = '';
