@@ -111,4 +111,34 @@ class ReturnRepositoryTest extends TestCase
 
         $this->assertNull((new ReturnRepository($dbTools))->getActiveByOrderId(42));
     }
+
+    public function testCountPendingReturnsCountAsInt(): void
+    {
+        $dbTools = $this->createStub(DbTools::class);
+        $dbTools->db = new \Db();
+        $dbTools->method('getValue')->willReturn('3');
+
+        $this->assertSame(3, (new ReturnRepository($dbTools))->countPending());
+    }
+
+    public function testCountPendingReturnsZeroWhenNoPendingReturns(): void
+    {
+        $dbTools = $this->createStub(DbTools::class);
+        $dbTools->db = new \Db();
+        $dbTools->method('getValue')->willReturn(false);
+
+        $this->assertSame(0, (new ReturnRepository($dbTools))->countPending());
+    }
+
+    public function testCountPendingQueriesOnlyPendingStatus(): void
+    {
+        $dbTools = $this->createMock(DbTools::class);
+        $dbTools->db = new \Db();
+        $dbTools->expects($this->once())
+            ->method('getValue')
+            ->with($this->logicalAnd($this->stringContains('COUNT(*)'), $this->stringContains('pending')))
+            ->willReturn('2');
+
+        $this->assertSame(2, (new ReturnRepository($dbTools))->countPending());
+    }
 }

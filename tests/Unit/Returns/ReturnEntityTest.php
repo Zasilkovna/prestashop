@@ -19,6 +19,7 @@ class ReturnEntityTest extends TestCase
             'id_return' => '5',
             'id_order' => '42',
             'claim_id' => 'C000000000001',
+            'claim_password' => 'aBc123',
             'status' => ReturnEntity::STATUS_CREATED,
             'source' => ReturnEntity::SOURCE_ADMIN,
             'date_add' => '2026-07-09 12:00:00',
@@ -27,8 +28,23 @@ class ReturnEntityTest extends TestCase
         $this->assertSame(5, $return->getIdReturn());
         $this->assertSame(42, $return->getIdOrder());
         $this->assertSame('C000000000001', $return->getClaimId());
+        $this->assertSame('aBc123', $return->getClaimPassword());
         $this->assertSame('created', $return->getStatus());
         $this->assertSame('admin', $return->getSource());
         $this->assertSame('2026-07-09 12:00:00', $return->getDateAdd());
+    }
+
+    public function testFromDbRowMapsMissingClaimPasswordToNull(): void
+    {
+        $return = ReturnEntity::fromDbRow([
+            'id_return' => '6',
+            'id_order' => '42',
+            'claim_id' => '',
+            'status' => ReturnEntity::STATUS_PENDING,
+            'source' => ReturnEntity::SOURCE_CUSTOMER,
+            'date_add' => '2026-07-09 12:00:00',
+        ]);
+
+        $this->assertNull($return->getClaimPassword());
     }
 }

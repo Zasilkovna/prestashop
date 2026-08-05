@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Packetery\Tests\Unit\Returns;
 
-use Packetery\Module\Helper;
 use Packetery\Returns\CustomerReturnSectionProvider;
 use Packetery\Returns\ReturnCreationGate;
 use Packetery\Returns\ReturnEntity;
@@ -19,6 +18,7 @@ class CustomerReturnSectionProviderTest extends TestCase
 {
     private const ORDER_ID = 64;
     private const CLAIM_ID = '2850999578';
+    private const CLAIM_PASSWORD = 'pwD12345';
 
     public function testBuildReturnsConfirmationWhenActiveReturnExists(): void
     {
@@ -34,8 +34,6 @@ class CustomerReturnSectionProviderTest extends TestCase
         $data = (new CustomerReturnSectionProvider($returnRepository, $creationGate))->build(self::ORDER_ID);
 
         $this->assertSame(CustomerReturnSectionProvider::STATE_CREATED, $data['returnState']);
-        $this->assertSame(self::CLAIM_ID, $data['returnClaimId']);
-        $this->assertSame(Helper::getTrackingUrl(self::CLAIM_ID), $data['returnTrackingUrl']);
     }
 
     public function testBuildReturnsFormWhenEligibleAndNoActiveReturn(): void
@@ -49,7 +47,6 @@ class CustomerReturnSectionProviderTest extends TestCase
         $data = (new CustomerReturnSectionProvider($returnRepository, $creationGate))->build(self::ORDER_ID);
 
         $this->assertSame(CustomerReturnSectionProvider::STATE_FORM, $data['returnState']);
-        $this->assertSame('', $data['returnClaimId']);
     }
 
     public function testBuildReturnsNoneWhenNotEligible(): void
@@ -87,6 +84,19 @@ class CustomerReturnSectionProviderTest extends TestCase
         $this->assertSame('', $data['returnHistory'][1]['trackingUrl']);
     }
 
+    public function testHistoryCarriesClaimPassword(): void
+    {
+        $returnRepository = $this->createStub(ReturnRepository::class);
+        $returnRepository->method('getActiveByOrderId')->willReturn(null);
+        $returnRepository->method('getByOrderId')->willReturn([
+            new ReturnEntity(1, self::ORDER_ID, self::CLAIM_ID, ReturnEntity::STATUS_CREATED, ReturnEntity::SOURCE_CUSTOMER, '2026-07-10 10:00:00', null, null, self::CLAIM_PASSWORD),
+        ]);
+
+        $data = (new CustomerReturnSectionProvider($returnRepository, $this->createStub(ReturnCreationGate::class)))->build(self::ORDER_ID);
+
+        $this->assertSame(self::CLAIM_PASSWORD, $data['returnHistory'][0]['claimPassword']);
+    }
+
     public function testBuildReturnsPendingWhenReturnAwaitsApproval(): void
     {
         $returnRepository = $this->createStub(ReturnRepository::class);
@@ -103,6 +113,5 @@ class CustomerReturnSectionProviderTest extends TestCase
         $data = (new CustomerReturnSectionProvider($returnRepository, $creationGate))->build(self::ORDER_ID);
 
         $this->assertSame(CustomerReturnSectionProvider::STATE_PENDING, $data['returnState']);
-        $this->assertSame('', $data['returnClaimId']);
     }
 }

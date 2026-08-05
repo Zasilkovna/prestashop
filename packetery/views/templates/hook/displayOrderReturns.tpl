@@ -14,6 +14,7 @@
             <thead>
                 <tr>
                     <th>{l s='Return number' mod='packetery'}</th>
+                    <th>{l s='Consignment code' mod='packetery'}</th>
                     <th>{l s='Status' mod='packetery'}</th>
                     <th>{l s='Created' mod='packetery'}</th>
                     <th></th>
@@ -29,6 +30,7 @@
                                 {$return.claim_id|escape:'htmlall':'UTF-8'}
                             {/if}
                         </td>
+                        <td>{$return.claim_password|escape:'htmlall':'UTF-8'}</td>
                         <td>{include file="module:packetery/views/templates/hook/_returnStatusLabel.tpl" status=$return.status}</td>
                         <td>{$return.date_add|escape:'htmlall':'UTF-8'}</td>
                         <td>

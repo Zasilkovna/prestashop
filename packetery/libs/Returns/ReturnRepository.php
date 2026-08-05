@@ -121,6 +121,22 @@ class ReturnRepository
     }
 
     /**
+     * Number of returns awaiting the e-shop's approval. Drives the admin notice that tells the
+     * e-shop it has returns to review without opening the returns page.
+     *
+     * @throws DatabaseException
+     */
+    public function countPending(): int
+    {
+        $count = $this->dbTools->getValue('
+            SELECT COUNT(*)
+            FROM `' . _DB_PREFIX_ . self::$tableName . '`
+            WHERE `status` = "' . $this->dbTools->db->escape(ReturnEntity::STATUS_PENDING) . '"');
+
+        return (int) $count;
+    }
+
+    /**
      * @return ReturnEntity[]
      *
      * @throws DatabaseException

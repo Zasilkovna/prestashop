@@ -14,30 +14,19 @@
         <p class="alert alert-success">{l s='Your return has been created.' mod='packetery'}</p>
     {elseif $returnFlashPending}
         <p class="alert alert-success">{l s='Your return request has been submitted and is being processed by the e-shop.' mod='packetery'}</p>
+    {elseif $returnFlashExists}
+        <p class="alert alert-info">{l s='No new return has been created.' mod='packetery'}</p>
     {elseif $returnFlashError}
         <p class="alert alert-danger">{l s='The return could not be created. Please check your e-mail and phone number and try again, or contact the e-shop.' mod='packetery'}</p>
     {/if}
 
     {if $returnHistory && $returnHistory|@count > 0}
-        <p><strong>{l s='Your returns' mod='packetery'}:</strong></p>
-        <ul class="packetery-return-history">
-            {foreach from=$returnHistory item=historyItem}
-                <li>
-                    {include file="module:packetery/views/templates/hook/_returnStatusLabel.tpl" status=$historyItem.status}
-                    {if $historyItem.claimId}
-                        &mdash; {l s='Return number' mod='packetery'}:
-                        {if $historyItem.trackingUrl}
-                            <a href="{$historyItem.trackingUrl|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener noreferrer">{$historyItem.claimId|escape:'htmlall':'UTF-8'}</a>
-                        {else}
-                            <strong>{$historyItem.claimId|escape:'htmlall':'UTF-8'}</strong>
-                        {/if}
-                    {/if}
-                </li>
-            {/foreach}
-        </ul>
+        {include file="module:packetery/views/templates/hook/_returnHistoryTable.tpl" history=$returnHistory}
     {/if}
 
-    {if $returnState == 'pending'}
+    {if $returnState == 'created'}
+        <p>{l s='Packeta sends the return details to your e-mail. If the e-mail does not arrive, contact the e-shop.' mod='packetery'}</p>
+    {elseif $returnState == 'pending'}
         <p>{l s='Your return request is being processed by the e-shop.' mod='packetery'}</p>
     {elseif $returnState == 'form'}
         <h4>{l s='Return goods' mod='packetery'}</h4>

@@ -1015,10 +1015,20 @@ class Packetery extends CarrierModule
      */
     public function hookDisplayHeader()
     {
-        // @phpstan-ignore class.notFound
-        if ($this->context->controller->php_self !== 'order') {
+        /** @var FrontController $controller */
+        $controller = $this->context->controller;
+
+        /** @var Packetery\Tools\FrontAssetPolicy $assetPolicy */
+        $assetPolicy = $this->diContainer->get(Packetery\Tools\FrontAssetPolicy::class);
+
+        if ($assetPolicy->needsStylesheet($controller->php_self, $controller->getPageName())) {
+            $this->registerFrontStylesheet();
+        }
+
+        if (!$assetPolicy->needsCheckoutAssets($controller->php_self)) {
             return;
         }
+
         $jsList = [
             'front.js',
             'stringifyOptions.js',
@@ -1044,7 +1054,10 @@ class Packetery extends CarrierModule
             $uri = $this->_path . 'views/js/' . $file;
             $controllerWrapper->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => $jsServer]);
         }
+    }
 
+    private function registerFrontStylesheet(): void
+    {
         $cssServer = self::LOCAL;
         $cssPath = $this->_path . 'views/css/front.css';
         if (!Configuration::get('PS_CSS_THEME_CACHE')) {
@@ -1052,6 +1065,7 @@ class Packetery extends CarrierModule
             $cssServer = self::REMOTE;
         }
 
+        $controllerWrapper = $this->diContainer->get(Packetery\Tools\ControllerWrapper::class);
         $controllerWrapper->registerStylesheet('packetery-front', $cssPath, ['server' => $cssServer, 'media' => 'all']);
     }
 
@@ -1320,6 +1334,7 @@ class Packetery extends CarrierModule
             $returnRows[] = [
                 'id_return' => $return->getIdReturn(),
                 'claim_id' => $claimId,
+                'claim_password' => $return->getClaimPassword(),
                 'status' => $return->getStatus(),
                 'date_add' => $return->getDateAdd(),
                 'is_active' => $return->isCreated(),
@@ -1526,21 +1541,14 @@ class Packetery extends CarrierModule
 
     /**
      * hook used everywhere in administration
+     *
+     * @throws Packetery\Exceptions\DatabaseException
      */
     public function hookActionAdminControllerSetMedia()
     {
-        $suffix = '?v=' . $this->version;
-        if (Tools::version_compare(_PS_VERSION_, '1.7.0.0', '<')) {
-            $suffix = '';
-        }
-
-        $this->context->controller->addCSS($this->_path . 'views/css/back.css' . $suffix, 'all', null, false);
-        $this->context->controller->addJS($this->_path . 'views/js/stringyfyOptions.js' . $suffix);
-        $this->context->controller->addJS($this->_path . 'views/js/back.js' . $suffix);
-
-        /** @var Packetery\Module\VersionChecker $versionChecker */
-        $versionChecker = $this->diContainer->get(Packetery\Module\VersionChecker::class);
-        $versionChecker->checkForUpdate();
+        /** @var Packetery\Hooks\ActionAdminControllerSetMedia $handler */
+        $handler = $this->diContainer->get(Packetery\Hooks\ActionAdminControllerSetMedia::class);
+        $handler->execute();
     }
 
     /**
@@ -1636,8 +1644,6 @@ class Packetery extends CarrierModule
         } catch (Exception $exception) {
             $sectionData = [
                 'returnState' => Packetery\Returns\CustomerReturnSectionProvider::STATE_NONE,
-                'returnClaimId' => '',
-                'returnTrackingUrl' => '',
                 'returnHistory' => [],
             ];
         }
@@ -1653,6 +1659,7 @@ class Packetery extends CarrierModule
             'returnPrefillPhone' => $prefillPhone,
             'returnFlashCreated' => ($flash === 'created'),
             'returnFlashPending' => ($flash === 'pending'),
+            'returnFlashExists' => ($flash === 'exists'),
             'returnFlashError' => ($flash === 'error'),
         ]));
 

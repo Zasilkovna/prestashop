@@ -40,10 +40,14 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
     private $guestEmail = '';
     /** @var string */
     private $guestPhone = '';
-    /** @var string */
-    private $guestClaimId = '';
-    /** @var string */
-    private $guestTrackingUrl = '';
+    /** @var list<array{claimId: string, claimPassword: string|null, status: string, trackingUrl: string, dateAdd: string}> all returns of the looked-up order, newest first */
+    private $guestHistory = [];
+
+    /** @var bool */
+    private $guestJustCreated = false;
+
+    /** @var bool */
+    private $guestCreateAttempted = false;
 
     /**
      * @throws PrestaShopException
@@ -97,8 +101,10 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
 
         try {
             // STATE_FORM = eligible and no active return yet; guards eligibility and a duplicate on re-POST
-            if ($this->buildSection($orderId)['returnState'] !== CustomerReturnSectionProvider::STATE_FORM) {
-                $this->redirectToOrderDetail($orderId, 'error');
+            $state = $this->buildSection($orderId)['returnState'];
+            if ($state !== CustomerReturnSectionProvider::STATE_FORM) {
+                $existing = in_array($state, [CustomerReturnSectionProvider::STATE_CREATED, CustomerReturnSectionProvider::STATE_PENDING], true);
+                $this->redirectToOrderDetail($orderId, $existing ? 'exists' : 'error');
 
                 return;
             }
@@ -136,6 +142,7 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
     {
         $this->guestReference = trim((string) Tools::getValue('packetery_order_reference'));
         $this->guestEmail = trim((string) Tools::getValue('packetery_email'));
+        $this->guestCreateAttempted = Tools::isSubmit('submitPacketeryReturnGuestCreate');
 
         if (Tools::getValue('token') !== Tools::getToken(false)) {
             $this->guestError = $this->getModule()->l('Invalid security token.', 'return');
@@ -167,10 +174,12 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
             $section = $this->buildSection($orderId);
 
             // create only from the form state (eligible, no active return); guards a duplicate on re-POST
-            if (Tools::isSubmit('submitPacketeryReturnGuestCreate') && $section['returnState'] === CustomerReturnSectionProvider::STATE_FORM) {
+            if ($this->guestCreateAttempted && $section['returnState'] === CustomerReturnSectionProvider::STATE_FORM) {
                 $result = $this->createReturn($orderId);
                 if ($result->isError()) {
                     $this->guestError = $this->getModule()->l('The return could not be created. Please check your e-mail and phone number and try again, or contact the e-shop.', 'return');
+                } else {
+                    $this->guestJustCreated = true;
                 }
                 $section = $this->buildSection($orderId);
             }
@@ -182,14 +191,14 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * @param array{returnState: string, returnClaimId: string, returnTrackingUrl: string, returnHistory: list<array{claimId: string, status: string, trackingUrl: string, dateAdd: string}>} $section
+     * @param array{returnState: string, returnHistory: list<array{claimId: string, claimPassword: string|null, status: string, trackingUrl: string, dateAdd: string}>} $section
      */
     private function applyGuestView(array $section): void
     {
+        $this->guestHistory = $section['returnHistory'];
+
         if ($section['returnState'] === CustomerReturnSectionProvider::STATE_CREATED) {
             $this->guestView = 'created';
-            $this->guestClaimId = $section['returnClaimId'];
-            $this->guestTrackingUrl = $section['returnTrackingUrl'];
 
             return;
         }
@@ -221,15 +230,16 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
             'guestReference' => $this->guestReference,
             'guestEmail' => $this->guestEmail,
             'guestPhone' => $this->guestPhone,
-            'guestClaimId' => $this->guestClaimId,
-            'guestTrackingUrl' => $this->guestTrackingUrl,
+            'guestHistory' => $this->guestHistory,
+            'guestJustCreated' => $this->guestJustCreated,
+            'guestCreateAttempted' => $this->guestCreateAttempted,
             'returnActionUrl' => $this->context->link->getModuleLink(Packetery::MODULE_SLUG, 'return'),
             'returnToken' => Tools::getToken(false),
         ]);
     }
 
     /**
-     * @return array{returnState: string, returnClaimId: string, returnTrackingUrl: string, returnHistory: list<array{claimId: string, status: string, trackingUrl: string, dateAdd: string}>}
+     * @return array{returnState: string, returnHistory: list<array{claimId: string, claimPassword: string|null, status: string, trackingUrl: string, dateAdd: string}>}
      *
      * @throws Packetery\Exceptions\DatabaseException
      * @throws PrestaShopException
@@ -298,7 +308,7 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * @param string|null $status 'created', 'error', or null (shown as a flash in the order detail)
+     * @param string|null $status 'created', 'pending', 'exists', 'error', or null (shown as a flash in the order detail)
      *
      * @throws PrestaShopException
      */

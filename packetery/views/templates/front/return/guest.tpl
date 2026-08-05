@@ -17,18 +17,20 @@
         {/if}
 
         {if $guestView == 'created'}
-            <p class="alert alert-success">{l s='Your return has been created.' mod='packetery'}</p>
-            <p>
-                {l s='Return number' mod='packetery'}:
-                {if $guestTrackingUrl}
-                    <a href="{$guestTrackingUrl|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener noreferrer">{$guestClaimId|escape:'htmlall':'UTF-8'}</a>
-                {else}
-                    <strong>{$guestClaimId|escape:'htmlall':'UTF-8'}</strong>
-                {/if}
-            </p>
+            {* no message on a plain lookup: the list below already shows the return *}
+            {if $guestJustCreated}
+                <p class="alert alert-success">{l s='Your return has been created.' mod='packetery'}</p>
+            {elseif $guestCreateAttempted}
+                <p class="alert alert-info">{l s='No new return has been created.' mod='packetery'}</p>
+            {/if}
+            {include file="module:packetery/views/templates/hook/_returnHistoryTable.tpl" history=$guestHistory}
+            <p>{l s='Packeta sends the return details to your e-mail. If the e-mail does not arrive, contact the e-shop.' mod='packetery'}</p>
 
         {elseif $guestView == 'confirm'}
             <p>{l s='We found your order. Do you want to create a return via Packeta?' mod='packetery'}</p>
+            {if $guestHistory && $guestHistory|@count > 0}
+                {include file="module:packetery/views/templates/hook/_returnHistoryTable.tpl" history=$guestHistory}
+            {/if}
             <form action="{$returnActionUrl|escape:'htmlall':'UTF-8'}" method="post">
                 <input type="hidden" name="packetery_order_reference" value="{$guestReference|escape:'htmlall':'UTF-8'}">
                 <input type="hidden" name="token" value="{$returnToken|escape:'htmlall':'UTF-8'}">
@@ -46,9 +48,17 @@
             </form>
 
         {elseif $guestView == 'pending'}
-            <p class="alert alert-success">{l s='Your return request has been submitted and is being processed by the e-shop.' mod='packetery'}</p>
+            {if $guestJustCreated}
+                <p class="alert alert-success">{l s='Your return request has been submitted and is being processed by the e-shop.' mod='packetery'}</p>
+            {elseif $guestCreateAttempted}
+                <p class="alert alert-info">{l s='No new return has been created.' mod='packetery'}</p>
+            {/if}
+            {include file="module:packetery/views/templates/hook/_returnHistoryTable.tpl" history=$guestHistory}
 
         {else}
+            {if $guestHistory && $guestHistory|@count > 0}
+                {include file="module:packetery/views/templates/hook/_returnHistoryTable.tpl" history=$guestHistory}
+            {/if}
             <p>{l s='Enter your order number and e-mail address to return goods via Packeta.' mod='packetery'}</p>
             <form action="{$returnActionUrl|escape:'htmlall':'UTF-8'}" method="post">
                 <div class="mb-3">

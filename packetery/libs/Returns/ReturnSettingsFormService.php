@@ -47,7 +47,9 @@ class ReturnSettingsFormService extends AbstractFormService
         return [
             ConfigHelper::KEY_RETURNS_ENABLED => $this->yesNoField(
                 ConfigHelper::KEY_RETURNS_ENABLED,
-                $this->module->l('Enable returns', 'returnsettingsformservice')
+                $this->module->l('Enable returns', 'returnsettingsformservice'),
+                0,
+                $this->module->l('Master switch for returns. When enabled, customers can return a delivered order via Packeta from their account; you manage returns from the order detail and the Packeta > Returns page. Options below limit eligibility.', 'returnsettingsformservice')
             ),
             ConfigHelper::KEY_RETURNS_ALLOW_UNREGISTERED => $this->yesNoField(
                 ConfigHelper::KEY_RETURNS_ALLOW_UNREGISTERED,

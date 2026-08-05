@@ -38,7 +38,7 @@ class CustomerReturnSectionProvider
     }
 
     /**
-     * @return array{returnState: string, returnClaimId: string, returnTrackingUrl: string, returnHistory: list<array{claimId: string, status: string, trackingUrl: string, dateAdd: string}>}
+     * @return array{returnState: string, returnHistory: list<array{claimId: string, claimPassword: string|null, status: string, trackingUrl: string, dateAdd: string}>}
      *
      * @throws \Packetery\Exceptions\DatabaseException
      * @throws \PrestaShopException
@@ -47,31 +47,23 @@ class CustomerReturnSectionProvider
     {
         $history = $this->buildHistory($orderId);
 
-        $activeReturn = $this->returnRepository->getActiveByOrderId($orderId);
-        if ($activeReturn !== null) {
+        if ($this->returnRepository->getActiveByOrderId($orderId) !== null) {
             return [
                 'returnState' => self::STATE_CREATED,
-                'returnClaimId' => $activeReturn->getClaimId(),
-                'returnTrackingUrl' => Helper::getTrackingUrl($activeReturn->getClaimId()),
                 'returnHistory' => $history,
             ];
         }
 
         // a return awaiting e-shop approval occupies the customer's single return slot: hide the form
-        // (a pending return has no claim number/tracking yet)
         if ($this->returnRepository->getPendingByOrderId($orderId) !== null) {
             return [
                 'returnState' => self::STATE_PENDING,
-                'returnClaimId' => '',
-                'returnTrackingUrl' => '',
                 'returnHistory' => $history,
             ];
         }
 
         return [
             'returnState' => $this->creationGate->canCreate($orderId) ? self::STATE_FORM : self::STATE_NONE,
-            'returnClaimId' => '',
-            'returnTrackingUrl' => '',
             'returnHistory' => $history,
         ];
     }
@@ -80,7 +72,7 @@ class CustomerReturnSectionProvider
      * All returns of the order shown to the customer as history (newest first), each with its claim
      * number and tracking link when it has one (a pending/rejected return has none).
      *
-     * @return list<array{claimId: string, status: string, trackingUrl: string, dateAdd: string}>
+     * @return list<array{claimId: string, claimPassword: string|null, status: string, trackingUrl: string, dateAdd: string}>
      *
      * @throws \Packetery\Exceptions\DatabaseException
      */
@@ -91,6 +83,7 @@ class CustomerReturnSectionProvider
             $claimId = $return->getClaimId();
             $history[] = [
                 'claimId' => $claimId,
+                'claimPassword' => $return->getClaimPassword(),
                 'status' => $return->getStatus(),
                 'trackingUrl' => $claimId !== '' ? Helper::getTrackingUrl($claimId) : '',
                 'dateAdd' => $return->getDateAdd(),
