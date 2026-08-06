@@ -1025,6 +1025,10 @@ class Packetery extends CarrierModule
             $this->registerFrontStylesheet();
         }
 
+        if ($assetPolicy->needsReturnsScript($controller->getPageName())) {
+            $this->registerReturnsScript();
+        }
+
         if (!$assetPolicy->needsCheckoutAssets($controller->php_self)) {
             return;
         }
@@ -1054,6 +1058,19 @@ class Packetery extends CarrierModule
             $uri = $this->_path . 'views/js/' . $file;
             $controllerWrapper->registerJavascript(sha1($uri), $uri, ['position' => 'bottom', 'priority' => 80, 'server' => $jsServer]);
         }
+    }
+
+    private function registerReturnsScript(): void
+    {
+        $jsServer = self::LOCAL;
+        $jsPath = $this->_path . 'views/js/return.js';
+        if (!Configuration::get('PS_JS_THEME_CACHE')) {
+            $jsPath .= '?v=' . $this->version;
+            $jsServer = self::REMOTE;
+        }
+
+        $controllerWrapper = $this->diContainer->get(Packetery\Tools\ControllerWrapper::class);
+        $controllerWrapper->registerJavascript('packetery-return', $jsPath, ['position' => 'bottom', 'priority' => 80, 'server' => $jsServer]);
     }
 
     private function registerFrontStylesheet(): void
@@ -1650,6 +1667,12 @@ class Packetery extends CarrierModule
 
         [$prefillEmail, $prefillPhone] = $this->getReturnContactPrefill((int) $orderId);
 
+        /** @var Packetery\Returns\ReturnConsentProvider $consentProvider */
+        $consentProvider = $this->diContainer->get(Packetery\Returns\ReturnConsentProvider::class);
+        /** @var Language $language */
+        $language = $this->context->language;
+        $iso = (string) $language->iso_code;
+
         $flash = Tools::getValue('packetery_return');
         $this->context->smarty->assign(array_merge($sectionData, [
             'returnActionUrl' => $this->context->link->getModuleLink(self::MODULE_SLUG, 'return'),
@@ -1660,7 +1683,10 @@ class Packetery extends CarrierModule
             'returnFlashCreated' => ($flash === 'created'),
             'returnFlashPending' => ($flash === 'pending'),
             'returnFlashExists' => ($flash === 'exists'),
+            'returnFlashConsent' => ($flash === 'consent'),
             'returnFlashError' => ($flash === 'error'),
+            'consentTermsTag' => $consentProvider->getTermsLinkOpenTag($iso),
+            'consentPrivacyTag' => $consentProvider->getPrivacyPolicyLinkOpenTag($iso),
         ]));
 
         return $sectionData['returnState'];

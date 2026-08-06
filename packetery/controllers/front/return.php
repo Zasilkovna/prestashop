@@ -14,6 +14,7 @@ use Packetery\Address\AddressTools;
 use Packetery\Order\ClaimSubmitter;
 use Packetery\Order\ReturnSubmissionResult;
 use Packetery\Returns\CustomerReturnSectionProvider;
+use Packetery\Returns\ReturnConsentProvider;
 use Packetery\Returns\ReturnEntity;
 
 /**
@@ -109,6 +110,13 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
                 return;
             }
 
+            // legal consent is mandatory: without it no return is created, not even a pending one
+            if (!$this->isConsentGiven()) {
+                $this->redirectToOrderDetail($orderId, 'consent');
+
+                return;
+            }
+
             $result = $this->createReturn($orderId);
         } catch (Exception $exception) {
             $this->redirectToOrderDetail($orderId, 'error');
@@ -175,11 +183,16 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
 
             // create only from the form state (eligible, no active return); guards a duplicate on re-POST
             if ($this->guestCreateAttempted && $section['returnState'] === CustomerReturnSectionProvider::STATE_FORM) {
-                $result = $this->createReturn($orderId);
-                if ($result->isError()) {
-                    $this->guestError = $this->getModule()->l('The return could not be created. Please check your e-mail and phone number and try again, or contact the e-shop.', 'return');
+                // legal consent is mandatory: without it no return is created, not even a pending one
+                if (!$this->isConsentGiven()) {
+                    $this->guestError = $this->getModule()->l('You must agree to the Terms of Service and the Privacy Policy to create a return.', 'return');
                 } else {
-                    $this->guestJustCreated = true;
+                    $result = $this->createReturn($orderId);
+                    if ($result->isError()) {
+                        $this->guestError = $this->getModule()->l('The return could not be created. Please check your e-mail and phone number and try again, or contact the e-shop.', 'return');
+                    } else {
+                        $this->guestJustCreated = true;
+                    }
                 }
                 $section = $this->buildSection($orderId);
             }
@@ -223,6 +236,10 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
 
     private function assignGuestView(): void
     {
+        /** @var ReturnConsentProvider $consentProvider */
+        $consentProvider = $this->getModule()->diContainer->get(ReturnConsentProvider::class);
+        $iso = $this->currentLanguageIso();
+
         $this->context->smarty->assign([
             'guestView' => $this->guestView,
             'guestError' => $this->guestError,
@@ -235,6 +252,8 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
             'guestCreateAttempted' => $this->guestCreateAttempted,
             'returnActionUrl' => $this->context->link->getModuleLink(Packetery::MODULE_SLUG, 'return'),
             'returnToken' => Tools::getToken(false),
+            'consentTermsTag' => $consentProvider->getTermsLinkOpenTag($iso),
+            'consentPrivacyTag' => $consentProvider->getPrivacyPolicyLinkOpenTag($iso),
         ]);
     }
 
@@ -261,9 +280,24 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
     {
         $email = trim((string) Tools::getValue('packetery_email'));
         $phone = trim((string) Tools::getValue('packetery_phone'));
+        // captured here, at consent time: creating the return can lag (Packeta API call, or e-shop approval)
+        $consentGivenAt = (new DateTimeImmutable('now'))->format('Y-m-d H:i:s');
 
         return $this->getModule()->diContainer->get(ClaimSubmitter::class)
-            ->submit($orderId, ReturnEntity::SOURCE_CUSTOMER, $email, $phone);
+            ->submit($orderId, ReturnEntity::SOURCE_CUSTOMER, $email, $phone, $consentGivenAt, $this->currentLanguageIso());
+    }
+
+    private function isConsentGiven(): bool
+    {
+        return (bool) Tools::getValue('packetery_return_consent');
+    }
+
+    private function currentLanguageIso(): string
+    {
+        /** @var Language $language */
+        $language = $this->context->language;
+
+        return (string) $language->iso_code;
     }
 
     /**
@@ -308,7 +342,7 @@ class PacketeryReturnModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * @param string|null $status 'created', 'pending', 'exists', 'error', or null (shown as a flash in the order detail)
+     * @param string|null $status 'created', 'pending', 'exists', 'consent', 'error', or null (shown as a flash in the order detail)
      *
      * @throws PrestaShopException
      */

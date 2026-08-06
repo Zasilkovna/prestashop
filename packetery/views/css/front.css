@@ -122,3 +122,26 @@
     background-color: #e5e5e5;
     color: #777;
 }
+
+/* Return form required fields; the checkbox label has the asterisk in front, like the checkout terms checkbox */
+.packetery-required:after {
+    content: " *";
+    color: var(--bs-danger, #dc3545);
+}
+
+.form-check-label.packetery-required:after {
+    content: none;
+}
+
+.form-check-label.packetery-required:before {
+    content: "* ";
+    color: var(--bs-danger, #dc3545);
+}
+
+.packetery-was-validated input:invalid {
+    border-color: var(--bs-danger, #dc3545);
+}
+
+.packetery-was-validated input:invalid ~ .form-check-label {
+    color: var(--bs-danger, #dc3545);
+}

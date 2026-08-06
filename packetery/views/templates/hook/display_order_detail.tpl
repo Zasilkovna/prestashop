@@ -16,6 +16,8 @@
         <p class="alert alert-success">{l s='Your return request has been submitted and is being processed by the e-shop.' mod='packetery'}</p>
     {elseif $returnFlashExists}
         <p class="alert alert-info">{l s='No new return has been created.' mod='packetery'}</p>
+    {elseif $returnFlashConsent}
+        <p class="alert alert-danger">{l s='You must agree to the Terms of Service and the Privacy Policy to create a return.' mod='packetery'}</p>
     {elseif $returnFlashError}
         <p class="alert alert-danger">{l s='The return could not be created. Please check your e-mail and phone number and try again, or contact the e-shop.' mod='packetery'}</p>
     {/if}
@@ -30,17 +32,18 @@
         <p>{l s='Your return request is being processed by the e-shop.' mod='packetery'}</p>
     {elseif $returnState == 'form'}
         <h4>{l s='Return goods' mod='packetery'}</h4>
-        <form action="{$returnActionUrl|escape:'htmlall':'UTF-8'}" method="post">
+        <form action="{$returnActionUrl|escape:'htmlall':'UTF-8'}" method="post" class="packetery-return-form" novalidate>
             <input type="hidden" name="id_order" value="{$returnOrderId|intval}">
             <input type="hidden" name="token" value="{$returnToken|escape:'htmlall':'UTF-8'}">
             <div class="mb-3">
-                <label for="packetery_return_email">{l s='E-mail address' mod='packetery'}</label>
+                <label for="packetery_return_email" class="packetery-required">{l s='E-mail address' mod='packetery'}</label>
                 <input type="email" id="packetery_return_email" name="packetery_email" class="form-control" value="{$returnPrefillEmail|escape:'htmlall':'UTF-8'}" required>
             </div>
             <div class="mb-3">
                 <label for="packetery_return_phone">{l s='Phone' mod='packetery'}</label>
                 <input type="text" id="packetery_return_phone" name="packetery_phone" class="form-control" value="{$returnPrefillPhone|escape:'htmlall':'UTF-8'}">
             </div>
+            {include file="module:packetery/views/templates/hook/_returnConsentCheckbox.tpl" consentTermsTag=$consentTermsTag consentPrivacyTag=$consentPrivacyTag}
             <button type="submit" name="submitPacketeryReturn" class="btn btn-primary">
                 {l s='Return goods via Packeta' mod='packetery'}
             </button>

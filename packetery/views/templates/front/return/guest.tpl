@@ -31,17 +31,18 @@
             {if $guestHistory && $guestHistory|@count > 0}
                 {include file="module:packetery/views/templates/hook/_returnHistoryTable.tpl" history=$guestHistory}
             {/if}
-            <form action="{$returnActionUrl|escape:'htmlall':'UTF-8'}" method="post">
+            <form action="{$returnActionUrl|escape:'htmlall':'UTF-8'}" method="post" class="packetery-return-form" novalidate>
                 <input type="hidden" name="packetery_order_reference" value="{$guestReference|escape:'htmlall':'UTF-8'}">
                 <input type="hidden" name="token" value="{$returnToken|escape:'htmlall':'UTF-8'}">
                 <div class="mb-3">
-                    <label for="packetery_email">{l s='E-mail address' mod='packetery'}</label>
+                    <label for="packetery_email" class="packetery-required">{l s='E-mail address' mod='packetery'}</label>
                     <input type="email" id="packetery_email" name="packetery_email" class="form-control" value="{$guestEmail|escape:'htmlall':'UTF-8'}" required>
                 </div>
                 <div class="mb-3">
                     <label for="packetery_phone">{l s='Phone' mod='packetery'}</label>
                     <input type="text" id="packetery_phone" name="packetery_phone" class="form-control" value="{$guestPhone|escape:'htmlall':'UTF-8'}">
                 </div>
+                {include file="module:packetery/views/templates/hook/_returnConsentCheckbox.tpl" consentTermsTag=$consentTermsTag consentPrivacyTag=$consentPrivacyTag}
                 <button type="submit" name="submitPacketeryReturnGuestCreate" class="btn btn-primary">
                     {l s='Return goods via Packeta' mod='packetery'}
                 </button>
@@ -60,13 +61,13 @@
                 {include file="module:packetery/views/templates/hook/_returnHistoryTable.tpl" history=$guestHistory}
             {/if}
             <p>{l s='Enter your order number and e-mail address to return goods via Packeta.' mod='packetery'}</p>
-            <form action="{$returnActionUrl|escape:'htmlall':'UTF-8'}" method="post">
+            <form action="{$returnActionUrl|escape:'htmlall':'UTF-8'}" method="post" class="packetery-return-form" novalidate>
                 <div class="mb-3">
-                    <label for="packetery_order_reference">{l s='Order number' mod='packetery'}</label>
+                    <label for="packetery_order_reference" class="packetery-required">{l s='Order number' mod='packetery'}</label>
                     <input type="text" id="packetery_order_reference" name="packetery_order_reference" class="form-control" value="{$guestReference|escape:'htmlall':'UTF-8'}" required>
                 </div>
                 <div class="mb-3">
-                    <label for="packetery_email">{l s='E-mail address' mod='packetery'}</label>
+                    <label for="packetery_email" class="packetery-required">{l s='E-mail address' mod='packetery'}</label>
                     <input type="email" id="packetery_email" name="packetery_email" class="form-control" value="{$guestEmail|escape:'htmlall':'UTF-8'}" required>
                 </div>
                 <input type="hidden" name="token" value="{$returnToken|escape:'htmlall':'UTF-8'}">

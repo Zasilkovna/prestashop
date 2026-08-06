@@ -36,20 +36,25 @@ class ReturnRepository
         string $claimId,
         ?string $claimPassword,
         string $status,
-        string $source
+        string $source,
+        ?string $consentGivenAt = null,
+        ?string $consentLanguage = null
     ): bool {
         return $this->dbTools->insert(
             self::$tableName,
-            [
-                'id_order' => $idOrder,
-                'claim_id' => $this->dbTools->db->escape($claimId),
-                'claim_password' => $claimPassword === null
-                    ? null
-                    : $this->dbTools->db->escape($claimPassword),
-                'status' => $this->dbTools->db->escape($status),
-                'source' => $this->dbTools->db->escape($source),
-                'date_add' => (new \DateTimeImmutable('now'))->format('Y-m-d H:i:s'),
-            ],
+            array_merge(
+                [
+                    'id_order' => $idOrder,
+                    'claim_id' => $this->dbTools->db->escape($claimId),
+                    'claim_password' => $claimPassword === null
+                        ? null
+                        : $this->dbTools->db->escape($claimPassword),
+                    'status' => $this->dbTools->db->escape($status),
+                    'source' => $this->dbTools->db->escape($source),
+                    'date_add' => (new \DateTimeImmutable('now'))->format('Y-m-d H:i:s'),
+                ],
+                $this->consentColumns($consentGivenAt, $consentLanguage)
+            ),
             true // store a missing claim password as SQL NULL, not ''
         );
     }
@@ -62,22 +67,49 @@ class ReturnRepository
      *
      * @throws DatabaseException
      */
-    public function insertPending(int $idOrder, string $source, ?string $email = null, ?string $phone = null): bool
-    {
+    public function insertPending(
+        int $idOrder,
+        string $source,
+        ?string $email = null,
+        ?string $phone = null,
+        ?string $consentGivenAt = null,
+        ?string $consentLanguage = null
+    ): bool {
         return $this->dbTools->insert(
             self::$tableName,
-            [
-                'id_order' => $idOrder,
-                'claim_id' => null,
-                'claim_password' => null,
-                'status' => $this->dbTools->db->escape(ReturnEntity::STATUS_PENDING),
-                'source' => $this->dbTools->db->escape($source),
-                'date_add' => (new \DateTimeImmutable('now'))->format('Y-m-d H:i:s'),
-                'email' => ($email === null || $email === '') ? null : $this->dbTools->db->escape($email),
-                'phone' => ($phone === null || $phone === '') ? null : $this->dbTools->db->escape($phone),
-            ],
+            array_merge(
+                [
+                    'id_order' => $idOrder,
+                    'claim_id' => null,
+                    'claim_password' => null,
+                    'status' => $this->dbTools->db->escape(ReturnEntity::STATUS_PENDING),
+                    'source' => $this->dbTools->db->escape($source),
+                    'date_add' => (new \DateTimeImmutable('now'))->format('Y-m-d H:i:s'),
+                    'email' => ($email === null || $email === '') ? null : $this->dbTools->db->escape($email),
+                    'phone' => ($phone === null || $phone === '') ? null : $this->dbTools->db->escape($phone),
+                ],
+                $this->consentColumns($consentGivenAt, $consentLanguage)
+            ),
             true // store the empty claim id/password/contact as SQL NULL, not ''
         );
+    }
+
+    /**
+     * Consent columns are recorded together from the moment the customer submitted the form (captured
+     * by the controller, NOT date_add: creating the return can lag behind the consent, e.g. the Packeta
+     * API round-trip or waiting for e-shop approval). Both stay NULL when no consent was given
+     * (e.g. admin-created returns).
+     *
+     * @return array{consent_at: string|null, consent_language: string|null}
+     */
+    private function consentColumns(?string $consentGivenAt, ?string $consentLanguage): array
+    {
+        $given = $consentGivenAt !== null && $consentGivenAt !== '' && $consentLanguage !== null && $consentLanguage !== '';
+
+        return [
+            'consent_at' => $given ? $consentGivenAt : null,
+            'consent_language' => $given ? $this->dbTools->db->escape($consentLanguage) : null,
+        ];
     }
 
     /**
@@ -245,6 +277,8 @@ class ReturnRepository
             `date_add` datetime NOT NULL,
             `email` varchar(255) NULL,
             `phone` varchar(255) NULL,
+            `consent_at` datetime NULL,
+            `consent_language` varchar(2) NULL,
             PRIMARY KEY (`id_return`),
             KEY `idx_id_order` (`id_order`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';

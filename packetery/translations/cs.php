@@ -490,5 +490,8 @@ $_MODULE['<{packetery}prestashop>_returnhistorytable_0eceeb45861f9585dd7a97a3e36
 $_MODULE['<{packetery}prestashop>_returnhistorytable_ec53a8c4f07baed5d8825072c89799be'] = 'Stav';
 $_MODULE['<{packetery}prestashop>_returnhistorytable_e65b1f3c480c7fae2eb5e1620e862e5f'] = 'Číslo vratky';
 $_MODULE['<{packetery}prestashop>_returnhistorytable_22c6e79cf99308b6aeba432e6855a430'] = 'Podací kód';
+$_MODULE['<{packetery}prestashop>_returnconsentcheckbox_679b9371db44bbb30a095fb5e2369cc5'] = 'Souhlasím s [1]pravidly pro použití služby[/1] a beru na vědomí [2]Zásady zpracování osobních údajů[/2] nezbytných pro vrácení zásilky.';
+$_MODULE['<{packetery}prestashop>display_order_detail_2fb2c25fb98aaece444d3483e609b76b'] = 'Pro vytvoření vratky musíte souhlasit s pravidly pro použití služby a zásadami zpracování osobních údajů.';
+$_MODULE['<{packetery}prestashop>return_2fb2c25fb98aaece444d3483e609b76b'] = 'Pro vytvoření vratky musíte souhlasit s pravidly pro použití služby a zásadami zpracování osobních údajů.';
 $_MODULE['<{packetery}prestashop>pendingreturnsnotice_85f9a105700b2f5345cf172edb09f9a6'] = 'Vratky Zásilkovny čekají na vaše schválení: %count%.';
 $_MODULE['<{packetery}prestashop>pendingreturnsnotice_65caba5d1440a9c07153e3539aa1b445'] = 'Zobrazit vratky';

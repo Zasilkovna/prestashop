@@ -141,4 +141,55 @@ class ReturnRepositoryTest extends TestCase
 
         $this->assertSame(2, (new ReturnRepository($dbTools))->countPending());
     }
+
+    public function testInsertStoresTheConsentTimestampAndLanguage(): void
+    {
+        $data = $this->captureInsert(function (ReturnRepository $repository): void {
+            $repository->insert(42, 'C1', 'pw', ReturnEntity::STATUS_CREATED, ReturnEntity::SOURCE_CUSTOMER, '2026-07-09 11:59:58', 'cs');
+        });
+
+        $this->assertSame('2026-07-09 11:59:58', $data['consent_at']);
+        $this->assertSame('cs', $data['consent_language']);
+    }
+
+    public function testInsertStoresNullConsentWhenNoneWasGiven(): void
+    {
+        $data = $this->captureInsert(function (ReturnRepository $repository): void {
+            $repository->insert(42, 'C1', 'pw', ReturnEntity::STATUS_CREATED, ReturnEntity::SOURCE_ADMIN);
+        });
+
+        $this->assertNull($data['consent_at']);
+        $this->assertNull($data['consent_language']);
+    }
+
+    public function testInsertPendingStoresTheConsentTimestampAndLanguage(): void
+    {
+        $data = $this->captureInsert(function (ReturnRepository $repository): void {
+            $repository->insertPending(42, ReturnEntity::SOURCE_CUSTOMER, 'a@b.cz', '777', '2026-07-09 11:59:58', 'sk');
+        });
+
+        $this->assertSame('2026-07-09 11:59:58', $data['consent_at']);
+        $this->assertSame('sk', $data['consent_language']);
+    }
+
+    /**
+     * @param callable(ReturnRepository): void $call
+     *
+     * @return array<string, mixed> the row passed to DbTools::insert()
+     */
+    private function captureInsert(callable $call): array
+    {
+        $captured = [];
+        $dbTools = $this->createStub(DbTools::class);
+        $dbTools->db = new \Db();
+        $dbTools->method('insert')->willReturnCallback(static function ($table, $data) use (&$captured): bool {
+            $captured = $data;
+
+            return true;
+        });
+
+        $call(new ReturnRepository($dbTools));
+
+        return $captured;
+    }
 }
