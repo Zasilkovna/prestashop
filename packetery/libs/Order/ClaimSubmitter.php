@@ -47,27 +47,38 @@ class ClaimSubmitter
      * @param string $source ReturnEntity::SOURCE_ADMIN or ReturnEntity::SOURCE_CUSTOMER
      * @param string|null $email contact override from the customer return form (null = use the order)
      * @param string|null $phone contact override from the customer return form (null = use the order)
+     * @param string|null $consentGivenAt when the customer confirmed the consent (customer flow only),
+     *                                    as 'Y-m-d H:i:s'; captured at form submission, not at insert
+     * @param string|null $consentLanguage ISO code the customer confirmed the consent in (customer flow only)
      *
      * @throws DatabaseException
      */
-    public function submit(int $orderId, string $source, ?string $email = null, ?string $phone = null): ReturnSubmissionResult
-    {
+    public function submit(
+        int $orderId,
+        string $source,
+        ?string $email = null,
+        ?string $phone = null,
+        ?string $consentGivenAt = null,
+        ?string $consentLanguage = null
+    ): ReturnSubmissionResult {
         if ($source === ReturnEntity::SOURCE_CUSTOMER && $this->approvalPolicy->needsApproval($orderId)) {
             // not sent to Packeta yet; keep the entered contact so approval can build the claim from it
-            $this->returnRepository->insertPending($orderId, $source, $email, $phone);
+            $this->returnRepository->insertPending($orderId, $source, $email, $phone, $consentGivenAt, $consentLanguage);
 
             return ReturnSubmissionResult::pending();
         }
 
         $response = $this->apiSender->send($orderId, $email, $phone);
 
-        return ClaimApiSender::finalize($response, function () use ($orderId, $response, $source): void {
+        return ClaimApiSender::finalize($response, function () use ($orderId, $response, $source, $consentGivenAt, $consentLanguage): void {
             $this->returnRepository->insert(
                 $orderId,
                 (string) $response->getId(),
                 $response->getPassword(),
                 ReturnEntity::STATUS_CREATED,
-                $source
+                $source,
+                $consentGivenAt,
+                $consentLanguage
             );
         });
     }

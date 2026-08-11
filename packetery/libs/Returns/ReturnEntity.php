@@ -42,6 +42,10 @@ class ReturnEntity
     private $email;
     /** @var string|null */
     private $phone;
+    /** @var string|null */
+    private $consentGivenAt;
+    /** @var string|null */
+    private $consentLanguage;
 
     public function __construct(
         int $idReturn,
@@ -52,7 +56,9 @@ class ReturnEntity
         string $dateAdd,
         ?string $email = null,
         ?string $phone = null,
-        ?string $claimPassword = null
+        ?string $claimPassword = null,
+        ?string $consentGivenAt = null,
+        ?string $consentLanguage = null
     ) {
         $this->idReturn = $idReturn;
         $this->idOrder = $idOrder;
@@ -63,6 +69,8 @@ class ReturnEntity
         $this->email = $email;
         $this->phone = $phone;
         $this->claimPassword = $claimPassword;
+        $this->consentGivenAt = $consentGivenAt;
+        $this->consentLanguage = $consentLanguage;
     }
 
     /**
@@ -81,7 +89,9 @@ class ReturnEntity
             (string) $row['date_add'],
             isset($row['email']) ? (string) $row['email'] : null,
             isset($row['phone']) ? (string) $row['phone'] : null,
-            isset($row['claim_password']) ? (string) $row['claim_password'] : null
+            isset($row['claim_password']) ? (string) $row['claim_password'] : null,
+            isset($row['consent_at']) ? (string) $row['consent_at'] : null,
+            isset($row['consent_language']) ? (string) $row['consent_language'] : null
         );
     }
 
@@ -150,5 +160,23 @@ class ReturnEntity
     public function getPhone(): ?string
     {
         return $this->phone;
+    }
+
+    /**
+     * When the customer confirmed the return consent (checkbox on the return form), captured at form
+     * submission. Null when no customer consent was recorded (e.g. admin-created returns).
+     */
+    public function getConsentGivenAt(): ?string
+    {
+        return $this->consentGivenAt;
+    }
+
+    /**
+     * ISO code of the language the customer confirmed the return consent in. Null when no customer
+     * consent was recorded.
+     */
+    public function getConsentLanguage(): ?string
+    {
+        return $this->consentLanguage;
     }
 }

@@ -36,6 +36,11 @@ class FrontAssetPolicy
      */
     public function needsStylesheet(?string $phpSelf, string $pageName): bool
     {
-        return $this->needsCheckoutAssets($phpSelf) || in_array($pageName, self::RETURNS_PAGE_NAMES, true);
+        return $this->needsCheckoutAssets($phpSelf) || $this->needsReturnsScript($pageName);
+    }
+
+    public function needsReturnsScript(string $pageName): bool
+    {
+        return in_array($pageName, self::RETURNS_PAGE_NAMES, true);
     }
 }
