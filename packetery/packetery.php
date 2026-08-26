@@ -1779,7 +1779,7 @@ class Packetery extends CarrierModule
      *
      * @param array $params Hook parameter
      *
-     * @return false|string|void
+     * @return false|string
      *
      * @throws Packetery\Exceptions\DatabaseException
      * @throws ReflectionException
@@ -1799,7 +1799,7 @@ class Packetery extends CarrierModule
         $product = new Product($idProduct);
 
         if (Validate::isLoadedObject($product) === false || $product->is_virtual) {
-            return;
+            return '';
         }
 
         $isAgeVerificationRequired = null;
