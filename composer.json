@@ -1,6 +1,6 @@
 {
     "require": {
-        "php": "^8.1"
+        "php": "^8.3"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.12",
@@ -10,7 +10,9 @@
         "phpstan/phpstan-strict-rules": "^2.0",
         "stancer/php-stubs-prestashop": "^8.2",
         "phpstan/extension-installer": "^1.4",
-        "prestashop/php-dev-tools": "^4.0"
+        "prestashop/php-dev-tools": "^5",
+        "phpunit/phpunit": "^12",
+        "friendsofphp/php-cs-fixer": "^3"
     },
     "scripts": {
         "check:ec": "vendor/bin/ec .",
@@ -29,10 +31,19 @@
         "fix:all": [
             "@fix:phpcbf",
             "@fix:phpcsfixer"
-        ]
+        ],
+        "test": "vendor/bin/phpunit"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Packetery\\Tests\\": "tests/"
+        }
     },
     "prefer-stable": true,
     "config": {
+        "platform": {
+            "php": "8.3"
+        },
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpstan/extension-installer": true
