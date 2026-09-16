@@ -536,7 +536,6 @@ class OrderRepository
             `po`.`id_order`,
             `po`.`last_update_tracking_status`,
             `po`.`tracking_number`,
-            `pps`.`status_code`,
             `o`.`current_state` 
         FROM `' . _DB_PREFIX_ . 'packetery_order` `po`
         LEFT JOIN `' . _DB_PREFIX_ . 'orders` `o`
@@ -553,7 +552,7 @@ class OrderRepository
         WHERE `o`.`current_state` IN (' . $this->db->escape($implodedOrderStatuses) . ')
             AND `o`.`date_add` > "' . $oldestOrderDate->format('Y-m-d H:i:s') . '"
             AND `po`.`exported` = 1
-            AND `pps`.`status_code` IS NULL OR `pps`.`status_code` NOT IN (' . $this->db->escape($implodedIgnoredFinalPacketStatuses) . ')
+            AND (`pps`.`status_code` IS NULL OR `pps`.`status_code` NOT IN (' . $this->db->escape($implodedIgnoredFinalPacketStatuses) . '))
         ORDER BY `po`.`last_update_tracking_status` ASC
         LIMIT ' . (int) $maxProcessedOrdersLimit;
 

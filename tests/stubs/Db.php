@@ -1,0 +1,17 @@
+<?php
+/**
+ * @author    Packeta s.r.o. <e-commerce.support@packeta.com>
+ * @copyright 2015-2026 Packeta s.r.o.
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+declare(strict_types=1);
+
+class Db
+{
+    public const INSERT = 1;
+
+    public function escape(string $string, bool $htmlOK = false, bool $bqSQL = false): string
+    {
+        return $string;
+    }
+}
