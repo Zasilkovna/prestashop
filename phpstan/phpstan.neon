@@ -11,6 +11,13 @@ parameters:
 		allRules: true
 	treatPhpDocTypesAsCertain: false
 	ignoreErrors:
+		# DateMalformedStringException exists from PHP 8.3; the analysed range starts at 7.1,
+		# so the class is unknown there and PHPStan flags the @throws as non-Throwable.
+		# The warning appears only when PHPStan itself runs on a PHP 8.3+ binary, where the class is reflectable.
+		-
+			identifier: throws.notThrowable
+			paths:
+				- ../packetery/libs/Log/LogRepository.php
 	bootstrapFiles:
 	paths:
 		- ../packetery

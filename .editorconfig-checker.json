@@ -8,6 +8,7 @@
         ".idea/*",
         ".DS_Store",
         "vendor/*",
+        ".phpunit.cache/*",
         "packetery/translations/*"
     ],
     "AllowedContentTypes": [],
