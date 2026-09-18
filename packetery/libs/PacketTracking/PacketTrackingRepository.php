@@ -56,7 +56,7 @@ class PacketTrackingRepository
                 'packet_id' => $packetId,
                 'event_datetime' => $eventDatetime,
                 'status_code' => $statusCode,
-                'status_text' => $statusText,
+                'status_text' => $this->dbTools->db->escape($statusText, true),
             ]
         );
     }

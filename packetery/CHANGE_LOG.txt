@@ -1,3 +1,4 @@
+3.4.1  - Fixed: Packet status tracking cron could get stuck on a single order, process orders it should have skipped, and stop updating the rest.
 3.4.0  - Updated: Made compatible with feed v5.
        - Updated: Add `available` flag to import Packeta carriers from the feed (manual/cron), do not include not available or deleted carriers in lists.
        - Updated: Adjusted the display of selected pick-up point information in checkout, order list, and order detail.

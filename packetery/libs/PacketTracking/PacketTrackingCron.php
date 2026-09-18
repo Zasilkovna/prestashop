@@ -108,6 +108,7 @@ class PacketTrackingCron
         $isStatusChangeEnabled = ConfigHelper::get('PACKETERY_ORDER_STATUS_CHANGE_ENABLED');
         foreach ($orders as $order) {
             $statusRecordsOrErrorMessage = $this->soapApi->getPacketTracking($order['tracking_number']);
+            $this->orderRepository->setLastUpdateTrackingStatus(new \DateTimeImmutable('now'), $order['id_order']);
 
             if (!is_string($statusRecordsOrErrorMessage)) {
                 /** @var \stdClass $statusRecords */
@@ -138,7 +139,7 @@ class PacketTrackingCron
             }
 
             if (is_array($statusRecords->record) && count($statusRecords->record) > 0) {
-                $lastRecord = end($statusRecords->record);
+                $lastRecord = $this->getLatestRecord($statusRecords->record, $finalStatusIds);
             } else {
                 $lastRecord = $statusRecords->record;
             }
@@ -193,14 +194,51 @@ class PacketTrackingCron
             if ($isStatusChangeEnabled) {
                 $this->updateOrderStatus($lastRecord, $order['id_order']);
             }
-
-            $this->orderRepository->setLastUpdateTrackingStatus(new \DateTimeImmutable('now'), $order['id_order']);
         }
 
         return [
             'text' => $this->module->l('Order statuses have been updated.', 'packettrackingcron'),
             'class' => 'success',
         ];
+    }
+
+    /**
+     * Picks the newest event; API order is not reliable when timestamps match.
+     *
+     * @param \stdClass[] $records non-empty
+     * @param int[] $finalStatusIds
+     */
+    private function getLatestRecord(array $records, array $finalStatusIds): \stdClass
+    {
+        $latestRecord = null;
+        $latestTimestamp = null;
+        foreach ($records as $record) {
+            // an empty dateTime would become "now" and outrank every real event
+            if (!isset($record->dateTime) || (string) $record->dateTime === '') {
+                continue;
+            }
+
+            $timestamp = (new \DateTimeImmutable((string) $record->dateTime))->getTimestamp();
+
+            if ($latestRecord === null || $timestamp > $latestTimestamp) {
+                $latestRecord = $record;
+                $latestTimestamp = $timestamp;
+                continue;
+            }
+
+            if (
+                $timestamp === $latestTimestamp
+                && in_array((int) $record->statusCode, $finalStatusIds, true)
+            ) {
+                $latestRecord = $record;
+            }
+        }
+
+        if ($latestRecord === null) {
+            return reset($records);
+        }
+
+        return $latestRecord;
     }
 
     /**
