@@ -3,7 +3,7 @@ title: "prestashop — AST map"
 repo: prestashop
 module: null
 generated-by: tool:ast-map@0.3.1
-source-commit: 801bb6bd3514996008200dd24bd1d51eea71ef06
+source-commit: cb2aa9775073073b494da56d449c8fd74960990f
 last-generated: 2026-09-22
 tags: [ai-generated, repo-prestashop, type-ast]
 ---

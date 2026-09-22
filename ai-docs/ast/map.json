@@ -1,7 +1,7 @@
 {
   "repo": "prestashop",
   "generated-by": "tool:ast-map@0.3.1",
-  "source-commit": "801bb6bd3514996008200dd24bd1d51eea71ef06",
+  "source-commit": "cb2aa9775073073b494da56d449c8fd74960990f",
   "files": [
     {
       "path": ".php-cs-fixer.dist.php",
