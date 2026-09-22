@@ -1,0 +1,457 @@
+service: prestashop
+description: 'PrestaShop module that integrates the Packeta delivery service into a shop: pickup-point
+  selection at checkout, carrier configuration, packet submission, label printing and packet-status tracking.'
+generated-by: skill:generate-docs@0.3.5
+source_commit: b85243bbeb5f9f91c0bde739f5195b2285b867f9
+last-generated: 2026-09-22
+assumptions:
+- Configuration values are never copied into the documentation; only the key names declared on `ConfigHelper`
+  are.
+- Every table the module touches lives in the shop MySQL database; the logical database name is configured
+  outside the module and is recorded as `mysql/prestashop`.
+- Generated on branch `docs/packetery` at commit b85243bbeb5f9f91c0bde739f5195b2285b867f9 with a clean
+  working tree.
+- Line, type and public-method counts for packetery-carrier come from `ai-docs/ast/map.json`; PrestaShop
+  `index.php` directory-guard stubs are excluded.
+- Line, type and public-method counts for packetery-checkout come from `ai-docs/ast/map.json`; the PrestaShop
+  directory-guard stub files named index.php are excluded from them.
+- Line, type and public-method counts for packetery-module are taken from `ai-docs/ast/map.json` as supplied
+  by the run brief (2940 lines of logic, 20 types, 111 public methods), excluding the PrestaShop `index.php`
+  directory-guard stubs and `packetery/upgrade/`.
+- The AST map in `ai-docs/ast/` was generated at commit 801bb6bd3514996008200dd24bd1d51eea71ef06; `git
+  diff --stat 801bb6b..HEAD` touches no source file, so the map was used without regeneration.
+- The PrestaShop platform (the `carrier` table, `ObjectModel`, `HelperForm`, hooks) is described in prose
+  only and gets no manifest entry.
+- 'The SOAP calls of packetery-order were classified as `kind: other`, because the manifest schema has
+  no SOAP kind.'
+- The admin controllers whose tabs `Installer::insertMenuItems` registers (`PacketeryOrderGrid`, `PacketeryCarrierGrid`,
+  `PacketerySetting`, `PacketeryLogGrid`) are listed under `exposes` of packetery-admin-ui, which implements
+  them; packetery-module exposes only its own configuration page.
+- The counts stated for packetery-order (2567 lines of logic, 36 types, 140 public methods) come from
+  ai-docs/ast/map.json and exclude the PrestaShop `index.php` directory-guard stubs.
+- The counts stated on the reference page (26 types, 52 public methods) come from `ai-docs/ast/map.json`
+  and exclude the PrestaShop `index.php` directory-guard stubs, which hold no logic.
+- The five cron task names are treated as separate `exposes` entries because the controller dispatches
+  on the `task` value; the code registers one front controller only.
+- The four admin controllers are recorded as routes addressed by their PrestaShop tab class name (`PacketeryOrderGrid`,
+  `PacketeryCarrierGrid`, `PacketeryLogGrid`, `PacketerySetting`); PrestaShop builds the concrete URL
+  from the tab and the admin token, so no path is written.
+- The install DDL for `packetery_order`, `packetery_payment` and `packetery_address_delivery` lives in
+  `Installer::installDatabase`, but those tables are read and written by other modules, so `owns_data`
+  of packetery-module lists only `packetery_product_attribute`.
+- 'The module boundary of packetery-order is the one fixed by the run brief: packetery/libs/Order, packetery/libs/Request,
+  packetery/libs/Response and packetery/libs/Payment.'
+- The module map of the repository was supplied by the run; packetery-packet-tracking is the pair `packetery/libs/PacketTracking`
+  plus `packetery/libs/Cron` plus the `cron` front controller, and nothing in the code declares that grouping.
+- The outbound calls of `GetConsignPassword` (SOAP) and `DownloadCarriers` (the pickup-point JSON feed)
+  are attributed to this module because its task classes initiate them, although the clients themselves
+  live in packetery-order and packetery-carrier.
+- The repo id `prestashop` is the repository name from the origin URL; it denotes this Packeta module
+  repository, not the PrestaShop platform, which is described in prose only and has no manifest entry.
+- The repository holds one PrestaShop module of about 9 700 lines of logic, above the 3 000-line ceiling
+  for a single reference page, so it was split into seven reference pages along namespaces and directories;
+  nothing in the code declares that split.
+- The shop database is the PrestaShop MySQL database configured outside the module; `store` therefore
+  names the engine and the logical name only.
+- The skill `esterka:writing-technical-docs-in-ste` is not installed in this environment, so the prose
+  follows `templates/writing-sections.md` alone.
+- The storefront JavaScript under `packetery/views/js/` is not covered by the AST map and was read directly
+  from the source files.
+- The sub-actions of `PacketeryOrderGrid` (`print`, `cancel`, `submit`, `showCollectionPrint`) and its
+  bulk actions are query parameters of that one route, not separately registered routes, so they are not
+  separate `exposes` entries.
+- The tables packetery_order and packetery_payment live in the shop's own PrestaShop MySQL database; the
+  real database name is configured outside the module and was not looked up.
+- The three `exposes` entries are written as `checkout?action=...` because the PrestaShop front controller
+  `checkout` is one registered route whose branches are chosen by the `action` request value; the action
+  names are copied from the switch in the controller.
+- '`auth: prestashop-employee-tab-permission` names the PrestaShop scheme only: the controllers declare
+  no `viewAccess` override, so access follows the employee profile permission attached to the installed
+  tab.'
+- '`modules[].path` names the primary directory of each slice; the full set of covered paths is in the
+  `covers` front matter of each reference page and in the module table of overview.md.'
+- '`packetery/upgrade/` (migration scripts), `packetery/translations/` and the tooling configuration files
+  in the repository root belong to no module and are excluded from the module line counts.'
+- '`packetery_address_delivery` is listed under `owns_data` for packetery-carrier because `CarrierRepository`
+  is its only writer at runtime, although its DDL lives in `packetery/libs/Module/Installer.php` and the
+  one-off upgrade scripts under `packetery/upgrade/` also write it.'
+- '`packetery_carriers` is listed under `reads_external_data` rather than `owns_data` because every row
+  except the two internal pickup-point entries is a copy of the Packeta carrier feed.'
+- '`store: mysql/prestashop` names the engine and the logical database of the shop only; the real database
+  name is configured outside the module and was not looked up.'
+modules:
+- name: packetery-module
+  path: packetery/libs/Module
+  lines: 2940
+  doc: reference/packetery-module.md
+- name: packetery-order
+  path: packetery/libs/Order
+  lines: 2567
+  doc: reference/packetery-order.md
+- name: packetery-carrier
+  path: packetery/libs/Carrier
+  lines: 1195
+  doc: reference/packetery-carrier.md
+- name: packetery-admin-ui
+  path: packetery/controllers/admin
+  lines: 940
+  doc: reference/packetery-admin-ui.md
+- name: packetery-packet-tracking
+  path: packetery/libs/PacketTracking
+  lines: 939
+  doc: reference/packetery-packet-tracking.md
+- name: packetery-tools
+  path: packetery/libs/Tools
+  lines: 743
+  doc: reference/packetery-tools.md
+- name: packetery-checkout
+  path: packetery/libs/PickupPointValidate
+  lines: 411
+  doc: reference/packetery-checkout.md
+exposes:
+- kind: html
+  name: Packetery::getContent
+  module: packetery-module
+  consumers:
+  - unknown
+  auth: prestashop-admin-token
+  evidence: packetery/packetery.php#getContent
+  notes: Module configuration page in the back office; handles the main settings submit and the two form-service
+    submits, and renders the update notice.
+- kind: html
+  name: PacketeryCarrierGrid
+  module: packetery-admin-ui
+  consumers:
+  - unknown
+  auth: prestashop-employee-tab-permission
+  evidence: packetery/controllers/admin/PacketeryCarrierGridController.php#PacketeryCarrierGridController
+  notes: Carrier list; `viewcarrier` opens the carrier edit form rendered by `CarrierAdminForm`.
+- kind: html
+  name: PacketeryLogGrid
+  module: packetery-admin-ui
+  consumers:
+  - unknown
+  auth: prestashop-employee-tab-permission
+  evidence: packetery/controllers/admin/PacketeryLogGridController.php#PacketeryLogGridController
+  notes: Read-only log list; the `id_order` query parameter narrows it to one order.
+- kind: html
+  name: PacketeryOrderGrid
+  module: packetery-admin-ui
+  consumers:
+  - unknown
+  auth: prestashop-employee-tab-permission
+  evidence: packetery/controllers/admin/PacketeryOrderGridController.php#PacketeryOrderGridController
+  notes: Order list with Packeta columns; the `action` query parameter selects the row action and the
+    bulk actions are dispatched to the `processBulk` methods.
+- kind: html
+  name: PacketerySetting
+  module: packetery-admin-ui
+  consumers:
+  - unknown
+  auth: prestashop-employee-tab-permission
+  evidence: packetery/controllers/admin/PacketerySettingController.php#initContent
+  notes: Menu item only; redirects to the module configuration page of `AdminModules`.
+- kind: html
+  name: checkout?action=fetchExtraContent
+  module: packetery-checkout
+  consumers:
+  - prestashop
+  auth: csrf-token
+  evidence: packetery/controllers/front/checkout.php#fetchExtraContent
+  notes: Returns the rendered carrier extra content; used on PrestaShop 1.6, which has no hook for it.
+- kind: rest
+  name: checkout?action=saveAddressInCart
+  module: packetery-checkout
+  consumers:
+  - prestashop
+  auth: csrf-token
+  evidence: packetery/controllers/front/checkout.php#saveAddressInCart
+  notes: Stores the address the widget validated; neither the handler nor the controller writes a response
+    body for this action.
+- kind: rest
+  name: checkout?action=savePickupPointInCart
+  module: packetery-checkout
+  consumers:
+  - prestashop
+  auth: csrf-token
+  evidence: packetery/controllers/front/checkout.php#savePickupPointInCart
+  notes: Called by the module's own storefront JavaScript; guarded by a comparison with Tools::getToken('ajax_front'),
+    answers with JSON.
+- kind: html
+  name: cron
+  module: packetery-packet-tracking
+  consumers:
+  - unknown
+  auth: shared secret in the `token` query parameter, compared with the configuration key PACKETERY_CRON_TOKEN
+  evidence: packetery/controllers/front/cron.php#validateToken
+  notes: Registered PrestaShop module front controller; renders HTML message rows through Smarty and requires
+    a `task` value.
+- kind: html
+  name: cron?task=DeleteLabels
+  module: packetery-packet-tracking
+  consumers:
+  - unknown
+  auth: shared secret in the `token` query parameter, compared with the configuration key PACKETERY_CRON_TOKEN
+  evidence: packetery/controllers/front/cron.php#DeleteLabels
+  notes: Optional request values `number_of_days` and `number_of_files`, read inside the task.
+- kind: html
+  name: cron?task=DownloadCarriers
+  module: packetery-packet-tracking
+  consumers:
+  - unknown
+  auth: shared secret in the `token` query parameter, compared with the configuration key PACKETERY_CRON_TOKEN
+  evidence: packetery/controllers/front/cron.php#DownloadCarriers
+- kind: html
+  name: cron?task=GetConsignPassword
+  module: packetery-packet-tracking
+  consumers:
+  - unknown
+  auth: shared secret in the `token` query parameter, compared with the configuration key PACKETERY_CRON_TOKEN
+  evidence: packetery/controllers/front/cron.php#GetConsignPassword
+  notes: Optional request values `max_orders` and `max_order_age_days`, read by the controller.
+- kind: html
+  name: cron?task=PurgeLogs
+  module: packetery-packet-tracking
+  consumers:
+  - unknown
+  auth: shared secret in the `token` query parameter, compared with the configuration key PACKETERY_CRON_TOKEN
+  evidence: packetery/controllers/front/cron.php#PurgeLogs
+  notes: Optional request value `log_expiration_days`; the configuration page builds no URL for this task.
+- kind: html
+  name: cron?task=UpdatePacketStatus
+  module: packetery-packet-tracking
+  consumers:
+  - unknown
+  auth: shared secret in the `token` query parameter, compared with the configuration key PACKETERY_CRON_TOKEN
+  evidence: packetery/controllers/front/cron.php#UpdatePacketStatus
+calls:
+- service: github-api
+  kind: rest
+  purpose: Reads the release list of the module repository to detect a newer module version.
+  module: packetery-module
+  evidence: packetery/libs/Module/VersionChecker.php#checkForUpdate
+- service: mysql
+  kind: db
+  purpose: Runs every SQL statement of the module against the shop database through the PrestaShop `Db`
+    instance.
+  module: packetery-tools
+  evidence: packetery/libs/Tools/DbTools.php#execute
+- service: packeta-pickup-point-api
+  kind: rest
+  purpose: Downloads the Packeta carrier catalogue as JSON, keyed by the configured API key.
+  module: packetery-carrier
+  evidence: packetery/libs/ApiCarrier/Downloader.php#downloadJson
+- service: packeta-pickup-point-api
+  kind: rest
+  purpose: Trigger the refresh of the Packeta carrier list from the carrier feed.
+  module: packetery-packet-tracking
+  evidence: packetery/libs/Cron/Tasks/DownloadCarriers.php#Downloader
+- service: packeta-soap-api
+  kind: other
+  purpose: Obtains the carrier tracking numbers of the selected packets before carrier labels are printed.
+  module: packetery-admin-ui
+  evidence: packetery/controllers/admin/PacketeryOrderGridController.php#getPacketIdsWithCarrierNumbers
+- service: packeta-soap-api
+  kind: other
+  purpose: Submits and cancels packets, reads packet info and tracking, requests labels, shipments and
+    barcodes, and verifies the API password and the sender indication.
+  module: packetery-module
+  evidence: packetery/libs/Module/SoapApi.php#WSDL_URL
+- service: packeta-soap-api
+  kind: other
+  purpose: Creates a shipment for a set of packets and gets its barcode image for the bill of delivery.
+  module: packetery-order
+  evidence: packetery/libs/Order/BarcodeProvider.php#getBarcodeData
+- service: packeta-soap-api
+  kind: other
+  purpose: Gets the packet info that carries the consignment code of a packet.
+  module: packetery-order
+  evidence: packetery/libs/Order/ConsignPasswordProvider.php#fetchFromApi
+- service: packeta-soap-api
+  kind: other
+  purpose: Gets the Packeta label or the carrier label of a packet as a PDF.
+  module: packetery-order
+  evidence: packetery/libs/Order/Labels.php#packetsLabelsPdf
+- service: packeta-soap-api
+  kind: other
+  purpose: Cancels a packet that was already submitted for an order.
+  module: packetery-order
+  evidence: packetery/libs/Order/PacketCanceller.php#cancelPacket
+- service: packeta-soap-api
+  kind: other
+  purpose: Creates a packet for a PrestaShop order and returns its packet id.
+  module: packetery-order
+  evidence: packetery/libs/Order/PacketSubmitter.php#createPacketSoap
+- service: packeta-soap-api
+  kind: other
+  purpose: Read the consignment code of a submitted packet for orders that still miss one.
+  module: packetery-packet-tracking
+  evidence: packetery/libs/Cron/Tasks/GetConsignPassword.php#fetchFromApi
+- service: packeta-soap-api
+  kind: other
+  purpose: Read the full delivery history of one packet by its tracking number.
+  module: packetery-packet-tracking
+  evidence: packetery/libs/PacketTracking/PacketTrackingCron.php#getPacketTracking
+- service: packeta-widget
+  kind: other
+  purpose: Loads the Packeta widget library into the back office so an employee can pick a pickup point
+    or validate a home-delivery address.
+  module: packetery-admin-ui
+  evidence: packetery/views/js/back.js#getScript
+- service: packeta-widget
+  kind: rest
+  purpose: Re-checks the pickup point chosen in the cart before the delivery step is allowed to complete.
+  module: packetery-checkout
+  evidence: packetery/libs/PickupPointValidate/PickupPointValidate.php#URL_VALIDATE_ENDPOINT
+owns_data:
+- entity: packetery_address_delivery
+  store: mysql/prestashop
+  module: packetery-carrier
+  evidence: packetery/libs/Carrier/CarrierRepository.php#setPacketeryCarrier
+  notes: One row per PrestaShop carrier paired with a Packeta carrier; holds `pickup_point_type`, `address_validation`,
+    `allowed_vendors`, `is_cod` and the copied branch name and currency. Deleted when the pairing is cleared.
+- entity: packetery_log
+  store: mysql/prestashop
+  module: packetery-tools
+  evidence: packetery/libs/Log/LogRepository.php#getCreateTableSql
+  notes: Created and dropped by `LogRepository`, written by `insertRow`, trimmed by `purge`, read by the
+    admin log grid.
+- entity: packetery_order
+  store: mysql/prestashop
+  module: packetery-order
+  evidence: packetery/libs/Order/OrderRepository.php#getWithShopById
+  notes: One row per cart and order. Created at pickup-point selection, completed at order creation, and
+    read by every export, label and print path.
+- entity: packetery_payment
+  store: mysql/prestashop
+  module: packetery-order
+  evidence: packetery/libs/Payment/PaymentRepository.php#setOrInsert
+  notes: One row per PrestaShop payment module, holding the cash-on-delivery flag that the order saver
+    reads.
+- entity: packetery_product_attribute
+  store: mysql/prestashop
+  module: packetery-module
+  evidence: packetery/libs/Product/ProductAttributeRepository.php#getCreateTableSql
+  notes: One row per product carrying the age-verification flag; written from the product detail hooks
+    and deleted with the product.
+reads_external_data:
+- entity: LatestReleaseResponse
+  owner: github-api
+  via: api releases
+  module: packetery-module
+  evidence: packetery/libs/Module/VersionChecker.php#getLatestReleaseResponse
+- entity: consignPassword
+  owner: packeta-soap-api
+  via: api packetInfo
+  store: mysql/prestashop
+  module: packetery-packet-tracking
+  evidence: packetery/libs/Cron/Tasks/GetConsignPassword.php#fetchFromApi
+- entity: packetery_carriers
+  owner: packeta-pickup-point-api
+  via: api packeta-pickup-point-api
+  module: packetery-carrier
+  evidence: packetery/libs/ApiCarrier/ApiCarrierRepository.php#save
+- entity: packetery_packet_status
+  owner: packetery-packet-tracking
+  via: db packetery_packet_status
+  module: packetery-order
+  evidence: packetery/libs/Order/OrderRepository.php#getOrdersByStateAndLastUpdate
+- entity: packetery_packet_status
+  owner: packeta-soap-api
+  via: api packetTracking
+  store: mysql/prestashop
+  module: packetery-packet-tracking
+  evidence: packetery/libs/PacketTracking/PacketTrackingRepository.php#getCreateTableSql
+- entity: packetery_product_attribute
+  owner: packetery-module
+  via: db packetery_product_attribute
+  module: packetery-order
+  evidence: packetery/libs/Order/OrderRepository.php#isOrderForAdults
+unknowns:
+- question: How long the module's error log file is kept and whether anything rotates or truncates it.
+  checked: the module's classes and their log calls
+  resolved_by: the shop's filesystem housekeeping, or a person
+  blocks: 'owns_data: the file log'
+- question: The full attribute contract of the Packeta SOAP createPacket operation — which fields are
+    accepted and which are required beyond the keys packetery-order sends.
+  checked: the SOAP call sites and the response objects
+  resolved_by: the WSDL or the packeta-soap-api documentation
+  blocks: 'calls: packeta-soap-api'
+- question: The full schema of the Packeta carrier feed; the code validates fourteen required keys and
+    maps them, but neither the response contract nor its versioning is defined in the repository.
+  checked: the downloader, the column map, the feed validation
+  resolved_by: the packeta-pickup-point-api contract
+  blocks: '`reads_external_data: packetery_carriers`'
+- question: The retention period applied to `packetery_log`, because `LogRepository::purge` takes the
+    number of days as an argument and declares no default.
+  checked: LogRepository, DbTools
+  resolved_by: the caller that schedules the purge
+  blocks: 'owns_data: packetery_log'
+- question: Whether the four countries and two vendor groups hardcoded in `CarrierVendors::getVendors`
+    are the complete Packeta offering, and what changes them.
+  checked: the module source and the mapped feed columns
+  resolved_by: the Packeta widget documentation, or a person
+  blocks: '`owns_data: packetery_address_delivery` (the `allowed_vendors` column)'
+- question: Whether the missing configuration-page URL for `PurgeLogs` is intended or an omission.
+  checked: the cron info block and the controller dispatch
+  resolved_by: a person on the module team
+  blocks: 'exposes: cron?task=PurgeLogs'
+- question: Whether the optional constants `_PACKETERY_SOAP_WSDL_URL_`, `_PACKETERY_ALLOWED_RELEASE_TYPES_`,
+    `_GITHUB_ACCESS_TOKEN_` and `_PACKETERY_DEBUG_LOG_` are defined in a real installation, and what they
+    resolve to.
+  checked: the module source and its constant definitions
+  resolved_by: the shop's PrestaShop configuration
+  blocks: 'calls: packeta-soap-api, calls: github-api'
+- question: 'Whether the storefront widget-library load in `packetery/views/js/front.js` needs its own
+    `calls: packeta-widget` entry for packetery-checkout; only the back-office load and the validation
+    call were recorded.'
+  checked: the storefront and back-office JavaScript
+  resolved_by: a `--scope packetery-checkout` run
+  blocks: 'calls: packeta-widget'
+- question: Which Packeta carriers the two ids in `CARRIERS_SUPPORTING_AGE_VERIFICATION` denote, and how
+    the list is kept in step with the carrier feed.
+  checked: the module source and the carrier catalogue columns
+  resolved_by: the Packeta carrier catalogue, or a person
+  blocks: '`CarrierTools::orderSupportsAgeVerification`'
+- question: Which back-office pages besides the order detail contain the widget buttons that `back.js`
+    binds.
+  checked: this module's admin and hook templates
+  resolved_by: a back-office run, or the themes that render it
+  blocks: 'calls: packeta-widget'
+- question: Which checkout module owns the `wait` CSS class that every checkout AJAX request toggles on
+    the body element
+  checked: the storefront adapters and the front templates
+  resolved_by: the third-party checkout modules, or a person
+  blocks: '-'
+- question: Which checkout themes the PacketeryCheckoutModuleUnknown adapter is meant to support
+  checked: the storefront adapters and the detection list
+  resolved_by: a person; the source marks it a removal candidate
+  blocks: '-'
+- question: Which employee profiles are allowed to open the four Packeta admin tabs.
+  checked: the tab installation code and the four controllers
+  resolved_by: the installation's permission configuration
+  blocks: 'exposes: PacketeryOrderGrid, PacketeryCarrierGrid, PacketeryLogGrid, PacketerySetting'
+- question: Which packet attribute faults the Packeta SOAP API can raise; the fault detail is read generically
+    and no list of possible faults exists in the repository.
+  checked: the SOAP fault handling and the response objects
+  resolved_by: the WSDL or the packeta-soap-api documentation
+  blocks: 'calls: packeta-soap-api'
+- question: Which scheduler calls the `cron` front controller, and how often each task runs.
+  checked: the front controller, the tasks, the cron info block
+  resolved_by: the shop's cron configuration, or the operator
+  blocks: 'exposes: cron'
+- question: Which systems are allowed to call the cron route, so `consumers` stays `[unknown]` for every
+    entry.
+  checked: the front controller authorisation and the config keys
+  resolved_by: deployment documentation, or the shop operator
+  blocks: 'exposes: cron?task=UpdatePacketStatus'
+- question: Which systems or repositories reach the module configuration page; the code shows only that
+    PrestaShop renders it for a signed-in back-office employee.
+  checked: the hook and admin tab registration
+  resolved_by: the shop operator
+  blocks: 'exposes: Packetery::getContent'
+- question: Why the uninstall deletes fewer configuration keys than the module writes (`PACKETERY_LAST_RELEASE_NOTES`,
+    `PACKETERY_SHOW_CONSIGN_PASSWORD` and `PACKETERY_CONSIGN_PASSWORD_RETRIEVAL` survive an uninstall).
+  checked: the install and uninstall paths, the upgrade scripts
+  resolved_by: the module authors
+  blocks: '-'
