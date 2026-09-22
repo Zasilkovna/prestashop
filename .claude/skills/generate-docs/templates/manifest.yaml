@@ -1,0 +1,149 @@
+# Template: `ai-docs/manifest.yaml`
+#
+# Machine-readable inventory of one repository. This is the impact-analysis backbone:
+# cross-repo views (`tools/cross-repo-map/`) are computed from manifests, not from prose.
+#
+# The core keys (`service`, `repo`, `source_commit`, `description`, `publishes`, `consumes`,
+# `exposes`, `calls`, `owns_data`, `reads_external_data`, `frontends`) follow the Orbis KB
+# service manifest, so a platform that harvests Orbis manifests reads this file without
+# conversion. Everything else is our extension: a consumer that knows only the core ignores it.
+#
+# Contract (the validator and the aggregation fail on these):
+#  1. Names are COPIED from source, never paraphrased. Event, endpoint, entity, channel —
+#     all of it must be greppable in the repo. A name that cannot be grepped is a hallucination.
+#  2. If the counterparty (another repo, a contract package) has already named the same thing,
+#     use ITS name. An edge in the map exists only where names match.
+#  3. For envelope/oneof contracts use `Envelope.Case` (e.g. `DsaurEvent.PacketSnapshot`);
+#     several cases sharing one channel and one contract may be grouped as
+#     `Envelope.{CaseA,CaseB}`.
+#  4. Every entry in publishes/consumes/exposes/calls/owns_data/reads_external_data carries
+#     `evidence:` — an anchor `path#Symbol` (see SKILL.md, anchors).
+#  5. Every entry has a prose counterpart in `ai-docs/` (`dependencies.md` or
+#     `reference/<module-id>.md`). The manifest says WHAT, the prose says WHY and WHEN. Drift
+#     between them is an error.
+#  6. What does not follow from the code is NOT guessed: either `unknown`, or an entry in
+#     `unknowns:` below.
+#  7. A section that does not apply to the repo is OMITTED entirely (do not write an empty list).
+#  8. One entry = ONE thing. `entity: Bag, Cage` and `name: A / B` are not records but a list
+#     hidden in a string — the aggregation draws no edge from them and nobody can look them up.
+#     Several entities sharing one store = several entries. (The only exception is the
+#     `Envelope.{A,B}` notation, which the aggregation can expand.)
+#  9. Keys, not values: configuration keys, endpoints and names are copied; connection strings,
+#     URLs with hosts, IPs, credentials, contents of .env/appsettings*/fixtures and personal data
+#     are never written — anchor where the value lives instead. The source repository URL in the
+#     top-level `repo:` key is the one exception.
+#
+# Regenerated as a whole; never edited by hand.
+#
+# Fragments. A `--scope` run writes `manifest.part.<module-id>.yaml`: `service`, `source_commit`,
+# `assumptions: [..]`, `aliases: [..]` (any second name the code uses for the module or its
+# counterparts), the module's entries in the sections below, and its `unknowns`. No header fields
+# otherwise. `assemble.py` merges the fragments into this file and deletes them.
+#
+# Drift. The validator checks both directions: every name, service, entity and alias below is
+# mentioned in some ai-docs page, and every id in a dependency line of the prose (`calls → X`,
+# `called from → X`, `references → X`, `hosts → X`) is a module, a called service, an owner of
+# external data, an alias or the repo id here.
+
+service: <repo-id>                 # canonical id; identical to the front-matter key `repo:` of
+  # every ai-docs document and to the `repo-<id>` label. The repository name from the origin URL
+  # (last path segment, lowercase, without `.git`), or a canonical id the team fixed — then the
+  # URL name is an alias.
+repo: <git-url>                    # Source repository URL — the one exception to rule 9.
+  # OPTIONAL: required only when ai-docs/ lives outside the code repo
+description: <one sentence on what the repo does>
+aliases: [<abbreviation>, <old name>, <name in another system>]
+  # documented ones only, see dependencies.md; merged from the fragments (sorted, deduped).
+  # Omitted when empty.
+generated-by: skill:generate-docs@0.3.5
+source_commit: <sha of HEAD at generation time>
+last-generated: <ISO date>
+assumptions:                       # EXTENSION: what the run had to assume — branch, commit,
+  # anything not determinable from the code. A list of strings, merged from the fragments
+  # (sorted, deduped) and copied into `index.md` under "generation assumptions". Omitted when empty.
+  - <one assumption per string>
+
+modules:                           # module inventory, mirrors the table in overview.md — every
+  # module, the ones under the threshold included
+  - name: <module-id>              # canonical module id (lowercase, e.g. `orders`), identical to
+      # `module:` in the front-matter of the module's document
+    path: <path/to/module>
+    lines: <line count of own logic>
+    doc: reference/<module-id>.md  # or `overview.md` for a module below the threshold
+
+publishes:                         # messages/events the repo emits over a channel. In-process
+  # events (Symfony EventDispatcher, MediatR, .NET events) have no channel and never go here or
+  # under `consumes`; architecture.md describes them, one sentence per event family.
+  - name: <EventName|Envelope.Case>
+    channel: <transport>/<exchange-queue-topic>   # e.g. kafka/orbis.packet-operations.v1
+    contract: <contract package or repo/path>     # where it is defined; `unknown` if nowhere
+    module: <module-id>
+    evidence: <path/File.ext#Symbol>
+    notes: "<optional: when it is emitted, idempotence, ordering>"
+
+consumes:                          # messages/events the repo handles
+  - name: <EventName|Envelope.Case>
+    channel: <transport>/<exchange-queue-topic>
+    contract: <contract package or repo/path>
+    module: <module-id>
+    evidence: <path/File.ext#Symbol>
+    producer: self | external | <repo-id>   # optional, but USE IT when the producer is not
+      # a documented repo: `self` = the repo writes the event for itself (in-DB journal, inner
+      # loop), `external` = a system outside the documented repos emits it. Without this field
+      # the aggregation reports ENVELOPE-GAP ("the envelope is emitted, this case is not") and
+      # nobody knows whether it is a typo or intent. This field is the answer "intent",
+      # evidenced like everything else.
+
+exposes:                           # interfaces the repo offers to others — every registered
+  # route, no threshold; the prose table may group them, the manifest never does
+  - kind: rest | grpc | graphql | cli | library | html   # `html` = server-rendered pages
+      # (extension outside the Orbis core)
+    name: <interface name or path prefix>
+    module: <module-id>
+    consumers: [<repo-id>, ...]    # always a list; `[unknown]` when it cannot be determined
+      # from code — never guess
+    auth: <scheme or `none`>       # scheme only (e.g. `bearer`, `mTLS`) — never a key or token
+    evidence: <path/File.ext#Symbol>
+    unconfirmed: <what exactly is uncertain>   # optional; use it instead of a silent guess —
+      # mandatory for a route whose handler is a framework class (identity, health, template
+      # controllers): evidence = the registering call, plus an `unknowns` item
+    notes: "<optional: what the framework generates here, versioning, rate limits>"
+
+calls:                             # synchronous outbound calls
+  - service: <repo-id | module-id | external system name>   # a module id of THIS repo for an
+      # intra-repo HTTP call (one module calling another over the network)
+    kind: rest | grpc | graphql | db | telemetry | other
+    purpose: <one sentence on what is obtained or commanded>
+    module: <module-id>
+    evidence: <path/File.ext#Symbol>
+
+owns_data:                         # entities for which THIS repo is the source of truth
+  # Local projections/caches of foreign data do NOT belong here — not even when they live in
+  # the repo's own DB. They go under `reads_external_data`. The owner is who decides the value,
+  # not who stores it.
+  - entity: <EntityName>           # class/table name from source
+    store: <engine>/<database-or-schema>   # engine and logical name only — never a host, port
+      # or connection string
+    module: <module-id>
+    evidence: <path/File.ext#Symbol>
+    notes: "<optional: lifecycle, who reads it and how>"
+
+reads_external_data:               # data owned elsewhere that this repo reads or caches
+  - entity: <EntityName>
+    owner: <repo-id | external system name | unknown>
+    via: event <EventName> | api <interface name>
+    module: <module-id>
+    evidence: <path/File.ext#Symbol>
+
+frontends: [<frontend-repo-names>]   # UIs served by / dedicated to the repo; optional
+
+unknowns:                          # machine-readable blind spots — NOT a TODO for a human
+  # Every fact that does not follow from the code goes here. The aggregation computes from it
+  # where the impact analysis has holes. An empty section is omitted; never write `unknowns: []`
+  # as an alibi.
+  - question: <what specifically cannot be determined from the code>
+    checked: <the KIND of source searched>   # e.g. handlers, DI registrations, CI pipeline
+      # definitions, other repos. Name the kind of source, never a path to a secret or config
+      # artefact.
+    resolved_by: <which source would answer it — repo, contract, infra config, a person>
+    blocks: "<what it concerns — e.g. `exposes: Sorting API`, or `-`>"

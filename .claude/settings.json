@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "extraKnownMarketplaces": {
+    "packeta-dev": { "source": { "source": "git", "url": "https://gitlab.zasilkovna.cz/packeta-ai/community/developer-claude-marketplace.git" } }
+  },
+  "enabledPlugins": { "csharp-lsp@claude-plugins-official": true, "php-lsp@claude-plugins-official": true, "esterka@packeta-dev": true },
+  "permissions": {
+    "allow": [
+      "Read", "Grep", "Glob",
+      "Edit(ai-docs/**)", "Edit(ai-docs-review/**)",
+      "Bash(git status *)", "Bash(git log *)", "Bash(git diff *)", "Bash(git branch *)", "Bash(git rev-parse *)",
+      "Bash(python3 .claude/skills/generate-docs/validate.py *)",
+      "Bash(python3 .claude/skills/generate-docs/stale_check.py *)",
+      "Bash(python3 .claude/skills/generate-docs/assemble.py *)"
+    ],
+    "deny": [
+      "Read(.env)", "Read(.env.*)", "Read(**/secrets.json)", "Read(**/*.pfx)", "Read(**/*.pem)", "Read(**/*.key)",
+      "Edit(.gitlab-ci.yml)", "Edit(.github/**)", "Edit(.claude/**)", "Edit(CODEOWNERS)",
+      "Bash(curl *)", "Bash(wget *)", "WebFetch"
+    ]
+  },
+  "sandbox": { "enabled": true, "network": { "allowedDomains": [] } },
+  "hooks": {
+    "Stop": [
+      { "hooks": [ { "type": "command",
+                     "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/skills/generate-docs/stale_check.py\" --repo \"${CLAUDE_PROJECT_DIR}\" --format hook",
+                     "timeout": 10 } ] }
+    ]
+  }
+}
