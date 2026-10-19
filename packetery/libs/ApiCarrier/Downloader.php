@@ -172,4 +172,15 @@ class Downloader
 
         return true;
     }
+
+    /**
+     * @param mixed $manual value of the "manual" request parameter
+     * @param array{class: string} $result result of run()
+     *
+     * @return bool
+     */
+    public static function isSuccessfulManualRun($manual, array $result): bool
+    {
+        return $manual === '1' && $result['class'] === 'success';
+    }
 }

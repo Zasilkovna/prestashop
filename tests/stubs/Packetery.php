@@ -15,9 +15,15 @@ class Packetery
     /** @var string */
     public $version = '3.6.0';
 
+    /** @var array<string, string> translated texts by source text */
+    public $translations = [];
+
+    /**
+     * Escapes like Module::l()
+     */
     public function l(string $string, ...$arguments): string
     {
-        return $string;
+        return htmlspecialchars($this->translations[$string] ?? $string, ENT_COMPAT, 'UTF-8');
     }
 
     public function getContext(): object
@@ -30,8 +36,16 @@ class Packetery
         return '/modules/packetery/';
     }
 
-    public function getAdminLink(string $controller): string
-    {
-        return "/admin/{$controller}";
+    /**
+     * @param array<string, mixed> $params
+     */
+    public function getAdminLink(
+        string $controller,
+        array $params = [],
+        string $anchor = ''
+    ): string {
+        $query = $params === [] ? '' : '?' . http_build_query($params);
+
+        return "/admin/{$controller}{$query}{$anchor}";
     }
 }

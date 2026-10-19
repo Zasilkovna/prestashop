@@ -1,4 +1,5 @@
-3.6.0  - Added: Customer returns via Packeta – configurable eligibility, registered and guest flows for Packeta and non-Packeta orders, and an admin returns page with an optional approval step.
+3.6.0  - Added: Home page with a setup guide as the first item of the Packeta menu.
+       - Added: Customer returns via Packeta – configurable eligibility, registered and guest flows for Packeta and non-Packeta orders, and an admin returns page with an optional approval step.
        - Fixed: Packeta admin menu items now display in each installed shop language instead of the current administrator's language.
 3.5.0  - Fixed: If customer change PP to HD before confirmation order, save and display correct information in confirmation page/e-mail/administration and allow to consign packet.
        - Updated: Modified validation and display of warnings in the module manager.

@@ -141,6 +141,12 @@ class Installer
             ],
             [
                 'parentClass' => 'Packetery',
+                'class' => 'PacketeryHome',
+                'name' => 'Home',
+                'translatedName' => $this->module->l('Home', 'installer'),
+            ],
+            [
+                'parentClass' => 'Packetery',
                 'class' => 'PacketeryOrderGrid',
                 'name' => 'Packeta Orders',
                 'translatedName' => $this->module->l('Packeta Orders', 'installer'),

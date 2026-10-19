@@ -37,9 +37,9 @@ function upgrade_module_3_6_0(Packetery $module): bool
         true
     );
 
-    // register the new "Returns" admin tab (idempotent: existing tabs are skipped) and refresh the
-    // menu: per-language names (older installs stored the admin's current language) and the intended
-    // order (a newly added tab would otherwise land last instead of after "Packeta Orders")
+    // register the new "Home" and "Returns" admin tabs (idempotent: existing tabs are skipped)
+    // and refresh the menu: per-language names (older installs stored the admin's current language)
+    // and the intended order (a newly added tab would otherwise land last instead of in its place)
     return $executeResult !== false
         && $installer->insertMenuItems()
         && $installer->refreshMenuItems();

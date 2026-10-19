@@ -57,6 +57,7 @@ class Uninstaller
     private function deleteMenuItems()
     {
         return $this->deleteTab('Packetery')
+            && $this->deleteTab('PacketeryHome')
             && $this->deleteTab('PacketerySetting')
             && $this->deleteTab('PacketeryCarrierGrid')
             && $this->deleteTab('PacketeryOrderGrid')
@@ -193,6 +194,10 @@ class Uninstaller
             && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_ALLOWED_CARRIERS)
             && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_ALLOWED_COUNTRIES)
             && \Configuration::deleteByName(ConfigHelper::KEY_RETURNS_APPROVE_FIRST)
+            && \Configuration::deleteByName(ConfigHelper::KEY_CARRIERS_MANUALLY_UPDATED)
+            && \Configuration::deleteByName(ConfigHelper::KEY_CRON_LAST_RUN_DOWNLOAD_CARRIERS)
+            && \Configuration::deleteByName(ConfigHelper::KEY_CRON_LAST_RUN_UPDATE_PACKET_STATUS)
+            && \Configuration::deleteByName(ConfigHelper::KEY_CRON_LAST_RUN_GET_CONSIGN_PASSWORD)
         ;
     }
 

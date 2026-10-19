@@ -8,6 +8,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use Packetery\Cron\CronRunLog;
 use Packetery\Cron\Tasks\DeleteLabels;
 use Packetery\Cron\Tasks\DownloadCarriers;
 use Packetery\Cron\Tasks\GetConsignPassword;
@@ -49,6 +50,10 @@ class PacketeryCronModuleFrontController extends ModuleFrontController
 
             return;
         }
+
+        // Before the run, so a failed run counts too
+        $cronRunLog = $this->getModule()->diContainer->get(CronRunLog::class);
+        $cronRunLog->record($task);
 
         switch ($task) {
             case DeleteLabels::getTaskName():
