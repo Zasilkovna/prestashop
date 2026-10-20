@@ -29,13 +29,13 @@
                         {if $step.isDone}
                             <span class="label label-success packetery-setup-marker"><i class="material-icons" aria-hidden="true">check</i></span>
                         {elseif $step.isInformative}
-                            <span class="packetery-setup-marker packetery-setup-marker-info"><i class="material-icons" aria-hidden="true">store</i></span>
+                            <span class="packetery-setup-marker packetery-setup-marker-info text-muted"><i class="material-icons" aria-hidden="true">store</i></span>
                         {else}
                             <span class="packetery-setup-marker packetery-setup-marker-todo">{$step.number|intval}</span>
                         {/if}
                         <div class="packetery-setup-step-body">
                             <div class="packetery-setup-step-heading">
-                                <span class="packetery-setup-step-title" role="heading" aria-level="3">{$step.title|escape:'html':'UTF-8'}</span>
+                                <span class="packetery-setup-step-title{if $step.isDone} text-muted{/if}" role="heading" aria-level="3">{$step.title|escape:'html':'UTF-8'}</span>
                                 {if $step.isDone}
                                     <span class="label label-success packetery-setup-step-label packetery-setup-step-done-label">{l s='Done' mod='packetery'}</span>
                                 {/if}
@@ -47,7 +47,7 @@
                                 {/if}
                             </div>
                             <p class="help-block packetery-setup-step-description">{$step.description|escape:'html':'UTF-8'}</p>
-                            <div class="packetery-setup-step-location">{$step.location|escape:'html':'UTF-8'}</div>
+                            <div class="help-block packetery-setup-step-location">{$step.location|escape:'html':'UTF-8'}</div>
                             {if $step.cronTasks}
                                 <ul class="list-group packetery-setup-cron-tasks">
                                     {foreach from=$step.cronTasks item=cronTask}
@@ -56,10 +56,10 @@
                                             {if $cronTask.lastRun}
                                                 <span class="label label-success packetery-setup-cron-marker"><i class="material-icons" aria-hidden="true">check</i></span>
                                             {else}
-                                                <span class="packetery-setup-cron-marker packetery-setup-marker-todo"></span>
+                                                <span class="packetery-setup-cron-marker packetery-setup-marker-todo text-muted"></span>
                                             {/if}
                                             <span class="packetery-setup-cron-name">{$cronTask.name|escape:'html':'UTF-8'}</span>
-                                            <span class="packetery-setup-cron-status">
+                                            <span class="packetery-setup-cron-status text-muted">
                                                 {if $cronTask.lastRun}
                                                     {capture assign=cronLastRunDate}{dateFormat date=$cronTask.lastRun full=1}{/capture}
                                                     {l s='Last run: %s' sprintf=[$cronLastRunDate] mod='packetery'}

@@ -105,11 +105,6 @@
     font-weight: 600;
 }
 
-#packetery-home .packetery-setup-cron-marker.packetery-setup-marker-todo,
-#packetery-home .packetery-setup-step-done .packetery-setup-step-title {
-    color: #8c959b;
-}
-
 #packetery-home .packetery-setup-step-label {
     display: inline-block;
     line-height: inherit;
@@ -134,14 +129,8 @@
     line-height: 1.5;
 }
 
-#packetery-home .packetery-setup-step-location,
-#packetery-home .packetery-setup-cron-status,
-#packetery-home .packetery-setup-marker-info {
-    color: #6c868e;
-}
-
 #packetery-home .packetery-setup-step-location {
-    margin-top: 4px;
+    margin: 4px 0 0;
     font-size: 12px;
 }
 
@@ -155,7 +144,7 @@
     align-items: center;
     gap: 12px;
     padding: 10px 12px;
-    border: 1px solid #eeeeee;
+    border-width: 1px;
 }
 
 #packetery-home .packetery-setup-cron-name {
