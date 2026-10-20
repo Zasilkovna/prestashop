@@ -29,4 +29,5 @@ require __DIR__ . '/stubs/Currency.php';
 require __DIR__ . '/stubs/Country.php';
 require __DIR__ . '/stubs/Validate.php';
 require __DIR__ . '/stubs/Db.php';
+require __DIR__ . '/stubs/Shop.php';
 require __DIR__ . '/stubs/Tools.php';

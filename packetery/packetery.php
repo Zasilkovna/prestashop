@@ -229,7 +229,11 @@ class Packetery extends CarrierModule
 
         if (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') {
             $downloader = $this->diContainer->get(Packetery\ApiCarrier\Downloader::class);
-            Tools::redirectAdmin($this->getAdminLink('PacketeryCarrierGrid', ['messages' => [$downloader->run()]]));
+            $result = $downloader->run();
+            if (Tools::getValue('manual') === '1' && Packetery\ApiCarrier\Downloader::isSuccessfulRun($result)) {
+                Packetery\Tools\ConfigHelper::update(Packetery\Tools\ConfigHelper::KEY_CARRIERS_MANUALLY_UPDATED, 1);
+            }
+            Tools::redirectAdmin($this->getAdminLink('PacketeryCarrierGrid', ['messages' => [$result]]));
         }
         if (Tools::getIsset('messages')) {
             $this->context->smarty->assign('messages', Tools::getValue('messages'));
@@ -252,7 +256,7 @@ class Packetery extends CarrierModule
         );
 
         if ($configHelper->getApiKey()) {
-            $updateCarriersLink = $this->getAdminLink('PacketeryCarrierGrid', ['action' => 'updateCarriers']);
+            $updateCarriersLink = $this->getAdminLink('PacketeryCarrierGrid', ['action' => 'updateCarriers', 'manual' => 1]);
             $this->context->smarty->assign('updateCarriersLink', $updateCarriersLink);
         }
 
@@ -366,7 +370,8 @@ class Packetery extends CarrierModule
             $output .= $this->displayConfirmation($this->l('Settings updated'));
         }
 
-        $output .= $this->displayForm($isStatusSubmitted, $isReturnsSubmitted);
+        $isStatusTabRequested = $isSubmit === false && Packetery\Module\ConfigurationPage::isPacketStatusTrackingTabRequested();
+        $output .= $this->displayForm($isStatusSubmitted || $isStatusTabRequested, $isReturnsSubmitted);
 
         return $output;
     }
@@ -590,6 +595,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('deleteLabelsUrl', $deleteLabelsUrl);
         $this->context->smarty->assign('numberOfDays', $numberOfDays);
         $this->context->smarty->assign('numberOfFiles', $numberOfFiles);
+        $this->context->smarty->assign('cronJobsAnchor', Packetery\Module\ConfigurationPage::CRON_JOBS_ANCHOR);
 
         return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/generateCronInfoBlock.tpl');
     }

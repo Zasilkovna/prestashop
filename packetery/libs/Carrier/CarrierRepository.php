@@ -92,6 +92,23 @@ class CarrierRepository
     }
 
     /**
+     * Checks the carriers of all shops, like the other carrier queries
+     *
+     * @throws DatabaseException
+     */
+    public function hasActivePairedCarrier(): bool
+    {
+        $result = $this->dbTools->getValue(
+            'SELECT 1 FROM `' . _DB_PREFIX_ . 'packetery_address_delivery` `pad`
+            JOIN `' . _DB_PREFIX_ . 'carrier` `c` USING(`id_carrier`)
+            WHERE `c`.`active` = 1
+            AND `c`.`deleted` = 0'
+        );
+
+        return (int) $result === 1;
+    }
+
+    /**
      * @return array|false
      *
      * @throws DatabaseException

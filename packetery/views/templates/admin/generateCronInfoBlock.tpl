@@ -3,7 +3,7 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *}
 
-<div class="panel">
+<div class="panel" id="{$cronJobsAnchor|escape:'html':'UTF-8'}">
     <div class="panel-heading">
         {l s='CRON jobs' mod='packetery'}
     </div>

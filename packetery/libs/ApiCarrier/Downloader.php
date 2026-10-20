@@ -172,4 +172,14 @@ class Downloader
 
         return true;
     }
+
+    /**
+     * @param array{class: string} $result result of run()
+     *
+     * @return bool
+     */
+    public static function isSuccessfulRun(array $result): bool
+    {
+        return $result['class'] === 'success';
+    }
 }

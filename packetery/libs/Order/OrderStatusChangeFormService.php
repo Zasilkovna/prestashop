@@ -12,6 +12,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use Packetery\AbstractFormService;
+use Packetery\Module\ConfigurationPage;
 use Packetery\Module\Options;
 use Packetery\PacketTracking\PacketStatusFactory;
 
@@ -34,6 +35,11 @@ class OrderStatusChangeFormService extends AbstractFormService
     public function getSubmitActionKey()
     {
         return self::SUBMIT_ACTION_KEY;
+    }
+
+    protected function getFormId(): ?string
+    {
+        return ConfigurationPage::ORDER_STATUS_CHANGE_ANCHOR;
     }
 
     /**

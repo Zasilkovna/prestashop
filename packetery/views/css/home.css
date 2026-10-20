@@ -1,0 +1,164 @@
+/* #packetery-home outranks core .panel, .label and .list-group */
+#packetery-home .packetery-setup-guide-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 24px;
+    height: auto;
+    min-height: 32px;
+}
+
+#packetery-home .packetery-setup-guide-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 0 1 280px;
+    min-width: 200px;
+    margin-left: auto;
+}
+
+#packetery-home .packetery-setup-guide-progress .progress {
+    flex: 1 1 auto;
+    height: 8px;
+    margin: 0;
+}
+
+#packetery-home .packetery-setup-guide-percent {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#packetery-home .packetery-setup-steps,
+#packetery-home .packetery-setup-cron-tasks {
+    list-style: none;
+}
+
+/* The list-group-item border is the step separator */
+#packetery-home .packetery-setup-step {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px 16px;
+    margin: 0;
+    padding: 16px 0;
+    border-width: 0 0 1px;
+    border-radius: 0;
+}
+
+#packetery-home .packetery-setup-step:last-child {
+    border-bottom-width: 0;
+}
+
+#packetery-home .packetery-setup-marker,
+#packetery-home .packetery-setup-cron-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0;
+    border-radius: 50%;
+}
+
+#packetery-home .packetery-setup-marker {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#packetery-home .packetery-setup-cron-marker {
+    width: 22px;
+    height: 22px;
+}
+
+#packetery-home .packetery-setup-marker .material-icons {
+    font-size: 16px;
+}
+
+#packetery-home .packetery-setup-marker-info .material-icons {
+    font-size: 22px;
+}
+
+#packetery-home .packetery-setup-cron-marker .material-icons {
+    font-size: 12px;
+}
+
+#packetery-home .packetery-setup-marker-todo {
+    border: 2px solid currentColor;
+}
+
+#packetery-home .packetery-setup-step-body {
+    flex: 1 1 360px;
+    min-width: 0;
+}
+
+#packetery-home .packetery-setup-step-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+#packetery-home .packetery-setup-step-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+#packetery-home .packetery-setup-step-label {
+    display: inline-block;
+    line-height: inherit;
+}
+
+#packetery-home .packetery-setup-step-done-label {
+    padding: 1px 6px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 10px;
+}
+
+#packetery-home .packetery-setup-step-label.label-default {
+    padding: 1px 5px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 2px;
+}
+
+#packetery-home .packetery-setup-step-description {
+    margin: 4px 0 0;
+    line-height: 1.5;
+}
+
+#packetery-home .packetery-setup-step-location {
+    margin: 4px 0 0;
+    font-size: 12px;
+}
+
+#packetery-home .packetery-setup-cron-tasks {
+    margin: 12px 0 0;
+}
+
+/* The core rules for .panel > .list-group remove the side borders of nested items. Restore the full frame. */
+#packetery-home .packetery-setup-cron-task {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-width: 1px;
+}
+
+#packetery-home .packetery-setup-cron-name {
+    flex: 1 1 auto;
+    font-weight: 600;
+}
+
+#packetery-home .packetery-setup-cron-status {
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+#packetery-home .packetery-setup-step-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}

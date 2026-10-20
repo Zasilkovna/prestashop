@@ -182,7 +182,20 @@ abstract class AbstractFormService
             ],
         ];
 
-        return $helperForm->generateForm([$formDefinition]);
+        $formId = $this->getFormId();
+        if ($formId === null) {
+            return $helperForm->generateForm([$formDefinition]);
+        }
+
+        $formDefinition['form']['id_form'] = $formId;
+
+        // HelperForm form.tpl reads id_form only from the fieldset under the key "form".
+        return $helperForm->generateForm(['form' => $formDefinition]);
+    }
+
+    protected function getFormId(): ?string
+    {
+        return null;
     }
 
     /**
