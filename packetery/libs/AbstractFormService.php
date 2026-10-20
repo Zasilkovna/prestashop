@@ -189,6 +189,7 @@ abstract class AbstractFormService
 
         $formDefinition['form']['id_form'] = $formId;
 
+        // HelperForm form.tpl reads id_form only from the fieldset under the key "form".
         return $helperForm->generateForm(['form' => $formDefinition]);
     }
 
