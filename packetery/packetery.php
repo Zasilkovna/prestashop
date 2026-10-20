@@ -370,7 +370,7 @@ class Packetery extends CarrierModule
             $output .= $this->displayConfirmation($this->l('Settings updated'));
         }
 
-        $isStatusTabRequested = $isSubmit === false && Packetery\SetupGuide\SetupGuidePresenter::isPacketStatusTrackingTabRequested();
+        $isStatusTabRequested = $isSubmit === false && Packetery\Module\ConfigurationPage::isPacketStatusTrackingTabRequested();
         $output .= $this->displayForm($isStatusSubmitted || $isStatusTabRequested, $isReturnsSubmitted);
 
         return $output;
@@ -595,7 +595,7 @@ class Packetery extends CarrierModule
         $this->context->smarty->assign('deleteLabelsUrl', $deleteLabelsUrl);
         $this->context->smarty->assign('numberOfDays', $numberOfDays);
         $this->context->smarty->assign('numberOfFiles', $numberOfFiles);
-        $this->context->smarty->assign('cronJobsAnchor', Packetery\SetupGuide\SetupGuidePresenter::CRON_JOBS_ANCHOR);
+        $this->context->smarty->assign('cronJobsAnchor', Packetery\Module\ConfigurationPage::CRON_JOBS_ANCHOR);
 
         return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/generateCronInfoBlock.tpl');
     }

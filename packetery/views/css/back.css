@@ -148,7 +148,7 @@
     color: #777;
 }
 
-/* The fixed .page-head ends at 174 px in PS 9. The margin keeps the setup guide anchor targets below it after the jump. */
+/* The fixed .page-head ends at 174 px in PS 9. The margin keeps the anchor targets below it after the jump. */
 #packetery-cron-jobs,
 [id^="payment_cod_"],
 #packetery-order-status-change {

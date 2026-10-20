@@ -72,11 +72,6 @@ class SetupGuidePresenterTest extends TestCase
         self::CRON_CONSIGNMENT_CODE_RUN => true,
     ];
 
-    protected function tearDown(): void
-    {
-        \Tools::$values = [];
-    }
-
     public function testStepsAreInDisplayOrderWithInformativeStepLast(): void
     {
         $data = $this->present($this->createState([]));
@@ -417,29 +412,6 @@ class SetupGuidePresenterTest extends TestCase
         $buttons = $this->findStep($this->present($state)['steps'], SetupGuideStep::COD_PAYMENTS)['buttons'];
 
         $this->assertSame([$expectedUrl], array_column($buttons, 'url'));
-    }
-
-    /**
-     * @return array<string, array{array<string, string>, bool}>
-     */
-    public static function packetStatusTrackingTabRequestProvider(): array
-    {
-        return [
-            'tab requested' => [['packetery_tab' => 'packet_status_tracking'], true],
-            'other tab requested' => [['packetery_tab' => 'returns'], false],
-            'no tab requested' => [[], false],
-        ];
-    }
-
-    /**
-     * @param array<string, string> $requestValues
-     */
-    #[DataProvider('packetStatusTrackingTabRequestProvider')]
-    public function testPacketStatusTrackingTabIsRequestedByTabParameter(array $requestValues, bool $expected): void
-    {
-        \Tools::$values = $requestValues;
-
-        $this->assertSame($expected, SetupGuidePresenter::isPacketStatusTrackingTabRequested());
     }
 
     #[DataProvider('doneEditUrlProvider')]

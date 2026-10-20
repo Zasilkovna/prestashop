@@ -15,6 +15,7 @@ if (!defined('_PS_VERSION_')) {
 use Packetery\Cron\Tasks\DownloadCarriers;
 use Packetery\Cron\Tasks\GetConsignPassword;
 use Packetery\Cron\Tasks\UpdatePacketStatus;
+use Packetery\Module\ConfigurationPage;
 
 /**
  * @phpstan-type Button array{label: string, url: string, isPrimary: bool}
@@ -34,26 +35,12 @@ use Packetery\Cron\Tasks\UpdatePacketStatus;
  */
 class SetupGuidePresenter
 {
-    /** views/css/back.css also uses this ID */
-    public const CRON_JOBS_ANCHOR = 'packetery-cron-jobs';
-    /** views/css/back.css also uses this ID */
-    public const ORDER_STATUS_CHANGE_ANCHOR = 'packetery-order-status-change';
-    private const CONFIGURATION_TAB_PARAMETER = 'packetery_tab';
-    private const PACKET_STATUS_TRACKING_TAB = 'packet_status_tracking';
-    /** HelperForm builds the checkbox id from the field name payment_cod and the module name */
-    private const PAYMENT_COD_ANCHOR_PREFIX = 'payment_cod_';
-
     /** @var \Packetery */
     private $module;
 
     public function __construct(\Packetery $module)
     {
         $this->module = $module;
-    }
-
-    public static function isPacketStatusTrackingTabRequested(): bool
-    {
-        return \Tools::getValue(self::CONFIGURATION_TAB_PARAMETER) === self::PACKET_STATUS_TRACKING_TAB;
     }
 
     /**
@@ -178,7 +165,7 @@ class SetupGuidePresenter
 
     private function getPrimaryUrl(SetupGuide $setupGuide, string $stepId): string
     {
-        $packetStatusTrackingTab = [self::CONFIGURATION_TAB_PARAMETER => self::PACKET_STATUS_TRACKING_TAB];
+        $packetStatusTrackingTab = [ConfigurationPage::TAB_PARAMETER => ConfigurationPage::PACKET_STATUS_TRACKING_TAB];
 
         switch ($stepId) {
             case SetupGuideStep::CARRIERS_UPDATE:
@@ -187,13 +174,13 @@ class SetupGuidePresenter
             case SetupGuideStep::COD_PAYMENTS:
                 $paymentModuleName = $setupGuide->getFirstPaymentModuleName();
 
-                return $this->getConfigurationUrl([], $paymentModuleName === null ? '' : '#' . self::PAYMENT_COD_ANCHOR_PREFIX . $paymentModuleName);
+                return $this->getConfigurationUrl([], $paymentModuleName === null ? '' : '#' . ConfigurationPage::PAYMENT_COD_ANCHOR_PREFIX . $paymentModuleName);
             case SetupGuideStep::PACKET_STATUS_TRACKING:
                 return $this->getConfigurationUrl($packetStatusTrackingTab);
             case SetupGuideStep::ORDER_STATUS_CHANGE:
-                return $this->getConfigurationUrl($packetStatusTrackingTab, '#' . self::ORDER_STATUS_CHANGE_ANCHOR);
+                return $this->getConfigurationUrl($packetStatusTrackingTab, '#' . ConfigurationPage::ORDER_STATUS_CHANGE_ANCHOR);
             case SetupGuideStep::CRON_JOBS:
-                return $this->getConfigurationUrl([], '#' . self::CRON_JOBS_ANCHOR);
+                return $this->getConfigurationUrl([], '#' . ConfigurationPage::CRON_JOBS_ANCHOR);
             default:
                 return $this->getConfigurationUrl();
         }
