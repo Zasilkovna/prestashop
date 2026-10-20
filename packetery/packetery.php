@@ -230,7 +230,7 @@ class Packetery extends CarrierModule
         if (Tools::getIsset('action') && Tools::getValue('action') === 'updateCarriers') {
             $downloader = $this->diContainer->get(Packetery\ApiCarrier\Downloader::class);
             $result = $downloader->run();
-            if (Packetery\ApiCarrier\Downloader::isSuccessfulManualRun(Tools::getValue('manual'), $result)) {
+            if (Tools::getValue('manual') === '1' && Packetery\ApiCarrier\Downloader::isSuccessfulRun($result)) {
                 Packetery\Tools\ConfigHelper::update(Packetery\Tools\ConfigHelper::KEY_CARRIERS_MANUALLY_UPDATED, 1);
             }
             Tools::redirectAdmin($this->getAdminLink('PacketeryCarrierGrid', ['messages' => [$result]]));

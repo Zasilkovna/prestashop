@@ -14,33 +14,23 @@ use PHPUnit\Framework\TestCase;
 
 class DownloaderTest extends TestCase
 {
-    private const MANUAL = '1';
-    private const NOT_MANUAL = false;
-    private const SUCCESS = ['class' => 'success'];
-    private const FAILURE = ['class' => 'danger'];
-
     /**
-     * @return array<string, array{string|false, array{class: string}, bool}>
+     * @return array<string, array{array{class: string}, bool}>
      */
-    public static function manualRunProvider(): array
+    public static function runResultProvider(): array
     {
         return [
-            'manual update that succeeded' => [self::MANUAL, self::SUCCESS, true],
-            'manual update that failed' => [self::MANUAL, self::FAILURE, false],
-            'automatic update that succeeded' => [self::NOT_MANUAL, self::SUCCESS, false],
-            'automatic update that failed' => [self::NOT_MANUAL, self::FAILURE, false],
+            'update that succeeded' => [['class' => 'success'], true],
+            'update that failed' => [['class' => 'danger'], false],
         ];
     }
 
     /**
      * @param array{class: string} $result
      */
-    #[DataProvider('manualRunProvider')]
-    public function testIsSuccessfulManualRun(
-        string|false $manual,
-        array $result,
-        bool $expected
-    ): void {
-        $this->assertSame($expected, Downloader::isSuccessfulManualRun($manual, $result));
+    #[DataProvider('runResultProvider')]
+    public function testIsSuccessfulRun(array $result, bool $expected): void
+    {
+        $this->assertSame($expected, Downloader::isSuccessfulRun($result));
     }
 }
